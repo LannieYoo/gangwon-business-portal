@@ -16,6 +16,7 @@ Notes:
 
 import argparse
 import os
+from pathlib import Path
 import sys
 from typing import List
 
@@ -67,7 +68,16 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.tesseract_cmd:
-        pytesseract.pytesseract.tesseract_cmd = args.tesseract_cmd
+        pytesseract_path = Path(args.tesseract_cmd).expanduser()
+        if not pytesseract_path.is_file():
+            print(f"Error: provided tesseract-cmd does not exist: {pytesseract_path}", file=sys.stderr)
+            sys.exit(1)
+        pytesseract.pytesseract.tesseract_cmd = str(pytesseract_path)
+    else:
+        # Auto-detect the common Windows installation path so users don't need to provide it explicitly.
+        default_windows_path = Path("C:/Program Files/Tesseract-OCR/tesseract.exe")
+        if default_windows_path.is_file():
+            pytesseract.pytesseract.tesseract_cmd = str(default_windows_path)
 
     input_dir = args.input_dir
     output_md = args.output_md
