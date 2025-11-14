@@ -49,15 +49,15 @@
 
 ### 企业会员端模块
 
-| 模块        | 目录建议                                    | 主要职责                                                                   |
-| ----------- | ------------------------------------------- | -------------------------------------------------------------------------- |
-| Auth        | `frontend/src/member/modules/auth`        | 登录、注册、找回账号、整合审批中提示与密码策略校验                         |
-| Home        | `frontend/src/member/modules/home`        | 个人化首页、横幅轮播、最新公告、项目快捷入口                               |
-| Profile     | `frontend/src/member/modules/profile`     | 企业基本信息维护、企业资料修改 （营业执照号不可修改）、附件更新            |
-| About       | `frontend/src/member/modules/about`       | 系统介绍、常见问题、运营方联系方式                                         |
-| Projects    | `frontend/src/member/modules/projects`    | 公告列表、详情与附件、项目在线申报流程                                     |
-| Performance | `frontend/src/member/modules/performance` | 绩效数据录入（销售雇佣/政府支持/知识产权）、提交、草稿管理、状态查询、导出 |
-| Support     | `frontend/src/member/modules/support`     | 1:1 咨询、FAQ、工单跟踪、通知中心                                          |
+| 模块        | 目录建议                                    | 主要职责                                                                         |
+| ----------- | ------------------------------------------- | -------------------------------------------------------------------------------- |
+| Auth        | `frontend/src/member/modules/auth`        | 登录、注册、找回账号、整合审批中提示与密码策略校验                               |
+| Home        | `frontend/src/member/modules/home`        | 个人化首页、横幅轮播、最新公告、项目快捷入口                                     |
+| Profile     | `frontend/src/member/modules/profile`     | 企业基本信息维护、企业资料修改 （营业执照号不可修改）、附件更新                  |
+| About       | `frontend/src/member/modules/about`       | 系统介绍、常见问题、运营方联系方式                                               |
+| Projects    | `frontend/src/member/modules/projects`    | 公告列表、详情与附件、项目在线申报流程                                           |
+| Performance | `frontend/src/member/modules/performance` | 绩效数据录入（销售雇佣/政府支持/知识产权）、<br />提交、草稿管理、状态查询、导出 |
+| Support     | `frontend/src/member/modules/support`     | 1:1 咨询、FAQ、工单跟踪、通知中心                                                |
 
 ### 管理员端模块
 
@@ -73,14 +73,15 @@
 
 ### 共享层
 
-| 模块       | 目录建议                           | 主要职责                                        |
-| ---------- | ---------------------------------- | ----------------------------------------------- |
-| Components | `frontend/src/shared/components` | UI 基础组件（表格、表单、图表、上传）、业务组件 |
-| Hooks      | `frontend/src/shared/hooks`      | 通用逻辑（认证守卫、表单校验、文件上传、分页）  |
-| Services   | `frontend/src/shared/services`   | Axios 客户端封装、API 定义、错误处理、缓存策略  |
-| Styles     | `frontend/src/shared/styles`     | 基础样式、主题变量、BEM 规范样式库              |
-| Utils      | `frontend/src/shared/utils`      | 辅助函数、常量、权限工具、日期与数字格式化      |
-| i18n       | `frontend/src/shared/i18n`       | 语言资源、语言切换逻辑、动态文案加载            |
+| 模块       | 目录建议                           | 主要职责                                                                    |
+| ---------- | ---------------------------------- | --------------------------------------------------------------------------- |
+| Components | `frontend/src/shared/components` | UI 基础组件（表格、表单、图表、上传）、业务组件                             |
+| Hooks      | `frontend/src/shared/hooks`      | 通用逻辑（认证守卫、表单校验、文件上传、分页）                              |
+| Stores     | `frontend/src/shared/stores`     | Zustand 状态管理（认证状态、UI状态、全局配置）                              |
+| Services   | `frontend/src/shared/services`   | Axios 客户端封装、API 定义、错误处理、缓存策略                              |
+| Styles     | `frontend/src/shared/styles`     | 基础样式、主题变量、BEM 规范样式库                                          |
+| Utils      | `frontend/src/shared/utils`      | 辅助函数、常量、权限工具、日期与数字格式化                                  |
+| i18n       | `frontend/src/shared/i18n`       | 语言资源、语言切换逻辑、动态文案加载                                        |
 
 ### Mock 数据层（开发阶段）
 
@@ -165,11 +166,11 @@
 | 文件名           | 路径                         | 主要职责                                           |
 | ---------------- | ---------------------------- | -------------------------------------------------- |
 | requirements.txt | `backend/requirements.txt` | Python 依赖列表                                    |
-| pyproject.toml   | `backend/pyproject.toml`   | （可选）Poetry/PEP 621 `<br>`项目信息与依赖管理  |
-| .env.local       | `backend/.env.local`       | 数据库、JWT Secret、`<br>`外部服务密钥           |
+| pyproject.toml   | `backend/pyproject.toml`   | （可选）Poetry/PEP 621 项目信息与依赖管理  |
+| .env.local       | `backend/.env.local`       | 数据库、JWT Secret、外部服务密钥           |
 | .gitignore       | `backend/.gitignore`       | Git 忽略文件配置                                   |
-| main.py          | `backend/src/main.py`      | FastAPI 应用入口、路由注册、`<br>`CORS、异常处理 |
-| alembic.ini      | `backend/alembic.ini`      | 数据库迁移配置 `<br>`（若使用 Alembic）          |
+| main.py          | `backend/src/main.py`      | FastAPI 应用入口、路由注册、CORS、异常处理 |
+| alembic.ini      | `backend/alembic.ini`      | 数据库迁移配置 （若使用 Alembic）          |
 
 ## 代码风格
 
@@ -180,10 +181,12 @@
 
 ## 技术栈
 
-- **前端**：Vite 6.x、React 18.3+、Zustand 5.x、TanStack Query 5.x、React Router DOM 6.x、Axios 1.x、ECharts 5.x、Tailwind CSS 3.x、react-i18next 15.x。
-- **后端**：FastAPI 0.115+、SQLAlchemy 2.0+（异步 ORM）、asyncpg（PostgreSQL 异步驱动）、Pydantic 2.x、Python 3.11+、Uvicorn + Gunicorn、HTTPX、Authlib、APScheduler、Redis（可选）。
-- **数据层**：Supabase PostgreSQL、Supabase Storage、Supabase Migrations。
-- **运维**：Docker、GitHub Actions（CI/CD）、Sentry（错误追踪）、Prometheus + Grafana（监控）。
+| 分类             | 技术栈                                                                                                                                                   |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **前端**   | Vite 6.x、React 18.3+、Zustand 5.x、TanStack Query 5.x、React Router DOM 6.x、Axios 1.x、ECharts 5.x、Tailwind CSS 3.x、react-i18next 15.x               |
+| **后端**   | FastAPI 0.115+、SQLAlchemy 2.0+（异步 ORM）、asyncpg（PostgreSQL 异步驱动）、Pydantic 2.x、Python 3.11+、Uvicorn + Gunicorn、HTTPX、Authlib、APScheduler |
+| **数据层** | Supabase PostgreSQL、Supabase Storage、Supabase Migrations                                                                                               |
+| **运维**   | Docker、GitHub Actions（CI/CD）、Sentry（错误追踪）、Prometheus + Grafana（监控）                                                                        |
 
 ## 命名规范
 

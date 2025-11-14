@@ -1,0 +1,63 @@
+{
+  "projects": {
+    "title": "项目管理",
+    "subtitle": "查看支持项目公告并申请",
+    "searchPlaceholder": "按项目名称或关键词搜索",
+    "resultsCount": "共{{count}}个项目",
+    "apply": "申请",
+    "status": {
+      "recruiting": "招募中",
+      "ongoing": "进行中",
+      "closed": "已结束"
+    },
+    "types": {
+      "startup": "创业支持",
+      "rd": "R&D支持",
+      "export": "出口支持",
+      "investment": "投资引进"
+    },
+    "detail": {
+      "basicInfo": "基本信息",
+      "duration": "项目期间",
+      "applicationDeadline": "申请截止日期",
+      "eligibility": "申请资格",
+      "supportDetails": "支持内容",
+      "requiredDocuments": "提交文件",
+      "contact": "联系方式",
+      "contactPerson": "负责人",
+      "contactPhone": "电话号码",
+      "contactEmail": "邮箱"
+    },
+    "application": {
+      "title": "项目申请",
+      "subtitle": "请填写项目申请书",
+      "saveDraft": "保存草稿",
+      "notice": {
+        "title": "申请前确认事项",
+        "item1": "请准确填写所有必填项(*)。",
+        "item2": "附件只能使用PDF、DOC、XLS格式。",
+        "item3": "提交后无法修改，请谨慎填写。"
+      },
+      "form": {
+        "title": "填写申请书",
+        "projectTitle": "项目名称",
+        "projectTitlePlaceholder": "请输入项目标题",
+        "budget": "申请预算 (韩元)",
+        "duration": "项目期间",
+        "objectives": "项目目标",
+        "objectivesHint": "请描述通过项目要达成的具体目标。",
+        "scope": "项目范围",
+        "expectedResults": "预期效果",
+        "teamMembers": "参与人员",
+        "teamMembersPlaceholder": "请输入姓名、职责、经历等"
+      },
+      "attachments": {
+        "title": "附件文件",
+        "description": "请上传营业执照、项目计划书等必要文件。",
+        "hint": "文件格式: PDF, DOC, XLS / 最大 10MB",
+        "uploaded": "已上传文件"
+      }
+    }
+  }
+}
+

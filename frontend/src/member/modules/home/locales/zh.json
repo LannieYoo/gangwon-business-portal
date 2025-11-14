@@ -1,0 +1,31 @@
+{
+  "home": {
+    "banner": {
+      "welcome": "欢迎来到江原创业门户",
+      "subtitle": "为创业企业提供一站式支持系统"
+    },
+    "quickLinks": {
+      "title": "快捷入口",
+      "projectApplication": "项目申请",
+      "projectApplicationDesc": "查看支持项目公告并申请",
+      "performance": "业绩管理",
+      "performanceDesc": "输入并提交季度业绩数据",
+      "profile": "企业信息",
+      "profileDesc": "管理企业基本信息和资料",
+      "support": "客户支持",
+      "supportDesc": "1:1咨询及查看FAQ"
+    },
+    "notices": {
+      "title": "最新公告",
+      "important": "重要"
+    },
+    "stats": {
+      "title": "我的概况",
+      "projectsParticipated": "参与项目",
+      "performanceSubmitted": "已提交业绩",
+      "pendingReview": "待审核",
+      "documentsUploaded": "已上传文档"
+    }
+  }
+}
+

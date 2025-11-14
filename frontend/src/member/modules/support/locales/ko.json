@@ -1,0 +1,35 @@
+{
+  "support": {
+    "title": "원스톱 지원",
+    "subtitle": "문의, FAQ, 알림 센터",
+    "inquiry": "1:1 문의",
+    "faq": "자주 묻는 질문",
+    "notifications": "알림 센터",
+    "newInquiry": "새 문의",
+    "inquiryHistory": "문의 내역",
+    "noInquiries": "문의 내역이 없습니다",
+    "noNotifications": "알림이 없습니다",
+    "category": "카테고리",
+    "selectCategory": "카테고리 선택",
+    "categories": {
+      "project": "사업 관리",
+      "performance": "실적 관리",
+      "account": "계정 관리",
+      "technical": "기술 지원",
+      "other": "기타"
+    },
+    "subject": "제목",
+    "subjectPlaceholder": "문의 제목을 입력하세요",
+    "content": "내용",
+    "contentPlaceholder": "상세 내용을 입력하세요",
+    "status": {
+      "pending": "답변 대기",
+      "answered": "답변 완료"
+    },
+    "createdDate": "작성일",
+    "answeredDate": "답변일",
+    "searchFAQ": "FAQ 검색",
+    "views": "조회수"
+  }
+}
+

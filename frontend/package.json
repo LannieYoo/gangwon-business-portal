@@ -1,0 +1,49 @@
+{
+  "name": "gangwon-business-portal",
+  "version": "1.0.0",
+  "description": "江原特别自治道创业企业绩效管理门户",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist node_modules/.vite"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "zustand": "^5.0.2",
+    "@tanstack/react-query": "^5.62.7",
+    "axios": "^1.7.9",
+    "react-i18next": "^15.1.3",
+    "i18next": "^24.2.0",
+    "i18next-browser-languagedetector": "^8.0.2",
+    "echarts": "^5.5.1",
+    "echarts-for-react": "^3.0.2",
+    "date-fns": "^4.1.0",
+    "clsx": "^2.1.1",
+    "react-hook-form": "^7.54.2",
+    "msw": "^2.6.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.3",
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8.4.49",
+    "autoprefixer": "^10.4.20"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
+

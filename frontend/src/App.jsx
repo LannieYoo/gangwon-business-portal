@@ -1,0 +1,51 @@
+/**
+ * Root App Component
+ */
+
+import { useEffect } from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '@shared/i18n';
+import { router } from './router';
+import { useAuth } from '@shared/hooks';
+import { LoadingOverlay } from '@shared/components';
+
+// Create a QueryClient instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000 // 5 minutes
+    }
+  }
+});
+
+export default function App() {
+  const { isAuthenticated, getCurrentUser, isLoading } = useAuth();
+  
+  // Initialize authentication state on app load
+  useEffect(() => {
+    if (isAuthenticated) {
+      getCurrentUser().catch(() => {
+        // Silently fail if token is invalid
+      });
+    }
+  }, []);
+  
+  if (isLoading) {
+    return <LoadingOverlay text="초기화 중..." />;
+  }
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <I18nextProvider i18n={i18n}>
+        <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </I18nextProvider>
+    </QueryClientProvider>
+  );
+}
+

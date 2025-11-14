@@ -1,0 +1,37 @@
+{
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "logout": "退出登录",
+    "email": "邮箱",
+    "password": "密码",
+    "passwordConfirm": "确认密码",
+    "rememberMe": "记住我",
+    "forgotPassword": "忘记密码？",
+    "noAccount": "还没有账号？",
+    "hasAccount": "已有账号？",
+    "loginFailed": "登录失败",
+    "registerSuccess": "注册成功",
+    "registerFailed": "注册失败",
+    "invalidEmail": "请输入有效的邮箱地址",
+    "invalidPassword": "密码至少需要8个字符",
+    "passwordMismatch": "密码不匹配",
+    "emailRequired": "请输入邮箱",
+    "passwordRequired": "请输入密码",
+    "loginTitle": "登录",
+    "registerTitle": "注册",
+    "welcomeBack": "欢迎回来",
+    "createAccount": "创建新账号",
+    "redirectToLogin": "正在跳转到登录页面...",
+    "companyInfo": "企业信息",
+    "accountInfo": "账号信息"
+  },
+  "validation": {
+    "required": "此项为必填项",
+    "passwordMismatch": "密码不匹配",
+    "minLength": "至少需要{{min}}个字符",
+    "maxLength": "最多允许{{max}}个字符",
+    "invalidFormat": "格式不正确"
+  }
+}
+

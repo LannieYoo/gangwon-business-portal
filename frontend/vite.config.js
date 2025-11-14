@@ -1,0 +1,48 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@shared': path.resolve(__dirname, './src/shared'),
+      '@member': path.resolve(__dirname, './src/member'),
+      '@admin': path.resolve(__dirname, './src/admin'),
+      '@mocks': path.resolve(__dirname, './src/mocks')
+    },
+    extensions: ['.jsx', '.js', '.json']
+  },
+  server: {
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_BASE_URL || 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-query': ['@tanstack/react-query', 'axios'],
+          'vendor-state': ['zustand'],
+          'vendor-i18n': ['react-i18next', 'i18next'],
+          'vendor-charts': ['echarts', 'echarts-for-react']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom']
+  }
+});
+

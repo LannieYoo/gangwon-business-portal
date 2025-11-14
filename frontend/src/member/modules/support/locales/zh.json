@@ -1,0 +1,35 @@
+{
+  "support": {
+    "title": "一站式支持",
+    "subtitle": "咨询、FAQ、通知中心",
+    "inquiry": "1:1咨询",
+    "faq": "常见问题",
+    "notifications": "通知中心",
+    "newInquiry": "新建咨询",
+    "inquiryHistory": "咨询历史",
+    "noInquiries": "暂无咨询记录",
+    "noNotifications": "暂无通知",
+    "category": "分类",
+    "selectCategory": "选择分类",
+    "categories": {
+      "project": "项目管理",
+      "performance": "业绩管理",
+      "account": "账户管理",
+      "technical": "技术支持",
+      "other": "其他"
+    },
+    "subject": "标题",
+    "subjectPlaceholder": "请输入咨询标题",
+    "content": "内容",
+    "contentPlaceholder": "请输入详细内容",
+    "status": {
+      "pending": "待回复",
+      "answered": "已回复"
+    },
+    "createdDate": "创建日期",
+    "answeredDate": "回复日期",
+    "searchFAQ": "搜索FAQ",
+    "views": "浏览量"
+  }
+}
+

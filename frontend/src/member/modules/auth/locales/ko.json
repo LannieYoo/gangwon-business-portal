@@ -1,0 +1,37 @@
+{
+  "auth": {
+    "login": "로그인",
+    "register": "회원가입",
+    "logout": "로그아웃",
+    "email": "이메일",
+    "password": "비밀번호",
+    "passwordConfirm": "비밀번호 확인",
+    "rememberMe": "로그인 상태 유지",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "noAccount": "계정이 없으신가요?",
+    "hasAccount": "이미 계정이 있으신가요?",
+    "loginFailed": "로그인에 실패했습니다",
+    "registerSuccess": "회원가입이 완료되었습니다",
+    "registerFailed": "회원가입에 실패했습니다",
+    "invalidEmail": "유효한 이메일 주소를 입력해주세요",
+    "invalidPassword": "비밀번호는 최소 8자 이상이어야 합니다",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다",
+    "emailRequired": "이메일을 입력해주세요",
+    "passwordRequired": "비밀번호를 입력해주세요",
+    "loginTitle": "로그인",
+    "registerTitle": "회원가입",
+    "welcomeBack": "다시 오신 것을 환영합니다",
+    "createAccount": "새 계정 만들기",
+    "redirectToLogin": "로그인 페이지로 이동합니다...",
+    "companyInfo": "기업 정보",
+    "accountInfo": "계정 정보"
+  },
+  "validation": {
+    "required": "필수 항목입니다",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다",
+    "minLength": "최소 {{min}}자 이상 입력해주세요",
+    "maxLength": "최대 {{max}}자까지 입력 가능합니다",
+    "invalidFormat": "올바른 형식이 아닙니다"
+  }
+}
+

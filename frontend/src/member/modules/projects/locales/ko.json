@@ -1,0 +1,63 @@
+{
+  "projects": {
+    "title": "사업 관리",
+    "subtitle": "지원 사업 공고 확인 및 신청",
+    "searchPlaceholder": "사업명 또는 키워드로 검색",
+    "resultsCount": "총 {{count}}개의 사업",
+    "apply": "신청하기",
+    "status": {
+      "recruiting": "모집중",
+      "ongoing": "진행중",
+      "closed": "마감"
+    },
+    "types": {
+      "startup": "창업 지원",
+      "rd": "R&D 지원",
+      "export": "수출 지원",
+      "investment": "투자 유치"
+    },
+    "detail": {
+      "basicInfo": "기본 정보",
+      "duration": "사업 기간",
+      "applicationDeadline": "신청 마감일",
+      "eligibility": "신청 자격",
+      "supportDetails": "지원 내용",
+      "requiredDocuments": "제출 서류",
+      "contact": "문의처",
+      "contactPerson": "담당자",
+      "contactPhone": "전화번호",
+      "contactEmail": "이메일"
+    },
+    "application": {
+      "title": "사업 신청",
+      "subtitle": "사업 신청서를 작성해주세요",
+      "saveDraft": "임시저장",
+      "notice": {
+        "title": "신청 전 확인사항",
+        "item1": "모든 필수 항목(*)을 정확하게 입력해주세요.",
+        "item2": "첨부 파일은 PDF, DOC, XLS 형식만 가능합니다.",
+        "item3": "제출 후에는 수정이 불가능하니 신중하게 작성해주세요."
+      },
+      "form": {
+        "title": "신청서 작성",
+        "projectTitle": "사업명",
+        "projectTitlePlaceholder": "사업의 제목을 입력하세요",
+        "budget": "신청 예산 (원)",
+        "duration": "사업 기간",
+        "objectives": "사업 목표",
+        "objectivesHint": "사업을 통해 달성하고자 하는 구체적인 목표를 작성하세요.",
+        "scope": "사업 범위",
+        "expectedResults": "기대 효과",
+        "teamMembers": "참여 인력",
+        "teamMembersPlaceholder": "이름, 역할, 경력 등을 입력하세요"
+      },
+      "attachments": {
+        "title": "첨부 서류",
+        "description": "사업자등록증, 사업계획서 등 필요한 서류를 첨부해주세요.",
+        "hint": "파일 형식: PDF, DOC, XLS / 최대 10MB",
+        "uploaded": "업로드된 파일"
+      }
+    }
+  }
+}
+
