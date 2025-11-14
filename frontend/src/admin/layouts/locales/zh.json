@@ -1,0 +1,25 @@
+{
+  "admin": {
+    "header": {
+      "title": "江原创业门户管理员",
+      "admin": "管理员",
+      "profile": "个人资料",
+      "logout": "退出登录",
+      "notifications": "通知"
+    },
+    "menu": {
+      "dashboard": "仪表盘",
+      "members": "企业会员",
+      "performance": "业绩管理",
+      "projects": "项目管理",
+      "content": "内容管理",
+      "settings": "系统设置",
+      "reports": "统计报表"
+    },
+    "footer": {
+      "copyright": "江原创业门户. 版权所有.",
+      "version": "版本"
+    }
+  }
+}
+

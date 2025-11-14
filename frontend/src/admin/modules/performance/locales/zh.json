@@ -1,0 +1,29 @@
+{
+  "admin": {
+    "performance": {
+      "title": "业绩管理",
+      "approve": "批准",
+      "requestRevision": "请求补正",
+      "status": {
+        "pending": "待审批",
+        "revision": "补正中",
+        "approved": "已批准"
+      },
+      "table": {
+        "documentType": "文档类型",
+        "fileName": "文件名",
+        "memberName": "企业名称",
+        "year": "年度",
+        "quarter": "季度",
+        "status": "状态",
+        "actions": "操作"
+      },
+      "revisionModal": {
+        "title": "补正请求",
+        "description": "请输入需要补正的项。",
+        "placeholder": "请输入补正请求原因..."
+      }
+    }
+  }
+}
+

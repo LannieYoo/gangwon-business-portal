@@ -8,28 +8,68 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
+import { apiService } from '@shared/services';
+import { API_PREFIX } from '@shared/utils/constants';
 
 export default function Home() {
   const { t } = useTranslation();
   const [banners, setBanners] = useState([]);
   const [notices, setNotices] = useState([]);
+  const [stats, setStats] = useState({
+    projectsParticipated: 0,
+    performanceSubmitted: 0,
+    pendingReview: 0,
+    documentsUploaded: 0
+  });
   const [currentBanner, setCurrentBanner] = useState(0);
 
   useEffect(() => {
-    // TODO: 从 API 获取横幅和公告数据
-    // Mock data for development
-    setBanners([
-      { id: 1, imageUrl: '/images/banner1.jpg', link: '/about' },
-      { id: 2, imageUrl: '/images/banner2.jpg', link: '/projects' },
-      { id: 3, imageUrl: '/images/banner3.jpg', link: '/support' }
-    ]);
-
-    setNotices([
-      { id: 1, title: '2025年度创业支持项目公告', date: '2025-01-15', important: true },
-      { id: 2, title: '第一季度绩效数据提交通知', date: '2025-01-10', important: false },
-      { id: 3, title: '系统维护通知', date: '2025-01-05', important: false }
-    ]);
+    loadBanners();
+    loadNotices();
+    loadStats();
   }, []);
+
+  const loadBanners = async () => {
+    try {
+      const response = await apiService.get(`${API_PREFIX}/content/banners`);
+      if (response.banners) {
+        setBanners(response.banners.map(b => ({
+          id: b.id,
+          imageUrl: b.imageUrl,
+          link: b.linkUrl
+        })));
+      }
+    } catch (error) {
+      console.error('Failed to load banners:', error);
+    }
+  };
+
+  const loadNotices = async () => {
+    try {
+      const response = await apiService.get(`${API_PREFIX}/content/notices`, { limit: 5 });
+      if (response.notices) {
+        setNotices(response.notices.map(n => ({
+          id: n.id,
+          title: n.title,
+          date: n.publishedAt ? new Date(n.publishedAt).toISOString().split('T')[0] : '',
+          important: n.category === 'announcement'
+        })));
+      }
+    } catch (error) {
+      console.error('Failed to load notices:', error);
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      const response = await apiService.get(`${API_PREFIX}/member/dashboard/stats`);
+      if (response.stats) {
+        setStats(response.stats);
+      }
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    }
+  };
 
   // 横幅自动切换
   useEffect(() => {
@@ -163,19 +203,19 @@ export default function Home() {
         <h2>{t('home.stats.title')}</h2>
         <div className="stats-grid">
           <Card className="stat-card">
-            <div className="stat-value">3</div>
+            <div className="stat-value">{stats.projectsParticipated}</div>
             <div className="stat-label">{t('home.stats.projectsParticipated')}</div>
           </Card>
           <Card className="stat-card">
-            <div className="stat-value">8</div>
+            <div className="stat-value">{stats.performanceSubmitted}</div>
             <div className="stat-label">{t('home.stats.performanceSubmitted')}</div>
           </Card>
           <Card className="stat-card">
-            <div className="stat-value">2</div>
+            <div className="stat-value">{stats.pendingReview}</div>
             <div className="stat-label">{t('home.stats.pendingReview')}</div>
           </Card>
           <Card className="stat-card">
-            <div className="stat-value">15</div>
+            <div className="stat-value">{stats.documentsUploaded}</div>
             <div className="stat-label">{t('home.stats.documentsUploaded')}</div>
           </Card>
         </div>

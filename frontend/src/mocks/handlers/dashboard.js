@@ -1,0 +1,247 @@
+/**
+ * MSW Handlers for Dashboard API
+ */
+
+import { http, HttpResponse } from 'msw';
+import { API_PREFIX, API_BASE_URL } from '@shared/utils/constants';
+import { delay, loadMockData, shouldSimulateError, getErrorStatus } from '../config.js';
+
+// Base URL for dashboard API (use absolute paths - MSW best practice)
+const ADMIN_BASE_URL = `${API_BASE_URL}${API_PREFIX}/admin/dashboard`;
+const MEMBER_BASE_URL = `${API_BASE_URL}${API_PREFIX}/member/dashboard`;
+
+// Initialize data on first load
+let membersData = null;
+let performanceData = null;
+
+async function initializeData() {
+  if (!membersData) {
+    const members = await loadMockData('members');
+    membersData = members.members || [];
+  }
+  if (!performanceData) {
+    const performance = await loadMockData('performance');
+    performanceData = performance.performanceRecords || [];
+  }
+}
+
+// Get admin dashboard stats
+async function getAdminDashboardStats(req) {
+  await delay();
+  
+  if (shouldSimulateError(ADMIN_BASE_URL)) {
+    return HttpResponse.json(
+      { message: 'Internal server error', code: 'SERVER_ERROR' },
+      { status: getErrorStatus() }
+    );
+  }
+  
+  await initializeData();
+  
+  // Parse query parameters
+  const url = new URL(req.request.url);
+  const yearParam = url.searchParams.get('year');
+  const year = yearParam === 'all' ? 'all' : (yearParam ? parseInt(yearParam, 10) : new Date().getFullYear());
+  const quarterParam = url.searchParams.get('quarter');
+  const quarter = quarterParam || 'all';
+  const businessLicense = url.searchParams.get('businessLicense');
+  
+  console.log('[MSW Dashboard] Request params:', { year, quarter, businessLicense, url: req.request.url });
+  console.log('[MSW Dashboard] Members data count:', membersData?.length || 0);
+  console.log('[MSW Dashboard] Performance data count:', performanceData?.length || 0);
+  
+  // Calculate stats - only count approved members
+  const totalMembers = membersData.filter(m => m.approvalStatus === 'approved').length;
+  
+  // Filter performance records by year and quarter, and optionally by business license
+  let filteredPerformance = performanceData.filter(p => {
+    // If year is 'all', don't filter by year
+    if (year === 'all') {
+      return p.status === 'approved';
+    }
+    return p.year === year && p.status === 'approved';
+  });
+  
+  // Filter by business license if provided
+  if (businessLicense) {
+    const member = membersData.find(m => m.businessLicense === businessLicense);
+    if (member) {
+      filteredPerformance = filteredPerformance.filter(p => p.memberId === member.id);
+    } else {
+      filteredPerformance = [];
+    }
+  }
+  
+  if (quarter !== 'all') {
+    if (quarter === 'annual') {
+      filteredPerformance = filteredPerformance.filter(p => p.quarter === null || p.quarter === undefined);
+    } else if (quarter.startsWith('Q')) {
+      const quarterNum = parseInt(quarter.replace('Q', ''), 10);
+      filteredPerformance = filteredPerformance.filter(p => p.quarter === quarterNum);
+    }
+  }
+  
+  console.log('[MSW Dashboard] Filtered performance count:', filteredPerformance.length);
+  
+  // Calculate stats
+  const totalSales = filteredPerformance.reduce((sum, p) => sum + (p.salesRevenue || 0), 0);
+  // 雇佣合计使用新雇佣基准 (newHires)
+  const totalEmployment = filteredPerformance.reduce((sum, p) => sum + (p.newHires || 0), 0);
+  const totalIntellectualProperty = filteredPerformance.reduce((sum, p) => {
+    return sum + (p.intellectualProperty?.length || 0);
+  }, 0);
+  
+  // Generate chart data (time series by year and quarter)
+  const chartData = generateChartData(performanceData, membersData, year, quarter, businessLicense);
+  
+  const stats = {
+    totalMembers,
+    totalSales,
+    totalEmployment,
+    totalIntellectualProperty
+  };
+  
+  console.log('[MSW Dashboard] Calculated stats:', stats);
+  
+  return HttpResponse.json({
+    stats,
+    chartData,
+    year,
+    quarter
+  });
+}
+
+// Generate chart data for dashboard
+function generateChartData(performanceData, membersData, selectedYear, selectedQuarter, businessLicense) {
+  // Filter approved performance records
+  let filteredData = performanceData.filter(p => p.status === 'approved');
+  
+  // Filter by year if specified
+  if (selectedYear !== 'all' && selectedYear !== null && selectedYear !== undefined) {
+    filteredData = filteredData.filter(p => p.year === selectedYear);
+  }
+  
+  // Filter by quarter if specified
+  if (selectedQuarter !== 'all' && selectedQuarter !== null && selectedQuarter !== undefined) {
+    if (selectedQuarter === 'annual') {
+      filteredData = filteredData.filter(p => p.quarter === null || p.quarter === undefined);
+    } else if (selectedQuarter.startsWith('Q')) {
+      const quarterNum = parseInt(selectedQuarter.replace('Q', ''), 10);
+      filteredData = filteredData.filter(p => p.quarter === quarterNum);
+    }
+  }
+  
+  // Filter by business license if provided
+  if (businessLicense) {
+    const member = membersData.find(m => m.businessLicense === businessLicense);
+    if (member) {
+      filteredData = filteredData.filter(p => p.memberId === member.id);
+    } else {
+      filteredData = [];
+    }
+  }
+  
+  // Group by year and quarter
+  const dataByPeriod = {};
+  filteredData.forEach(p => {
+    const key = `${p.year}-Q${p.quarter || 'A'}`;
+    if (!dataByPeriod[key]) {
+      dataByPeriod[key] = {
+        year: p.year,
+        quarter: p.quarter,
+        sales: 0,
+        employment: 0,
+        members: new Set(),
+        ip: 0
+      };
+    }
+    dataByPeriod[key].sales += p.salesRevenue || 0;
+    dataByPeriod[key].employment += p.newHires || 0; // 新雇佣基准
+    dataByPeriod[key].members.add(p.memberId);
+    dataByPeriod[key].ip += p.intellectualProperty?.length || 0;
+  });
+  
+  // Convert to arrays and sort by year and quarter
+  let chartData = Object.values(dataByPeriod)
+    .map(item => ({
+      period: item.quarter ? `${item.year} Q${item.quarter}` : `${item.year} Annual`,
+      year: item.year,
+      quarter: item.quarter,
+      sales: item.sales,
+      employment: item.employment,
+      members: item.members.size,
+      ip: item.ip
+    }))
+    .sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      if (a.quarter === null) return 1;
+      if (b.quarter === null) return -1;
+      return a.quarter - b.quarter;
+    });
+  
+  // If specific year and quarter are selected, only show that period
+  // Otherwise, show all periods that match the filters
+  // (This allows showing trends when filtering by year but not quarter)
+  
+  return {
+    members: chartData.map(d => ({ period: d.period, value: d.members })),
+    sales: chartData.map(d => ({ period: d.period, value: d.sales })),
+    employment: chartData.map(d => ({ period: d.period, value: d.employment })),
+    ip: chartData.map(d => ({ period: d.period, value: d.ip })),
+    salesEmployment: chartData.map(d => ({
+      period: d.period,
+      sales: d.sales,
+      employment: d.employment
+    }))
+  };
+}
+
+// Get member dashboard stats
+async function getMemberDashboardStats(req) {
+  await delay();
+  
+  if (shouldSimulateError(MEMBER_BASE_URL)) {
+    return HttpResponse.json(
+      { message: 'Internal server error', code: 'SERVER_ERROR' },
+      { status: getErrorStatus() }
+    );
+  }
+  
+  await initializeData();
+  
+  const memberId = 1; // Mock: current user ID
+  
+  // Get member's performance records
+  const memberPerformance = performanceData.filter(p => p.memberId === memberId);
+  
+  // Calculate stats
+  const projectsParticipated = 3; // Mock: would come from project applications
+  const performanceSubmitted = memberPerformance.filter(p => p.status !== 'draft').length;
+  const pendingReview = memberPerformance.filter(p => p.status === 'pending' || p.status === 'revision_required').length;
+  const documentsUploaded = 15; // Mock: would come from attachments
+  
+  return HttpResponse.json({
+    stats: {
+      projectsParticipated,
+      performanceSubmitted,
+      pendingReview,
+      documentsUploaded
+    }
+  });
+}
+
+// Export handlers
+// Use absolute paths (MSW best practice)
+export const dashboardHandlers = [
+  // Admin: Get dashboard stats
+  http.get(`${ADMIN_BASE_URL}`, getAdminDashboardStats),
+  http.get(`${ADMIN_BASE_URL}/stats`, getAdminDashboardStats),
+  http.get(`${API_BASE_URL}${API_PREFIX}/admin/dashboard`, getAdminDashboardStats),
+  
+  // Member: Get dashboard stats
+  http.get(`${MEMBER_BASE_URL}`, getMemberDashboardStats),
+  http.get(`${MEMBER_BASE_URL}/stats`, getMemberDashboardStats),
+  http.get(`${API_BASE_URL}${API_PREFIX}/member/home/stats`, getMemberDashboardStats),
+  http.get(`${API_BASE_URL}${API_PREFIX}/member/dashboard/stats`, getMemberDashboardStats)
+];
+

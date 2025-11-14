@@ -1,0 +1,43 @@
+/**
+ * Admin Footer Styles
+ */
+
+.admin-footer {
+  background-color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 1.5rem;
+  margin-top: 3rem;
+}
+
+.footer-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.footer-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-section p {
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-footer {
+    padding: 1rem;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
+

@@ -1,0 +1,47 @@
+{
+  "admin": {
+    "members": {
+      "title": "企业会员管理",
+      "export": "导出 Excel",
+      "approve": "批准",
+      "reject": "拒绝",
+      "search": {
+        "companyName": "企业名称",
+        "representative": "代表人姓名",
+        "businessField": "业务领域",
+        "placeholder": "请输入搜索关键词"
+      },
+      "status": {
+        "pending": "待审批",
+        "approved": "已批准",
+        "rejected": "已拒绝"
+      },
+      "table": {
+        "companyName": "企业名称",
+        "representative": "代表人",
+        "businessNumber": "营业执照号",
+        "address": "地址",
+        "industry": "行业",
+        "status": "状态",
+        "actions": "操作"
+      },
+      "detail": {
+        "notFound": "找不到会员信息",
+        "basicInfo": "基本信息",
+        "businessNumber": "营业执照号",
+        "companyName": "企业名称",
+        "representative": "代表人",
+        "legalNumber": "法人号码",
+        "address": "地址",
+        "industry": "行业",
+        "phone": "电话",
+        "email": "邮箱",
+        "searchNiceDnb": "查询 Nice D&B",
+        "viewPerformance": "查看业绩管理",
+        "nicednbInfo": "Nice D&B 信息",
+        "nicednbPlaceholder": "可通过 Nice D&B API 查询企业信息。"
+      }
+    }
+  }
+}
+

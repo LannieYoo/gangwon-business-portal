@@ -1,0 +1,25 @@
+{
+  "admin": {
+    "settings": {
+      "title": "系统设置",
+      "tabs": {
+        "business": "业务设置",
+        "terms": "条款管理",
+        "system": "系统设置"
+      },
+      "business": {
+        "title": "业务领域设置",
+        "placeholder": "业务领域设置功能开发中"
+      },
+      "terms": {
+        "title": "条款管理",
+        "placeholder": "条款管理功能开发中"
+      },
+      "system": {
+        "title": "系统设置",
+        "placeholder": "系统设置功能开发中"
+      }
+    }
+  }
+}
+

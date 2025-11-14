@@ -1,0 +1,30 @@
+{
+  "admin": {
+    "content": {
+      "title": "콘텐츠 관리",
+      "tabs": {
+        "banners": "배너",
+        "popups": "팝업",
+        "notices": "공지사항",
+        "news": "뉴스 자료"
+      },
+      "banners": {
+        "title": "배너 관리",
+        "placeholder": "배너 관리 기능 개발 예정"
+      },
+      "popups": {
+        "title": "팝업 관리",
+        "placeholder": "팝업 관리 기능 개발 예정"
+      },
+      "notices": {
+        "title": "공지사항 관리",
+        "placeholder": "공지사항 관리 기능 개발 예정"
+      },
+      "news": {
+        "title": "뉴스 자료 관리",
+        "placeholder": "뉴스 자료 관리 기능 개발 예정"
+      }
+    }
+  }
+}
+

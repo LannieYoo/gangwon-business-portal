@@ -1,0 +1,21 @@
+{
+  "admin": {
+    "projects": {
+      "title": "项目管理",
+      "create": "创建项目",
+      "status": {
+        "active": "进行中",
+        "inactive": "未激活"
+      },
+      "table": {
+        "title": "项目名称",
+        "target": "受理对象",
+        "startDate": "开始日期",
+        "endDate": "截止日期",
+        "status": "状态",
+        "actions": "操作"
+      }
+    }
+  }
+}
+

@@ -8,6 +8,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
+import { apiService } from '@shared/services';
+import { API_PREFIX } from '@shared/utils/constants';
 
 export default function ProjectDetail() {
   const { t } = useTranslation();
@@ -17,55 +19,44 @@ export default function ProjectDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: 从 API 获取项目详情
-    // Mock data for development
-    setTimeout(() => {
-      setProject({
-        id: id,
-        title: '2025 창업기업 지원 사업',
-        type: 'startup',
-        status: 'recruiting',
-        startDate: '2025-01-01',
-        endDate: '2025-12-31',
-        applicationDeadline: '2025-02-28',
-        budget: '50000000',
-        description: '신규 창업 기업을 위한 종합 지원 프로그램입니다.',
-        objectives: [
-          '창업 초기 기업의 안정적 성장 지원',
-          '혁신 기술 개발 및 사업화 촉진',
-          '지역 경제 활성화 및 일자리 창출'
-        ],
-        eligibility: [
-          '강원특별자치도 내 소재 기업',
-          '창업 7년 이내 기업',
-          '상시 근로자 수 50명 이하'
-        ],
-        supportDetails: [
-          '사업화 자금: 최대 3천만원',
-          '컨설팅 및 멘토링 지원',
-          '네트워킹 및 마케팅 지원'
-        ],
-        requiredDocuments: [
-          '사업계획서',
-          '사업자등록증 사본',
-          '재무제표 (최근 2년)',
-          '기타 증빙 서류'
-        ],
-        contactPerson: '김담당',
-        contactPhone: '033-123-4567',
-        contactEmail: 'support@gangwonbiz.or.kr',
-        attachments: [
-          { id: 1, name: '사업 공고문.pdf', size: '1.2MB', downloadUrl: '#' },
-          { id: 2, name: '신청서 양식.docx', size: '245KB', downloadUrl: '#' },
-          { id: 3, name: '사업계획서 작성 가이드.pdf', size: '3.5MB', downloadUrl: '#' }
-        ],
-        views: 234,
-        createdAt: '2024-12-01',
-        updatedAt: '2024-12-15'
-      });
-      setLoading(false);
-    }, 500);
+    loadProjectDetail();
   }, [id]);
+
+  const loadProjectDetail = async () => {
+    setLoading(true);
+    try {
+      const response = await apiService.get(`${API_PREFIX}/projects/${id}`);
+      if (response.project) {
+        const p = response.project;
+        setProject({
+          id: p.id,
+          title: p.title,
+          type: p.type,
+          status: p.status,
+          startDate: p.startDate,
+          endDate: p.endDate,
+          applicationDeadline: p.recruitmentEndDate,
+          budget: p.budget,
+          description: p.description,
+          objectives: p.objectives || [],
+          eligibility: p.scope ? [p.scope] : [],
+          supportDetails: [],
+          requiredDocuments: [],
+          contactPerson: p.manager,
+          contactPhone: p.managerPhone,
+          contactEmail: p.managerEmail,
+          attachments: p.attachments || [],
+          views: p.views || 0,
+          createdAt: p.createdAt,
+          updatedAt: p.updatedAt
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load project detail:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (

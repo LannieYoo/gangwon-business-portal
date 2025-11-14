@@ -4,7 +4,7 @@
 
 import axios from 'axios';
 import { API_BASE_URL, API_PREFIX, ACCESS_TOKEN_KEY, HTTP_STATUS } from '@shared/utils/constants';
-import { getStorage, removeStorage } from '@shared/utils/storage';
+import { getStorage, setStorage, removeStorage } from '@shared/utils/storage';
 
 // Create axios instance
 const apiClient = axios.create({

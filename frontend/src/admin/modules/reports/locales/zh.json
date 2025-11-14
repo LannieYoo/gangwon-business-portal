@@ -1,0 +1,18 @@
+{
+  "admin": {
+    "reports": {
+      "title": "统计报表",
+      "quarter": {
+        "all": "全部",
+        "Q1": "第一季度",
+        "Q2": "第二季度",
+        "Q3": "第三季度",
+        "Q4": "第四季度"
+      },
+      "exportExcel": "导出 Excel",
+      "exportCSV": "导出 CSV",
+      "placeholder": "统计报表功能开发中"
+    }
+  }
+}
+

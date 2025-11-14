@@ -10,10 +10,13 @@ import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
+import { apiService } from '@shared/services';
+import { API_PREFIX } from '@shared/utils/constants';
 
 export default function Profile() {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [companyData, setCompanyData] = useState({
     companyName: '',
     businessLicense: '',
@@ -31,24 +34,37 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    // TODO: 从 API 获取企业信息
-    // Mock data for development
-    setCompanyData({
-      companyName: '강원테크',
-      businessLicense: '123-45-67890',
-      corporationNumber: '110111-1234567',
-      establishedDate: '2020-03-15',
-      representativeName: '김철수',
-      phone: '033-123-4567',
-      address: '강원특별자치도 춘천시 중앙로 1',
-      region: '춘천시',
-      category: 'tech',
-      industry: 'software',
-      description: '혁신적인 소프트웨어 솔루션을 제공하는 기업입니다.',
-      website: 'https://gangwontech.com',
-      logo: null
-    });
+    loadProfile();
   }, []);
+
+  const loadProfile = async () => {
+    setLoading(true);
+    try {
+      const response = await apiService.get(`${API_PREFIX}/member/profile`);
+      if (response.member) {
+        const m = response.member;
+        setCompanyData({
+          companyName: m.companyName || '',
+          businessLicense: m.businessLicense || '',
+          corporationNumber: m.corporationNumber || '',
+          establishedDate: m.establishedDate || '',
+          representativeName: m.representativeName || '',
+          phone: m.phone || '',
+          address: m.address || '',
+          region: m.region || '',
+          category: m.category || '',
+          industry: m.industry || '',
+          description: m.description || '',
+          website: m.website || '',
+          logo: m.logo || null
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (field, value) => {
     setCompanyData(prev => ({
@@ -59,11 +75,10 @@ export default function Profile() {
 
   const handleSave = async () => {
     try {
-      // TODO: API 호출하여 데이터 저장
-      console.log('Saving company data:', companyData);
+      await apiService.put(`${API_PREFIX}/member/profile`, companyData);
       setIsEditing(false);
-      // 성功 메시지 표시
       alert(t('message.saveSuccess'));
+      loadProfile();
     } catch (error) {
       console.error('Failed to save:', error);
       alert(t('message.saveFailed'));
@@ -84,13 +99,13 @@ export default function Profile() {
   };
 
   const regionOptions = [
-    { value: '춘천시', label: '춘천시' },
-    { value: '원주시', label: '원주시' },
-    { value: '강릉시', label: '강릉시' },
-    { value: '동해시', label: '동해시' },
-    { value: '태백시', label: '태백시' },
-    { value: '속초시', label: '속초시' },
-    { value: '삼척시', label: '삼척시' }
+    { value: '춘천시', label: t('profile.regions.춘천시') },
+    { value: '원주시', label: t('profile.regions.원주시') },
+    { value: '강릉시', label: t('profile.regions.강릉시') },
+    { value: '동해시', label: t('profile.regions.동해시') },
+    { value: '태백시', label: t('profile.regions.태백시') },
+    { value: '속초시', label: t('profile.regions.속초시') },
+    { value: '삼척시', label: t('profile.regions.삼척시') }
   ];
 
   const categoryOptions = [
@@ -212,16 +227,14 @@ export default function Profile() {
             />
           </div>
 
-          <div className="form-group">
-            <label>{t('member.region')} *</label>
-            <Select
-              value={companyData.region}
-              onChange={(e) => handleChange('region', e.target.value)}
-              options={regionOptions}
-              disabled={!isEditing}
-              required
-            />
-          </div>
+          <Select
+            label={t('member.region')}
+            value={companyData.region}
+            onChange={(e) => handleChange('region', e.target.value)}
+            options={regionOptions}
+            disabled={!isEditing}
+            required
+          />
         </div>
       </Card>
 
@@ -229,27 +242,23 @@ export default function Profile() {
       <Card>
         <h2>{t('profile.sections.businessInfo')}</h2>
         <div className="form-grid">
-          <div className="form-group">
-            <label>{t('member.category')} *</label>
-            <Select
-              value={companyData.category}
-              onChange={(e) => handleChange('category', e.target.value)}
-              options={categoryOptions}
-              disabled={!isEditing}
-              required
-            />
-          </div>
+          <Select
+            label={t('member.category')}
+            value={companyData.category}
+            onChange={(e) => handleChange('category', e.target.value)}
+            options={categoryOptions}
+            disabled={!isEditing}
+            required
+          />
 
-          <div className="form-group">
-            <label>{t('member.industry')} *</label>
-            <Select
-              value={companyData.industry}
-              onChange={(e) => handleChange('industry', e.target.value)}
-              options={industryOptions}
-              disabled={!isEditing}
-              required
-            />
-          </div>
+          <Select
+            label={t('member.industry')}
+            value={companyData.industry}
+            onChange={(e) => handleChange('industry', e.target.value)}
+            options={industryOptions}
+            disabled={!isEditing}
+            required
+          />
 
           <div className="form-group full-width">
             <label>{t('member.website')}</label>

@@ -10,6 +10,8 @@ import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Select from '@shared/components/Select';
+import { apiService } from '@shared/services';
+import { API_PREFIX } from '@shared/utils/constants';
 
 export default function ProjectList() {
   const { t } = useTranslation();
@@ -18,75 +20,47 @@ export default function ProjectList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // TODO: 从 API 获取项目列表
-    // Mock data for development
-    const mockProjects = [
-      {
-        id: 1,
-        title: '2025 창업기업 지원 사업',
-        type: 'startup',
-        status: 'recruiting',
-        startDate: '2025-01-01',
-        endDate: '2025-12-31',
-        budget: '50000000',
-        description: '신규 창업 기업을 위한 종합 지원 프로그램',
-        attachments: 3,
-        views: 234
-      },
-      {
-        id: 2,
-        title: '기술개발 R&D 지원',
-        type: 'rd',
-        status: 'recruiting',
-        startDate: '2025-02-01',
-        endDate: '2025-11-30',
-        budget: '100000000',
-        description: '기술 혁신을 위한 R&D 프로젝트 지원',
-        attachments: 5,
-        views: 456
-      },
-      {
-        id: 3,
-        title: '수출 지원 프로그램',
-        type: 'export',
-        status: 'closed',
-        startDate: '2024-06-01',
-        endDate: '2024-12-31',
-        budget: '30000000',
-        description: '해외 시장 진출을 위한 지원',
-        attachments: 2,
-        views: 123
-      }
-    ];
-    setProjects(mockProjects);
-    setFilteredProjects(mockProjects);
+    loadProjects();
   }, []);
 
+  const loadProjects = async () => {
+    setLoading(true);
+    try {
+      const params = {
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        type: typeFilter !== 'all' ? typeFilter : undefined,
+        search: searchTerm || undefined
+      };
+      const response = await apiService.get(`${API_PREFIX}/projects`, params);
+      if (response.projects) {
+        const formattedProjects = response.projects.map(p => ({
+          id: p.id,
+          title: p.title,
+          type: p.type,
+          status: p.status,
+          startDate: p.startDate,
+          endDate: p.endDate,
+          budget: p.budget,
+          description: p.description,
+          attachments: p.attachments?.length || 0,
+          views: p.views || 0
+        }));
+        setProjects(formattedProjects);
+        setFilteredProjects(formattedProjects);
+      }
+    } catch (error) {
+      console.error('Failed to load projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let filtered = [...projects];
-
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(project =>
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(project => project.status === statusFilter);
-    }
-
-    // Type filter
-    if (typeFilter !== 'all') {
-      filtered = filtered.filter(project => project.type === typeFilter);
-    }
-
-    setFilteredProjects(filtered);
-  }, [searchTerm, statusFilter, typeFilter, projects]);
+    loadProjects();
+  }, [statusFilter, typeFilter, searchTerm]);
 
   const statusOptions = [
     { value: 'all', label: t('common.all') },

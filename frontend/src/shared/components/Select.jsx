@@ -3,6 +3,7 @@
  */
 
 import { forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@shared/utils/helpers';
 
 export const Select = forwardRef(function Select({
@@ -11,27 +12,26 @@ export const Select = forwardRef(function Select({
   help,
   required,
   options = [],
-  placeholder = '선택하세요',
+  placeholder,
+  inline = false,
   className,
   ...props
 }, ref) {
-  return (
-    <div className="form-group">
-      {label && (
-        <label className={cn('form-label', required && 'form-label-required')}>
-          {label}
-        </label>
-      )}
+  const { t } = useTranslation();
+  const defaultPlaceholder = placeholder !== null ? (placeholder || t('common.pleaseSelect')) : null;
+  const selectElement = (
+    <>
       <select
         ref={ref}
         className={cn(
           'input',
+          inline && 'input-inline',
           error && 'input-error',
           className
         )}
         {...props}
       >
-        <option value="">{placeholder}</option>
+        {defaultPlaceholder !== null && <option value="">{defaultPlaceholder}</option>}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -44,7 +44,24 @@ export const Select = forwardRef(function Select({
       {help && !error && (
         <p className="form-help">{help}</p>
       )}
+    </>
+  );
+
+  if (inline) {
+    return selectElement;
+  }
+
+  return (
+    <div className="form-group">
+      {label && (
+        <label className={cn('form-label', required && 'form-label-required')}>
+          {label}
+        </label>
+      )}
+      {selectElement}
     </div>
   );
 });
+
+export default Select;
 

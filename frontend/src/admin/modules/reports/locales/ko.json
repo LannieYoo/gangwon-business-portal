@@ -1,0 +1,18 @@
+{
+  "admin": {
+    "reports": {
+      "title": "통계 리포트",
+      "quarter": {
+        "all": "전체",
+        "Q1": "1분기",
+        "Q2": "2분기",
+        "Q3": "3분기",
+        "Q4": "4분기"
+      },
+      "exportExcel": "엑셀 내보내기",
+      "exportCSV": "CSV 내보내기",
+      "placeholder": "통계 리포트 기능 개발 예정"
+    }
+  }
+}
+

@@ -38,6 +38,7 @@
     "optional": "可选",
     "all": "全部",
     "select": "选择",
+    "pleaseSelect": "请选择",
     "selectAll": "全选",
     "deselectAll": "取消全选",
     "page": "页",

@@ -50,6 +50,84 @@ export function formatCurrency(value) {
 }
 
 /**
+ * Format currency with compact notation and internationalization
+ * Supports large numbers using 천/千 (thousand) unit
+ * @param {number|string} value - The value to format
+ * @param {Object} options - Formatting options
+ * @param {string} options.language - Language code ('ko' or 'zh'), defaults to 'ko'
+ * @param {boolean} options.showCurrency - Whether to show currency unit, defaults to true
+ * @param {number} options.decimals - Number of decimal places, defaults to 1
+ * @returns {string} Formatted currency string
+ */
+export function formatCurrencyCompact(value, options = {}) {
+  if (value === null || value === undefined || value === '') return '';
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num) || num === 0) return '0';
+  
+  const {
+    language = 'ko',
+    showCurrency = true,
+    decimals = 1,
+    showUnitLabel = true  // Whether to show (단위: 만원) format
+  } = options;
+  
+  // Get currency and unit translations
+  const getUnit = (unit) => {
+    const units = {
+      ko: {
+        currency: '원',
+        man: '만',  // 10 thousand
+        cheon: '천', // thousand
+        unitLabel: '단위' // unit label
+      },
+      zh: {
+        currency: '元',
+        man: '万',  // 10 thousand
+        cheon: '千', // thousand
+        unitLabel: '单位' // unit label
+      }
+    };
+    return units[language]?.[unit] || units.ko[unit];
+  };
+  
+  const absNum = Math.abs(num);
+  const sign = num < 0 ? '-' : '';
+  
+  // Format based on magnitude (no 억/亿 unit, use 천/千 instead)
+  if (absNum >= 10000) {
+    // 만/万 (10 thousand) or more
+    const man = absNum / 10000;
+    const formatted = man.toFixed(decimals).replace(/\.?0+$/, '');
+    // Add comma separators
+    const formattedWithCommas = parseFloat(formatted).toLocaleString(language === 'ko' ? 'ko-KR' : 'zh-CN');
+    if (!showUnitLabel) {
+      return `${sign}${formattedWithCommas}`;
+    }
+    const unit = showCurrency ? `${getUnit('man')}${getUnit('currency')}` : getUnit('man');
+    return `${sign}${formattedWithCommas} (${getUnit('unitLabel')}: ${unit})`;
+  } else if (absNum >= 1000) {
+    // 천/千 (thousand) or more
+    const cheon = absNum / 1000;
+    const formatted = cheon.toFixed(decimals).replace(/\.?0+$/, '');
+    // Add comma separators
+    const formattedWithCommas = parseFloat(formatted).toLocaleString(language === 'ko' ? 'ko-KR' : 'zh-CN');
+    if (!showUnitLabel) {
+      return `${sign}${formattedWithCommas}`;
+    }
+    const unit = showCurrency ? `${getUnit('cheon')}${getUnit('currency')}` : getUnit('cheon');
+    return `${sign}${formattedWithCommas} (${getUnit('unitLabel')}: ${unit})`;
+  } else {
+    // Less than 1000, use regular formatting
+    const formatted = absNum.toLocaleString(language === 'ko' ? 'ko-KR' : 'zh-CN');
+    if (!showUnitLabel) {
+      return `${sign}${formatted}`;
+    }
+    const unit = showCurrency ? getUnit('currency') : '';
+    return unit ? `${sign}${formatted} (${getUnit('unitLabel')}: ${unit})` : `${sign}${formatted}`;
+  }
+}
+
+/**
  * Format number with thousand separators
  */
 export function formatNumber(value) {

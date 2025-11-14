@@ -10,6 +10,8 @@ import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Select from '@shared/components/Select';
+import { apiService } from '@shared/services';
+import { API_PREFIX } from '@shared/utils/constants';
 
 export default function PerformanceList() {
   const { t } = useTranslation();
@@ -19,86 +21,55 @@ export default function PerformanceList() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [yearFilter, setYearFilter] = useState('all');
   const [quarterFilter, setQuarterFilter] = useState('all');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // TODO: 从 API 获取绩效数据列表
-    // Mock data for development
-    const mockPerformances = [
-      {
-        id: 1,
-        year: 2024,
-        quarter: 4,
-        type: 'quarterly',
-        status: 'approved',
-        submittedDate: '2024-12-15',
-        approvedDate: '2024-12-20',
-        sales: 50000000,
-        employment: 15,
-        governmentSupport: 10000000,
-        intellectualProperty: 2
-      },
-      {
-        id: 2,
-        year: 2024,
-        quarter: 3,
-        type: 'quarterly',
-        status: 'submitted',
-        submittedDate: '2024-09-20',
-        approvedDate: null,
-        sales: 45000000,
-        employment: 14,
-        governmentSupport: 8000000,
-        intellectualProperty: 1
-      },
-      {
-        id: 3,
-        year: 2024,
-        quarter: null,
-        type: 'annual',
-        status: 'draft',
-        submittedDate: null,
-        approvedDate: null,
-        sales: 200000000,
-        employment: 15,
-        governmentSupport: 35000000,
-        intellectualProperty: 5
+    loadPerformances();
+  }, [statusFilter, yearFilter, quarterFilter]);
+
+  const loadPerformances = async () => {
+    setLoading(true);
+    try {
+      const params = {
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        year: yearFilter !== 'all' ? parseInt(yearFilter, 10) : undefined,
+        quarter: quarterFilter !== 'all' ? (quarterFilter === 'annual' ? 'annual' : parseInt(quarterFilter, 10)) : undefined
+      };
+      const response = await apiService.get(`${API_PREFIX}/member/performance`, params);
+      if (response.records) {
+        const formatted = response.records.map(r => ({
+          id: r.id,
+          year: r.year,
+          quarter: r.quarter,
+          type: r.quarter ? 'quarterly' : 'annual',
+          status: r.status,
+          submittedDate: r.submittedAt ? new Date(r.submittedAt).toISOString().split('T')[0] : null,
+          approvedDate: r.reviewedAt ? new Date(r.reviewedAt).toISOString().split('T')[0] : null,
+          sales: r.salesRevenue || 0,
+          employment: r.employeeCount || 0,
+          governmentSupport: r.governmentSupport?.reduce((sum, g) => sum + (g.amount || 0), 0) || 0,
+          intellectualProperty: r.intellectualProperty?.length || 0
+        }));
+        setPerformances(formatted);
+        setFilteredPerformances(formatted);
       }
-    ];
-    setPerformances(mockPerformances);
-    setFilteredPerformances(mockPerformances);
-  }, []);
+    } catch (error) {
+      console.error('Failed to load performances:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
+    // Client-side search filter
     let filtered = [...performances];
-
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(perf =>
         `${perf.year}년 ${perf.quarter ? `Q${perf.quarter}` : '연간'}`.includes(searchTerm)
       );
     }
-
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(perf => perf.status === statusFilter);
-    }
-
-    // Year filter
-    if (yearFilter !== 'all') {
-      filtered = filtered.filter(perf => perf.year === parseInt(yearFilter));
-    }
-
-    // Quarter filter
-    if (quarterFilter !== 'all') {
-      if (quarterFilter === 'annual') {
-        filtered = filtered.filter(perf => perf.quarter === null);
-      } else {
-        filtered = filtered.filter(perf => perf.quarter === parseInt(quarterFilter));
-      }
-    }
-
     setFilteredPerformances(filtered);
-  }, [searchTerm, statusFilter, yearFilter, quarterFilter, performances]);
+  }, [searchTerm, performances]);
 
   const statusOptions = [
     { value: 'all', label: t('common.all') },
@@ -108,11 +79,14 @@ export default function PerformanceList() {
     { value: 'approved', label: t('performance.approved') }
   ];
 
+  // 生成年份选项（最近5年）
+  const currentYear = new Date().getFullYear();
   const yearOptions = [
     { value: 'all', label: t('common.all') },
-    { value: '2024', label: '2024' },
-    { value: '2023', label: '2023' },
-    { value: '2022', label: '2022' }
+    ...Array.from({ length: 5 }, (_, i) => {
+      const year = currentYear - i;
+      return { value: year.toString(), label: year.toString() };
+    })
   ];
 
   const quarterOptions = [

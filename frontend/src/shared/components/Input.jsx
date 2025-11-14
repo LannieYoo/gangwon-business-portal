@@ -39,3 +39,5 @@ export const Input = forwardRef(function Input({
   );
 });
 
+export default Input;
+

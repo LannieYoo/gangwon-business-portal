@@ -1,0 +1,21 @@
+{
+  "admin": {
+    "projects": {
+      "title": "프로젝트 관리",
+      "create": "프로젝트 생성",
+      "status": {
+        "active": "진행중",
+        "inactive": "비활성"
+      },
+      "table": {
+        "title": "프로젝트명",
+        "target": "접수 대상",
+        "startDate": "시작일",
+        "endDate": "종료일",
+        "status": "상태",
+        "actions": "작업"
+      }
+    }
+  }
+}
+

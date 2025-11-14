@@ -16,9 +16,43 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import koShared from './locales/ko.json';
 import zhShared from './locales/zh.json';
 
-// Module locales
+// Member layout locales
+import memberLayoutKo from '@member/layouts/locales/ko.json';
+import memberLayoutZh from '@member/layouts/locales/zh.json';
+
+// Member module locales
 import authKo from '@member/modules/auth/locales/ko.json';
 import authZh from '@member/modules/auth/locales/zh.json';
+import homeKo from '@member/modules/home/locales/ko.json';
+import homeZh from '@member/modules/home/locales/zh.json';
+import aboutKo from '@member/modules/about/locales/ko.json';
+import aboutZh from '@member/modules/about/locales/zh.json';
+import profileKo from '@member/modules/profile/locales/ko.json';
+import profileZh from '@member/modules/profile/locales/zh.json';
+import projectsKo from '@member/modules/projects/locales/ko.json';
+import projectsZh from '@member/modules/projects/locales/zh.json';
+import performanceKo from '@member/modules/performance/locales/ko.json';
+import performanceZh from '@member/modules/performance/locales/zh.json';
+import supportKo from '@member/modules/support/locales/ko.json';
+import supportZh from '@member/modules/support/locales/zh.json';
+
+// Admin module locales
+import adminLayoutKo from '@admin/layouts/locales/ko.json';
+import adminLayoutZh from '@admin/layouts/locales/zh.json';
+import adminDashboardKo from '@admin/modules/dashboard/locales/ko.json';
+import adminDashboardZh from '@admin/modules/dashboard/locales/zh.json';
+import adminMembersKo from '@admin/modules/members/locales/ko.json';
+import adminMembersZh from '@admin/modules/members/locales/zh.json';
+import adminPerformanceKo from '@admin/modules/performance/locales/ko.json';
+import adminPerformanceZh from '@admin/modules/performance/locales/zh.json';
+import adminProjectsKo from '@admin/modules/projects/locales/ko.json';
+import adminProjectsZh from '@admin/modules/projects/locales/zh.json';
+import adminContentKo from '@admin/modules/content/locales/ko.json';
+import adminContentZh from '@admin/modules/content/locales/zh.json';
+import adminSettingsKo from '@admin/modules/settings/locales/ko.json';
+import adminSettingsZh from '@admin/modules/settings/locales/zh.json';
+import adminReportsKo from '@admin/modules/reports/locales/ko.json';
+import adminReportsZh from '@admin/modules/reports/locales/zh.json';
 
 // Deep merge function to combine translations
 const deepMerge = (target, source) => {
@@ -43,13 +77,64 @@ const isObject = (item) => {
   return item && typeof item === 'object' && !Array.isArray(item);
 };
 
+// Merge all module translations
+const mergeModules = (...modules) => {
+  return modules.reduce((acc, module) => deepMerge(acc, module), {});
+};
+
+// Merge all member module translations
+const memberKo = mergeModules(
+  memberLayoutKo,
+  authKo,
+  homeKo,
+  aboutKo,
+  profileKo,
+  projectsKo,
+  performanceKo,
+  supportKo
+);
+
+const memberZh = mergeModules(
+  memberLayoutZh,
+  authZh,
+  homeZh,
+  aboutZh,
+  profileZh,
+  projectsZh,
+  performanceZh,
+  supportZh
+);
+
+// Merge all admin module translations
+const adminKo = mergeModules(
+  adminLayoutKo,
+  adminDashboardKo,
+  adminMembersKo,
+  adminPerformanceKo,
+  adminProjectsKo,
+  adminContentKo,
+  adminSettingsKo,
+  adminReportsKo
+);
+
+const adminZh = mergeModules(
+  adminLayoutZh,
+  adminDashboardZh,
+  adminMembersZh,
+  adminPerformanceZh,
+  adminProjectsZh,
+  adminContentZh,
+  adminSettingsZh,
+  adminReportsZh
+);
+
 // Merge all translations
 const resources = {
   ko: {
-    translation: deepMerge(koShared, authKo)
+    translation: deepMerge(deepMerge(koShared, memberKo), adminKo)
   },
   zh: {
-    translation: deepMerge(zhShared, authZh)
+    translation: deepMerge(deepMerge(zhShared, memberZh), adminZh)
   }
 };
 

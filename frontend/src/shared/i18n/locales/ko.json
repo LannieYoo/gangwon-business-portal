@@ -38,6 +38,7 @@
     "optional": "선택",
     "all": "전체",
     "select": "선택",
+    "pleaseSelect": "선택하세요",
     "selectAll": "전체 선택",
     "deselectAll": "전체 해제",
     "page": "페이지",

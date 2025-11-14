@@ -1,0 +1,37 @@
+/**
+ * Tabs Styles
+ */
+
+.tabs {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tabs-list {
+  display: flex;
+  gap: 0;
+}
+
+.tab-item {
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  color: #666;
+  transition: all 0.2s;
+  position: relative;
+  bottom: -1px;
+}
+
+.tab-item:hover {
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+.tab-item.active {
+  color: var(--primary-color, #0066cc);
+  border-bottom-color: var(--primary-color, #0066cc);
+  font-weight: 500;
+}
+

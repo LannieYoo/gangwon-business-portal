@@ -1,0 +1,35 @@
+/**
+ * Settings Styles
+ */
+
+.admin-settings {
+  padding: 0;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.tab-content {
+  padding: 1.5rem 0;
+}
+
+.tab-content h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 1rem 0;
+}
+
+.tab-content p {
+  color: #666;
+  margin: 0;
+}
+

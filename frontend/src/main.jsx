@@ -11,10 +11,27 @@ import '@shared/styles/index.css';
 async function enableMocking() {
   if (import.meta.env.VITE_USE_MOCK === 'true' && import.meta.env.DEV) {
     const { worker } = await import('./mocks/browser');
+    
     return worker.start({
-      onUnhandledRequest: 'bypass'
+      onUnhandledRequest(request, print) {
+        // Only intercept API requests, ignore route requests
+        if (request.url.includes('/api/')) {
+          print.warning();
+        }
+        // Silently ignore non-API requests (routes, static assets, etc.)
+      },
+      serviceWorker: {
+        url: '/mockServiceWorker.js'
+      },
+      quiet: false // Enable logging to see if MSW is working
+    }).then(() => {
+      console.log('[MSW] Mock Service Worker started successfully');
+    }).catch((error) => {
+      console.error('[MSW] Failed to start Mock Service Worker:', error);
     });
   }
+  
+  return Promise.resolve();
 }
 
 enableMocking().then(() => {

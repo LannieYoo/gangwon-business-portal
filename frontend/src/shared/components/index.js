@@ -13,4 +13,6 @@ export * from './Modal';
 export * from './Loading';
 export * from './Pagination';
 export * from './Table';
+export * from './Tabs';
+export { default as LanguageSwitcher } from './LanguageSwitcher';
 

@@ -1,0 +1,29 @@
+{
+  "admin": {
+    "performance": {
+      "title": "실적 관리",
+      "approve": "승인",
+      "requestRevision": "보완 요청",
+      "status": {
+        "pending": "대기중",
+        "revision": "보완",
+        "approved": "승인됨"
+      },
+      "table": {
+        "documentType": "문서 유형",
+        "fileName": "파일명",
+        "memberName": "기업명",
+        "year": "연도",
+        "quarter": "분기",
+        "status": "상태",
+        "actions": "작업"
+      },
+      "revisionModal": {
+        "title": "보완 요청",
+        "description": "보완이 필요한 항목을 입력하세요.",
+        "placeholder": "보완 요청 사유를 입력하세요..."
+      }
+    }
+  }
+}
+

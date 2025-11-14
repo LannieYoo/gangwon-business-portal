@@ -73,15 +73,15 @@
 
 ### 共享层
 
-| 模块       | 目录建议                           | 主要职责                                                                    |
-| ---------- | ---------------------------------- | --------------------------------------------------------------------------- |
-| Components | `frontend/src/shared/components` | UI 基础组件（表格、表单、图表、上传）、业务组件                             |
-| Hooks      | `frontend/src/shared/hooks`      | 通用逻辑（认证守卫、表单校验、文件上传、分页）                              |
-| Stores     | `frontend/src/shared/stores`     | Zustand 状态管理（认证状态、UI状态、全局配置）                              |
-| Services   | `frontend/src/shared/services`   | Axios 客户端封装、API 定义、错误处理、缓存策略                              |
-| Styles     | `frontend/src/shared/styles`     | 基础样式、主题变量、BEM 规范样式库                                          |
-| Utils      | `frontend/src/shared/utils`      | 辅助函数、常量、权限工具、日期与数字格式化                                  |
-| i18n       | `frontend/src/shared/i18n`       | 语言资源、语言切换逻辑、动态文案加载                                        |
+| 模块       | 目录建议                           | 主要职责                                        |
+| ---------- | ---------------------------------- | ----------------------------------------------- |
+| Components | `frontend/src/shared/components` | UI 基础组件（表格、表单、图表、上传）、业务组件 |
+| Hooks      | `frontend/src/shared/hooks`      | 通用逻辑（认证守卫、表单校验、文件上传、分页）  |
+| Stores     | `frontend/src/shared/stores`     | Zustand 状态管理（认证状态、UI状态、全局配置）  |
+| Services   | `frontend/src/shared/services`   | Axios 客户端封装、API 定义、错误处理、缓存策略  |
+| Styles     | `frontend/src/shared/styles`     | 基础样式、主题变量、BEM 规范样式库              |
+| Utils      | `frontend/src/shared/utils`      | 辅助函数、常量、权限工具、日期与数字格式化      |
+| i18n       | `frontend/src/shared/i18n`       | 语言资源、语言切换逻辑、动态文案加载            |
 
 ### Mock 数据层（开发阶段）
 
@@ -94,10 +94,6 @@
 | Browser  | `frontend/src/mocks/browser.js` | 浏览器环境 Mock 配置（开发模式启用）       |
 | Server   | `frontend/src/mocks/server.js`  | Node 环境 Mock 配置（单元测试使用，可选）  |
 | Config   | `frontend/src/mocks/config.js`  | Mock 开关、延迟配置、错误模拟              |
-
-**双语数据规范**：
-
-所有面向用户展示的 Mock 数据必须包含**韩语（ko）和中文（zh）**双语字段。可选用嵌套对象结构（`title: {ko: "...", zh: "..."}`）或平铺字段结构（`titleKo`, `titleZh`）。非文本字段（状态、日期、数字、ID）不需要国际化。
 
 **使用方式**：
 
@@ -163,12 +159,12 @@
 
 ### 后端配置
 
-| 文件名           | 路径                         | 主要职责                                           |
-| ---------------- | ---------------------------- | -------------------------------------------------- |
-| requirements.txt | `backend/requirements.txt` | Python 依赖列表                                    |
+| 文件名           | 路径                         | 主要职责                                   |
+| ---------------- | ---------------------------- | ------------------------------------------ |
+| requirements.txt | `backend/requirements.txt` | Python 依赖列表                            |
 | pyproject.toml   | `backend/pyproject.toml`   | （可选）Poetry/PEP 621 项目信息与依赖管理  |
 | .env.local       | `backend/.env.local`       | 数据库、JWT Secret、外部服务密钥           |
-| .gitignore       | `backend/.gitignore`       | Git 忽略文件配置                                   |
+| .gitignore       | `backend/.gitignore`       | Git 忽略文件配置                           |
 | main.py          | `backend/src/main.py`      | FastAPI 应用入口、路由注册、CORS、异常处理 |
 | alembic.ini      | `backend/alembic.ini`      | 数据库迁移配置 （若使用 Alembic）          |
 

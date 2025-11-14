@@ -1,0 +1,30 @@
+{
+  "admin": {
+    "content": {
+      "title": "内容管理",
+      "tabs": {
+        "banners": "横幅",
+        "popups": "弹窗",
+        "notices": "公告",
+        "news": "新闻资料"
+      },
+      "banners": {
+        "title": "横幅管理",
+        "placeholder": "横幅管理功能开发中"
+      },
+      "popups": {
+        "title": "弹窗管理",
+        "placeholder": "弹窗管理功能开发中"
+      },
+      "notices": {
+        "title": "公告管理",
+        "placeholder": "公告管理功能开发中"
+      },
+      "news": {
+        "title": "新闻资料管理",
+        "placeholder": "新闻资料管理功能开发中"
+      }
+    }
+  }
+}
+
