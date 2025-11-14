@@ -1,0 +1,149 @@
+{
+  "businessAreas": [
+    {
+      "id": 1,
+      "code": "IT",
+      "name": "信息通信",
+      "description": "信息通信技术及软件开发",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "code": "BIO",
+      "name": "生物",
+      "description": "生物医药品及医疗保健",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "code": "ENERGY",
+      "name": "新能源",
+      "description": "太阳能、风力等新能源",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "code": "FOOD",
+      "name": "食品",
+      "description": "食品制造及加工",
+      "order": 4,
+      "isActive": true
+    },
+    {
+      "id": 5,
+      "code": "TOURISM",
+      "name": "旅游",
+      "description": "旅游及内容开发",
+      "order": 5,
+      "isActive": true
+    }
+  ],
+  "cooperationAreas": [
+    {
+      "id": 1,
+      "code": "REGIONAL",
+      "name": "地区产业合作",
+      "description": "江原道地区内企业间合作",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "code": "RND",
+      "name": "研发合作",
+      "description": "研发项目合作",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "code": "MARKETING",
+      "name": "营销合作",
+      "description": "共同营销及销售合作",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "code": "SUPPLY",
+      "name": "供应链合作",
+      "description": "供应链及流通合作",
+      "order": 4,
+      "isActive": true
+    }
+  ],
+  "ipCategories": [
+    {
+      "id": 1,
+      "code": "PATENT",
+      "name": "专利",
+      "description": "发明专利",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "code": "TRADEMARK",
+      "name": "商标",
+      "description": "商标权",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "code": "DESIGN",
+      "name": "设计",
+      "description": "设计专利",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "code": "COPYRIGHT",
+      "name": "著作权",
+      "description": "著作权",
+      "order": 4,
+      "isActive": true
+    }
+  ],
+  "terms": [
+    {
+      "id": 1,
+      "type": "terms_of_service",
+      "title": "使用条款",
+      "content": "江原道创业企业门户使用条款内容...",
+      "version": "1.0",
+      "isActive": true,
+      "effectiveDate": "2024-01-01",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "type": "privacy_policy",
+      "title": "个人信息处理方针",
+      "content": "江原道创业企业门户个人信息处理方针内容...",
+      "version": "1.0",
+      "isActive": true,
+      "effectiveDate": "2024-01-01",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "systemConfig": {
+    "siteName": "江原道创业企业门户",
+    "siteDescription": "面向江原道创业企业的综合支援平台",
+    "contactEmail": "support@gwstartup.kr",
+    "contactPhone": "033-123-4567",
+    "officeHours": "平日 09:00 ~ 18:00",
+    "maxFileSize": 10485760,
+    "allowedFileTypes": ["pdf", "doc", "docx", "xls", "xlsx", "hwp", "jpg", "jpeg", "png"],
+    "performanceSubmissionDeadline": 30,
+    "projectApplicationDeadline": 7,
+    "memberApprovalDeadline": 2
+  }
+}
+

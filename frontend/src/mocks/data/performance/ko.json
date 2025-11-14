@@ -1,0 +1,507 @@
+{
+  "performanceRecords": [
+    {
+      "id": 1,
+      "memberId": 1,
+      "year": 2024,
+      "quarter": 4,
+      "status": "approved",
+      "salesRevenue": 450000000,
+      "domesticSales": 300000000,
+      "exportSales": 150000000,
+      "employeeCount": 25,
+      "fullTimeEmployees": 20,
+      "partTimeEmployees": 5,
+      "newHires": 3,
+      "governmentSupport": [
+        {
+          "id": 1,
+          "type": "subsidy",
+          "name": "2024년 창업기업 지원금",
+          "amount": 50000000,
+          "provider": "강원도청",
+          "receivedDate": "2024-10-15"
+        },
+        {
+          "id": 2,
+          "type": "loan",
+          "name": "중소기업 기술개발 자금",
+          "amount": 100000000,
+          "provider": "신용보증기금",
+          "receivedDate": "2024-11-01"
+        }
+      ],
+      "intellectualProperty": [
+        {
+          "id": 1,
+          "type": "patent",
+          "title": "AI 기반 제조 공정 최적화 시스템",
+          "registrationNumber": "10-2024-0123456",
+          "registrationDate": "2024-09-20",
+          "status": "registered"
+        },
+        {
+          "id": 2,
+          "type": "trademark",
+          "title": "GWTech 로고",
+          "registrationNumber": "40-2024-0012345",
+          "registrationDate": "2024-08-15",
+          "status": "registered"
+        }
+      ],
+      "submittedAt": "2024-12-15T10:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2024-12-18T14:30:00Z",
+      "reviewComment": "제출된 성과 데이터가 정확합니다. 승인합니다.",
+      "createdAt": "2024-12-15T09:30:00Z",
+      "updatedAt": "2024-12-18T14:30:00Z"
+    },
+    {
+      "id": 2,
+      "memberId": 1,
+      "year": 2024,
+      "quarter": 3,
+      "status": "approved",
+      "salesRevenue": 380000000,
+      "domesticSales": 250000000,
+      "exportSales": 130000000,
+      "employeeCount": 22,
+      "fullTimeEmployees": 18,
+      "partTimeEmployees": 4,
+      "newHires": 2,
+      "governmentSupport": [
+        {
+          "id": 3,
+          "type": "subsidy",
+          "name": "2024년 3분기 R&D 지원금",
+          "amount": 30000000,
+          "provider": "강원도청",
+          "receivedDate": "2024-07-20"
+        }
+      ],
+      "intellectualProperty": [],
+      "submittedAt": "2024-09-20T11:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2024-09-25T16:00:00Z",
+      "reviewComment": "승인 완료",
+      "createdAt": "2024-09-20T10:30:00Z",
+      "updatedAt": "2024-09-25T16:00:00Z"
+    },
+    {
+      "id": 3,
+      "memberId": 2,
+      "year": 2024,
+      "quarter": 4,
+      "status": "pending",
+      "salesRevenue": 650000000,
+      "domesticSales": 500000000,
+      "exportSales": 150000000,
+      "employeeCount": 18,
+      "fullTimeEmployees": 15,
+      "partTimeEmployees": 3,
+      "newHires": 1,
+      "governmentSupport": [
+        {
+          "id": 4,
+          "type": "subsidy",
+          "name": "바이오 의약품 개발 지원금",
+          "amount": 80000000,
+          "provider": "과학기술정보통신부",
+          "receivedDate": "2024-11-10"
+        }
+      ],
+      "intellectualProperty": [
+        {
+          "id": 3,
+          "type": "patent",
+          "title": "신약 후보물질 합성 방법",
+          "registrationNumber": "10-2024-0234567",
+          "registrationDate": "2024-10-05",
+          "status": "registered"
+        }
+      ],
+      "submittedAt": "2024-12-18T14:00:00Z",
+      "reviewer": null,
+      "reviewedAt": null,
+      "reviewComment": null,
+      "createdAt": "2024-12-18T13:30:00Z",
+      "updatedAt": "2024-12-18T14:00:00Z"
+    },
+    {
+      "id": 4,
+      "memberId": 1,
+      "year": 2024,
+      "quarter": 4,
+      "status": "draft",
+      "salesRevenue": 0,
+      "domesticSales": 0,
+      "exportSales": 0,
+      "employeeCount": 0,
+      "fullTimeEmployees": 0,
+      "partTimeEmployees": 0,
+      "newHires": 0,
+      "governmentSupport": [],
+      "intellectualProperty": [],
+      "submittedAt": null,
+      "reviewer": null,
+      "reviewedAt": null,
+      "reviewComment": null,
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 5,
+      "memberId": 2,
+      "year": 2024,
+      "quarter": 3,
+      "status": "revision_required",
+      "salesRevenue": 600000000,
+      "domesticSales": 450000000,
+      "exportSales": 150000000,
+      "employeeCount": 17,
+      "fullTimeEmployees": 14,
+      "partTimeEmployees": 3,
+      "newHires": 0,
+      "governmentSupport": [
+        {
+          "id": 5,
+          "type": "subsidy",
+          "name": "2024년 3분기 바이오 지원금",
+          "amount": 50000000,
+          "provider": "강원도청",
+          "receivedDate": "2024-07-15"
+        }
+      ],
+      "intellectualProperty": [],
+      "submittedAt": "2024-09-18T09:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2024-09-22T11:00:00Z",
+      "reviewComment": "정부 지원금 증빙 자료를 추가로 제출해주세요.",
+      "createdAt": "2024-09-18T08:30:00Z",
+      "updatedAt": "2024-09-22T11:00:00Z"
+    },
+    {
+      "id": 6,
+      "memberId": 1,
+      "year": 2024,
+      "quarter": 2,
+      "status": "approved",
+      "salesRevenue": 320000000,
+      "domesticSales": 220000000,
+      "exportSales": 100000000,
+      "employeeCount": 20,
+      "fullTimeEmployees": 16,
+      "partTimeEmployees": 4,
+      "newHires": 2,
+      "governmentSupport": [
+        {
+          "id": 6,
+          "type": "subsidy",
+          "name": "2024년 2분기 창업 지원금",
+          "amount": 40000000,
+          "provider": "강원도청",
+          "receivedDate": "2024-05-10"
+        }
+      ],
+      "intellectualProperty": [
+        {
+          "id": 4,
+          "type": "patent",
+          "title": "빅데이터 분석 알고리즘",
+          "registrationNumber": "10-2024-0034567",
+          "registrationDate": "2024-06-15",
+          "status": "registered"
+        }
+      ],
+      "submittedAt": "2024-06-20T10:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2024-06-25T14:00:00Z",
+      "reviewComment": "승인 완료",
+      "createdAt": "2024-06-20T09:30:00Z",
+      "updatedAt": "2024-06-25T14:00:00Z"
+    },
+    {
+      "id": 7,
+      "memberId": 1,
+      "year": 2024,
+      "quarter": 1,
+      "status": "approved",
+      "salesRevenue": 280000000,
+      "domesticSales": 200000000,
+      "exportSales": 80000000,
+      "employeeCount": 18,
+      "fullTimeEmployees": 15,
+      "partTimeEmployees": 3,
+      "newHires": 1,
+      "governmentSupport": [
+        {
+          "id": 7,
+          "type": "subsidy",
+          "name": "2024년 1분기 기술개발 지원금",
+          "amount": 35000000,
+          "provider": "강원도청",
+          "receivedDate": "2024-03-15"
+        }
+      ],
+      "intellectualProperty": [],
+      "submittedAt": "2024-03-20T10:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2024-03-25T15:00:00Z",
+      "reviewComment": "승인 완료",
+      "createdAt": "2024-03-20T09:30:00Z",
+      "updatedAt": "2024-03-25T15:00:00Z"
+    },
+    {
+      "id": 8,
+      "memberId": 2,
+      "year": 2024,
+      "quarter": 2,
+      "status": "approved",
+      "salesRevenue": 580000000,
+      "domesticSales": 450000000,
+      "exportSales": 130000000,
+      "employeeCount": 16,
+      "fullTimeEmployees": 13,
+      "partTimeEmployees": 3,
+      "newHires": 1,
+      "governmentSupport": [
+        {
+          "id": 8,
+          "type": "subsidy",
+          "name": "2024년 2분기 바이오 R&D 지원금",
+          "amount": 60000000,
+          "provider": "과학기술정보통신부",
+          "receivedDate": "2024-05-20"
+        }
+      ],
+      "intellectualProperty": [
+        {
+          "id": 5,
+          "type": "patent",
+          "title": "의약품 제조 공정 개선 방법",
+          "registrationNumber": "10-2024-0045678",
+          "registrationDate": "2024-05-10",
+          "status": "registered"
+        }
+      ],
+      "submittedAt": "2024-06-18T11:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2024-06-22T16:00:00Z",
+      "reviewComment": "승인 완료",
+      "createdAt": "2024-06-18T10:30:00Z",
+      "updatedAt": "2024-06-22T16:00:00Z"
+    },
+    {
+      "id": 9,
+      "memberId": 2,
+      "year": 2024,
+      "quarter": 1,
+      "status": "approved",
+      "salesRevenue": 520000000,
+      "domesticSales": 400000000,
+      "exportSales": 120000000,
+      "employeeCount": 15,
+      "fullTimeEmployees": 12,
+      "partTimeEmployees": 3,
+      "newHires": 0,
+      "governmentSupport": [
+        {
+          "id": 9,
+          "type": "subsidy",
+          "name": "2024년 1분기 바이오 지원금",
+          "amount": 45000000,
+          "provider": "강원도청",
+          "receivedDate": "2024-03-10"
+        }
+      ],
+      "intellectualProperty": [],
+      "submittedAt": "2024-03-18T11:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2024-03-22T15:00:00Z",
+      "reviewComment": "승인 완료",
+      "createdAt": "2024-03-18T10:30:00Z",
+      "updatedAt": "2024-03-22T15:00:00Z"
+    },
+    {
+      "id": 10,
+      "memberId": 4,
+      "year": 2024,
+      "quarter": 4,
+      "status": "approved",
+      "salesRevenue": 280000000,
+      "domesticSales": 280000000,
+      "exportSales": 0,
+      "employeeCount": 12,
+      "fullTimeEmployees": 10,
+      "partTimeEmployees": 2,
+      "newHires": 2,
+      "governmentSupport": [
+        {
+          "id": 10,
+          "type": "subsidy",
+          "name": "2024년 지역특산물 개발 지원금",
+          "amount": 30000000,
+          "provider": "강원도청",
+          "receivedDate": "2024-10-20"
+        }
+      ],
+      "intellectualProperty": [
+        {
+          "id": 6,
+          "type": "trademark",
+          "title": "강원푸드 브랜드",
+          "registrationNumber": "40-2024-0023456",
+          "registrationDate": "2024-09-10",
+          "status": "registered"
+        }
+      ],
+      "submittedAt": "2024-12-10T10:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2024-12-15T14:00:00Z",
+      "reviewComment": "승인 완료",
+      "createdAt": "2024-12-10T09:30:00Z",
+      "updatedAt": "2024-12-15T14:00:00Z"
+    },
+    {
+      "id": 11,
+      "memberId": 4,
+      "year": 2024,
+      "quarter": 3,
+      "status": "approved",
+      "salesRevenue": 250000000,
+      "domesticSales": 250000000,
+      "exportSales": 0,
+      "employeeCount": 10,
+      "fullTimeEmployees": 8,
+      "partTimeEmployees": 2,
+      "newHires": 1,
+      "governmentSupport": [
+        {
+          "id": 11,
+          "type": "subsidy",
+          "name": "2024년 3분기 식품산업 지원금",
+          "amount": 25000000,
+          "provider": "강원도청",
+          "receivedDate": "2024-08-15"
+        }
+      ],
+      "intellectualProperty": [],
+      "submittedAt": "2024-09-10T10:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2024-09-15T14:00:00Z",
+      "reviewComment": "승인 완료",
+      "createdAt": "2024-09-10T09:30:00Z",
+      "updatedAt": "2024-09-15T14:00:00Z"
+    },
+    {
+      "id": 12,
+      "memberId": 1,
+      "year": 2023,
+      "quarter": 4,
+      "status": "approved",
+      "salesRevenue": 400000000,
+      "domesticSales": 280000000,
+      "exportSales": 120000000,
+      "employeeCount": 15,
+      "fullTimeEmployees": 12,
+      "partTimeEmployees": 3,
+      "newHires": 2,
+      "governmentSupport": [
+        {
+          "id": 12,
+          "type": "subsidy",
+          "name": "2023년 창업기업 지원금",
+          "amount": 45000000,
+          "provider": "강원도청",
+          "receivedDate": "2023-10-10"
+        }
+      ],
+      "intellectualProperty": [
+        {
+          "id": 7,
+          "type": "patent",
+          "title": "AI 학습 모델 최적화 방법",
+          "registrationNumber": "10-2023-0123456",
+          "registrationDate": "2023-09-15",
+          "status": "registered"
+        }
+      ],
+      "submittedAt": "2023-12-15T10:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2023-12-20T14:00:00Z",
+      "reviewComment": "승인 완료",
+      "createdAt": "2023-12-15T09:30:00Z",
+      "updatedAt": "2023-12-20T14:00:00Z"
+    },
+    {
+      "id": 13,
+      "memberId": 2,
+      "year": 2023,
+      "quarter": 4,
+      "status": "approved",
+      "salesRevenue": 550000000,
+      "domesticSales": 420000000,
+      "exportSales": 130000000,
+      "employeeCount": 14,
+      "fullTimeEmployees": 11,
+      "partTimeEmployees": 3,
+      "newHires": 1,
+      "governmentSupport": [
+        {
+          "id": 13,
+          "type": "subsidy",
+          "name": "2023년 바이오 의약품 개발 지원금",
+          "amount": 70000000,
+          "provider": "과학기술정보통신부",
+          "receivedDate": "2023-11-10"
+        }
+      ],
+      "intellectualProperty": [
+        {
+          "id": 8,
+          "type": "patent",
+          "title": "신약 개발 공정",
+          "registrationNumber": "10-2023-0234567",
+          "registrationDate": "2023-10-05",
+          "status": "registered"
+        }
+      ],
+      "submittedAt": "2023-12-18T11:00:00Z",
+      "reviewer": 1,
+      "reviewedAt": "2023-12-22T16:00:00Z",
+      "reviewComment": "승인 완료",
+      "createdAt": "2023-12-18T10:30:00Z",
+      "updatedAt": "2023-12-22T16:00:00Z"
+    }
+  ],
+  "performanceReviews": [
+    {
+      "id": 1,
+      "performanceRecordId": 1,
+      "reviewer": 1,
+      "status": "approved",
+      "comment": "제출된 성과 데이터가 정확합니다. 승인합니다.",
+      "reviewedAt": "2024-12-18T14:30:00Z",
+      "createdAt": "2024-12-18T14:30:00Z"
+    },
+    {
+      "id": 2,
+      "performanceRecordId": 2,
+      "reviewer": 1,
+      "status": "approved",
+      "comment": "승인 완료",
+      "reviewedAt": "2024-09-25T16:00:00Z",
+      "createdAt": "2024-09-25T16:00:00Z"
+    },
+    {
+      "id": 3,
+      "performanceRecordId": 5,
+      "reviewer": 1,
+      "status": "revision_required",
+      "comment": "정부 지원금 증빙 자료를 추가로 제출해주세요.",
+      "reviewedAt": "2024-09-22T11:00:00Z",
+      "createdAt": "2024-09-22T11:00:00Z"
+    }
+  ]
+}
+

@@ -30,7 +30,16 @@ export default function BannerManagement() {
     try {
       const response = await apiService.get(`${API_PREFIX}/admin/banners`);
       if (response && response.banners) {
-        setBanners(response.banners);
+        const bannerKeys = ['main', 'systemIntro', 'projects', 'performance', 'support'];
+        const normalizedBanners = {};
+        bannerKeys.forEach(key => {
+          const banner = response.banners[key] || {};
+          normalizedBanners[key] = {
+            image: banner.image || null,
+            url: banner.url || ''
+          };
+        });
+        setBanners(normalizedBanners);
       }
     } catch (error) {
       console.error('Failed to load banners:', error);
@@ -64,6 +73,7 @@ export default function BannerManagement() {
       }
     }));
   };
+
 
   const handleSave = async (bannerKey) => {
     setLoading(true);
@@ -99,20 +109,20 @@ export default function BannerManagement() {
       {loading ? (
         <Loading />
       ) : (
-        <div className="banner-list">
+        <div className="banner-grid">
           {bannerConfig.map(({ key, label }) => (
-            <Card key={key} className="banner-card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
+            <Card key={key} className="banner-card" style={{ padding: '1.5rem' }}>
               <h3 className="section-title">{label}</h3>
               
               <div className="banner-form">
                 <div className="banner-item">
                   <label>{t('admin.dashboard.banner.image')}</label>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {banners[key].image && (
                       <img 
                         src={banners[key].image} 
                         alt={label}
-                        style={{ maxWidth: '200px', maxHeight: '100px', objectFit: 'contain' }}
+                        style={{ maxWidth: '100%', maxHeight: '120px', objectFit: 'contain', borderRadius: '4px' }}
                       />
                     )}
                     <input
@@ -127,7 +137,7 @@ export default function BannerManagement() {
                       id={`banner-${key}-file`}
                     />
                     <label htmlFor={`banner-${key}-file`} style={{ cursor: 'pointer' }}>
-                      <Button variant="outline" type="button">
+                      <Button variant="outline" type="button" style={{ width: '100%' }}>
                         {t('admin.dashboard.banner.upload')}
                       </Button>
                     </label>
@@ -135,7 +145,7 @@ export default function BannerManagement() {
                 </div>
 
                 <div className="banner-item" style={{ marginTop: '1rem' }}>
-                  <label>{t('admin.dashboard.banner.url')} ({t('admin.dashboard.banner.optional')})</label>
+                  <label>{t('admin.dashboard.banner.url')}</label>
                   <Input
                     type="text"
                     value={banners[key].url}
@@ -145,7 +155,7 @@ export default function BannerManagement() {
                 </div>
 
                 <div style={{ marginTop: '1rem' }}>
-                  <Button onClick={() => handleSave(key)}>
+                  <Button onClick={() => handleSave(key)} style={{ width: '100%' }}>
                     {t('admin.dashboard.banner.save')}
                   </Button>
                 </div>

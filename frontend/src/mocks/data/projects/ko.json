@@ -1,0 +1,259 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "title": "2025 창업기업 지원 사업",
+      "type": "startup",
+      "status": "recruiting",
+      "startDate": "2025-01-01",
+      "endDate": "2025-12-31",
+      "recruitmentStartDate": "2024-12-01",
+      "recruitmentEndDate": "2025-02-28",
+      "budget": 50000000,
+      "description": "신규 창업 기업을 위한 종합 지원 프로그램으로, 창업 자금, 멘토링, 네트워킹 등 다양한 지원을 제공합니다.",
+      "objectives": [
+        "신규 창업 기업의 안정적 성장 지원",
+        "지역 경제 활성화 기여",
+        "일자리 창출"
+      ],
+      "scope": "강원도 내 창업 3년 이내 기업",
+      "manager": "홍길동",
+      "managerPhone": "033-123-4567",
+      "managerEmail": "hong@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 1,
+          "name": "2025창업지원사업공고.pdf",
+          "url": "/uploads/projects/1/2025창업지원사업공고.pdf",
+          "type": "document",
+          "size": 2048000,
+          "uploadedAt": "2024-11-25T09:00:00Z"
+        },
+        {
+          "id": 2,
+          "name": "신청서양식.hwp",
+          "url": "/uploads/projects/1/신청서양식.hwp",
+          "type": "document",
+          "size": 512000,
+          "uploadedAt": "2024-11-25T09:05:00Z"
+        },
+        {
+          "id": 3,
+          "name": "사업계획서양식.xlsx",
+          "url": "/uploads/projects/1/사업계획서양식.xlsx",
+          "type": "document",
+          "size": 307200,
+          "uploadedAt": "2024-11-25T09:10:00Z"
+        }
+      ],
+      "views": 234,
+      "applicationsCount": 15,
+      "isPublished": true,
+      "publishedAt": "2024-11-25T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2024-11-25T08:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "기술개발 R&D 지원",
+      "type": "rd",
+      "status": "recruiting",
+      "startDate": "2025-02-01",
+      "endDate": "2025-11-30",
+      "recruitmentStartDate": "2024-12-15",
+      "recruitmentEndDate": "2025-01-31",
+      "budget": 100000000,
+      "description": "기술 혁신을 위한 R&D 프로젝트 지원 프로그램으로, 연구개발비, 장비 구매비 등을 지원합니다.",
+      "objectives": [
+        "기업의 기술 경쟁력 강화",
+        "신기술 개발 촉진",
+        "산학연 협력 활성화"
+      ],
+      "scope": "강원도 내 중소기업 및 벤처기업",
+      "manager": "김영희",
+      "managerPhone": "033-234-5678",
+      "managerEmail": "kim@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 4,
+          "name": "R&D지원사업공고.pdf",
+          "url": "/uploads/projects/2/R&D지원사업공고.pdf",
+          "type": "document",
+          "size": 2560000,
+          "uploadedAt": "2024-12-15T10:00:00Z"
+        },
+        {
+          "id": 5,
+          "name": "연구개발계획서양식.xlsx",
+          "url": "/uploads/projects/2/연구개발계획서양식.xlsx",
+          "type": "document",
+          "size": 614400,
+          "uploadedAt": "2024-12-15T10:05:00Z"
+        }
+      ],
+      "views": 456,
+      "applicationsCount": 23,
+      "isPublished": true,
+      "publishedAt": "2024-12-15T10:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2024-12-15T09:00:00Z",
+      "updatedAt": "2024-12-19T14:30:00Z"
+    },
+    {
+      "id": 3,
+      "title": "수출 지원 프로그램",
+      "type": "export",
+      "status": "closed",
+      "startDate": "2024-06-01",
+      "endDate": "2024-12-31",
+      "recruitmentStartDate": "2024-05-01",
+      "recruitmentEndDate": "2024-05-31",
+      "budget": 30000000,
+      "description": "해외 시장 진출을 위한 종합 지원 프로그램으로, 수출 마케팅비, 박람회 참가비 등을 지원합니다.",
+      "objectives": [
+        "중소기업의 해외시장 진출 지원",
+        "수출 확대를 통한 지역 경제 성장",
+        "글로벌 경쟁력 강화"
+      ],
+      "scope": "강원도 내 수출 기업 및 수출 예정 기업",
+      "manager": "이철수",
+      "managerPhone": "033-345-6789",
+      "managerEmail": "lee@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 6,
+          "name": "수출지원사업공고.pdf",
+          "url": "/uploads/projects/3/수출지원사업공고.pdf",
+          "type": "document",
+          "size": 1536000,
+          "uploadedAt": "2024-05-01T09:00:00Z"
+        }
+      ],
+      "views": 123,
+      "applicationsCount": 8,
+      "isPublished": true,
+      "publishedAt": "2024-05-01T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2024-05-01T08:00:00Z",
+      "updatedAt": "2024-12-31T18:00:00Z"
+    },
+    {
+      "id": 4,
+      "title": "투자 유치 지원 사업",
+      "type": "investment",
+      "status": "ongoing",
+      "startDate": "2024-09-01",
+      "endDate": "2025-08-31",
+      "recruitmentStartDate": "2024-08-01",
+      "recruitmentEndDate": "2024-08-31",
+      "budget": 200000000,
+      "description": "스타트업의 투자 유치를 위한 지원 프로그램으로, 투자 매칭, IR 지원 등을 제공합니다.",
+      "objectives": [
+        "스타트업 투자 유치 활성화",
+        "성장 기반 마련",
+        "투자 생태계 조성"
+      ],
+      "scope": "강원도 내 창업 5년 이내 기업",
+      "manager": "박민수",
+      "managerPhone": "033-456-7890",
+      "managerEmail": "park@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 7,
+          "name": "투자유치지원사업공고.pdf",
+          "url": "/uploads/projects/4/투자유치지원사업공고.pdf",
+          "type": "document",
+          "size": 3072000,
+          "uploadedAt": "2024-08-01T09:00:00Z"
+        }
+      ],
+      "views": 189,
+      "applicationsCount": 12,
+      "isPublished": true,
+      "publishedAt": "2024-08-01T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2024-08-01T08:00:00Z",
+      "updatedAt": "2024-12-18T16:00:00Z"
+    },
+    {
+      "id": 5,
+      "title": "2025 녹색기술 지원 사업",
+      "type": "rd",
+      "status": "draft",
+      "startDate": "2025-04-01",
+      "endDate": "2025-12-31",
+      "recruitmentStartDate": "2025-03-01",
+      "recruitmentEndDate": "2025-03-31",
+      "budget": 80000000,
+      "description": "녹색 기술 개발을 위한 R&D 지원 사업입니다. (초안)",
+      "objectives": [
+        "탄소 중립 기술 개발",
+        "그린 산업 육성"
+      ],
+      "scope": "강원도 내 중소기업",
+      "manager": "정수진",
+      "managerPhone": "033-567-8901",
+      "managerEmail": "jung@gangwon.go.kr",
+      "attachments": [],
+      "views": 0,
+      "applicationsCount": 0,
+      "isPublished": false,
+      "publishedAt": null,
+      "createdBy": 1,
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    }
+  ],
+  "projectApplications": [
+    {
+      "id": 1,
+      "projectId": 1,
+      "memberId": 1,
+      "status": "submitted",
+      "applicationDate": "2024-12-10T10:00:00Z",
+      "businessPlan": "AI 솔루션을 활용한 스마트 팩토리 구축 사업계획",
+      "expectedBudget": 30000000,
+      "expectedResults": "제조업 고도화 및 생산성 향상",
+      "attachments": [
+        {
+          "id": 101,
+          "name": "사업계획서.pdf",
+          "url": "/uploads/applications/1/사업계획서.pdf",
+          "type": "document",
+          "size": 2048000
+        }
+      ],
+      "reviewer": null,
+      "reviewedAt": null,
+      "reviewComment": null,
+      "createdAt": "2024-12-10T09:30:00Z",
+      "updatedAt": "2024-12-10T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "projectId": 2,
+      "memberId": 2,
+      "status": "approved",
+      "applicationDate": "2024-12-18T14:00:00Z",
+      "businessPlan": "신약 개발을 위한 연구개발 프로젝트",
+      "expectedBudget": 80000000,
+      "expectedResults": "신약 후보물질 확보 및 특허 출원",
+      "attachments": [
+        {
+          "id": 102,
+          "name": "연구개발계획서.pdf",
+          "url": "/uploads/applications/2/연구개발계획서.pdf",
+          "type": "document",
+          "size": 3072000
+        }
+      ],
+      "reviewer": 1,
+      "reviewedAt": "2024-12-19T11:00:00Z",
+      "reviewComment": "우수한 연구개발 계획으로 승인합니다.",
+      "createdAt": "2024-12-18T13:30:00Z",
+      "updatedAt": "2024-12-19T11:00:00Z"
+    }
+  ]
+}
+

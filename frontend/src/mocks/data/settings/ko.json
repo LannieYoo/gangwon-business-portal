@@ -1,0 +1,149 @@
+{
+  "businessAreas": [
+    {
+      "id": 1,
+      "code": "IT",
+      "name": "정보통신",
+      "description": "정보통신 기술 및 소프트웨어 개발",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "code": "BIO",
+      "name": "바이오",
+      "description": "바이오 의약품 및 헬스케어",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "code": "ENERGY",
+      "name": "신재생에너지",
+      "description": "태양광, 풍력 등 신재생에너지",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "code": "FOOD",
+      "name": "식품",
+      "description": "식품 제조 및 가공",
+      "order": 4,
+      "isActive": true
+    },
+    {
+      "id": 5,
+      "code": "TOURISM",
+      "name": "관광",
+      "description": "관광 및 콘텐츠 개발",
+      "order": 5,
+      "isActive": true
+    }
+  ],
+  "cooperationAreas": [
+    {
+      "id": 1,
+      "code": "REGIONAL",
+      "name": "지역 산업 협력",
+      "description": "강원도 지역 내 기업 간 협력",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "code": "RND",
+      "name": "연구개발 협력",
+      "description": "연구개발 프로젝트 협력",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "code": "MARKETING",
+      "name": "마케팅 협력",
+      "description": "공동 마케팅 및 판매 협력",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "code": "SUPPLY",
+      "name": "공급망 협력",
+      "description": "공급망 및 유통 협력",
+      "order": 4,
+      "isActive": true
+    }
+  ],
+  "ipCategories": [
+    {
+      "id": 1,
+      "code": "PATENT",
+      "name": "특허",
+      "description": "발명 특허",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "code": "TRADEMARK",
+      "name": "상표",
+      "description": "상표권",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "code": "DESIGN",
+      "name": "디자인",
+      "description": "디자인 특허",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "code": "COPYRIGHT",
+      "name": "저작권",
+      "description": "저작권",
+      "order": 4,
+      "isActive": true
+    }
+  ],
+  "terms": [
+    {
+      "id": 1,
+      "type": "terms_of_service",
+      "title": "이용약관",
+      "content": "강원도 창업기업 포털 이용약관 내용입니다...",
+      "version": "1.0",
+      "isActive": true,
+      "effectiveDate": "2024-01-01",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "type": "privacy_policy",
+      "title": "개인정보처리방침",
+      "content": "강원도 창업기업 포털 개인정보처리방침 내용입니다...",
+      "version": "1.0",
+      "isActive": true,
+      "effectiveDate": "2024-01-01",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "systemConfig": {
+    "siteName": "강원도 창업기업 포털",
+    "siteDescription": "강원도 창업기업을 위한 종합 지원 플랫폼",
+    "contactEmail": "support@gwstartup.kr",
+    "contactPhone": "033-123-4567",
+    "officeHours": "평일 09:00 ~ 18:00",
+    "maxFileSize": 10485760,
+    "allowedFileTypes": ["pdf", "doc", "docx", "xls", "xlsx", "hwp", "jpg", "jpeg", "png"],
+    "performanceSubmissionDeadline": 30,
+    "projectApplicationDeadline": 7,
+    "memberApprovalDeadline": 2
+  }
+}
+

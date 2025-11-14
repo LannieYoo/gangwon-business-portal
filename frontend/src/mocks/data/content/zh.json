@@ -1,0 +1,191 @@
+{
+  "banners": [
+    {
+      "id": 1,
+      "type": "main",
+      "title": "2025年创业企业支援事业招募",
+      "description": "面向江原道创业企业的综合支援项目",
+      "imageUrl": "/uploads/banners/main_2025.jpg",
+      "linkUrl": "/projects/1",
+      "order": 1,
+      "isActive": true,
+      "startDate": "2024-12-01",
+      "endDate": "2025-02-28",
+      "createdAt": "2024-11-25T09:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "type": "main",
+      "title": "R&D技术开发支援事业指南",
+      "description": "面向技术创新的研发项目支援",
+      "imageUrl": "/uploads/banners/rd_2025.jpg",
+      "linkUrl": "/projects/2",
+      "order": 2,
+      "isActive": true,
+      "startDate": "2024-12-15",
+      "endDate": "2025-01-31",
+      "createdAt": "2024-12-15T10:00:00Z",
+      "updatedAt": "2024-12-19T14:30:00Z"
+    },
+    {
+      "id": 3,
+      "type": "scroll",
+      "title": "系统维护通知",
+      "description": "2024年12月25日 02:00 ~ 06:00 系统维护预定",
+      "linkUrl": null,
+      "order": 1,
+      "isActive": true,
+      "startDate": "2024-12-20",
+      "endDate": "2024-12-25",
+      "createdAt": "2024-12-20T09:00:00Z",
+      "updatedAt": "2024-12-20T09:00:00Z"
+    }
+  ],
+  "popups": [
+    {
+      "id": 1,
+      "title": "2025年新年问候",
+      "content": "江原道创业企业各位，新年快乐！",
+      "imageUrl": "/uploads/popups/newyear_2025.jpg",
+      "linkUrl": "/about",
+      "width": 600,
+      "height": 400,
+      "position": "center",
+      "isActive": true,
+      "startDate": "2025-01-01",
+      "endDate": "2025-01-07",
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    }
+  ],
+  "news": [
+    {
+      "id": 1,
+      "title": "2025年创业企业支援事业公告",
+      "content": "面向江原道创业企业的综合支援项目正在招募中。详细内容请查看公告。",
+      "category": "announcement",
+      "isPublished": true,
+      "publishedAt": "2024-11-25T09:00:00Z",
+      "views": 234,
+      "attachments": [
+        {
+          "id": 1,
+          "name": "2025创业支援事业公告.pdf",
+          "url": "/uploads/news/1/2025创业支援事业公告.pdf",
+          "type": "document",
+          "size": 2048000
+        }
+      ],
+      "createdAt": "2024-11-25T08:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "R&D技术开发支援事业指南",
+      "content": "面向技术创新的研发项目支援正在招募中。",
+      "category": "announcement",
+      "isPublished": true,
+      "publishedAt": "2024-12-15T10:00:00Z",
+      "views": 456,
+      "attachments": [
+        {
+          "id": 2,
+          "name": "R&D支援事业公告.pdf",
+          "url": "/uploads/news/2/R&D支援事业公告.pdf",
+          "type": "document",
+          "size": 2560000
+        }
+      ],
+      "createdAt": "2024-12-15T09:00:00Z",
+      "updatedAt": "2024-12-19T14:30:00Z"
+    },
+    {
+      "id": 3,
+      "title": "系统使用指南",
+      "content": "为您介绍江原道创业企业门户系统的使用方法。",
+      "category": "notice",
+      "isPublished": true,
+      "publishedAt": "2024-12-01T09:00:00Z",
+      "views": 123,
+      "attachments": [],
+      "createdAt": "2024-12-01T08:00:00Z",
+      "updatedAt": "2024-12-01T08:00:00Z"
+    }
+  ],
+  "faqs": [
+    {
+      "id": 1,
+      "category": "registration",
+      "question": "如何进行会员注册？",
+      "answer": "请点击网站顶部的'会员注册'按钮，进入注册页面后，输入所需信息并提交。管理员批准后即可登录。",
+      "order": 1,
+      "isPublished": true,
+      "createdAt": "2024-01-10T09:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "category": "registration",
+      "question": "会员注册批准需要多长时间？",
+      "answer": "通常注册申请后1~2天内会完成批准处理。批准结果将通过您注册的邮箱发送通知。",
+      "order": 2,
+      "isPublished": true,
+      "createdAt": "2024-01-10T09:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 3,
+      "category": "project",
+      "question": "如何申请项目？",
+      "answer": "登录后，在'项目'菜单中查看可申请的项目，点击'申请'按钮填写申请书。",
+      "order": 1,
+      "isPublished": true,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 4,
+      "category": "performance",
+      "question": "绩效数据何时提交？",
+      "answer": "季度绩效数据请在各季度结束后1个月内提交。例如：第一季度绩效需在4月底前提交",
+      "order": 1,
+      "isPublished": true,
+      "createdAt": "2024-01-20T11:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 5,
+      "category": "performance",
+      "question": "可以修改绩效数据吗？",
+      "answer": "提交前状态的绩效数据可随时修改。提交后，在管理员批准前可以修改，批准后需要向管理员申请修改。",
+      "order": 2,
+      "isPublished": true,
+      "createdAt": "2024-01-20T11:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 6,
+      "category": "support",
+      "question": "如何进行1:1咨询？",
+      "answer": "登录后，在'支援'菜单的'1:1咨询'中填写咨询内容并提交。答复将发送至您注册的邮箱。",
+      "order": 1,
+      "isPublished": true,
+      "createdAt": "2024-02-01T09:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    }
+  ],
+  "about": {
+    "id": 1,
+    "title": "江原道创业企业门户介绍",
+    "content": "江原道创业企业门户是面向江原道内创业企业的综合支援平台。提供项目申请、绩效管理、信息共享等多种服务。",
+    "contact": {
+      "phone": "033-123-4567",
+      "email": "support@gwstartup.kr",
+      "address": "江原道春川市中央路123",
+      "officeHours": "平日 09:00 ~ 18:00"
+    },
+    "updatedAt": "2024-12-20T10:00:00Z"
+  }
+}
+

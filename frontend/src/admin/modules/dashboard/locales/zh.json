@@ -48,6 +48,7 @@
         "image": "图片",
         "url": "URL",
         "optional": "可选",
+        "enableUrl": "启用横幅点击链接",
         "urlPlaceholder": "请输入横幅点击时跳转的URL",
         "upload": "上传",
         "save": "保存"

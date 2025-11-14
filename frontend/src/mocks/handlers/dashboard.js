@@ -230,6 +230,75 @@ async function getMemberDashboardStats(req) {
   });
 }
 
+// Get admin banners (for banner management)
+async function getAdminBanners(req) {
+  await delay();
+  
+  const BANNERS_BASE_URL = `${API_BASE_URL}${API_PREFIX}/admin/banners`;
+  
+  if (shouldSimulateError(BANNERS_BASE_URL)) {
+    return HttpResponse.json(
+      { message: 'Internal server error', code: 'SERVER_ERROR' },
+      { status: getErrorStatus() }
+    );
+  }
+  
+  // Return banners in the format expected by BannerManagement component
+  // Format: { banners: { main: {...}, systemIntro: {...}, ... } }
+  const banners = {
+    main: {
+      image: null,
+      url: ''
+    },
+    systemIntro: {
+      image: null,
+      url: ''
+    },
+    projects: {
+      image: null,
+      url: ''
+    },
+    performance: {
+      image: null,
+      url: ''
+    },
+    support: {
+      image: null,
+      url: ''
+    }
+  };
+  
+  return HttpResponse.json({ banners });
+}
+
+// Update admin banner
+async function updateAdminBanner(req) {
+  await delay();
+  
+  const BANNERS_BASE_URL = `${API_BASE_URL}${API_PREFIX}/admin/banners`;
+  
+  if (shouldSimulateError(BANNERS_BASE_URL)) {
+    return HttpResponse.json(
+      { message: 'Internal server error', code: 'SERVER_ERROR' },
+      { status: getErrorStatus() }
+    );
+  }
+  
+  const { bannerKey } = req.params;
+  
+  // In a real implementation, this would save to the database
+  // For now, just return success
+  return HttpResponse.json({
+    success: true,
+    message: 'Banner updated successfully',
+    banner: {
+      key: bannerKey,
+      image: null,
+      url: ''
+    }
+  });
+}
+
 // Export handlers
 // Use absolute paths (MSW best practice)
 export const dashboardHandlers = [
@@ -237,6 +306,13 @@ export const dashboardHandlers = [
   http.get(`${ADMIN_BASE_URL}`, getAdminDashboardStats),
   http.get(`${ADMIN_BASE_URL}/stats`, getAdminDashboardStats),
   http.get(`${API_BASE_URL}${API_PREFIX}/admin/dashboard`, getAdminDashboardStats),
+  
+  // Admin: Get banners (for banner management)
+  http.get(`${API_BASE_URL}${API_PREFIX}/admin/banners`, getAdminBanners),
+  
+  // Admin: Update banner
+  http.post(`${API_BASE_URL}${API_PREFIX}/admin/banners/:bannerKey`, updateAdminBanner),
+  http.put(`${API_BASE_URL}${API_PREFIX}/admin/banners/:bannerKey`, updateAdminBanner),
   
   // Member: Get dashboard stats
   http.get(`${MEMBER_BASE_URL}`, getMemberDashboardStats),

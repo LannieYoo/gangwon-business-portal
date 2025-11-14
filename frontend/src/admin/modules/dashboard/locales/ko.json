@@ -48,6 +48,7 @@
         "image": "이미지",
         "url": "URL",
         "optional": "선택사항",
+        "enableUrl": "배너 클릭 시 링크 활성화",
         "urlPlaceholder": "배너 클릭 시 이동할 URL을 입력하세요",
         "upload": "업로드",
         "save": "저장"

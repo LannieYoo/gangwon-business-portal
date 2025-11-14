@@ -37,3 +37,6 @@ pnpm-debug.log*
 .temp
 *.tmp
 
+# Allow mocks data directory (exception to root .gitignore)
+!src/mocks/data/
+

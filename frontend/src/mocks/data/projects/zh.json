@@ -1,0 +1,259 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "title": "2025创业企业支持事业",
+      "type": "startup",
+      "status": "recruiting",
+      "startDate": "2025-01-01",
+      "endDate": "2025-12-31",
+      "recruitmentStartDate": "2024-12-01",
+      "recruitmentEndDate": "2025-02-28",
+      "budget": 50000000,
+      "description": "为新创业企业提供的综合支持计划，提供创业资金、指导、网络等多种支持。",
+      "objectives": [
+        "支持新创业企业的稳定成长",
+        "为地区经济活性化做出贡献",
+        "创造就业岗位"
+      ],
+      "scope": "江原道内创业3年以内企业",
+      "manager": "洪吉童",
+      "managerPhone": "033-123-4567",
+      "managerEmail": "hong@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 1,
+          "name": "2025创业支持事业公告.pdf",
+          "url": "/uploads/projects/1/2025创业支持事业公告.pdf",
+          "type": "document",
+          "size": 2048000,
+          "uploadedAt": "2024-11-25T09:00:00Z"
+        },
+        {
+          "id": 2,
+          "name": "申请书格式.hwp",
+          "url": "/uploads/projects/1/申请书格式.hwp",
+          "type": "document",
+          "size": 512000,
+          "uploadedAt": "2024-11-25T09:05:00Z"
+        },
+        {
+          "id": 3,
+          "name": "事业计划书格式.xlsx",
+          "url": "/uploads/projects/1/事业计划书格式.xlsx",
+          "type": "document",
+          "size": 307200,
+          "uploadedAt": "2024-11-25T09:10:00Z"
+        }
+      ],
+      "views": 234,
+      "applicationsCount": 15,
+      "isPublished": true,
+      "publishedAt": "2024-11-25T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2024-11-25T08:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "技术开发 R&D 支持",
+      "type": "rd",
+      "status": "recruiting",
+      "startDate": "2025-02-01",
+      "endDate": "2025-11-30",
+      "recruitmentStartDate": "2024-12-15",
+      "recruitmentEndDate": "2025-01-31",
+      "budget": 100000000,
+      "description": "为技术创新提供的R&D项目支持计划，支持研发费、设备购买费等。",
+      "objectives": [
+        "强化企业的技术竞争力",
+        "促进新技术开发",
+        "活跃产学研合作"
+      ],
+      "scope": "江原道内中小企业及风险企业",
+      "manager": "金英姬",
+      "managerPhone": "033-234-5678",
+      "managerEmail": "kim@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 4,
+          "name": "R&D支持事业公告.pdf",
+          "url": "/uploads/projects/2/R&D支持事业公告.pdf",
+          "type": "document",
+          "size": 2560000,
+          "uploadedAt": "2024-12-15T10:00:00Z"
+        },
+        {
+          "id": 5,
+          "name": "研究开发计划书格式.xlsx",
+          "url": "/uploads/projects/2/研究开发计划书格式.xlsx",
+          "type": "document",
+          "size": 614400,
+          "uploadedAt": "2024-12-15T10:05:00Z"
+        }
+      ],
+      "views": 456,
+      "applicationsCount": 23,
+      "isPublished": true,
+      "publishedAt": "2024-12-15T10:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2024-12-15T09:00:00Z",
+      "updatedAt": "2024-12-19T14:30:00Z"
+    },
+    {
+      "id": 3,
+      "title": "出口支持计划",
+      "type": "export",
+      "status": "closed",
+      "startDate": "2024-06-01",
+      "endDate": "2024-12-31",
+      "recruitmentStartDate": "2024-05-01",
+      "recruitmentEndDate": "2024-05-31",
+      "budget": 30000000,
+      "description": "为海外市场进军提供的综合支持计划，支持出口营销费、展览会参与费等。",
+      "objectives": [
+        "支持中小企业的海外市场进军",
+        "通过扩大出口实现地区经济增长",
+        "强化全球竞争力"
+      ],
+      "scope": "江原道内出口企业及计划出口企业",
+      "manager": "李哲洙",
+      "managerPhone": "033-345-6789",
+      "managerEmail": "lee@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 6,
+          "name": "出口支持事业公告.pdf",
+          "url": "/uploads/projects/3/出口支持事业公告.pdf",
+          "type": "document",
+          "size": 1536000,
+          "uploadedAt": "2024-05-01T09:00:00Z"
+        }
+      ],
+      "views": 123,
+      "applicationsCount": 8,
+      "isPublished": true,
+      "publishedAt": "2024-05-01T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2024-05-01T08:00:00Z",
+      "updatedAt": "2024-12-31T18:00:00Z"
+    },
+    {
+      "id": 4,
+      "title": "投资引资支持事业",
+      "type": "investment",
+      "status": "ongoing",
+      "startDate": "2024-09-01",
+      "endDate": "2025-08-31",
+      "recruitmentStartDate": "2024-08-01",
+      "recruitmentEndDate": "2024-08-31",
+      "budget": 200000000,
+      "description": "为初创企业引资提供的支持计划，提供投资匹配、IR支持等。",
+      "objectives": [
+        "活跃初创企业引资",
+        "奠定成长基础",
+        "打造投资生态系统"
+      ],
+      "scope": "江原道内创业5年以内企业",
+      "manager": "朴民洙",
+      "managerPhone": "033-456-7890",
+      "managerEmail": "park@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 7,
+          "name": "投资引资支持事业公告.pdf",
+          "url": "/uploads/projects/4/投资引资支持事业公告.pdf",
+          "type": "document",
+          "size": 3072000,
+          "uploadedAt": "2024-08-01T09:00:00Z"
+        }
+      ],
+      "views": 189,
+      "applicationsCount": 12,
+      "isPublished": true,
+      "publishedAt": "2024-08-01T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2024-08-01T08:00:00Z",
+      "updatedAt": "2024-12-18T16:00:00Z"
+    },
+    {
+      "id": 5,
+      "title": "2025绿色技术支持事业",
+      "type": "rd",
+      "status": "draft",
+      "startDate": "2025-04-01",
+      "endDate": "2025-12-31",
+      "recruitmentStartDate": "2025-03-01",
+      "recruitmentEndDate": "2025-03-31",
+      "budget": 80000000,
+      "description": "为绿色技术开发提供的R&D支持事业。（草案）",
+      "objectives": [
+        "碳中和技术开发",
+        "培育绿色产业"
+      ],
+      "scope": "江原道内中小企业",
+      "manager": "郑秀珍",
+      "managerPhone": "033-567-8901",
+      "managerEmail": "jung@gangwon.go.kr",
+      "attachments": [],
+      "views": 0,
+      "applicationsCount": 0,
+      "isPublished": false,
+      "publishedAt": null,
+      "createdBy": 1,
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    }
+  ],
+  "projectApplications": [
+    {
+      "id": 1,
+      "projectId": 1,
+      "memberId": 1,
+      "status": "submitted",
+      "applicationDate": "2024-12-10T10:00:00Z",
+      "businessPlan": "利用AI解决方案的智能工厂建设事业计划",
+      "expectedBudget": 30000000,
+      "expectedResults": "制造业高度化及生产力提升",
+      "attachments": [
+        {
+          "id": 101,
+          "name": "事业计划书.pdf",
+          "url": "/uploads/applications/1/事业计划书.pdf",
+          "type": "document",
+          "size": 2048000
+        }
+      ],
+      "reviewer": null,
+      "reviewedAt": null,
+      "reviewComment": null,
+      "createdAt": "2024-12-10T09:30:00Z",
+      "updatedAt": "2024-12-10T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "projectId": 2,
+      "memberId": 2,
+      "status": "approved",
+      "applicationDate": "2024-12-18T14:00:00Z",
+      "businessPlan": "新药开发研究开发项目",
+      "expectedBudget": 80000000,
+      "expectedResults": "确保新药候选物质及专利申请",
+      "attachments": [
+        {
+          "id": 102,
+          "name": "研究开发计划书.pdf",
+          "url": "/uploads/applications/2/研究开发计划书.pdf",
+          "type": "document",
+          "size": 3072000
+        }
+      ],
+      "reviewer": 1,
+      "reviewedAt": "2024-12-19T11:00:00Z",
+      "reviewComment": "优秀的研究开发计划，批准通过。",
+      "createdAt": "2024-12-18T13:30:00Z",
+      "updatedAt": "2024-12-19T11:00:00Z"
+    }
+  ]
+}
+

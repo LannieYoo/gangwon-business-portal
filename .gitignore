@@ -66,6 +66,8 @@ frontend/.cache/
 # Project data
 backend/data/
 data/
+# Exception: allow frontend mocks data
+!frontend/src/mocks/data/
 
 # Temporary files
 *.tmp
