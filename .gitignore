@@ -32,7 +32,6 @@ ENV/
 .env.*.local
 
 # IDE
-.vscode/
 .idea/
 .cursor/
 *.swp
