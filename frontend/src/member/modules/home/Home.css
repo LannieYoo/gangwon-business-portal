@@ -13,14 +13,93 @@
   overflow-x: hidden; /* 防止横向滚动 */
 }
 
+/* Banner 和 PageContainer 之间的距离 */
+.home .banner-section,
+.home .member-banner-section {
+  margin-bottom: 4.5rem !important;
+}
+
+/* 三列布局容器 */
+.home-three-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* 确保三列宽度完全相等 */
+  gap: 2rem;
+  margin: 0;
+  width: 100%;
+  align-items: stretch; /* 拉伸所有列到相同高度，实现上下对齐 */
+}
+
+.home-column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0; /* 防止内容溢出 */
+}
+
+/* 移除子组件的下边距，确保下边界对齐 */
+.home-column > * {
+  margin-bottom: 0 !important;
+}
+
+/* 确保子组件填充可用空间 */
+.home-column > .notices-section,
+.home-column > .news-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.home-column > .notices-section > *:last-child,
+.home-column > .news-section > *:last-child {
+  margin-bottom: 0;
+}
+
 /* Secondary Banner Section - 主横幅(2)小尺寸 */
 .secondary-banner-section {
-  margin: 3rem 0 2rem 0;
-  padding-top: 2rem;
+  margin: 0;
+  padding-top: 2rem; /* 与其他两列保持一致 */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* 填充可用空间 */
+  flex: 1; /* 允许拉伸 */
 }
 
 .secondary-banner-section .banner-section {
   margin-bottom: 0;
+  margin-top: 0;
+  /* 覆盖全屏宽度，只在列内显示 */
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  flex: 1; /* 填充可用空间 */
+  display: flex;
+  flex-direction: column;
+}
+
+.secondary-banner-section .banner-carousel {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1; /* 填充可用空间 */
+  display: flex;
+  flex-direction: column;
+}
+
+.secondary-banner-section .banner-image {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important; /* 填充可用空间，覆盖内联样式 */
+  min-height: 0; /* 允许 flex 子元素缩小 */
+  object-fit: cover !important; /* 保持图片比例 */
+}
+
+/* 确保 Banner 组件在第三列中不设置固定高度 */
+.secondary-banner-section .banner-image[style*="height"] {
+  height: 100% !important; /* 覆盖内联样式中的固定高度 */
 }
 
 /* Responsive */
@@ -31,14 +110,12 @@
 
   .home .banner-section,
   .home .member-banner-section {
-    margin-bottom: 1.5rem !important;
+    margin-bottom: 4.5rem !important;
   }
 
-  .secondary-banner-section .banner-section {
-    height: 150px !important;
+  .home-three-columns {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
-  
-  .secondary-banner-section .banner-image {
-    height: 150px !important;
-  }
+
 }

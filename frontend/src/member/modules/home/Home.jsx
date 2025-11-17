@@ -26,23 +26,30 @@ export default function Home() {
       <Banner
         bannerType={BANNER_TYPES.MAIN_PRIMARY}
         sectionClassName="member-banner-section"
-        height="500px"
+        height="400px"
       />
       
-      {/* 公告事项 - 最近5条 */}
+      {/* 三列布局：公告事项、新闻稿、主横幅(2) */}
       <PageContainer>
-        <NoticesPreview />
-        
-        {/* 新闻稿 - 最近1条缩略图 */}
-        <PressPreview />
+        <div className="home-three-columns">
+          <div className="home-column">
+            <NoticesPreview />
+          </div>
+          
+          <div className="home-column">
+            {/* 新闻稿 - 最近1条缩略图 */}
+            <PressPreview />
+          </div>
+          
+          <div className="home-column">
+            {/* 主横幅(2) - 小尺寸 */}
+            <Banner
+              bannerType={BANNER_TYPES.MAIN_SECONDARY}
+              sectionClassName="secondary-banner-section"
+            />
+          </div>
+        </div>
       </PageContainer>
-      
-      {/* 主横幅(2) - 小尺寸 */}
-      <Banner
-        bannerType={BANNER_TYPES.MAIN_SECONDARY}
-        sectionClassName="secondary-banner-section"
-        height="200px"
-      />
     </div>
   );
 }

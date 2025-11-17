@@ -7,7 +7,7 @@
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem 2rem 1.5rem;
+  padding: 1rem 2rem 4.5rem;
   box-sizing: border-box;
   /* 确保 padding 始终生效 */
   min-width: 0;
@@ -16,13 +16,13 @@
 /* 大尺寸容器 */
 .page-container-large {
   max-width: 1600px;
-  padding: 1rem 2rem 2rem;
+  padding: 1rem 2rem 4.5rem;
 }
 
 /* 小尺寸容器 */
 .page-container-small {
   max-width: 1200px;
-  padding: 1.5rem 2rem 1.5rem;
+  padding: 1.5rem 2rem 4.5rem;
 }
 
 /* 全宽度（不限制最大宽度） */
@@ -33,39 +33,39 @@
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .page-container {
-    padding: 1rem 1.5rem 1.25rem;
+    padding: 1rem 1.5rem 4.5rem;
   }
 
   .page-container-large {
-    padding: 1rem 1.5rem 1.5rem;
+    padding: 1rem 1.5rem 4.5rem;
   }
 }
 
 @media (max-width: 768px) {
   .page-container {
-    padding: 1rem 1.5rem 1.5rem;
+    padding: 1rem 1.5rem 4.5rem;
   }
 
   .page-container-large {
-    padding: 1rem 1.5rem 1.5rem;
+    padding: 1rem 1.5rem 4.5rem;
   }
 
   .page-container-small {
-    padding: 1rem 1.5rem 1.25rem;
+    padding: 1rem 1.5rem 4.5rem;
   }
 }
 
 @media (max-width: 640px) {
   .page-container {
-    padding: 1rem 1rem 1rem;
+    padding: 1rem 1rem 4.5rem;
   }
 
   .page-container-large {
-    padding: 1rem 1rem 1rem;
+    padding: 1rem 1rem 4.5rem;
   }
 
   .page-container-small {
-    padding: 1rem 1rem 1rem;
+    padding: 1rem 1rem 4.5rem;
   }
 }
 

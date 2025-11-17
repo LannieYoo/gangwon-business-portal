@@ -5,6 +5,14 @@ export default {
     "./src/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
+    // 响应式断点配置（Tailwind 默认值，明确列出便于参考）
+    screens: {
+      'sm': '640px',   // 小屏设备（手机横屏、小平板）
+      'md': '768px',   // 中等屏幕（平板竖屏）
+      'lg': '1024px',  // 大屏设备（平板横屏、小桌面）
+      'xl': '1280px',  // 超大屏（桌面）
+      '2xl': '1536px'  // 超超大屏（大桌面）
+    },
     extend: {
       colors: {
         primary: {

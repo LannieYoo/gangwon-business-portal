@@ -1,6 +1,6 @@
 /**
  * Notices Preview Component - Member Portal
- * 公告预览组件 - 显示最近5条公告
+ * 公告预览组件 - 显示最近4条公告
  */
 
 import './NoticesPreview.css';
@@ -22,7 +22,7 @@ function NoticesPreview() {
       try {
         const params = {
           page: 1,
-          page_size: 5, // 只加载最近5条
+          page_size: 4, // 只加载最近4条
           category: 'announcement' // 只加载公告，不包括新闻
         };
         const response = await apiService.get(`${API_PREFIX}/content/notices`, params);
@@ -30,7 +30,7 @@ function NoticesPreview() {
         // 处理不同的响应格式
         const noticesData = response.notices || response.data || [];
         if (Array.isArray(noticesData)) {
-          const formattedNotices = noticesData.slice(0, 5).map(n => ({
+          const formattedNotices = noticesData.slice(0, 4).map(n => ({
             id: n.id,
             title: n.title,
             date: n.publishedAt ? new Date(n.publishedAt).toISOString().split('T')[0] : (n.date || ''),
