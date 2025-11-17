@@ -37,6 +37,7 @@ const EXTENDED_ROUTE_TO_BANNER_TYPE = {
 // 默认横幅图片映射
 const DEFAULT_BANNER_IMAGES = {
   [BANNER_TYPES.MAIN_PRIMARY]: '/uploads/banners/main_primary.png',
+  [BANNER_TYPES.MAIN_SECONDARY]: '/uploads/banners/main_secondary.png',
   [BANNER_TYPES.ABOUT]: '/uploads/banners/about.png',
   [BANNER_TYPES.PROJECTS]: '/uploads/banners/projects.png',
   [BANNER_TYPES.PERFORMANCE]: '/uploads/banners/performance.png',

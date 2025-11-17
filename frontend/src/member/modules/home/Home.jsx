@@ -1,91 +1,48 @@
 /**
  * Home Page - Member Portal
  * 企业会员首页
+ * 
+ * 按照文档要求，首页包含：
+ * 1. 主横幅(1) - 大尺寸图片（点击时如有URL则跳转）
+ * 2. 公告事项 - 最近5条
+ * 3. 新闻稿 - 最近1条缩略图（点击时跳转到相应公告板）
+ * 4. 主横幅(2) - 小尺寸
  */
 
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useMemo } from 'react';
-import { Banner, Submenu } from '@shared/components';
+import { Banner } from '@shared/components';
 import { BANNER_TYPES } from '@shared/utils/constants';
-import Stats from './Stats';
-import QuickLinks from './QuickLinks';
-import NoticesList from './NoticesList';
-import NewsList from './NewsList';
+import { PageContainer } from '@member/layouts';
+import NoticesPreview from './NoticesPreview';
+import PressPreview from './PressPreview';
 import './Home.css';
 
 export default function Home() {
   const { t } = useTranslation();
-  const [currentHash, setCurrentHash] = useState(() => window.location.hash.replace('#', ''));
-
-  // 监听 hash 变化
-  useEffect(() => {
-    const handleHashChange = () => {
-      setCurrentHash(window.location.hash.replace('#', ''));
-    };
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, []);
-
-  // Submenu 配置 - 使用 useMemo 缓存，避免每次渲染都重新创建
-  const submenuItems = useMemo(() => [
-    {
-      key: 'stats',
-      label: t('home.stats.title', '我的概览'),
-      hash: 'stats',
-      isTab: true
-    },
-    {
-      key: 'quickLinks',
-      label: t('home.quickLinks.title', '快捷入口'),
-      hash: 'quickLinks',
-      isTab: true
-    },
-    {
-      key: 'notices',
-      label: t('home.notices.title', '最新公告'),
-      hash: 'notices',
-      isTab: true
-    },
-    {
-      key: 'news',
-      label: t('home.news.title', '新闻资料'),
-      hash: 'news',
-      isTab: true
-    }
-  ], [t]);
-
-  // 渲染当前激活的内容 - 使用 useMemo 缓存，避免不必要的重新渲染
-  const renderContent = useMemo(() => {
-    const hash = currentHash || 'stats';
-    switch (hash) {
-      case 'stats':
-        return <Stats />;
-      case 'quickLinks':
-        return <QuickLinks />;
-      case 'notices':
-        return <NoticesList />;
-      case 'news':
-        return <NewsList />;
-      default:
-        return <Stats />;
-    }
-  }, [currentHash]);
 
   return (
     <div className="home">
+      {/* 主横幅(1) - 大尺寸 */}
       <Banner
         bannerType={BANNER_TYPES.MAIN_PRIMARY}
         sectionClassName="member-banner-section"
+        height="500px"
       />
       
-      <Submenu items={submenuItems} renderLeft={() => null} />
+      {/* 公告事项 - 最近5条 */}
+      <PageContainer>
+        <NoticesPreview />
+        
+        {/* 新闻稿 - 最近1条缩略图 */}
+        <PressPreview />
+      </PageContainer>
       
-      <div className="home-tab-content">
-        {renderContent}
-      </div>
+      {/* 主横幅(2) - 小尺寸 */}
+      <Banner
+        bannerType={BANNER_TYPES.MAIN_SECONDARY}
+        sectionClassName="secondary-banner-section"
+        height="200px"
+      />
     </div>
   );
 }

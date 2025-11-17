@@ -4,7 +4,6 @@
  */
 
 import { Outlet } from 'react-router-dom';
-import { memo } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import './MemberLayout.css';
@@ -26,6 +25,5 @@ function MemberLayout() {
   );
 }
 
-// 使用 memo 包装，避免不必要的重渲染
-export default memo(MemberLayout);
+export default MemberLayout;
 

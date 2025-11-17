@@ -29,7 +29,7 @@ export default function Features() {
     {
       title: t('about.features.management.title'),
       description: t('about.features.management.description'),
-      link: '/member/profile',
+      link: '/member/performance/company-info',
       linkText: t('common.visit') || 'Visit',
       imageUrl: '/uploads/banners/main_primary.png'
     },

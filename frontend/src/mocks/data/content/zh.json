@@ -138,6 +138,34 @@
       "endDate": "2025-12-31",
       "createdAt": "2024-12-20T10:00:00Z",
       "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 11,
+      "type": "main_secondary",
+      "title": "2025年江原道创业企业支援指南",
+      "subtitle": "全方位支持，助力企业成长",
+      "imageUrl": "/uploads/banners/main_secondary.png",
+      "linkUrl": "/member/about",
+      "order": 1,
+      "isActive": true,
+      "startDate": "2024-12-01",
+      "endDate": "2025-12-31",
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 12,
+      "type": "main_secondary",
+      "title": "加入我们，共创未来",
+      "subtitle": "江原道创业企业门户，为您的事业保驾护航",
+      "imageUrl": "/uploads/banners/scroll.png",
+      "linkUrl": "/member/projects",
+      "order": 2,
+      "isActive": true,
+      "startDate": "2024-12-01",
+      "endDate": "2025-12-31",
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
     }
   ],
   "popups": [
@@ -310,6 +338,100 @@
       ],
       "createdAt": "2024-11-30T09:00:00Z",
       "updatedAt": "2024-11-30T10:00:00Z"
+    },
+    {
+      "id": 9,
+      "title": "江原道创业企业成功案例分享",
+      "content": "介绍江原道地区创业企业的成功案例，为其他企业提供参考和启发。本期重点介绍人工智能领域的创新企业。",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-22T14:00:00Z",
+      "views": 892,
+      "thumbnailUrl": "/uploads/news/9/thumbnail.jpg",
+      "imageUrl": "/uploads/news/9/main.jpg",
+      "attachments": [],
+      "createdAt": "2024-12-22T13:00:00Z",
+      "updatedAt": "2024-12-22T14:00:00Z"
+    },
+    {
+      "id": 10,
+      "title": "2025年江原道创业博览会即将开幕",
+      "content": "2025年江原道创业博览会将于3月在春川市举行。届时将展示各类创业企业的创新产品和服务，欢迎各界人士参观。",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-20T11:30:00Z",
+      "views": 654,
+      "thumbnailUrl": "/uploads/news/10/thumbnail.jpg",
+      "imageUrl": "/uploads/news/10/main.jpg",
+      "attachments": [
+        {
+          "id": 10,
+          "name": "创业博览会参展指南.pdf",
+          "url": "/uploads/news/10/创业博览会参展指南.pdf",
+          "type": "document",
+          "size": 1820000
+        }
+      ],
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T11:30:00Z"
+    },
+    {
+      "id": 11,
+      "title": "数字化转型支援项目成果报告",
+      "content": "2024年江原道创业企业数字化转型支援项目圆满完成，共有50家企业参与，成功实现数字化转型目标。",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-18T15:00:00Z",
+      "views": 523,
+      "thumbnailUrl": "/uploads/news/11/thumbnail.jpg",
+      "imageUrl": "/uploads/news/11/main.jpg",
+      "attachments": [
+        {
+          "id": 11,
+          "name": "数字化转型项目成果报告.pdf",
+          "url": "/uploads/news/11/数字化转型项目成果报告.pdf",
+          "type": "document",
+          "size": 3420000
+        }
+      ],
+      "createdAt": "2024-12-18T14:00:00Z",
+      "updatedAt": "2024-12-18T15:00:00Z"
+    },
+    {
+      "id": 12,
+      "title": "江原道创业企业国际交流活动圆满结束",
+      "content": "为期一周的江原道创业企业国际交流活动圆满结束。来自多个国家的创业企业与江原道本地企业进行了深入的交流与合作洽谈。",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-15T16:00:00Z",
+      "views": 756,
+      "thumbnailUrl": "/uploads/news/12/thumbnail.jpg",
+      "imageUrl": "/uploads/news/12/main.jpg",
+      "attachments": [],
+      "createdAt": "2024-12-15T15:00:00Z",
+      "updatedAt": "2024-12-15T16:00:00Z"
+    },
+    {
+      "id": 13,
+      "title": "绿色技术创业企业加速器项目启动",
+      "content": "为推动江原道地区绿色技术产业的发展，现启动绿色技术创业企业加速器项目，为相关企业提供资金、技术、市场等多方面的支持。",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-12T10:00:00Z",
+      "views": 431,
+      "thumbnailUrl": "/uploads/news/13/thumbnail.jpg",
+      "imageUrl": "/uploads/news/13/main.jpg",
+      "attachments": [
+        {
+          "id": 13,
+          "name": "绿色技术加速器项目说明.pdf",
+          "url": "/uploads/news/13/绿色技术加速器项目说明.pdf",
+          "type": "document",
+          "size": 2750000
+        }
+      ],
+      "createdAt": "2024-12-12T09:00:00Z",
+      "updatedAt": "2024-12-12T10:00:00Z"
     }
   ],
   "faqs": [

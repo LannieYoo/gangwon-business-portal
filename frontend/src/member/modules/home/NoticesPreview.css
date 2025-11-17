@@ -1,72 +1,46 @@
 /**
- * Notices List Page Styles - Member Portal
- * 公告列表页面样式
+ * Notices Preview Component Styles - Member Portal
+ * 公告预览组件样式
  */
 
-.page-header {
+.notices-section {
+  margin-bottom: 3rem;
+  padding-top: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 1.5rem;
 }
 
-.page-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
   color: #111827;
-  margin: 0 0 0.5rem 0;
-}
-
-.page-description {
-  font-size: 1rem;
-  color: #6b7280;
   margin: 0;
 }
 
-.loading-state,
-.empty-state,
-.error-state {
-  text-align: center;
-  padding: 3rem 2rem;
-}
-
-.loading-state p,
-.empty-state p {
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0;
-}
-
-.error-state {
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 0.5rem;
-}
-
-.error-message {
-  font-size: 1rem;
-  color: #dc2626;
-  margin: 0 0 1rem 0;
-}
-
-.retry-button {
-  padding: 0.5rem 1.5rem;
-  background-color: #dc2626;
-  color: white;
-  border: none;
-  border-radius: 0.375rem;
+.view-all {
+  color: #2563eb;
+  text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.retry-button:hover {
-  background-color: #b91c1c;
+.view-all:hover {
+  color: #3b82f6;
+  text-decoration: underline;
 }
 
 .notices-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem;
 }
 
 .notice-card {
@@ -74,22 +48,19 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 0.5rem;
 }
 
-.notice-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
+/* 移除悬停效果，因为卡片不可点击 */
+/* .notice-card:hover { } */
 
 .notice-card-link {
   display: flex;
   flex-direction: column;
   padding: 1.25rem;
-  text-decoration: none;
   color: inherit;
   height: 100%;
   flex: 1;
+  cursor: default;
 }
 
 .notice-card-header {
@@ -120,6 +91,14 @@
   flex: 1;
 }
 
+.notice-card-empty {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  text-align: center;
+  padding: 1rem;
+}
+
 .badge {
   display: inline-block;
   padding: 0.25rem 0.5rem;
@@ -134,16 +113,28 @@
   color: #dc2626;
 }
 
-.pagination-wrapper {
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: center;
+.loading-state {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .page-header h1 {
-    font-size: 1.5rem;
+  .notices-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
   .notices-grid {

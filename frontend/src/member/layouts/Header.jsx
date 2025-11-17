@@ -5,7 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { useState, useRef, useEffect, useMemo, memo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import useAuthStore from '@shared/stores/authStore';
 import LanguageSwitcher from '@shared/components/LanguageSwitcher';
 import {
@@ -31,8 +31,8 @@ function Header() {
   const userMenuRef = useRef(null);
   const notificationsRef = useRef(null);
 
-  // 一级导航菜单 - 使用 useMemo 缓存，避免每次渲染都重新创建
-  const mainMenuItems = useMemo(() => [
+  // 一级导航菜单
+  const mainMenuItems = [
     {
       key: 'home',
       path: '/member/home',
@@ -64,17 +64,15 @@ function Header() {
       icon: SupportIcon,
       label: t('menu.support')
     }
-  ], [t]);
+  ];
 
-  // 使用 useMemo 缓存菜单激活状态计算
-  const isMenuActive = useMemo(() => {
-    return (item) => {
-      if (item.exact) {
-        return location.pathname === item.path;
-      }
-      return location.pathname.startsWith(item.path);
-    };
-  }, [location.pathname]);
+  // 菜单激活状态计算
+  const isMenuActive = (item) => {
+    if (item.exact) {
+      return location.pathname === item.path;
+    }
+    return location.pathname.startsWith(item.path);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -212,7 +210,7 @@ function Header() {
               <div className="menu-divider" />
               
               <Link 
-                to="/member/profile"
+                to="/member/performance/company-info"
                 className="menu-item"
                 onClick={() => setShowUserMenu(false)}
               >
@@ -246,6 +244,5 @@ function Header() {
   );
 }
 
-// 使用 memo 包装组件，避免不必要的重渲染
-export default memo(Header);
+export default Header;
 

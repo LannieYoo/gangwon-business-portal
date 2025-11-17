@@ -138,6 +138,34 @@
       "endDate": "2025-12-31",
       "createdAt": "2024-12-20T10:00:00Z",
       "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 11,
+      "type": "main_secondary",
+      "title": "2025년 강원도 창업기업 지원 가이드",
+      "subtitle": "전방위 지원으로 기업 성장을 돕습니다",
+      "imageUrl": "/uploads/banners/main_secondary.png",
+      "linkUrl": "/member/about",
+      "order": 1,
+      "isActive": true,
+      "startDate": "2024-12-01",
+      "endDate": "2025-12-31",
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 12,
+      "type": "main_secondary",
+      "title": "함께 성장하는 강원도 창업기업 포털",
+      "subtitle": "강원도 창업기업 포털이 여러분의 사업을 함께 합니다",
+      "imageUrl": "/uploads/banners/scroll.png",
+      "linkUrl": "/member/projects",
+      "order": 2,
+      "isActive": true,
+      "startDate": "2024-12-01",
+      "endDate": "2025-12-31",
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
     }
   ],
   "popups": [
@@ -310,6 +338,100 @@
       ],
       "createdAt": "2024-11-30T09:00:00Z",
       "updatedAt": "2024-11-30T10:00:00Z"
+    },
+    {
+      "id": 9,
+      "title": "강원도 창업기업 성공사례 공유",
+      "content": "강원도 지역 창업기업의 성공사례를 소개하여 다른 기업들에게 참고와 영감을 제공합니다. 이번 호에서는 인공지능 분야의 혁신 기업을 집중 소개합니다.",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-22T14:00:00Z",
+      "views": 892,
+      "thumbnailUrl": "/uploads/news/9/thumbnail.jpg",
+      "imageUrl": "/uploads/news/9/main.jpg",
+      "attachments": [],
+      "createdAt": "2024-12-22T13:00:00Z",
+      "updatedAt": "2024-12-22T14:00:00Z"
+    },
+    {
+      "id": 10,
+      "title": "2025년 강원도 창업박람회 개최 예정",
+      "content": "2025년 강원도 창업박람회가 3월 춘천시에서 개최됩니다. 각종 창업기업의 혁신 제품과 서비스를 전시하며, 많은 분들의 관람을 환영합니다.",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-20T11:30:00Z",
+      "views": 654,
+      "thumbnailUrl": "/uploads/news/10/thumbnail.jpg",
+      "imageUrl": "/uploads/news/10/main.jpg",
+      "attachments": [
+        {
+          "id": 10,
+          "name": "창업박람회참가가이드.pdf",
+          "url": "/uploads/news/10/창업박람회참가가이드.pdf",
+          "type": "document",
+          "size": 1820000
+        }
+      ],
+      "createdAt": "2024-12-20T10:00:00Z",
+      "updatedAt": "2024-12-20T11:30:00Z"
+    },
+    {
+      "id": 11,
+      "title": "디지털 전환 지원 프로젝트 성과보고",
+      "content": "2024년 강원도 창업기업 디지털 전환 지원 프로젝트가 성공적으로 완료되었으며, 총 50개 기업이 참여하여 디지털 전환 목표를 달성했습니다.",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-18T15:00:00Z",
+      "views": 523,
+      "thumbnailUrl": "/uploads/news/11/thumbnail.jpg",
+      "imageUrl": "/uploads/news/11/main.jpg",
+      "attachments": [
+        {
+          "id": 11,
+          "name": "디지털전환프로젝트성과보고서.pdf",
+          "url": "/uploads/news/11/디지털전환프로젝트성과보고서.pdf",
+          "type": "document",
+          "size": 3420000
+        }
+      ],
+      "createdAt": "2024-12-18T14:00:00Z",
+      "updatedAt": "2024-12-18T15:00:00Z"
+    },
+    {
+      "id": 12,
+      "title": "강원도 창업기업 국제교류 행사 성황리에 마무리",
+      "content": "일주일간 진행된 강원도 창업기업 국제교류 행사가 성황리에 마무리되었습니다. 여러 국가의 창업기업과 강원도 지역 기업 간의 깊이 있는 교류와 협력이 이루어졌습니다.",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-15T16:00:00Z",
+      "views": 756,
+      "thumbnailUrl": "/uploads/news/12/thumbnail.jpg",
+      "imageUrl": "/uploads/news/12/main.jpg",
+      "attachments": [],
+      "createdAt": "2024-12-15T15:00:00Z",
+      "updatedAt": "2024-12-15T16:00:00Z"
+    },
+    {
+      "id": 13,
+      "title": "그린기술 창업기업 액셀러레이터 프로젝트 출범",
+      "content": "강원도 지역 그린기술 산업 발전을 위해 그린기술 창업기업 액셀러레이터 프로젝트를 출범하여 관련 기업들에게 자금, 기술, 시장 등 전방위적 지원을 제공합니다.",
+      "category": "news",
+      "isPublished": true,
+      "publishedAt": "2024-12-12T10:00:00Z",
+      "views": 431,
+      "thumbnailUrl": "/uploads/news/13/thumbnail.jpg",
+      "imageUrl": "/uploads/news/13/main.jpg",
+      "attachments": [
+        {
+          "id": 13,
+          "name": "그린기술액셀러레이터프로젝트안내.pdf",
+          "url": "/uploads/news/13/그린기술액셀러레이터프로젝트안내.pdf",
+          "type": "document",
+          "size": 2750000
+        }
+      ],
+      "createdAt": "2024-12-12T09:00:00Z",
+      "updatedAt": "2024-12-12T10:00:00Z"
     }
   ],
   "faqs": [

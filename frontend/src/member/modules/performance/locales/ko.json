@@ -1,11 +1,14 @@
 {
   "performance": {
-    "title": "실적 관리",
-    "subtitle": "기업 실적 데이터 입력 및 관리",
+    "title": "성과 관리",
+    "subtitle": "기업 성과 데이터 입력 및 관리",
+    "companyInfo": "기업 정보",
+    "query": "성과 조회",
+    "input": "성과 입력",
     "searchPlaceholder": "연도 또는 분기로 검색",
     "resultsCount": "총 {{count}}건",
-    "createNew": "실적 등록",
-    "edit": "실적 수정",
+    "createNew": "성과 등록",
+    "edit": "성과 수정",
     "saveDraft": "임시저장",
     "supplement": "보완하기",
     "year": "연도",
@@ -17,8 +20,8 @@
     "quarterly": "분기",
     "annual": "연간",
     "selectQuarter": "분기 선택",
-    "quarterHint": "분기를 선택하지 않으면 연간 실적으로 처리됩니다.",
-    "type": "실적 유형",
+    "quarterHint": "분기를 선택하지 않으면 연간 성과로 처리됩니다.",
+    "type": "성과 유형",
     "sales": "매출액",
     "employment": "고용인원",
     "governmentSupport": "정부지원",
@@ -32,10 +35,18 @@
     "people": "명",
     "proofDocument": "증빙서류",
     "proofDocumentsDesc": "매출액, 고용인원, 정부지원 등 관련 증빙서류를 업로드해주세요.",
-    "fileUploadHint": "파일 형식: PDF, DOC, XLS / 최대 10MB",
+    "fileUploadHint": "파일 형식: PDF / 최대 10MB",
     "uploadedFiles": "업로드된 파일",
     "notes": "비고",
     "notesPlaceholder": "기타 설명이 필요한 사항을 입력하세요",
+    "approvalNotice": "관리자 승인 전에는 관리자 승인 후에만 화면에 표시됩니다",
+    "delete": "삭제",
+    "modify": "수정",
+    "download": "다운로드",
+    "documentType": "문서 유형",
+    "fileName": "파일명",
+    "documentStatus": "문서 상태",
+    "documentConfirm": "문서 확인",
     "status": {
       "draft": "임시저장",
       "submitted": "제출 완료",
@@ -48,13 +59,81 @@
     "reviewComments": "검토 의견",
     "sections": {
       "basicInfo": "기본 정보",
-      "salesEmployment": "매출 및 고용",
-      "governmentSupport": "정부지원",
+      "salesEmployment": "매출 고용",
+      "governmentSupport": "정부지원 수혜 이력",
       "intellectualProperty": "지식재산권",
       "proofDocuments": "증빙서류",
       "notes": "비고",
       "reviewInfo": "검토 정보"
+    },
+    "tabs": {
+      "salesEmployment": "매출 고용",
+      "governmentSupport": "정부지원 수혜 이력",
+      "intellectualProperty": "지식재산권"
+    },
+    "salesEmploymentFields": {
+      "sales": "매출액",
+      "salesPerformance": "매출 실적",
+      "previousYear": "전년도",
+      "reportingDate": "작성 기준일",
+      "export": "수출액",
+      "exchangeRate": "연보 발행시 환율 기준",
+      "employment": "고용 창출",
+      "employmentCount": "고용인원",
+      "currentEmployees": "현재 직원 수",
+      "newEmployees": "신규 고용 인원",
+      "totalEmployees": "총 인원",
+      "unit": {
+        "won": "원",
+        "people": "명"
+      }
+    },
+    "governmentSupportFields": {
+      "projectName": "실행 프로젝트명",
+      "startupProjectName": "창업 프로젝트명",
+      "supportPeriod": "지원 기간",
+      "startDate": "시작일",
+      "endDate": "종료일",
+      "supportAmount": "지원 금액",
+      "supportAmountUnit": "천원",
+      "supportOrganization": "지원 기관명",
+      "add": "추가"
+    },
+    "intellectualPropertyFields": {
+      "name": "지식재산권명",
+      "number": "지식재산권번호",
+      "type": "지식재산권 구분",
+      "registrationType": "지식재산권 등록 구분",
+      "country": "등록 국가",
+      "overseasType": "해외 신청 구분",
+      "registrationDate": "등록일",
+      "publicDisclosure": "공개 희망 여부",
+      "proofDocument": "증명 자료 첨부",
+      "types": {
+        "patent": "특허",
+        "trademark": "상표권",
+        "utility": "실용신안",
+        "design": "디자인",
+        "other": "기타"
+      },
+      "registrationTypes": {
+        "application": "신청",
+        "registered": "등록"
+      },
+      "countries": {
+        "korea": "대한민국",
+        "usa": "미국",
+        "uk": "영국",
+        "china": "중국",
+        "japan": "일본",
+        "europe": "유럽",
+        "other": "기타 국가"
+      },
+      "overseasTypes": {
+        "domestic": "국내 신청",
+        "pct": "PCT 해외 신청",
+        "general": "일반 해외 신청"
+      }
     }
   }
 }
-

@@ -81,10 +81,11 @@ const AdminLogin = lazy(() => import('@admin/modules/auth/Login').then(m => ({ d
 // Lazy load member modules
 const MemberHome = lazy(() => import('@member/modules/home/Home').then(m => ({ default: m.default })));
 const MemberProjects = lazy(() => import('@member/modules/projects/Projects').then(m => ({ default: m.default })));
-const MemberProfile = lazy(() => import('@member/modules/profile/Profile').then(m => ({ default: m.default })));
 const MemberAbout = lazy(() => import('@member/modules/about/About').then(m => ({ default: m.default })));
 const MemberPerformance = lazy(() => import('@member/modules/performance').then(m => ({ default: m.default })));
 const MemberSupport = lazy(() => import('@member/modules/support/Support').then(m => ({ default: m.default })));
+const NoticesList = lazy(() => import('@member/modules/home/NoticesList').then(m => ({ default: m.default })));
+const PressList = lazy(() => import('@member/modules/home/PressList').then(m => ({ default: m.default })));
 
 // Lazy load admin modules
 const AdminDashboard = lazy(() => import('@admin/modules/dashboard').then(m => ({ default: m.default })));
@@ -200,19 +201,31 @@ export const router = createBrowserRouter(
           )
         },
         {
-          path: 'profile',
-          element: (
-            <LazyRoute>
-              <MemberProfile />
-            </LazyRoute>
-          )
-        },
-        {
           path: 'support',
           element: (
             <ProtectedRoute allowedRoles={['member']}>
               <LazyRoute>
                 <MemberSupport />
+              </LazyRoute>
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: 'notices',
+          element: (
+            <ProtectedRoute allowedRoles={['member']}>
+              <LazyRoute>
+                <NoticesList />
+              </LazyRoute>
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: 'press',
+          element: (
+            <ProtectedRoute allowedRoles={['member']}>
+              <LazyRoute>
+                <PressList />
               </LazyRoute>
             </ProtectedRoute>
           )

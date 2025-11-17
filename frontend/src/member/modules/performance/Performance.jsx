@@ -1,12 +1,13 @@
 /**
  * Performance Page - Member Portal
- * 绩效管理主页面
+ * 成果管理主页面
  */
 
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { Banner, Submenu } from '@shared/components';
 import { BANNER_TYPES } from '@shared/utils/constants';
+import PerformanceCompanyInfo from './PerformanceCompanyInfo';
 import PerformanceListContent from './PerformanceListContent';
 import PerformanceFormContent from './PerformanceFormContent';
 import './Performance.css';
@@ -27,32 +28,40 @@ export default function Performance() {
     };
   }, []);
 
-  // Submenu 配置
+  // Submenu 配置 - 按照文档要求：企业信息、成果查询、成果输入
   const submenuItems = [
     {
-      key: 'performance-list',
-      label: t('performance.title', '绩效管理'),
-      hash: 'list',
+      key: 'company-info',
+      label: t('performance.companyInfo', '企业信息'),
+      hash: 'company-info',
       isTab: true
     },
     {
-      key: 'performance-new',
-      label: t('performance.createNew', '新增绩效'),
-      hash: 'new',
+      key: 'performance-query',
+      label: t('performance.query', '成果查询'),
+      hash: 'query',
+      isTab: true
+    },
+    {
+      key: 'performance-input',
+      label: t('performance.input', '成果输入'),
+      hash: 'input',
       isTab: true
     }
   ];
 
   // 渲染当前激活的内容
   const renderContent = () => {
-    const hash = currentHash || 'list';
+    const hash = currentHash || 'company-info';
     switch (hash) {
-      case 'list':
+      case 'company-info':
+        return <PerformanceCompanyInfo />;
+      case 'query':
         return <PerformanceListContent />;
-      case 'new':
+      case 'input':
         return <PerformanceFormContent />;
       default:
-        return <PerformanceListContent />;
+        return <PerformanceCompanyInfo />;
     }
   };
 

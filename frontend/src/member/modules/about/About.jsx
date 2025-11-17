@@ -4,7 +4,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Banner, Submenu } from '@shared/components';
 import { BANNER_TYPES } from '@shared/utils/constants';
 import Overview from './Overview';
@@ -25,14 +25,14 @@ export default function About() {
   const { t } = useTranslation();
   
   // 从 URL hash 获取当前激活的选项卡
-  const getActiveTabFromHash = useCallback(() => {
+  const getActiveTabFromHash = () => {
     const hash = window.location.hash.replace('#', '');
     if (hash && Object.values(TAB_TYPES).includes(hash)) {
       return hash;
     }
     // 默认显示第一个选项卡
     return TAB_TYPES.OVERVIEW;
-  }, []);
+  };
 
   const [activeTab, setActiveTab] = useState(getActiveTabFromHash);
 
@@ -52,7 +52,7 @@ export default function About() {
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
     };
-  }, [getActiveTabFromHash]);
+  }, []);
 
   // 渲染当前激活的组件内容
   const renderActiveContent = () => {

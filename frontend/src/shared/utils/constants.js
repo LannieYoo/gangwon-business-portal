@@ -200,6 +200,7 @@ export const ROUTES = {
   MEMBER_SUPPORT: '/member/support',
   MEMBER_NOTICES: '/member/notices',
   MEMBER_NEWS: '/member/news',
+  MEMBER_PRESS: '/member/press',
   
   // Admin
   ADMIN_HOME: '/admin',

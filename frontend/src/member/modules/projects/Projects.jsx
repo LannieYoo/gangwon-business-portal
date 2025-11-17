@@ -1,46 +1,17 @@
 /**
- * Projects Page - Member Portal
- * 项目列表主页面
+ * Projects Page Container - Member Portal
+ * 项目页面容器组件
  */
 
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Banner, Submenu } from '@shared/components';
-import { BANNER_TYPES } from '@shared/utils/constants';
-import './Projects.css';
+import { Routes, Route } from 'react-router-dom';
+import ProjectList from './ProjectList';
+import ProjectDetail from './ProjectDetail';
 
 export default function Projects() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-
-  // 获取 submenu 配置
-  const getSubmenuItems = () => {
-    return [
-      {
-        key: 'projects-list',
-        path: '/member/projects',
-        label: t('projects.title', '项目管理'),
-        exact: true,
-        onNavigate: (item) => {
-          navigate(item.path);
-        }
-      }
-    ];
-  };
-
   return (
-    <div className="projects">
-      <Banner
-        bannerType={BANNER_TYPES.PROJECTS}
-        sectionClassName="member-banner-section"
-      />
-      <Submenu
-        items={getSubmenuItems()}
-        className="projects-submenu"
-        headerSelector=".member-header"
-      />
-      <p>Projects page</p>
-    </div>
+    <Routes>
+      <Route index element={<ProjectList />} />
+      <Route path=":id" element={<ProjectDetail />} />
+    </Routes>
   );
 }
-

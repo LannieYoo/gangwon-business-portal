@@ -1,0 +1,149 @@
+/**
+ * Rolling Banner Card Component Styles - Member Portal
+ * 滚动横幅卡片组件样式
+ */
+
+.rolling-banner-card {
+  width: 100%;
+  position: relative;
+}
+
+.rolling-banner-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.rolling-banner-image {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  position: relative;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.rolling-banner-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  padding: 2rem;
+  color: white;
+}
+
+.rolling-banner-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.rolling-banner-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.rolling-banner-btn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.rolling-banner-btn-prev {
+  left: 1rem;
+}
+
+.rolling-banner-btn-next {
+  right: 1rem;
+}
+
+.rolling-banner-btn-pause {
+  top: auto;
+  bottom: 1rem;
+  right: 1rem;
+  transform: none;
+}
+
+.rolling-banner-btn-pause:hover {
+  transform: scale(1.1);
+}
+
+.rolling-banner-indicators {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.rolling-banner-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.rolling-banner-indicator:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.rolling-banner-indicator.active {
+  background-color: white;
+  width: 24px;
+  border-radius: 5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .rolling-banner-image {
+    min-height: 200px;
+  }
+
+  .rolling-banner-overlay {
+    padding: 1.5rem;
+  }
+
+  .rolling-banner-title {
+    font-size: 1.25rem;
+  }
+
+  .rolling-banner-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .rolling-banner-btn-prev {
+    left: 0.5rem;
+  }
+
+  .rolling-banner-btn-next {
+    right: 0.5rem;
+  }
+
+  .rolling-banner-btn-pause {
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
+}
+

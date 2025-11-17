@@ -249,12 +249,12 @@
   }
 
   /* Page Layout */
-  .page-container {
-    @apply min-h-screen flex flex-col;
-  }
+  /* Note: .page-container is defined in member/layouts/PageContainer.css */
 
   .page-header {
-    @apply bg-white shadow;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
   .page-main {

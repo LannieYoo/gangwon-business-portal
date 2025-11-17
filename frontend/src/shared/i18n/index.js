@@ -27,8 +27,6 @@ import homeKo from '@member/modules/home/locales/ko.json';
 import homeZh from '@member/modules/home/locales/zh.json';
 import aboutKo from '@member/modules/about/locales/ko.json';
 import aboutZh from '@member/modules/about/locales/zh.json';
-import profileKo from '@member/modules/profile/locales/ko.json';
-import profileZh from '@member/modules/profile/locales/zh.json';
 import projectsKo from '@member/modules/projects/locales/ko.json';
 import projectsZh from '@member/modules/projects/locales/zh.json';
 import performanceKo from '@member/modules/performance/locales/ko.json';
@@ -90,7 +88,6 @@ const memberKo = mergeModules(
   authKo,
   homeKo,
   aboutKo,
-  profileKo,
   projectsKo,
   performanceKo,
   supportKo
@@ -101,7 +98,6 @@ const memberZh = mergeModules(
   authZh,
   homeZh,
   aboutZh,
-  profileZh,
   projectsZh,
   performanceZh,
   supportZh

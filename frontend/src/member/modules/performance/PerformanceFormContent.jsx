@@ -1,6 +1,6 @@
 /**
  * Performance Form Content - Member Portal
- * 绩效数据录入表单内容组件
+ * 成果输入表单内容组件 - 包含3种输入形式（标签页）
  */
 
 import { useTranslation } from 'react-i18next';
@@ -10,100 +10,186 @@ import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
+import { Tabs } from '@shared/components';
 import { apiService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import { PaperclipIcon, DocumentIcon, XIcon } from '@shared/components/Icons';
+import { PaperclipIcon, DocumentIcon, XIcon, PlusIcon } from '@shared/components/Icons';
 import './Performance.css';
 
 export default function PerformanceFormContent() {
   const { t } = useTranslation();
-  const isEdit = false; // 编辑功能可通过 hash 参数实现，如 #edit-${id}
-  
+  const [activeTab, setActiveTab] = useState('salesEmployment');
   const [formData, setFormData] = useState({
     year: new Date().getFullYear(),
     quarter: '',
-    sales: '',
-    employment: '',
-    governmentSupport: '',
-    intellectualProperty: {
-      patents: '',
-      trademarks: '',
-      copyrights: '',
-      certifications: ''
+    // 销售额雇佣
+    salesEmployment: {
+      sales: {
+        previousYear: '',
+        reportingDate: ''
+      },
+      export: {
+        previousYear: '',
+        reportingDate: ''
+      },
+      employment: {
+        currentEmployees: {
+          previousYear: '',
+          reportingDate: ''
+        },
+        newEmployees: {
+          previousYear: '',
+          reportingDate: ''
+        },
+        totalEmployees: {
+          previousYear: '',
+          reportingDate: ''
+        }
+      }
     },
-    proofDocuments: [],
-    notes: ''
+    // 政府支持受惠历史
+    governmentSupport: [],
+    // 知识产权
+    intellectualProperty: []
   });
 
-  useEffect(() => {
-    // 编辑功能可通过 hash 参数实现，如 #edit-${id}
-    // 当前仅支持新建功能
-    if (isEdit) {
-      // TODO: 从 hash 中解析 id，如 window.location.hash === '#edit-123'
-      // TODO: 从 API 获取绩效数据
-      // Mock data for development
-      setFormData({
-        year: 2024,
-        quarter: 4,
-        sales: '50000000',
-        employment: '15',
-        governmentSupport: '10000000',
-        intellectualProperty: {
-          patents: '1',
-          trademarks: '1',
-          copyrights: '0',
-          certifications: '0'
-        },
-        proofDocuments: [],
-        notes: ''
-      });
-    }
-  }, [isEdit]);
+  // 格式化数字（每3位加逗号）
+  const formatNumber = (value) => {
+    if (!value) return '';
+    const num = value.toString().replace(/,/g, '');
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  // 解析数字（移除逗号）
+  const parseNumber = (value) => {
+    return value ? value.toString().replace(/,/g, '') : '';
+  };
 
   const handleChange = (field, value) => {
-    if (field.startsWith('intellectualProperty.')) {
-      const ipField = field.split('.')[1];
-      setFormData(prev => ({
-        ...prev,
-        intellectualProperty: {
-          ...prev.intellectualProperty,
-          [ipField]: value
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleNestedChange = (path, value) => {
+    setFormData(prev => {
+      const newData = JSON.parse(JSON.stringify(prev)); // 深拷贝
+      const keys = path.split('.');
+      let target = newData;
+      
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!target[keys[i]]) {
+          target[keys[i]] = {};
         }
-      }));
-    } else {
+        target = target[keys[i]];
+      }
+      
+      target[keys[keys.length - 1]] = value;
+      return newData;
+    });
+  };
+
+  const handleNumberChange = (path, value) => {
+    const numValue = parseNumber(value);
+    handleNestedChange(path, numValue);
+  };
+
+  // 添加政府支持记录
+  const addGovernmentSupport = () => {
       setFormData(prev => ({
         ...prev,
-        [field]: value
-      }));
+      governmentSupport: [
+        ...prev.governmentSupport,
+        {
+          projectName: '',
+          startupProjectName: '',
+          startDate: '',
+          endDate: '',
+          supportAmount: '',
+          supportOrganization: ''
+        }
+      ]
+    }));
+  };
+
+  // 删除政府支持记录
+  const removeGovernmentSupport = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      governmentSupport: prev.governmentSupport.filter((_, i) => i !== index)
+    }));
+  };
+
+  // 更新政府支持记录
+  const updateGovernmentSupport = (index, field, value) => {
+      setFormData(prev => ({
+        ...prev,
+      governmentSupport: prev.governmentSupport.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+
+  // 添加知识产权记录
+  const addIntellectualProperty = () => {
+    setFormData(prev => ({
+      ...prev,
+      intellectualProperty: [
+        ...prev.intellectualProperty,
+        {
+          name: '',
+          number: '',
+          type: '',
+          registrationType: '',
+          country: '',
+          overseasType: '',
+          registrationDate: '',
+          publicDisclosure: '',
+          proofDocument: null
+        }
+      ]
+    }));
+  };
+
+  // 删除知识产权记录
+  const removeIntellectualProperty = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      intellectualProperty: prev.intellectualProperty.filter((_, i) => i !== index)
+    }));
+  };
+
+  // 更新知识产权记录
+  const updateIntellectualProperty = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      intellectualProperty: prev.intellectualProperty.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+
+  // 处理文件上传
+  const handleFileUpload = (index, file) => {
+    if (file && file.type !== 'application/pdf') {
+      alert(t('performance.fileUploadHint', '仅支持PDF格式'));
+      return;
     }
-  };
-
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setFormData(prev => ({
-      ...prev,
-      proofDocuments: [...prev.proofDocuments, ...files]
-    }));
-  };
-
-  const handleRemoveFile = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      proofDocuments: prev.proofDocuments.filter((_, i) => i !== index)
-    }));
+    updateIntellectualProperty(index, 'proofDocument', file);
   };
 
   const handleSubmit = async () => {
     try {
       // TODO: 验证表单
-      // TODO: API 调用提交绩效数据
+      // TODO: API 调用提交成果数据
       console.log('Submitting performance:', formData);
-      alert(t('message.submitSuccess'));
-      window.location.hash = 'list';
+      alert(t('message.submitSuccess') || '提交成功');
+      window.location.hash = 'query';
       window.dispatchEvent(new HashChangeEvent('hashchange'));
     } catch (error) {
       console.error('Failed to submit:', error);
-      alert(t('message.submitFailed'));
+      alert(t('message.submitFailed') || '提交失败');
     }
   };
 
@@ -111,10 +197,10 @@ export default function PerformanceFormContent() {
     try {
       // TODO: API 调用保存草稿
       console.log('Saving draft:', formData);
-      alert(t('message.saveSuccess'));
+      alert(t('message.saveSuccess') || '保存成功');
     } catch (error) {
       console.error('Failed to save draft:', error);
-      alert(t('message.saveFailed'));
+      alert(t('message.saveFailed') || '保存失败');
     }
   };
 
@@ -124,29 +210,462 @@ export default function PerformanceFormContent() {
   });
 
   const quarterOptions = [
-    { value: '', label: t('performance.selectQuarter') },
-    { value: '1', label: t('performance.quarter1') },
-    { value: '2', label: t('performance.quarter2') },
-    { value: '3', label: t('performance.quarter3') },
-    { value: '4', label: t('performance.quarter4') }
+    { value: '', label: t('performance.selectQuarter', '选择季度') },
+    { value: '1', label: t('performance.quarter1', '第一季度') },
+    { value: '2', label: t('performance.quarter2', '第二季度') },
+    { value: '3', label: t('performance.quarter3', '第三季度') },
+    { value: '4', label: t('performance.quarter4', '第四季度') }
   ];
 
-  const totalIP = Object.values(formData.intellectualProperty).reduce(
-    (sum, val) => sum + (parseInt(val) || 0), 0
-  );
+  const tabs = [
+    {
+      key: 'salesEmployment',
+      label: t('performance.tabs.salesEmployment', '销售额雇佣')
+    },
+    {
+      key: 'governmentSupport',
+      label: t('performance.tabs.governmentSupport', '政府支持受惠历史')
+    },
+    {
+      key: 'intellectualProperty',
+      label: t('performance.tabs.intellectualProperty', '知识产权')
+    }
+  ];
+
+  // 渲染销售额雇佣标签页
+  const renderSalesEmploymentTab = () => {
+    const se = formData.salesEmployment;
+    return (
+      <div className="performance-form-tab">
+        {/* 销售额 */}
+        <Card>
+          <h3>{t('performance.salesEmploymentFields.sales', '销售额')}</h3>
+          <div className="form-section">
+            <div className="form-group">
+              <label>{t('performance.salesEmploymentFields.salesPerformance', '销售实绩')}</label>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>{t('performance.salesEmploymentFields.previousYear', '前一年度')} ({t('performance.salesEmploymentFields.unit.won', '元')})</label>
+                  <Input
+                    type="text"
+                    value={formatNumber(se.sales.previousYear)}
+                    onChange={(e) => handleNumberChange('salesEmployment.sales.previousYear', e.target.value)}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>{t('performance.salesEmploymentFields.reportingDate', '编写基准日')} ({t('performance.salesEmploymentFields.unit.won', '元')})</label>
+                  <Input
+                    type="text"
+                    value={formatNumber(se.sales.reportingDate)}
+                    onChange={(e) => handleNumberChange('salesEmployment.sales.reportingDate', e.target.value)}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* 出口额 */}
+        <Card>
+          <h3>{t('performance.salesEmploymentFields.export', '出口额')}</h3>
+          <div className="form-section">
+            <div className="form-group">
+              <label>{t('performance.salesEmploymentFields.exchangeRate', '年报发行时汇率基准')}</label>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>{t('performance.salesEmploymentFields.previousYear', '前一年度')} ({t('performance.salesEmploymentFields.unit.won', '元')})</label>
+                  <Input
+                    type="text"
+                    value={formatNumber(se.export.previousYear)}
+                    onChange={(e) => handleNumberChange('salesEmployment.export.previousYear', e.target.value)}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>{t('performance.salesEmploymentFields.reportingDate', '编写基准日')} ({t('performance.salesEmploymentFields.unit.won', '元')})</label>
+                  <Input
+                    type="text"
+                    value={formatNumber(se.export.reportingDate)}
+                    onChange={(e) => handleNumberChange('salesEmployment.export.reportingDate', e.target.value)}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* 雇佣创造 */}
+        <Card>
+          <h3>{t('performance.salesEmploymentFields.employment', '雇佣创造')}</h3>
+          <div className="form-section">
+            <div className="form-group">
+              <label>{t('performance.salesEmploymentFields.employmentCount', '雇佣人数')}</label>
+              
+              {/* 现有员工数 */}
+              <div className="form-subsection">
+                <h4>{t('performance.salesEmploymentFields.currentEmployees', '现有员工数')}</h4>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>{t('performance.salesEmploymentFields.previousYear', '前一年度')} ({t('performance.salesEmploymentFields.unit.people', '名')})</label>
+                    <Input
+                      type="text"
+                      value={formatNumber(se.employment.currentEmployees.previousYear)}
+                      onChange={(e) => handleNumberChange('salesEmployment.employment.currentEmployees.previousYear', e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.salesEmploymentFields.reportingDate', '编写基准日')} ({t('performance.salesEmploymentFields.unit.people', '名')})</label>
+                    <Input
+                      type="text"
+                      value={formatNumber(se.employment.currentEmployees.reportingDate)}
+                      onChange={(e) => handleNumberChange('salesEmployment.employment.currentEmployees.reportingDate', e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 新雇佣人数 */}
+              <div className="form-subsection">
+                <h4>{t('performance.salesEmploymentFields.newEmployees', '新雇佣人数')}</h4>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>{t('performance.salesEmploymentFields.previousYear', '前一年度')} ({t('performance.salesEmploymentFields.unit.people', '名')})</label>
+                    <Input
+                      type="text"
+                      value={formatNumber(se.employment.newEmployees.previousYear)}
+                      onChange={(e) => handleNumberChange('salesEmployment.employment.newEmployees.previousYear', e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.salesEmploymentFields.reportingDate', '编写基准日')} ({t('performance.salesEmploymentFields.unit.people', '名')})</label>
+                    <Input
+                      type="text"
+                      value={formatNumber(se.employment.newEmployees.reportingDate)}
+                      onChange={(e) => handleNumberChange('salesEmployment.employment.newEmployees.reportingDate', e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 总人数 */}
+              <div className="form-subsection">
+                <h4>{t('performance.salesEmploymentFields.totalEmployees', '总人数')}</h4>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>{t('performance.salesEmploymentFields.previousYear', '前一年度')} ({t('performance.salesEmploymentFields.unit.people', '名')})</label>
+                    <Input
+                      type="text"
+                      value={formatNumber(se.employment.totalEmployees.previousYear)}
+                      onChange={(e) => handleNumberChange('salesEmployment.employment.totalEmployees.previousYear', e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.salesEmploymentFields.reportingDate', '编写基准日')} ({t('performance.salesEmploymentFields.unit.people', '名')})</label>
+                    <Input
+                      type="text"
+                      value={formatNumber(se.employment.totalEmployees.reportingDate)}
+                      onChange={(e) => handleNumberChange('salesEmployment.employment.totalEmployees.reportingDate', e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  };
+
+  // 渲染政府支持受惠历史标签页
+  const renderGovernmentSupportTab = () => {
+    return (
+      <div className="performance-form-tab">
+        <Card>
+          <div className="form-header">
+            <h3>{t('performance.tabs.governmentSupport', '政府支持受惠历史')}</h3>
+            <Button onClick={addGovernmentSupport} variant="secondary" size="small">
+              <PlusIcon className="w-4 h-4" style={{ marginRight: '0.5rem' }} />
+              {t('performance.governmentSupportFields.add', '添加')}
+            </Button>
+          </div>
+
+          {formData.governmentSupport.length === 0 ? (
+            <div className="empty-state">
+              <p>{t('common.noData', '暂无数据')}</p>
+              <p className="hint">{t('performance.governmentSupportFields.add', '添加')} {t('performance.governmentSupportFields.add', '添加')} {t('common.click', '点击')} {t('performance.governmentSupportFields.add', '添加')} {t('common.button', '按钮')} {t('common.add', '添加')} {t('performance.governmentSupportFields.add', '添加')}</p>
+            </div>
+          ) : (
+            formData.governmentSupport.map((item, index) => (
+              <Card key={index} className="government-support-item">
+                <div className="item-header">
+                  <h4>{t('performance.governmentSupportFields.add', '添加')} {index + 1}</h4>
+                  <Button
+                    onClick={() => removeGovernmentSupport(index)}
+                    variant="text"
+                    size="small"
+                  >
+                    <XIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>{t('performance.governmentSupportFields.projectName', '执行项目名')} *</label>
+                    <Input
+                      value={item.projectName}
+                      onChange={(e) => updateGovernmentSupport(index, 'projectName', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.governmentSupportFields.startupProjectName', '创业项目名')} *</label>
+                    <Input
+                      value={item.startupProjectName}
+                      onChange={(e) => updateGovernmentSupport(index, 'startupProjectName', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.governmentSupportFields.startDate', '开始日')} *</label>
+                    <Input
+                      type="date"
+                      value={item.startDate}
+                      onChange={(e) => updateGovernmentSupport(index, 'startDate', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.governmentSupportFields.endDate', '结束日')} *</label>
+                    <Input
+                      type="date"
+                      value={item.endDate}
+                      onChange={(e) => updateGovernmentSupport(index, 'endDate', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.governmentSupportFields.supportAmount', '支持金额')} ({t('performance.governmentSupportFields.supportAmountUnit', '千元')}) *</label>
+                    <Input
+                      type="text"
+                      value={formatNumber(item.supportAmount)}
+                      onChange={(e) => updateGovernmentSupport(index, 'supportAmount', parseNumber(e.target.value))}
+                      placeholder="0"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.governmentSupportFields.supportOrganization', '支持机构名')} *</label>
+                    <Input
+                      value={item.supportOrganization}
+                      onChange={(e) => updateGovernmentSupport(index, 'supportOrganization', e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              </Card>
+            ))
+          )}
+        </Card>
+      </div>
+    );
+  };
+
+  // 渲染知识产权标签页
+  const renderIntellectualPropertyTab = () => {
+    const ipTypes = [
+      { value: 'patent', label: t('performance.intellectualPropertyFields.types.patent', '专利') },
+      { value: 'trademark', label: t('performance.intellectualPropertyFields.types.trademark', '商标权') },
+      { value: 'utility', label: t('performance.intellectualPropertyFields.types.utility', '实用新型') },
+      { value: 'design', label: t('performance.intellectualPropertyFields.types.design', '设计') },
+      { value: 'other', label: t('performance.intellectualPropertyFields.types.other', '其他') }
+    ];
+
+    const registrationTypes = [
+      { value: 'application', label: t('performance.intellectualPropertyFields.registrationTypes.application', '申请') },
+      { value: 'registered', label: t('performance.intellectualPropertyFields.registrationTypes.registered', '注册') }
+    ];
+
+    const countries = [
+      { value: 'korea', label: t('performance.intellectualPropertyFields.countries.korea', '大韩民国') },
+      { value: 'usa', label: t('performance.intellectualPropertyFields.countries.usa', '美国') },
+      { value: 'uk', label: t('performance.intellectualPropertyFields.countries.uk', '英国') },
+      { value: 'china', label: t('performance.intellectualPropertyFields.countries.china', '中国') },
+      { value: 'japan', label: t('performance.intellectualPropertyFields.countries.japan', '日本') },
+      { value: 'europe', label: t('performance.intellectualPropertyFields.countries.europe', '欧洲') },
+      { value: 'other', label: t('performance.intellectualPropertyFields.countries.other', '其他国家') }
+    ];
+
+    const overseasTypes = [
+      { value: 'domestic', label: t('performance.intellectualPropertyFields.overseasTypes.domestic', '国内申请') },
+      { value: 'pct', label: t('performance.intellectualPropertyFields.overseasTypes.pct', 'PCT海外申请') },
+      { value: 'general', label: t('performance.intellectualPropertyFields.overseasTypes.general', '一般海外申请') }
+    ];
+
+    return (
+      <div className="performance-form-tab">
+        <Card>
+          <div className="form-header">
+            <h3>{t('performance.tabs.intellectualProperty', '知识产权')}</h3>
+            <Button onClick={addIntellectualProperty} variant="secondary" size="small">
+              <PlusIcon className="w-4 h-4" style={{ marginRight: '0.5rem' }} />
+              {t('performance.governmentSupportFields.add', '添加')}
+            </Button>
+          </div>
+
+          {formData.intellectualProperty.length === 0 ? (
+            <div className="empty-state">
+              <p>{t('common.noData', '暂无数据')}</p>
+            </div>
+          ) : (
+            formData.intellectualProperty.map((item, index) => (
+              <Card key={index} className="intellectual-property-item">
+                <div className="item-header">
+                  <h4>{t('performance.tabs.intellectualProperty', '知识产权')} {index + 1}</h4>
+                  <Button
+                    onClick={() => removeIntellectualProperty(index)}
+                    variant="text"
+                    size="small"
+                  >
+                    <XIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>{t('performance.intellectualPropertyFields.name', '知识产权名')}</label>
+                    <Input
+                      value={item.name}
+                      onChange={(e) => updateIntellectualProperty(index, 'name', e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.intellectualPropertyFields.number', '知识产权号')}</label>
+                    <Input
+                      value={item.number}
+                      onChange={(e) => updateIntellectualProperty(index, 'number', e.target.value)}
+                      placeholder="2022-174880"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.intellectualPropertyFields.type', '知识产权区分')}</label>
+                    <Select
+                      value={item.type}
+                      onChange={(e) => updateIntellectualProperty(index, 'type', e.target.value)}
+                      options={ipTypes}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.intellectualPropertyFields.registrationType', '知识产权注册区分')}</label>
+                    <Select
+                      value={item.registrationType}
+                      onChange={(e) => updateIntellectualProperty(index, 'registrationType', e.target.value)}
+                      options={registrationTypes}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.intellectualPropertyFields.country', '注册国家')}</label>
+                    <Select
+                      value={item.country}
+                      onChange={(e) => updateIntellectualProperty(index, 'country', e.target.value)}
+                      options={countries}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.intellectualPropertyFields.overseasType', '海外申请区分')}</label>
+                    <Select
+                      value={item.overseasType}
+                      onChange={(e) => updateIntellectualProperty(index, 'overseasType', e.target.value)}
+                      options={overseasTypes}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.intellectualPropertyFields.registrationDate', '注册日期')}</label>
+                    <Input
+                      type="date"
+                      value={item.registrationDate}
+                      onChange={(e) => updateIntellectualProperty(index, 'registrationDate', e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('performance.intellectualPropertyFields.publicDisclosure', '公开希望与否')}</label>
+                    <div className="radio-group">
+                      <label>
+                        <input
+                          type="radio"
+                          name={`publicDisclosure-${index}`}
+                          value="yes"
+                          checked={item.publicDisclosure === 'yes'}
+                          onChange={(e) => updateIntellectualProperty(index, 'publicDisclosure', e.target.value)}
+                        />
+                        {t('common.public', '公开')}
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name={`publicDisclosure-${index}`}
+                          value="no"
+                          checked={item.publicDisclosure === 'no'}
+                          onChange={(e) => updateIntellectualProperty(index, 'publicDisclosure', e.target.value)}
+                        />
+                        {t('common.private', '非公开')}
+                      </label>
+                    </div>
+                  </div>
+                  <div className="form-group full-width">
+                    <label>{t('performance.intellectualPropertyFields.proofDocument', '证明材料附件')}</label>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={(e) => handleFileUpload(index, e.target.files[0])}
+                      style={{ display: 'none' }}
+                      id={`ip-file-${index}`}
+                    />
+                    <Button
+                      onClick={() => document.getElementById(`ip-file-${index}`).click()}
+                      variant="secondary"
+                      size="small"
+                    >
+                      <PaperclipIcon className="w-4 h-4" style={{ marginRight: '0.5rem' }} />
+                      {t('common.upload', '上传')}
+                    </Button>
+                    {item.proofDocument && (
+                      <div className="file-item">
+                        <DocumentIcon className="w-4 h-4" />
+                        <span>{item.proofDocument.name}</span>
+                      </div>
+                    )}
+                    <small className="form-hint">
+                      {t('performance.fileUploadHint', '文件格式: PDF / 最大 10MB')}
+                    </small>
+                  </div>
+                </div>
+              </Card>
+            ))
+          )}
+        </Card>
+      </div>
+    );
+  };
 
   return (
     <div className="performance-form-content">
       <div className="page-header">
-        <h1>{isEdit ? t('performance.edit', '编辑绩效') : t('performance.createNew', '新增绩效')}</h1>
+        <h1>{t('performance.input', '成果输入')}</h1>
       </div>
 
       {/* 基本信息 */}
       <Card>
-        <h2>{t('performance.sections.basicInfo')}</h2>
+        <h2>{t('performance.sections.basicInfo', '基本信息')}</h2>
         <div className="form-grid">
           <div className="form-group">
-            <label>{t('performance.year')} *</label>
+            <label>{t('performance.year', '年度')} *</label>
             <Select
               value={formData.year.toString()}
               onChange={(e) => handleChange('year', parseInt(e.target.value))}
@@ -154,205 +673,60 @@ export default function PerformanceFormContent() {
               required
             />
           </div>
-
           <div className="form-group">
-            <label>{t('performance.quarter')}</label>
+            <label>{t('performance.quarter', '季度')}</label>
             <Select
               value={formData.quarter}
               onChange={(e) => handleChange('quarter', e.target.value)}
               options={quarterOptions}
             />
             <small className="form-hint">
-              {t('performance.quarterHint')}
+              {t('performance.quarterHint', '不选择季度则视为年度成果')}
             </small>
           </div>
         </div>
       </Card>
 
-      {/* 销售和雇佣 */}
-      <Card>
-        <h2>{t('performance.sections.salesEmployment')}</h2>
-        <div className="form-grid">
-          <div className="form-group">
-            <label>{t('performance.sales')} (원) *</label>
-            <Input
-              type="number"
-              value={formData.sales}
-              onChange={(e) => handleChange('sales', e.target.value)}
-              placeholder="0"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>{t('performance.employment')} (명) *</label>
-            <Input
-              type="number"
-              value={formData.employment}
-              onChange={(e) => handleChange('employment', e.target.value)}
-              placeholder="0"
-              required
-            />
-          </div>
+      {/* 标签页 */}
+      <div className="performance-tabs-container">
+        <Tabs
+          tabs={tabs}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+        />
+        <div className="tab-content">
+          {activeTab === 'salesEmployment' && renderSalesEmploymentTab()}
+          {activeTab === 'governmentSupport' && renderGovernmentSupportTab()}
+          {activeTab === 'intellectualProperty' && renderIntellectualPropertyTab()}
         </div>
-      </Card>
-
-      {/* 政府支持 */}
-      <Card>
-        <h2>{t('performance.sections.governmentSupport')}</h2>
-        <div className="form-group">
-          <label>{t('performance.governmentSupport')} (원)</label>
-          <Input
-            type="number"
-            value={formData.governmentSupport}
-            onChange={(e) => handleChange('governmentSupport', e.target.value)}
-            placeholder="0"
-          />
         </div>
-      </Card>
-
-      {/* 知识产权 */}
-      <Card>
-        <h2>{t('performance.sections.intellectualProperty')}</h2>
-        <div className="form-grid">
-          <div className="form-group">
-            <label>{t('performance.patent')} (건)</label>
-            <Input
-              type="number"
-              value={formData.intellectualProperty.patents}
-              onChange={(e) => handleChange('intellectualProperty.patents', e.target.value)}
-              placeholder="0"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>{t('performance.trademark')} (건)</label>
-            <Input
-              type="number"
-              value={formData.intellectualProperty.trademarks}
-              onChange={(e) => handleChange('intellectualProperty.trademarks', e.target.value)}
-              placeholder="0"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>{t('performance.copyright')} (건)</label>
-            <Input
-              type="number"
-              value={formData.intellectualProperty.copyrights}
-              onChange={(e) => handleChange('intellectualProperty.copyrights', e.target.value)}
-              placeholder="0"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>{t('performance.certification')} (건)</label>
-            <Input
-              type="number"
-              value={formData.intellectualProperty.certifications}
-              onChange={(e) => handleChange('intellectualProperty.certifications', e.target.value)}
-              placeholder="0"
-            />
-          </div>
-        </div>
-        
-        <div className="ip-summary">
-          <strong>{t('performance.totalIP')}: {totalIP} {t('performance.items')}</strong>
-        </div>
-      </Card>
-
-      {/* 证明文件 */}
-      <Card>
-        <h2>{t('performance.sections.proofDocuments')}</h2>
-        <p className="section-description">
-          {t('performance.proofDocumentsDesc')}
-        </p>
-
-        <div className="file-upload-area">
-          <input
-            type="file"
-            id="file-upload"
-            multiple
-            onChange={handleFileUpload}
-            style={{ display: 'none' }}
-          />
-          <Button
-            onClick={() => document.getElementById('file-upload').click()}
-            variant="secondary"
-          >
-            <PaperclipIcon className="w-4 h-4" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '0.5rem' }} />
-            {t('common.upload')}
-          </Button>
-          <small className="form-hint">
-            {t('performance.fileUploadHint')}
-          </small>
-        </div>
-
-        {formData.proofDocuments.length > 0 && (
-          <div className="uploaded-files">
-            <h3>{t('performance.uploadedFiles')}</h3>
-            {formData.proofDocuments.map((file, index) => (
-              <div key={index} className="file-item">
-                <span className="file-name">
-                  <DocumentIcon className="w-4 h-4" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '0.5rem' }} />
-                  {file.name}
-                </span>
-                <span className="file-size">
-                  ({(file.size / 1024).toFixed(1)} KB)
-                </span>
-                <Button
-                  onClick={() => handleRemoveFile(index)}
-                  variant="text"
-                  size="small"
-                >
-                  <XIcon className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
-
-      {/* 备注 */}
-      <Card>
-        <h2>{t('performance.sections.notes')}</h2>
-        <div className="form-group">
-          <Textarea
-            value={formData.notes}
-            onChange={(e) => handleChange('notes', e.target.value)}
-            rows={5}
-            placeholder={t('performance.notesPlaceholder')}
-          />
-        </div>
-      </Card>
 
       {/* 操作按钮 */}
       <div className="action-buttons">
         <Button
           onClick={() => {
-            window.location.hash = 'list';
+            window.location.hash = 'query';
             window.dispatchEvent(new HashChangeEvent('hashchange'));
           }}
           variant="secondary"
         >
-          {t('common.cancel')}
+          {t('common.cancel', '取消')}
         </Button>
         
         <Button
           onClick={handleSaveDraft}
           variant="outline"
         >
-          {t('performance.saveDraft')}
+          {t('performance.saveDraft', '临时保存')}
         </Button>
         
         <Button
           onClick={handleSubmit}
           variant="primary"
         >
-          {t('common.submit')}
+          {t('performance.input', '成果提交')}
         </Button>
       </div>
     </div>
   );
 }
-

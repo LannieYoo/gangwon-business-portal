@@ -21,7 +21,7 @@
 .support > .member-banner-section,
 .support > .banner-section {
   order: 1 !important;
-  margin-top: var(--header-height, 70px) !important;
+  margin-top: calc(-1 * var(--header-height, 70px)) !important; /* 抵消 layout-body 的 padding-top，让 banner 紧贴 header */
 }
 
 /* Banner Section */

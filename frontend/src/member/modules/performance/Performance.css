@@ -48,7 +48,7 @@
 .performance > .member-banner-section,
 .performance > .banner-section {
   order: 1 !important;
-  margin-top: var(--header-height, 70px) !important;
+  margin-top: calc(-1 * var(--header-height, 70px)) !important; /* 抵消 layout-body 的 padding-top，让 banner 紧贴 header */
 }
 
 .performance-list {
@@ -522,6 +522,102 @@
 .performance-form {
   width: 100%;
   max-width: 100%;
+}
+
+.performance-form-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.performance-form-tab > .card {
+  margin-bottom: 0;
+}
+
+.performance-form-tab .card h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 1rem 0;
+}
+
+.performance-form-tab .form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.performance-form-tab .form-header h3 {
+  margin: 0;
+}
+
+.performance-form-tab .empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.performance-form-tab .empty-state p {
+  margin: 0.5rem 0;
+  color: #6b7280;
+}
+
+.performance-form-tab .empty-state .hint {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+/* Government Support Item */
+.government-support-item {
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+}
+
+.government-support-item:last-child {
+  margin-bottom: 0;
+}
+
+.government-support-item .item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.government-support-item .item-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+/* IP Item */
+.intellectual-property-item {
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+}
+
+.intellectual-property-item:last-child {
+  margin-bottom: 0;
+}
+
+.intellectual-property-item .item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.intellectual-property-item .item-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
 }
 
 /* Form Styles */

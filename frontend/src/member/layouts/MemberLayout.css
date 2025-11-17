@@ -59,7 +59,8 @@
 .layout-body {
   display: flex;
   flex: 1;
-  /* padding-top 由 banner 或内容区域处理 */
+  padding-top: var(--header-height);
+  flex-direction: column;
 }
 
 .main-content {
@@ -85,8 +86,15 @@
 }
 
 /* 让 Outlet 的内容直接参与布局，这样 banner 和 submenu 可以正确排序 */
-.content-wrapper > *:not(.member-submenu) {
+/* 但保留 page-container 的正常显示，确保 padding 生效 */
+.content-wrapper > *:not(.member-submenu):not(.page-container) {
   display: contents; /* Outlet 的内容直接参与父布局 */
+}
+
+/* 确保 page-container 正常显示（padding 由 PageContainer.css 统一控制） */
+.content-wrapper > .page-container {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Submenu 显示在 banner 之后 */
@@ -104,9 +112,7 @@
 .performance .banner-section,
 .performance .member-banner-section,
 .support .banner-section,
-.support .member-banner-section,
-.profile .banner-section,
-.profile .member-banner-section {
+.support .member-banner-section {
   order: 1 !important;
 }
 
@@ -115,8 +121,7 @@
 .about > *:not(.banner-section):not(.member-banner-section),
 .projects > *:not(.banner-section):not(.member-banner-section),
 .performance > *:not(.banner-section):not(.member-banner-section),
-.support > *:not(.banner-section):not(.member-banner-section),
-.profile > *:not(.banner-section):not(.member-banner-section) {
+.support > *:not(.banner-section):not(.member-banner-section) {
   order: 3;
 }
 
@@ -130,5 +135,7 @@
   .content-wrapper {
     padding: 0;
   }
+  
+  /* 边距由 PageContainer.css 统一控制 */
 }
 

@@ -19,7 +19,7 @@
 .profile .member-banner-section,
 .projects .banner-section,
 .projects .member-banner-section {
-  margin-top: var(--header-height, 70px) !important; /* 为固定 header 留出空间 */
+  margin-top: calc(-1 * var(--header-height, 70px)) !important; /* 抵消 layout-body 的 padding-top，让 banner 紧贴 header */
   margin-bottom: 0 !important; /* submenu 会处理间距 */
   order: 1 !important; /* banner 在最前面 */
   width: 100vw !important;
