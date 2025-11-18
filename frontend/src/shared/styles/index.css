@@ -1,324 +1,148 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+/* =========================================
+ * KRDS Core (index.css v2 - Minimal)
+ * 只负责：Tailwind + Tokens + 全局基础样式 + 极少布局
+ * =======================================*/
 
-/* Google Fonts - Noto Sans KR & SC */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Base Styles */
+/* ========== 1. Design Tokens（核心变量） ========== */
 @layer base {
-  * {
-    @apply box-border;
+  :root {
+    /* ---- 颜色 ---- */
+    --gov-color-primary: #0052a4;
+    --gov-color-primary-dark: #003777;
+    --gov-color-primary-light: #e5eff9;
+
+    --gov-color-accent: #d32f2f;
+    --gov-color-bg: #f5f6f7;
+    --gov-color-surface: #ffffff;
+    --gov-color-border-subtle: #e5e7eb;
+
+    --gov-color-text-main: #111827;
+    --gov-color-text-muted: #6b7280;
+    --gov-color-text-inverse: #ffffff;
+
+    /* ---- 间距刻度（8px 系） ---- */
+    --gov-space-1: 0.5rem;   /* 8px  */
+    --gov-space-1_5: 0.75rem;/* 12px */
+    --gov-space-2: 1rem;     /* 16px */
+    --gov-space-2_5: 1.25rem;/* 20px */
+    --gov-space-3: 1.5rem;   /* 24px */
+    --gov-space-4: 2rem;     /* 32px */
+    --gov-space-5: 2.5rem;   /* 40px */
+    --gov-space-6: 3rem;     /* 48px */
+
+    /* 语义化等级（可选，用得多可以保留） */
+    --gov-space-tight: var(--gov-space-1);
+    --gov-space-sm:    var(--gov-space-2);
+    --gov-space-md:    var(--gov-space-3);
+    --gov-space-lg:    var(--gov-space-4);
+    --gov-space-xl:    var(--gov-space-5);
+
+    /* ---- 容器内边距（桌面端基准） ---- */
+    --gov-container-pad-default-x: var(--gov-space-3); /* 24px */
+    --gov-container-pad-default-y: var(--gov-space-4); /* 32px */
+    --gov-container-pad-large-x:   var(--gov-space-4); /* 32px */
+    --gov-container-pad-large-y:   var(--gov-space-5); /* 40px */
+
+    /* ---- 页面左右边距 ---- */
+    --gov-page-margin-x: 1.5rem; /* 24px - 桌面 */
+
+    /* ---- Header / z-index ---- */
+    --header-height: 4.5rem; /* 72px */
+    --z-header: 40;
+    --z-dropdown: 50;
+
+    /* ---- 圆角 & 阴影 ---- */
+    --gov-radius-md: 0.5rem;  /* 8px */
+    --gov-radius-lg: 0.75rem; /* 12px */
+    --gov-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+
+    /* ---- 字体 ---- */
+    --gov-font-sans: system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo",
+      "Malgun Gothic", sans-serif;
+
+    --gov-line-height-body: 1.6;
+    --gov-line-height-heading: 1.3;
   }
 
-  html {
-    @apply h-full;
+  @media (max-width: 639px) {
+    :root {
+      --gov-page-margin-x: 1rem; /* 16px - 移动 */
+    }
+  }
+
+  /* ---- 全局基础样式 ---- */
+  html,
+  body {
+    margin: 0;
+    padding: 0;
   }
 
   body {
-    @apply h-full font-sans text-gray-900 bg-gray-50 antialiased;
+    font-family: var(--gov-font-sans);
+    background-color: var(--gov-color-bg);
+    color: var(--gov-color-text-main);
+    line-height: var(--gov-line-height-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
-  #root {
-    @apply h-full;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--gov-color-text-main);
+    line-height: var(--gov-line-height-heading);
+    font-weight: 600;
   }
 
-  /* Scrollbar Styles */
-  ::-webkit-scrollbar {
-    @apply w-2 h-2;
+  a {
+    color: var(--gov-color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
-  ::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+  a:hover {
+    color: var(--gov-color-primary-dark);
   }
 
-  ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
+  main {
+    min-height: 100vh;
   }
 }
 
-/* Component Styles */
+/* ========== 2. 基础布局组件：容器 & 区块 ========== */
 @layer components {
-  /* Button Base */
-  .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  /* 页面主容器：负责左右留白 + 最大宽度 */
+  .gov-page {
+    max-width: 80rem; /* 1280px */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--gov-page-margin-x);
+    padding-right: var(--gov-page-margin-x);
   }
 
-  .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  /* 标准内容区块 */
+  .gov-section-default {
+    background-color: var(--gov-color-surface);
+    border-radius: var(--gov-radius-md);
+    box-shadow: var(--gov-shadow-sm);
+    padding: var(--gov-container-pad-default-y)
+      var(--gov-container-pad-default-x);
   }
 
-  .btn-secondary {
-    @apply btn bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
-  }
-
-  .btn-success {
-    @apply btn bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500;
-  }
-
-  .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
-  }
-
-  .btn-outline {
-    @apply btn bg-transparent border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-primary-500;
-  }
-
-  .btn-sm {
-    @apply px-3 py-1.5 text-sm;
-  }
-
-  .btn-lg {
-    @apply px-6 py-3 text-lg;
-  }
-
-  /* Input Base */
-  .input {
-    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white;
-  }
-
-  /* Select specific styles */
-  select.input {
-    @apply appearance-none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-    cursor: pointer;
-  }
-
-  select.input:disabled {
-    @apply bg-gray-50 cursor-not-allowed opacity-60;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  }
-
-  /* Inline select for header-actions */
-  select.input.input-inline {
-    @apply inline-block;
-    width: auto;
-    min-width: 120px;
-  }
-
-  .input-error {
-    @apply border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500;
-  }
-
-  /* Card */
-  .card {
-    @apply bg-white shadow-card rounded-lg overflow-hidden;
-  }
-
-  .card-hover {
-    @apply card transition-shadow duration-200 hover:shadow-card-hover;
-  }
-
-  .card-header {
-    @apply px-6 py-4 border-b border-gray-200;
-  }
-
-  .card-body {
-    @apply px-6 py-4;
-  }
-
-  .card-footer {
-    @apply px-6 py-4 border-t border-gray-200 bg-gray-50;
-  }
-
-  /* Table */
-  .table {
-    @apply min-w-full divide-y divide-gray-200;
-  }
-
-  .table thead {
-    @apply bg-gray-50;
-  }
-
-  .table th {
-    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
-  }
-
-  .table tbody {
-    @apply bg-white divide-y divide-gray-200;
-  }
-
-  .table td {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
-  }
-
-  /* Badge */
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  .badge-primary {
-    @apply badge bg-primary-100 text-primary-800;
-  }
-
-  .badge-success {
-    @apply badge bg-secondary-100 text-secondary-800;
-  }
-
-  .badge-warning {
-    @apply badge bg-yellow-100 text-yellow-800;
-  }
-
-  .badge-danger {
-    @apply badge bg-red-100 text-red-800;
-  }
-
-  .badge-gray {
-    @apply badge bg-gray-100 text-gray-800;
-  }
-
-  /* Alert */
-  .alert {
-    @apply p-4 rounded-md;
-  }
-
-  .alert-info {
-    @apply alert bg-blue-50 border border-blue-200 text-blue-800;
-  }
-
-  .alert-success {
-    @apply alert bg-secondary-50 border border-secondary-200 text-secondary-800;
-  }
-
-  .alert-warning {
-    @apply alert bg-yellow-50 border border-yellow-200 text-yellow-800;
-  }
-
-  .alert-error {
-    @apply alert bg-red-50 border border-red-200 text-red-800;
-  }
-
-  /* Form Group */
-  .form-group {
-    @apply mb-4;
-  }
-
-  .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
-  }
-
-  .form-label-required::after {
-    @apply text-red-500 ml-1;
-    content: '*';
-  }
-
-  .form-error {
-    @apply mt-1 text-sm text-red-600;
-  }
-
-  .form-help {
-    @apply mt-1 text-sm text-gray-500;
-  }
-
-  /* Loading Spinner */
-  .spinner {
-    @apply inline-block animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite];
-  }
-
-  .spinner-sm {
-    @apply spinner h-4 w-4;
-  }
-
-  .spinner-md {
-    @apply spinner h-6 w-6;
-  }
-
-  .spinner-lg {
-    @apply spinner h-8 w-8;
-  }
-
-  /* Modal Overlay */
-  .modal-overlay {
-    @apply fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-40;
-  }
-
-  .modal-container {
-    @apply fixed inset-0 z-50 overflow-y-auto;
-  }
-
-  .modal-content {
-    @apply relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full;
-  }
-
-  /* Page Layout */
-  /* Note: .page-container is defined in member/layouts/PageContainer.css */
-
-  .page-header {
-    background: none !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-
-  .page-main {
-    @apply flex-1 py-6;
-  }
-
-  .page-footer {
-    @apply bg-white border-t border-gray-200;
-  }
-
-  /* Content Container */
-  .container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  .container-sm {
-    @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  .container-lg {
-    @apply max-w-full mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  /* Section Title */
-  .section-title {
-    @apply text-2xl font-semibold text-gray-900 mb-4;
-  }
-
-  .section-subtitle {
-    @apply text-lg font-medium text-gray-700 mb-3;
-  }
-
-  /* Divider */
-  .divider {
-    @apply border-t border-gray-200 my-6;
+  /* 首页 / 重要区块 */
+  .gov-section-large {
+    background-color: var(--gov-color-surface);
+    border-radius: var(--gov-radius-md);
+    box-shadow: var(--gov-shadow-sm);
+    padding: var(--gov-container-pad-large-y)
+      var(--gov-container-pad-large-x);
   }
 }
-
-/* Utility Classes */
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .transition-base {
-    @apply transition-all duration-200 ease-in-out;
-  }
-
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500;
-  }
-
-  .truncate-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .truncate-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-

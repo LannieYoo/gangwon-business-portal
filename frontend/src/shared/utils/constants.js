@@ -195,7 +195,7 @@ export const ROUTES = {
   MEMBER_HOME: '/member',
   MEMBER_PROFILE: '/member/profile',
   MEMBER_ABOUT: '/member/about',
-  MEMBER_PROJECTS: '/member/projects',
+  MEMBER_PROJECTS: '/member/programs',
   MEMBER_PERFORMANCE: '/member/performance',
   MEMBER_SUPPORT: '/member/support',
   MEMBER_NOTICES: '/member/notices',

@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import Card from '@shared/components/Card';
 import { apiService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import './Support.css';
+import './ConsultationHistory.css';
 
 export default function ConsultationHistory() {
   const { t } = useTranslation();
@@ -36,22 +36,28 @@ export default function ConsultationHistory() {
 
   return (
     <Card>
-      <h2>{t('support.inquiryHistory', '咨询历史')}</h2>
+      <h2>{t('support.inquiryHistory')}</h2>
       {loading ? (
         <div className="loading">
-          <p>{t('common.loading', '加载中...')}</p>
+          <p>{t('common.loading')}</p>
         </div>
       ) : inquiries.length === 0 ? (
         <div className="no-data">
-          <p>{t('support.noInquiries', '暂无咨询记录')}</p>
+          <p>{t('support.noInquiries')}</p>
         </div>
       ) : (
         <div className="inquiries-list">
-          {inquiries.map((inquiry) => (
+          {inquiries.map((inquiry) => {
+            // 确保 inquiry.id 存在
+            if (!inquiry.id) {
+              console.warn('Inquiry missing id:', inquiry);
+              return null;
+            }
+            return (
             <Link 
               key={inquiry.id} 
               to={`/member/support/consultation/${inquiry.id}`} 
-              className="ac-card inquiry-item"
+              className="ac-card inquiry-item group"
             >
               <div 
                 className="ac-card-img" 
@@ -63,19 +69,20 @@ export default function ConsultationHistory() {
                 <div className="inquiry-header">
                   <h2>{inquiry.subject || inquiry.title}</h2>
                   <span className={`badge ${inquiry.status === 'answered' ? 'badge-success' : 'badge-warning'}`}>
-                    {t(`support.status.${inquiry.status}`, inquiry.status === 'answered' ? '已回复' : '待处理')}
+                    {t(`support.status.${inquiry.status}`)}
                   </span>
                 </div>
-                <div className="inquiry-meta" style={{ marginBottom: '1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
-                  <span>{t('support.createdDate', '注册日期')}: {inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleDateString() : ''}</span>
+                <div className="inquiry-meta">
+                  <span>{t('support.createdDate')}: {inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleDateString() : ''}</span>
                   {inquiry.answeredAt && (
-                    <span>{t('support.answeredDate', '回复日期')}: {new Date(inquiry.answeredAt).toLocaleDateString()}</span>
+                    <span>{t('support.answeredDate')}: {new Date(inquiry.answeredAt).toLocaleDateString()}</span>
                   )}
                 </div>
-                <span className="ac-btn bg-light-grey arrow">{t('common.details', '查看详情')}</span>
+                <span className="ac-btn bg-light-grey arrow">{t('common.details')}</span>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </Card>

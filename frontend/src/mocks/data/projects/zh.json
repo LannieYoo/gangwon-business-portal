@@ -203,6 +203,236 @@
       "createdBy": 1,
       "createdAt": "2024-12-20T10:00:00Z",
       "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 6,
+      "title": "数字化转型支持事业",
+      "type": "startup",
+      "status": "recruiting",
+      "startDate": "2025-03-01",
+      "endDate": "2025-12-31",
+      "recruitmentStartDate": "2025-01-15",
+      "recruitmentEndDate": "2025-02-28",
+      "budget": 150000000,
+      "description": "支持中小企业数字化转型的综合计划，支持云基础设施、数字营销、智能工厂建设等。",
+      "objectives": [
+        "强化中小企业数字竞争力",
+        "打造数字创新生态系统",
+        "增强第四次工业革命应对能力"
+      ],
+      "scope": "江原道内中小企业及小工商业者",
+      "manager": "崔英洙",
+      "managerPhone": "033-678-9012",
+      "managerEmail": "choi@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 8,
+          "name": "数字化转型支持事业公告.pdf",
+          "url": "/uploads/projects/6/数字化转型支持事业公告.pdf",
+          "type": "document",
+          "size": 3584000,
+          "uploadedAt": "2025-01-15T09:00:00Z"
+        },
+        {
+          "id": 9,
+          "name": "申请书格式.hwp",
+          "url": "/uploads/projects/6/申请书格式.hwp",
+          "type": "document",
+          "size": 614400,
+          "uploadedAt": "2025-01-15T09:05:00Z"
+        }
+      ],
+      "views": 312,
+      "applicationsCount": 18,
+      "isPublished": true,
+      "publishedAt": "2025-01-15T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2025-01-15T08:00:00Z",
+      "updatedAt": "2025-01-20T11:00:00Z"
+    },
+    {
+      "id": 7,
+      "title": "地区特色产业培育事业",
+      "type": "rd",
+      "status": "ongoing",
+      "startDate": "2024-10-01",
+      "endDate": "2025-09-30",
+      "recruitmentStartDate": "2024-09-01",
+      "recruitmentEndDate": "2024-09-30",
+      "budget": 250000000,
+      "description": "为培育江原道地区特色产业（旅游、农水产品、生物等）提供的综合支持事业。",
+      "objectives": [
+        "强化地区特色产业竞争力",
+        "活跃地区经济",
+        "创造就业岗位及稳定地区就业"
+      ],
+      "scope": "江原道内地区特色产业相关企业",
+      "manager": "韩美英",
+      "managerPhone": "033-789-0123",
+      "managerEmail": "han@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 10,
+          "name": "地区特色产业培育事业公告.pdf",
+          "url": "/uploads/projects/7/地区特色产业培育事业公告.pdf",
+          "type": "document",
+          "size": 4096000,
+          "uploadedAt": "2024-09-01T09:00:00Z"
+        }
+      ],
+      "views": 278,
+      "applicationsCount": 21,
+      "isPublished": true,
+      "publishedAt": "2024-09-01T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2024-09-01T08:00:00Z",
+      "updatedAt": "2024-12-15T14:00:00Z"
+    },
+    {
+      "id": 8,
+      "title": "初创企业孵化计划",
+      "type": "startup",
+      "status": "recruiting",
+      "startDate": "2025-05-01",
+      "endDate": "2026-04-30",
+      "recruitmentStartDate": "2025-03-15",
+      "recruitmentEndDate": "2025-04-30",
+      "budget": 300000000,
+      "description": "为早期初创企业提供的孵化计划，提供办公空间、指导、网络、投资连接等。",
+      "objectives": [
+        "支持早期初创企业成长",
+        "活跃创业生态系统",
+        "培育成功的初创企业"
+      ],
+      "scope": "江原道内创业1年以内初创企业",
+      "manager": "尹大贤",
+      "managerPhone": "033-890-1234",
+      "managerEmail": "yoon@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 11,
+          "name": "孵化计划公告.pdf",
+          "url": "/uploads/projects/8/孵化计划公告.pdf",
+          "type": "document",
+          "size": 5120000,
+          "uploadedAt": "2025-03-15T09:00:00Z"
+        },
+        {
+          "id": 12,
+          "name": "申请书格式.hwp",
+          "url": "/uploads/projects/8/申请书格式.hwp",
+          "type": "document",
+          "size": 716800,
+          "uploadedAt": "2025-03-15T09:05:00Z"
+        },
+        {
+          "id": 13,
+          "name": "事业计划书格式.xlsx",
+          "url": "/uploads/projects/8/事业计划书格式.xlsx",
+          "type": "document",
+          "size": 409600,
+          "uploadedAt": "2025-03-15T09:10:00Z"
+        }
+      ],
+      "views": 567,
+      "applicationsCount": 34,
+      "isPublished": true,
+      "publishedAt": "2025-03-15T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2025-03-15T08:00:00Z",
+      "updatedAt": "2025-03-18T16:30:00Z"
+    },
+    {
+      "id": 9,
+      "title": "海外市场开拓支持事业",
+      "type": "export",
+      "status": "recruiting",
+      "startDate": "2025-06-01",
+      "endDate": "2025-11-30",
+      "recruitmentStartDate": "2025-04-01",
+      "recruitmentEndDate": "2025-05-31",
+      "budget": 120000000,
+      "description": "为中小企业进军海外市场提供的综合支持计划，支持海外展览会参与、海外营销、当地进军咨询等。",
+      "objectives": [
+        "扩大中小企业海外市场进军",
+        "出口多元化及新市场开拓",
+        "强化全球竞争力"
+      ],
+      "scope": "江原道内出口企业及有出口意向企业",
+      "manager": "姜民浩",
+      "managerPhone": "033-901-2345",
+      "managerEmail": "kang@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 14,
+          "name": "海外市场开拓支持事业公告.pdf",
+          "url": "/uploads/projects/9/海外市场开拓支持事业公告.pdf",
+          "type": "document",
+          "size": 3072000,
+          "uploadedAt": "2025-04-01T09:00:00Z"
+        },
+        {
+          "id": 15,
+          "name": "申请书格式.hwp",
+          "url": "/uploads/projects/9/申请书格式.hwp",
+          "type": "document",
+          "size": 512000,
+          "uploadedAt": "2025-04-01T09:05:00Z"
+        }
+      ],
+      "views": 445,
+      "applicationsCount": 27,
+      "isPublished": true,
+      "publishedAt": "2025-04-01T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2025-04-01T08:00:00Z",
+      "updatedAt": "2025-04-05T10:20:00Z"
+    },
+    {
+      "id": 10,
+      "title": "AI·大数据应用支持事业",
+      "type": "rd",
+      "status": "recruiting",
+      "startDate": "2025-07-01",
+      "endDate": "2026-06-30",
+      "recruitmentStartDate": "2025-05-01",
+      "recruitmentEndDate": "2025-06-30",
+      "budget": 400000000,
+      "description": "支持利用AI和大数据技术进行事业化的计划，综合支持技术开发、基础设施建设、人才培养等。",
+      "objectives": [
+        "扩大AI·大数据技术应用",
+        "基于数据的经营创新",
+        "确保第四次工业革命核心技术"
+      ],
+      "scope": "江原道内中小企业及风险企业",
+      "manager": "宋智恩",
+      "managerPhone": "033-012-3456",
+      "managerEmail": "song@gangwon.go.kr",
+      "attachments": [
+        {
+          "id": 16,
+          "name": "AI大数据支持事业公告.pdf",
+          "url": "/uploads/projects/10/AI大数据支持事业公告.pdf",
+          "type": "document",
+          "size": 6144000,
+          "uploadedAt": "2025-05-01T09:00:00Z"
+        },
+        {
+          "id": 17,
+          "name": "研究开发计划书格式.xlsx",
+          "url": "/uploads/projects/10/研究开发计划书格式.xlsx",
+          "type": "document",
+          "size": 819200,
+          "uploadedAt": "2025-05-01T09:05:00Z"
+        }
+      ],
+      "views": 623,
+      "applicationsCount": 42,
+      "isPublished": true,
+      "publishedAt": "2025-05-01T09:00:00Z",
+      "createdBy": 1,
+      "createdAt": "2025-05-01T08:00:00Z",
+      "updatedAt": "2025-05-08T15:45:00Z"
     }
   ],
   "projectApplications": [

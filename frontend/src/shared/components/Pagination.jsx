@@ -3,6 +3,7 @@
  */
 
 import { cn } from '@shared/utils/helpers';
+import './Pagination.css';
 
 export function Pagination({ 
   currentPage, 
@@ -58,18 +59,18 @@ export function Pagination({
   };
   
   return (
-    <nav className={cn('flex items-center justify-center space-x-2', className)}>
+    <nav className={cn('pagination', className)}>
       <button
         onClick={handlePrevious}
         disabled={currentPage === 1}
-        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="pagination-btn pagination-btn-nav"
       >
         이전
       </button>
       
       {getPageNumbers().map((page, index) => (
         page === '...' ? (
-          <span key={`ellipsis-${index}`} className="px-3 py-2 text-gray-500">
+          <span key={`ellipsis-${index}`} className="pagination-ellipsis">
             ...
           </span>
         ) : (
@@ -77,10 +78,8 @@ export function Pagination({
             key={page}
             onClick={() => onPageChange(page)}
             className={cn(
-              'px-4 py-2 text-sm font-medium border rounded-md',
-              currentPage === page
-                ? 'bg-primary-600 text-white border-primary-600'
-                : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+              'pagination-btn',
+              currentPage === page ? 'pagination-btn-active' : 'pagination-btn-inactive'
             )}
           >
             {page}
@@ -91,7 +90,7 @@ export function Pagination({
       <button
         onClick={handleNext}
         disabled={currentPage === totalPages}
-        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="pagination-btn pagination-btn-nav"
       >
         다음
       </button>

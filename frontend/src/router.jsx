@@ -6,6 +6,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { useAuth } from '@shared/hooks';
 import { Button, Loading } from '@shared/components';
+import '@shared/styles/ErrorPages.css';
 
 // Protected Route Component
 function ProtectedRoute({ children, allowedRoles = [] }) {
@@ -41,11 +42,11 @@ function PublicRoute({ children }) {
 // Simple Error Page Components (inline, no separate pages directory)
 function Unauthorized() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4">
-      <div className="max-w-md w-full mx-auto text-center">
-        <div className="text-6xl font-bold text-primary-600 mb-4">403</div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">접근 권한이 없습니다</h1>
-        <p className="text-gray-600 mb-8">
+    <div className="error-page">
+      <div className="error-page-container">
+        <div className="error-code">403</div>
+        <h1 className="error-title">접근 권한이 없습니다</h1>
+        <p className="error-message">
           이 페이지에 접근할 수 있는 권한이 없습니다.
         </p>
         <Button onClick={() => window.location.href = '/'}>홈으로 돌아가기</Button>
@@ -56,11 +57,11 @@ function Unauthorized() {
 
 function NotFound() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4">
-      <div className="max-w-md w-full mx-auto text-center">
-        <div className="text-6xl font-bold text-primary-600 mb-4">404</div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">페이지를 찾을 수 없습니다</h1>
-        <p className="text-gray-600 mb-8">
+    <div className="error-page">
+      <div className="error-page-container">
+        <div className="error-code">404</div>
+        <h1 className="error-title">페이지를 찾을 수 없습니다</h1>
+        <p className="error-message">
           요청하신 페이지가 존재하지 않거나 이동되었습니다.
         </p>
         <Button onClick={() => window.location.href = '/'}>홈으로 돌아가기</Button>
@@ -81,9 +82,17 @@ const AdminLogin = lazy(() => import('@admin/modules/auth/Login').then(m => ({ d
 // Lazy load member modules
 const MemberHome = lazy(() => import('@member/modules/home/Home').then(m => ({ default: m.default })));
 const MemberProjects = lazy(() => import('@member/modules/projects/Projects').then(m => ({ default: m.default })));
+const MemberProjectDetail = lazy(() => import('@member/modules/projects/ProjectDetail').then(m => ({ default: m.default })));
 const MemberAbout = lazy(() => import('@member/modules/about/About').then(m => ({ default: m.default })));
-const MemberPerformance = lazy(() => import('@member/modules/performance').then(m => ({ default: m.default })));
+const MemberPerformance = lazy(() => import('@member/modules/performance/Performance').then(m => ({ default: m.default })));
+const MemberPerformanceCompanyInfo = lazy(() => import('@member/modules/performance/PerformanceCompanyInfo').then(m => ({ default: m.default })));
+const MemberPerformanceList = lazy(() => import('@member/modules/performance/PerformanceListContent').then(m => ({ default: m.default })));
+const MemberPerformanceEdit = lazy(() => import('@member/modules/performance/PerformanceFormContent').then(m => ({ default: m.default })));
 const MemberSupport = lazy(() => import('@member/modules/support/Support').then(m => ({ default: m.default })));
+const MemberSupportFAQ = lazy(() => import('@member/modules/support/FAQPage').then(m => ({ default: m.default })));
+const MemberSupportInquiry = lazy(() => import('@member/modules/support/InquiryPage').then(m => ({ default: m.default })));
+const MemberSupportInquiryHistory = lazy(() => import('@member/modules/support/InquiryHistoryPage').then(m => ({ default: m.default })));
+const MemberSupportConsultationDetail = lazy(() => import('@member/modules/support/ConsultationDetail').then(m => ({ default: m.default })));
 const NoticesList = lazy(() => import('@member/modules/home/NoticesList').then(m => ({ default: m.default })));
 const PressList = lazy(() => import('@member/modules/home/PressList').then(m => ({ default: m.default })));
 
@@ -181,11 +190,21 @@ export const router = createBrowserRouter(
         },
         // Protected routes - require authentication
         {
-          path: 'projects',
+          path: 'programs',
           element: (
             <ProtectedRoute allowedRoles={['member']}>
               <LazyRoute>
                 <MemberProjects />
+              </LazyRoute>
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: 'programs/:id',
+          element: (
+            <ProtectedRoute allowedRoles={['member']}>
+              <LazyRoute>
+                <MemberProjectDetail />
               </LazyRoute>
             </ProtectedRoute>
           )
@@ -198,7 +217,45 @@ export const router = createBrowserRouter(
                 <MemberPerformance />
               </LazyRoute>
             </ProtectedRoute>
-          )
+          ),
+          children: [
+            {
+              index: true,
+              element: <Navigate to="/member/performance/company-info" replace />
+            },
+            {
+              path: 'company-info',
+              element: (
+                <LazyRoute>
+                  <MemberPerformanceCompanyInfo />
+                </LazyRoute>
+              )
+            },
+            {
+              path: 'list',
+              element: (
+                <LazyRoute>
+                  <MemberPerformanceList />
+                </LazyRoute>
+              )
+            },
+            {
+              path: 'edit',
+              element: (
+                <LazyRoute>
+                  <MemberPerformanceEdit />
+                </LazyRoute>
+              )
+            },
+            {
+              path: 'edit/:id',
+              element: (
+                <LazyRoute>
+                  <MemberPerformanceEdit />
+                </LazyRoute>
+              )
+            }
+          ]
         },
         {
           path: 'support',
@@ -206,6 +263,46 @@ export const router = createBrowserRouter(
             <ProtectedRoute allowedRoles={['member']}>
               <LazyRoute>
                 <MemberSupport />
+              </LazyRoute>
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: 'support/faq',
+          element: (
+            <ProtectedRoute allowedRoles={['member']}>
+              <LazyRoute>
+                <MemberSupportFAQ />
+              </LazyRoute>
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: 'support/inquiry',
+          element: (
+            <ProtectedRoute allowedRoles={['member']}>
+              <LazyRoute>
+                <MemberSupportInquiry />
+              </LazyRoute>
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: 'support/inquiry-history',
+          element: (
+            <ProtectedRoute allowedRoles={['member']}>
+              <LazyRoute>
+                <MemberSupportInquiryHistory />
+              </LazyRoute>
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: 'support/consultation/:id',
+          element: (
+            <ProtectedRoute allowedRoles={['member']}>
+              <LazyRoute>
+                <MemberSupportConsultationDetail />
               </LazyRoute>
             </ProtectedRoute>
           )

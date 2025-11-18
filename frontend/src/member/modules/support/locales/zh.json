@@ -19,16 +19,38 @@
       "other": "其他"
     },
     "subject": "标题",
+    "subjectLabel": "咨询标题",
     "subjectPlaceholder": "请输入咨询标题",
     "content": "内容",
+    "contentLabel": "咨询内容",
     "contentPlaceholder": "请输入详细内容",
+    "name": "姓名",
+    "namePlaceholder": "请输入姓名",
+    "email": "邮箱",
+    "emailPlaceholder": "请输入邮箱",
+    "phone": "手机号",
+    "phonePlaceholder": "请输入手机号",
+    "user": "用户",
+    "admin": "管理员",
+    "attachments": "附件",
+    "attachmentNumber": "附件 {{number}}",
+    "maxFiles": "最多可上传3个文件",
+    "maxFilesLabel": "最多3个",
+    "noContent": "无内容",
     "status": {
       "pending": "待回复",
       "answered": "已回复"
     },
     "createdDate": "创建日期",
     "answeredDate": "回复日期",
-    "views": "浏览量"
+    "views": "浏览量",
+    "viewsLabel": "次浏览",
+    "fillAllFields": "请填写所有必填字段",
+    "consultationIdMissing": "咨询ID缺失",
+    "notFound": "咨询记录不存在",
+    "loadFailed": "加载咨询详情失败",
+    "pendingNotice": "您的咨询正在处理中，我们会尽快回复。",
+    "backToHistory": "返回列表"
   }
 }
 

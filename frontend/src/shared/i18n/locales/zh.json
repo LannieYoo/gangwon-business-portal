@@ -59,6 +59,8 @@
     "more": "更多",
     "less": "收起",
     "viewAll": "查看全部",
+    "loginRequired": "请先登录",
+    "notSet": "未设置",
     "theme": {
       "light": "浅色",
       "dark": "深色",
@@ -199,7 +201,53 @@
     "draft": "草稿",
     "submitted": "已提交",
     "needSupplement": "需补充",
-    "approved": "已批准"
+    "approved": "已批准",
+    "companyInfo": "企业信息"
+  },
+  "profile": {
+    "loginRequired": "需要登录",
+    "loginRequiredDesc": "要查看和管理企业信息，请先登录。",
+    "sections": {
+      "basicInfo": "基本信息",
+      "addressInfo": "地址信息",
+      "businessInfo": "业务信息",
+      "logo": "Logo",
+      "approvalStatus": "审批状态"
+    },
+    "regions": {
+      "춘천시": "춘천시",
+      "원주시": "원주시",
+      "강릉시": "강릉시",
+      "동해시": "동해시",
+      "태백시": "태백시",
+      "속초시": "속초시",
+      "삼척시": "삼척시"
+    },
+    "categories": {
+      "tech": "技术",
+      "manufacturing": "制造业",
+      "service": "服务业",
+      "retail": "零售",
+      "other": "其他"
+    },
+    "industries": {
+      "software": "软件",
+      "hardware": "硬件",
+      "biotechnology": "生物技术",
+      "healthcare": "医疗保健",
+      "education": "教育",
+      "finance": "金融",
+      "other": "其他"
+    },
+    "businessLicenseNotEditable": "营业执照号不可修改",
+    "businessLicenseHint": "营业执照号不可修改",
+    "noLogo": "无Logo",
+    "logoHint": "支持 JPG, PNG 格式，最大 5MB",
+    "approvalStatusDesc": {
+      "pending": "您的企业信息正在审核中，请耐心等待。",
+      "approved": "您的企业信息已通过审核。",
+      "rejected": "您的企业信息审核未通过，请修改后重新提交。"
+    }
   },
   "support": {
     "inquiry": "咨询",

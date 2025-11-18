@@ -4,4 +4,8 @@
  */
 
 export { default as Support } from './Support';
+export { default as FAQPage } from './FAQPage';
+export { default as InquiryPage } from './InquiryPage';
+export { default as InquiryHistoryPage } from './InquiryHistoryPage';
+export { default as ConsultationDetail } from './ConsultationDetail';
 

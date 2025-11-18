@@ -4,6 +4,7 @@
 
 import { forwardRef } from 'react';
 import { cn } from '@shared/utils/helpers';
+import './Textarea.css';
 
 export const Textarea = forwardRef(function Textarea({
   label,

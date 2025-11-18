@@ -187,7 +187,10 @@ async function getFAQs(req) {
   // Sort by order
   faqs.sort((a, b) => (a.order || 0) - (b.order || 0));
   
-  return HttpResponse.json({ faqs });
+  return HttpResponse.json({ 
+    records: faqs,
+    faqs: faqs 
+  });
 }
 
 // Initialize settings data based on current language

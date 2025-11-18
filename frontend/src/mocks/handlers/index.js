@@ -9,6 +9,7 @@ import { membersHandlers } from './members.js';
 import { performanceHandlers } from './performance.js';
 import { dashboardHandlers } from './dashboard.js';
 import { contentHandlers } from './content.js';
+import { supportHandlers } from './support.js';
 
 // Combine all handlers
 export const handlers = [
@@ -17,6 +18,7 @@ export const handlers = [
   ...membersHandlers,
   ...performanceHandlers,
   ...dashboardHandlers,
-  ...contentHandlers
+  ...contentHandlers,
+  ...supportHandlers
 ];
 

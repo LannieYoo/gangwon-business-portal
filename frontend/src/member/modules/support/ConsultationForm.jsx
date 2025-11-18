@@ -12,7 +12,7 @@ import Textarea from '@shared/components/Textarea';
 import { PaperclipIcon, XIcon, DocumentIcon } from '@shared/components/Icons';
 import { apiService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import './Support.css';
+import './ConsultationForm.css';
 
 export default function ConsultationForm({ onSubmitSuccess }) {
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ export default function ConsultationForm({ onSubmitSuccess }) {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.phone || !formData.subject || !formData.content) {
-      alert(t('support.fillAllFields', '请填写所有必填字段'));
+      alert(t('support.fillAllFields'));
       return;
     }
 
@@ -75,7 +75,7 @@ export default function ConsultationForm({ onSubmitSuccess }) {
         }
       });
 
-      alert(t('message.submitSuccess', '提交成功'));
+      alert(t('message.submitSuccess'));
       setFormData({
         name: '',
         email: '',
@@ -90,7 +90,7 @@ export default function ConsultationForm({ onSubmitSuccess }) {
       }
     } catch (error) {
       console.error('Failed to submit consultation:', error);
-      alert(t('message.submitFailed', '提交失败'));
+      alert(t('message.submitFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -98,63 +98,63 @@ export default function ConsultationForm({ onSubmitSuccess }) {
 
   return (
     <Card>
-      <h2>{t('support.newInquiry', '新建咨询')}</h2>
+      <h2>{t('support.newInquiry')}</h2>
       <form onSubmit={handleSubmit} className="consultation-form">
         <div className="form-group">
-          <label>{t('support.name', '姓名')} *</label>
+          <label>{t('support.name')} *</label>
           <Input
             value={formData.name}
             onChange={(e) => handleChange('name', e.target.value)}
-            placeholder={t('support.namePlaceholder', '请输入姓名')}
+            placeholder={t('support.namePlaceholder')}
             required
           />
         </div>
 
         <div className="form-group">
-          <label>{t('support.email', '邮箱')} *</label>
+          <label>{t('support.email')} *</label>
           <Input
             type="email"
             value={formData.email}
             onChange={(e) => handleChange('email', e.target.value)}
-            placeholder={t('support.emailPlaceholder', '请输入邮箱')}
+            placeholder={t('support.emailPlaceholder')}
             required
           />
         </div>
 
         <div className="form-group">
-          <label>{t('support.phone', '手机号')} *</label>
+          <label>{t('support.phone')} *</label>
           <Input
             type="tel"
             value={formData.phone}
             onChange={(e) => handleChange('phone', e.target.value)}
-            placeholder={t('support.phonePlaceholder', '请输入手机号')}
+            placeholder={t('support.phonePlaceholder')}
             required
           />
         </div>
 
         <div className="form-group">
-          <label>{t('support.subject', '咨询标题')} *</label>
+          <label>{t('support.subjectLabel')} *</label>
           <Input
             value={formData.subject}
             onChange={(e) => handleChange('subject', e.target.value)}
-            placeholder={t('support.subjectPlaceholder', '请输入咨询标题')}
+            placeholder={t('support.subjectPlaceholder')}
             required
           />
         </div>
 
         <div className="form-group">
-          <label>{t('support.content', '咨询内容')} *</label>
+          <label>{t('support.contentLabel')} *</label>
           <Textarea
             value={formData.content}
             onChange={(e) => handleChange('content', e.target.value)}
             rows={8}
-            placeholder={t('support.contentPlaceholder', '请输入咨询内容')}
+            placeholder={t('support.contentPlaceholder')}
             required
           />
         </div>
 
         <div className="form-group">
-          <label>{t('support.attachments', '附件')} (最多3个)</label>
+          <label>{t('support.attachments')} ({t('support.maxFilesLabel')})</label>
           <div className="file-upload-area">
             <input
               type="file"
@@ -162,7 +162,7 @@ export default function ConsultationForm({ onSubmitSuccess }) {
               multiple
               onChange={handleFileUpload}
               disabled={formData.attachments.length >= 3}
-              style={{ display: 'none' }}
+              className="hidden"
             />
             <Button
               type="button"
@@ -170,19 +170,19 @@ export default function ConsultationForm({ onSubmitSuccess }) {
               variant="secondary"
               disabled={formData.attachments.length >= 3}
             >
-              <PaperclipIcon className="w-4 h-4" style={{ marginRight: '0.5rem' }} />
-              {t('common.upload', '上传')}
+              <PaperclipIcon className="consultation-icon-attach" />
+              {t('common.upload')}
             </Button>
             <small className="form-hint">
-              {t('support.maxFiles', '最多可上传3个文件')} ({formData.attachments.length}/3)
+              {t('support.maxFiles')} ({formData.attachments.length}/3)
             </small>
           </div>
 
           {formData.attachments.length > 0 && (
             <div className="uploaded-files">
               {formData.attachments.map((file, index) => (
-                <div key={index} className="file-item">
-                  <DocumentIcon className="w-4 h-4" />
+                <div key={index} className="file-item group">
+                  <DocumentIcon className="consultation-icon-document" />
                   <span className="file-name">{file.name}</span>
                   <span className="file-size">
                     ({(file.size / 1024).toFixed(1)} KB)
@@ -193,7 +193,7 @@ export default function ConsultationForm({ onSubmitSuccess }) {
                     variant="text"
                     size="small"
                   >
-                    <XIcon className="w-4 h-4" />
+                    <XIcon className="consultation-icon-close" />
                   </Button>
                 </div>
               ))}
@@ -206,7 +206,7 @@ export default function ConsultationForm({ onSubmitSuccess }) {
           variant="primary"
           disabled={isSubmitting || !formData.name || !formData.email || !formData.phone || !formData.subject || !formData.content}
         >
-          {isSubmitting ? t('common.submitting', '提交中...') : t('common.submit', '提交')}
+          {isSubmitting ? t('common.submitting') : t('common.submit')}
         </Button>
       </form>
     </Card>

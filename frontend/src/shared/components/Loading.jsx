@@ -3,6 +3,7 @@
  */
 
 import { cn } from '@shared/utils/helpers';
+import './Loading.css';
 
 export function Loading({ size = 'md', text = '로딩 중...', className }) {
   const sizeClasses = {
@@ -12,10 +13,10 @@ export function Loading({ size = 'md', text = '로딩 중...', className }) {
   };
   
   return (
-    <div className={cn('flex flex-col items-center justify-center p-8', className)}>
+    <div className={cn('loading-container', className)}>
       <div className={cn('spinner', sizeClasses[size])} />
       {text && (
-        <p className="mt-4 text-sm text-gray-600">{text}</p>
+        <p className="loading-text">{text}</p>
       )}
     </div>
   );
@@ -23,8 +24,8 @@ export function Loading({ size = 'md', text = '로딩 중...', className }) {
 
 export function LoadingOverlay({ text = '처리 중...' }) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 shadow-xl">
+    <div className="loading-overlay">
+      <div className="loading-overlay-content">
         <Loading text={text} />
       </div>
     </div>

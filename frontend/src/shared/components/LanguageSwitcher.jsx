@@ -5,6 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { GlobeIcon } from './Icons';
+import './LanguageSwitcher.css';
 
 /**
  * @param {Object} props
@@ -33,8 +34,8 @@ export default function LanguageSwitcher({ variant = 'dark' }) {
 
   // 根据 variant 选择样式（无背景色）
   const buttonClasses = variant === 'light'
-    ? 'px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white text-white hover:opacity-80'
-    : 'px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 text-gray-700 dark:text-gray-300 hover:opacity-80';
+    ? 'language-switcher-btn language-switcher-btn-light'
+    : 'language-switcher-btn language-switcher-btn-dark';
 
   return (
     <button
@@ -42,7 +43,7 @@ export default function LanguageSwitcher({ variant = 'dark' }) {
       onClick={toggleLanguage}
       title={`切换到 ${nextLanguage.label} / Switch to ${nextLanguage.label}`}
     >
-      <GlobeIcon className="w-5 h-5" />
+      <GlobeIcon className="language-switcher-icon" />
     </button>
   );
 }

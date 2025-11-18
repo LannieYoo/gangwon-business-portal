@@ -128,11 +128,21 @@ async function getCurrentMemberProfile(req) {
   
   const profile = memberProfilesData.find(p => p.memberId === member.id);
   
+  // Merge profile data into member object for easier access
+  const mergedMember = {
+    ...member,
+    // Map profile fields to member fields
+    employeeCount: profile?.employeeCount || member.employeeCount || null,
+    sales: profile?.annualRevenue || member.sales || null,
+    mainBusiness: profile?.mainBusiness || member.mainBusiness || '',
+    businessField: profile?.businessArea || member.businessField || '',
+    cooperationFields: profile?.cooperationArea ? [profile.cooperationArea] : (member.cooperationFields || []),
+    // Keep profile object for backward compatibility
+    profile
+  };
+  
   return HttpResponse.json({ 
-    member: {
-      ...member,
-      profile
-    }
+    member: mergedMember
   });
 }
 

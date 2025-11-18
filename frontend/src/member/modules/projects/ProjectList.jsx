@@ -1,13 +1,12 @@
 /**
  * Project List Page - Member Portal
- * 程序公告列表页面 - 支持搜索、分页、程序申请
+ * 程序公告列表页面 - 支持搜索、分页、程序申请、详情查看
  */
 
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Banner, Submenu, Modal } from '@shared/components';
-import { BANNER_TYPES } from '@shared/utils/constants';
+import { Badge } from '@shared/components';
 import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
@@ -15,14 +14,13 @@ import Select from '@shared/components/Select';
 import { Pagination } from '@shared/components';
 import { apiService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import { SearchIcon, PaperclipIcon, XIcon, DocumentIcon } from '@shared/components/Icons';
-import useAuthStore from '@shared/stores/authStore';
-import './Projects.css';
+import { SearchIcon } from '@shared/components/Icons';
+import ApplicationModal from './ApplicationModal';
+import './ProjectList.css';
 
 export default function ProjectList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
   const [announcements, setAnnouncements] = useState([]);
   const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -31,11 +29,10 @@ export default function ProjectList() {
   const [pageSize, setPageSize] = useState(10);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
-  const [applicationFiles, setApplicationFiles] = useState([]);
 
   useEffect(() => {
     loadAnnouncements();
-  }, []);
+  }, [i18n.language]); // Reload data when language changes
 
   useEffect(() => {
     filterAndPaginate();
@@ -88,56 +85,17 @@ export default function ProjectList() {
 
   const handleApply = (announcement) => {
     setSelectedAnnouncement(announcement);
-    setApplicationFiles([]);
     setShowApplicationModal(true);
   };
 
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files).slice(0, 5 - applicationFiles.length);
-    setApplicationFiles(prev => [...prev, ...files]);
+  const handleApplicationSuccess = () => {
+    setSelectedAnnouncement(null);
+    // 可以在这里刷新列表或其他操作
   };
 
-  const handleRemoveFile = (index) => {
-    setApplicationFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSubmitApplication = async () => {
-    if (!user?.id) {
-      alert(t('common.loginRequired', '请先登录'));
-      return;
-    }
-
-    if (applicationFiles.length === 0) {
-      alert(t('projects.uploadAtLeastOneFile', '请至少上传一个附件'));
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append('announcementId', selectedAnnouncement.id);
-      formData.append('memberId', user.id);
-      applicationFiles.forEach((file, index) => {
-        formData.append(`files`, file);
-      });
-
-      await apiService.post(`${API_PREFIX}/member/project-applications`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      alert(t('message.submitSuccess', '提交成功'));
-      setShowApplicationModal(false);
-      setApplicationFiles([]);
-      setSelectedAnnouncement(null);
-    } catch (error) {
-      console.error('Failed to submit application:', error);
-      alert(t('message.submitFailed', '提交失败'));
-    }
-  };
-
+  // 处理查看详情的回调
   const handleViewDetail = (announcement) => {
-    navigate(`/member/projects/${announcement.id}`);
+    navigate(`/member/programs/${announcement.id}`);
   };
 
   // 计算分页
@@ -153,27 +111,42 @@ export default function ProjectList() {
     { value: '50', label: '50' }
   ];
 
-  return (
-    <div className="projects">
-      <Banner
-        bannerType={BANNER_TYPES.PROJECTS}
-        sectionClassName="member-banner-section"
-      />
-      <Submenu
-        items={[{
-          key: 'projects-list',
-          path: '/member/projects',
-          label: t('projects.title', '项目'),
-          exact: true
-        }]}
-        className="projects-submenu"
-        headerSelector=".member-header"
-      />
+  // 获取状态显示文本和样式
+  const getStatusInfo = (status) => {
+    const statusMap = {
+      recruiting: {
+        label: t('projects.status.recruiting', '모집중'),
+        variant: 'success'
+      },
+      ongoing: {
+        label: t('projects.status.ongoing', '진행중'),
+        variant: 'primary'
+      },
+      closed: {
+        label: t('projects.status.closed', '마감'),
+        variant: 'gray'
+      }
+    };
+    return statusMap[status] || { label: status, variant: 'gray' };
+  };
 
-      <div className="projects-content">
-        <div className="page-header">
-          <h1>{t('projects.title', '项目')}</h1>
-        </div>
+  // 获取类型显示文本
+  const getTypeLabel = (type) => {
+    const typeMap = {
+      startup: t('projects.types.startup', '창업 지원'),
+      rd: t('projects.types.rd', 'R&D 지원'),
+      export: t('projects.types.export', '수출 지원'),
+      investment: t('projects.types.investment', '투자 유치')
+    };
+    return typeMap[type] || type;
+  };
+
+  // 显示列表
+  return (
+    <>
+      <div className="page-header">
+        <h1>{t('projects.title', '项目')}</h1>
+      </div>
 
         {/* 搜索和分页设置 */}
         <Card>
@@ -188,7 +161,7 @@ export default function ProjectList() {
                   className="search-input"
                 />
                 <Button type="submit" variant="primary">
-                  <SearchIcon className="w-5 h-5" />
+                  <SearchIcon className="project-icon-search" />
                   {t('common.search', '搜索')}
                 </Button>
               </div>
@@ -220,32 +193,51 @@ export default function ProjectList() {
         ) : (
           <>
             <div className="announcements-list">
-              {paginatedAnnouncements.map((announcement) => (
-                <Card key={announcement.id} className="announcement-card">
-                  <div className="announcement-header">
-                    <h2 
-                      className="announcement-title"
-                      onClick={() => handleViewDetail(announcement)}
-                    >
-                      {announcement.title}
-                    </h2>
-                    <span className="announcement-date">
-                      {announcement.createdAt ? new Date(announcement.createdAt).toLocaleDateString() : ''}
-                    </span>
-                  </div>
-                  <div className="announcement-content">
-                    <p>{announcement.summary || announcement.content?.substring(0, 200)}...</p>
-                  </div>
-                  <div className="announcement-footer">
-                    <Button
-                      onClick={() => handleApply(announcement)}
-                      variant="primary"
-                    >
-                      {t('projects.apply', '创业者申请')}
-                    </Button>
-                  </div>
-                </Card>
-              ))}
+              {paginatedAnnouncements.map((announcement) => {
+                const statusInfo = announcement.status ? getStatusInfo(announcement.status) : null;
+                const typeLabel = announcement.type ? getTypeLabel(announcement.type) : null;
+                
+                return (
+                  <Card key={announcement.id} className="announcement-card">
+                    <div className="announcement-header">
+                      <div className="announcement-title-section">
+                        <h2 
+                          className="announcement-title"
+                          onClick={() => handleViewDetail(announcement)}
+                        >
+                          {announcement.title}
+                        </h2>
+                        <div className="announcement-meta">
+                          {typeLabel && (
+                            <Badge variant="primary" className="announcement-type">
+                              {typeLabel}
+                            </Badge>
+                          )}
+                          {statusInfo && (
+                            <Badge variant={statusInfo.variant} className="announcement-status">
+                              {statusInfo.label}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <span className="announcement-date">
+                        {announcement.createdAt ? new Date(announcement.createdAt).toLocaleDateString() : ''}
+                      </span>
+                    </div>
+                    <div className="announcement-content">
+                      <p>{announcement.summary || announcement.content?.substring(0, 200)}...</p>
+                    </div>
+                    <div className="announcement-footer">
+                      <Button
+                        onClick={() => handleApply(announcement)}
+                        variant="primary"
+                      >
+                        {t('projects.apply', '程序申请')}
+                      </Button>
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
 
             {/* 分页 */}
@@ -260,85 +252,15 @@ export default function ProjectList() {
             )}
           </>
         )}
-      </div>
 
-      {/* 创业者申请弹窗 */}
-      <Modal
+      {/* 程序申请弹窗 */}
+      <ApplicationModal
         isOpen={showApplicationModal}
         onClose={() => setShowApplicationModal(false)}
-        title={t('projects.apply', '创业者申请')}
-      >
-        {selectedAnnouncement && (
-          <div className="application-modal">
-            <div className="announcement-info">
-              <h3>{selectedAnnouncement.title}</h3>
-            </div>
-
-            <div className="form-section">
-              <label>{t('projects.uploadFiles', '上传附件')} (最多5个) *</label>
-              <div className="file-upload-area">
-                <input
-                  type="file"
-                  id="application-files"
-                  multiple
-                  onChange={handleFileUpload}
-                  disabled={applicationFiles.length >= 5}
-                  style={{ display: 'none' }}
-                />
-                <Button
-                  onClick={() => document.getElementById('application-files').click()}
-                  variant="secondary"
-                  disabled={applicationFiles.length >= 5}
-                >
-                  <PaperclipIcon className="w-4 h-4" style={{ marginRight: '0.5rem' }} />
-                  {t('common.upload', '上传')}
-                </Button>
-                <small className="form-hint">
-                  {t('projects.maxFiles', '最多可上传5个文件')} ({applicationFiles.length}/5)
-                </small>
-              </div>
-
-              {applicationFiles.length > 0 && (
-                <div className="uploaded-files">
-                  {applicationFiles.map((file, index) => (
-                    <div key={index} className="file-item">
-                      <DocumentIcon className="w-4 h-4" />
-                      <span className="file-name">{file.name}</span>
-                      <span className="file-size">
-                        ({(file.size / 1024).toFixed(1)} KB)
-                      </span>
-                      <Button
-                        onClick={() => handleRemoveFile(index)}
-                        variant="text"
-                        size="small"
-                      >
-                        <XIcon className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="modal-actions">
-              <Button
-                onClick={() => setShowApplicationModal(false)}
-                variant="secondary"
-              >
-                {t('common.cancel', '取消')}
-              </Button>
-              <Button
-                onClick={handleSubmitApplication}
-                variant="primary"
-                disabled={applicationFiles.length === 0}
-              >
-                {t('common.submit', '提交')}
-              </Button>
-            </div>
-          </div>
-        )}
-      </Modal>
-    </div>
+        announcement={selectedAnnouncement}
+        onSuccess={handleApplicationSuccess}
+      />
+    </>
   );
 }
 

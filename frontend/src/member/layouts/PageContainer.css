@@ -3,69 +3,27 @@
  * 页面容器样式 - 统一控制页面的边距和最大宽度
  */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .page-container {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem 2rem 4.5rem;
-  box-sizing: border-box;
-  /* 确保 padding 始终生效 */
-  min-width: 0;
+  @apply w-full max-w-[1400px] mx-auto box-border min-w-0;
+  @apply px-4 py-4 pb-[4.5rem] sm:px-6 lg:px-8;
 }
 
 /* 大尺寸容器 */
 .page-container-large {
-  max-width: 1600px;
-  padding: 1rem 2rem 4.5rem;
+  @apply max-w-[1600px] px-4 py-4 pb-[4.5rem] sm:px-6 lg:px-8;
 }
 
 /* 小尺寸容器 */
 .page-container-small {
-  max-width: 1200px;
-  padding: 1.5rem 2rem 4.5rem;
+  @apply max-w-[1200px] px-6 py-6 pb-[4.5rem] sm:px-8;
 }
 
 /* 全宽度（不限制最大宽度） */
 .page-container-full-width {
-  max-width: 100%;
-}
-
-/* 响应式设计 */
-@media (max-width: 1024px) {
-  .page-container {
-    padding: 1rem 1.5rem 4.5rem;
-  }
-
-  .page-container-large {
-    padding: 1rem 1.5rem 4.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .page-container {
-    padding: 1rem 1.5rem 4.5rem;
-  }
-
-  .page-container-large {
-    padding: 1rem 1.5rem 4.5rem;
-  }
-
-  .page-container-small {
-    padding: 1rem 1.5rem 4.5rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .page-container {
-    padding: 1rem 1rem 4.5rem;
-  }
-
-  .page-container-large {
-    padding: 1rem 1rem 4.5rem;
-  }
-
-  .page-container-small {
-    padding: 1rem 1rem 4.5rem;
-  }
+  @apply max-w-full;
 }
 

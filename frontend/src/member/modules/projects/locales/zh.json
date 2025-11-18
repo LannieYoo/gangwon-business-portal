@@ -5,7 +5,19 @@
     "searchPlaceholder": "按项目名称或关键词搜索",
     "resultsCount": "共{{count}}个项目",
     "perPage": "条/页",
-    "apply": "申请",
+    "itemsPerPage": "每页显示",
+    "apply": "程序申请",
+    "detail": "项目详情",
+    "attachments": "附件",
+    "companyInfo": "企业信息",
+    "companyId": "企业ID",
+    "companyName": "企业名",
+    "contactPerson": "负责人",
+    "uploadFiles": "上传附件",
+    "maxFiles": "最多可上传5个文件",
+    "clickOrDrag": "点击或拖拽文件到此处上传",
+    "uploadedFiles": "已上传文件",
+    "uploadAtLeastOneFile": "请至少上传一个附件",
     "status": {
       "recruiting": "招募中",
       "ongoing": "进行中",
@@ -17,7 +29,7 @@
       "export": "出口支持",
       "investment": "投资引进"
     },
-    "detail": {
+    "detailFields": {
       "basicInfo": "基本信息",
       "duration": "项目期间",
       "applicationDeadline": "申请截止日期",

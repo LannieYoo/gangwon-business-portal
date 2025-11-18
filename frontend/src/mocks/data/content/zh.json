@@ -442,6 +442,7 @@
       "answer": "请点击网站顶部的'会员注册'按钮，进入注册页面后，输入所需信息并提交。管理员批准后即可登录。",
       "order": 1,
       "isPublished": true,
+      "views": 1250,
       "createdAt": "2024-01-10T09:00:00Z",
       "updatedAt": "2024-12-20T10:00:00Z"
     },
@@ -452,6 +453,7 @@
       "answer": "通常注册申请后1~2天内会完成批准处理。批准结果将通过您注册的邮箱发送通知。",
       "order": 2,
       "isPublished": true,
+      "views": 980,
       "createdAt": "2024-01-10T09:00:00Z",
       "updatedAt": "2024-12-20T10:00:00Z"
     },
@@ -462,6 +464,7 @@
       "answer": "登录后，在'项目'菜单中查看可申请的项目，点击'申请'按钮填写申请书。",
       "order": 1,
       "isPublished": true,
+      "views": 1560,
       "createdAt": "2024-01-15T10:00:00Z",
       "updatedAt": "2024-12-20T10:00:00Z"
     },
@@ -472,6 +475,7 @@
       "answer": "季度绩效数据请在各季度结束后1个月内提交。例如：第一季度绩效需在4月底前提交",
       "order": 1,
       "isPublished": true,
+      "views": 890,
       "createdAt": "2024-01-20T11:00:00Z",
       "updatedAt": "2024-12-20T10:00:00Z"
     },
@@ -482,6 +486,7 @@
       "answer": "提交前状态的绩效数据可随时修改。提交后，在管理员批准前可以修改，批准后需要向管理员申请修改。",
       "order": 2,
       "isPublished": true,
+      "views": 720,
       "createdAt": "2024-01-20T11:00:00Z",
       "updatedAt": "2024-12-20T10:00:00Z"
     },
@@ -492,7 +497,30 @@
       "answer": "登录后，在'支援'菜单的'1:1咨询'中填写咨询内容并提交。答复将发送至您注册的邮箱。",
       "order": 1,
       "isPublished": true,
+      "views": 640,
       "createdAt": "2024-02-01T09:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 7,
+      "category": "project",
+      "question": "可以取消项目申请吗？",
+      "answer": "项目申请在审查开始前可以取消。如需取消，请通过1:1咨询提交取消请求。",
+      "order": 2,
+      "isPublished": true,
+      "views": 450,
+      "createdAt": "2024-02-15T10:00:00Z",
+      "updatedAt": "2024-12-20T10:00:00Z"
+    },
+    {
+      "id": 8,
+      "category": "system",
+      "question": "忘记了密码，应该怎么办？",
+      "answer": "请点击登录页面的'找回密码'链接，系统将向您注册的邮箱发送密码重置链接。",
+      "order": 1,
+      "isPublished": true,
+      "views": 380,
+      "createdAt": "2024-03-01T09:00:00Z",
       "updatedAt": "2024-12-20T10:00:00Z"
     }
   ],

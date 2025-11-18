@@ -6,6 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { useUIStore } from '@shared/stores/uiStore';
 import { SunIcon, MoonIcon } from './Icons';
+import './ThemeSwitcher.css';
 
 /**
  * @param {Object} props
@@ -17,8 +18,8 @@ export default function ThemeSwitcher({ variant = 'dark' }) {
 
   // 根据 variant 选择样式
   const buttonClasses = variant === 'light'
-    ? 'px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border border-white/30 flex items-center gap-2'
-    : 'px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 bg-primary-600 text-white hover:bg-primary-700 flex items-center gap-2';
+    ? 'theme-switcher-btn theme-switcher-btn-light'
+    : 'theme-switcher-btn theme-switcher-btn-dark';
 
   const isDark = theme === 'dark';
 
@@ -29,11 +30,11 @@ export default function ThemeSwitcher({ variant = 'dark' }) {
       title={isDark ? t('common.theme.switchToLight', '切换到浅色模式') : t('common.theme.switchToDark', '切换到深色模式')}
     >
       {isDark ? (
-        <SunIcon className="w-4 h-4" />
+        <SunIcon className="theme-switcher-icon" />
       ) : (
-        <MoonIcon className="w-4 h-4" />
+        <MoonIcon className="theme-switcher-icon" />
       )}
-      <span className="hidden sm:inline">
+      <span className="theme-switcher-text">
         {isDark ? t('common.theme.light', '浅色') : t('common.theme.dark', '深色')}
       </span>
     </button>

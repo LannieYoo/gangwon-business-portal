@@ -3,6 +3,10 @@
  * 通用二级导航栏样式
  */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --submenu-height: 50px;
 }
@@ -10,122 +14,84 @@
 /* 支持会员端和管理端的类名 */
 .submenu,
 .member-submenu {
-  position: relative;
-  width: 100%;
+  @apply relative w-full z-10 mt-0 mb-6 flex items-center justify-between;
   min-height: var(--submenu-height, 50px);
   background-color: #ffffff;
   border-bottom: 2px solid var(--border-color, #e0e0e0);
-  z-index: 10;
   box-shadow: var(--shadow-sm);
-  margin-top: 0;
-  margin-bottom: 1.5rem;
   order: 2;
-  /* 使用与 Header 完全相同的布局方式 */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   /* 与 Header 的 padding 保持一致 */
   padding: 0 2rem;
 }
 
 .submenu-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-shrink: 0;
+  @apply flex items-center gap-4 flex-shrink-0;
   /* 使用与 Header 相同的 flex 布局，自动对齐 */
   min-width: 0;
 }
 
 .submenu-title {
-  font-size: 1.5rem;
-  font-weight: 700;
+  @apply text-2xl font-bold m-0 whitespace-nowrap overflow-hidden;
   color: #111827;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .submenu-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @apply flex-1 flex justify-center items-center min-w-0;
   /* 与 Header center 的 margin 保持一致 */
   margin-left: 2rem;
   margin-right: 2rem;
-  min-width: 0;
 }
 
 .submenu-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
-  justify-content: flex-end;
+  @apply flex items-center gap-3 flex-shrink-0 justify-end;
   /* 使用与 Header 相同的 flex 布局，自动对齐 */
   min-width: 0;
 }
 
 .submenu-list {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  justify-content: center;
+  @apply flex items-center gap-1 list-none m-0 p-0 justify-center;
 }
 
 .submenu-item {
-  flex-shrink: 0;
+  @apply flex-shrink-0;
 }
 
 .submenu-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.5rem;
+  @apply flex items-center gap-2 py-3.5 px-6 no-underline text-[0.9375rem] font-semibold whitespace-nowrap transition-all duration-200 relative;
   color: var(--text-secondary, #616161);
-  text-decoration: none;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: all 0.2s ease;
   border-bottom: 3px solid transparent;
-  position: relative;
 }
 
 .submenu-link:hover {
+  @apply font-semibold;
   color: var(--gov-blue, #004c97);
   border-bottom-color: var(--gov-blue-light, #0066cc);
 }
 
 .submenu-link.active {
+  @apply font-bold;
   color: var(--gov-blue, #004c97);
   border-bottom-color: var(--gov-blue, #004c97);
-  font-weight: 700;
 }
 
 .submenu-label {
-  line-height: 1.25rem;
+  @apply leading-5;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
   .submenu,
   .member-submenu {
-    padding: 0 1.5rem;
+    @apply px-6;
   }
   
   .submenu-center {
-    margin-left: 1.5rem;
-    margin-right: 1.5rem;
+    @apply mx-6;
   }
 
   .submenu-title {
-    font-size: 1.25rem;
+    @apply text-xl;
   }
 }
 
@@ -133,21 +99,18 @@
   .submenu,
   .member-submenu {
     --submenu-height: 48px;
-    padding: 0 1rem;
+    @apply px-4;
   }
   
   .submenu-center {
-    margin-left: 1rem;
-    margin-right: 1rem;
+    @apply mx-4;
   }
 
   .submenu-link {
-    padding: 0.75rem 1.25rem;
-    font-size: 0.875rem;
+    @apply py-3 px-5 text-sm;
   }
 
   .submenu-title {
-    font-size: 1.125rem;
+    @apply text-lg;
   }
 }
-

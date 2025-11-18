@@ -5,7 +5,19 @@
     "searchPlaceholder": "사업명 또는 키워드로 검색",
     "resultsCount": "총 {{count}}개의 사업",
     "perPage": "개씩",
-    "apply": "신청하기",
+    "itemsPerPage": "페이지당 표시",
+    "apply": "프로그램 신청",
+    "detail": "사업 상세",
+    "attachments": "첨부파일",
+    "companyInfo": "기업 정보",
+    "companyId": "기업 ID",
+    "companyName": "기업명",
+    "contactPerson": "담당자",
+    "uploadFiles": "첨부파일 업로드",
+    "maxFiles": "최대 5개까지 업로드 가능",
+    "clickOrDrag": "클릭하거나 파일을 여기로 드래그하여 업로드",
+    "uploadedFiles": "업로드된 파일",
+    "uploadAtLeastOneFile": "최소 1개 이상의 파일을 업로드해주세요",
     "status": {
       "recruiting": "모집중",
       "ongoing": "진행중",
@@ -17,7 +29,7 @@
       "export": "수출 지원",
       "investment": "투자 유치"
     },
-    "detail": {
+    "detailFields": {
       "basicInfo": "기본 정보",
       "duration": "사업 기간",
       "applicationDeadline": "신청 마감일",

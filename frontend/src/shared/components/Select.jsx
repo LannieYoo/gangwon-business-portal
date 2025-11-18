@@ -5,6 +5,7 @@
 import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@shared/utils/helpers';
+import './Select.css';
 
 export const Select = forwardRef(function Select({
   label,

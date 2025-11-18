@@ -1,17 +1,23 @@
 /**
- * Projects Page Container - Member Portal
- * 项目页面容器组件
+ * Projects Page - Member Portal
+ * 项目页面 - 显示项目列表
  */
 
-import { Routes, Route } from 'react-router-dom';
+import { Banner } from '@shared/components';
+import { BANNER_TYPES } from '@shared/utils/constants';
 import ProjectList from './ProjectList';
-import ProjectDetail from './ProjectDetail';
+import './Projects.css';
 
 export default function Projects() {
   return (
-    <Routes>
-      <Route index element={<ProjectList />} />
-      <Route path=":id" element={<ProjectDetail />} />
-    </Routes>
+    <div className="projects">
+      <Banner
+        bannerType={BANNER_TYPES.PROJECTS}
+        sectionClassName="member-banner-section"
+      />
+      <div className="projects-content">
+        <ProjectList />
+      </div>
+    </div>
   );
 }

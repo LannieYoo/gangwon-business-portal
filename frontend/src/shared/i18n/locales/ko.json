@@ -59,6 +59,8 @@
     "more": "더보기",
     "less": "접기",
     "viewAll": "전체 보기",
+    "loginRequired": "로그인이 필요합니다",
+    "notSet": "설정되지 않음",
     "theme": {
       "light": "라이트",
       "dark": "다크",
@@ -199,7 +201,53 @@
     "draft": "임시저장",
     "submitted": "제출 완료",
     "needSupplement": "보완 필요",
-    "approved": "승인 완료"
+    "approved": "승인 완료",
+    "companyInfo": "기업 정보"
+  },
+  "profile": {
+    "loginRequired": "로그인이 필요합니다",
+    "loginRequiredDesc": "기업 정보를 조회하고 관리하려면 먼저 로그인해주세요.",
+    "sections": {
+      "basicInfo": "기본 정보",
+      "addressInfo": "주소 정보",
+      "businessInfo": "사업 정보",
+      "logo": "로고",
+      "approvalStatus": "승인 상태"
+    },
+    "regions": {
+      "춘천시": "춘천시",
+      "원주시": "원주시",
+      "강릉시": "강릉시",
+      "동해시": "동해시",
+      "태백시": "태백시",
+      "속초시": "속초시",
+      "삼척시": "삼척시"
+    },
+    "categories": {
+      "tech": "기술",
+      "manufacturing": "제조업",
+      "service": "서비스업",
+      "retail": "유통업",
+      "other": "기타"
+    },
+    "industries": {
+      "software": "소프트웨어",
+      "hardware": "하드웨어",
+      "biotechnology": "바이오기술",
+      "healthcare": "의료보건",
+      "education": "교육",
+      "finance": "금융",
+      "other": "기타"
+    },
+    "businessLicenseNotEditable": "사업자등록번호는 수정할 수 없습니다",
+    "businessLicenseHint": "사업자등록번호는 수정할 수 없습니다",
+    "noLogo": "로고 없음",
+    "logoHint": "JPG, PNG 형식 지원, 최대 5MB",
+    "approvalStatusDesc": {
+      "pending": "기업 정보가 검토 중입니다. 잠시만 기다려주세요.",
+      "approved": "기업 정보가 승인되었습니다.",
+      "rejected": "기업 정보 승인이 거부되었습니다. 수정 후 다시 제출해주세요."
+    }
   },
   "support": {
     "inquiry": "문의",

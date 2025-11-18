@@ -48,7 +48,7 @@ function Header() {
     },
     {
       key: 'projects',
-      path: '/member/projects',
+      path: '/member/programs',
       icon: FolderIcon,
       label: t('menu.projects')
     },

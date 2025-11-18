@@ -4,6 +4,7 @@
 
 import { forwardRef } from 'react';
 import { cn } from '@shared/utils/helpers';
+import './Input.css';
 
 export const Input = forwardRef(function Input({
   label,

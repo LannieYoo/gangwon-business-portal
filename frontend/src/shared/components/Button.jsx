@@ -3,6 +3,7 @@
  */
 
 import { cn } from '@shared/utils/helpers';
+import './Button.css';
 
 const variantStyles = {
   primary: 'btn-primary',
@@ -39,7 +40,7 @@ export function Button({
       {...props}
     >
       {loading && (
-        <span className="spinner spinner-sm mr-2" />
+        <span className="btn-spinner" />
       )}
       {children}
     </button>

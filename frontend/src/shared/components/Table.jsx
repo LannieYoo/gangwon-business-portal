@@ -3,6 +3,7 @@
  */
 
 import { cn } from '@shared/utils/helpers';
+import './Table.css';
 
 export function Table({ 
   children, 
@@ -22,15 +23,15 @@ export function Table({
     const someSelected = selectedRows.length > 0 && selectedRows.length < data.length;
 
     return (
-      <div className="overflow-x-auto">
+      <div className="table-wrapper">
         <table className={cn('table', className)} {...props}>
-          <thead className="bg-gray-50">
+          <thead>
             <tr>
               {selectable && (
-                <th className="px-4 py-3 text-left">
+                <th className="table-checkbox-header">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    className="table-checkbox"
                     checked={allSelected}
                     ref={(input) => {
                       if (input) input.indeterminate = someSelected;
@@ -46,28 +47,28 @@ export function Table({
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="table-header"
                 >
                   {column.label}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody>
             {data.map((row, rowIndex) => (
               <tr
                 key={row.id || rowIndex}
                 className={cn(
-                  'bg-white hover:bg-gray-50',
-                  onRowClick && 'cursor-pointer'
+                  'table-row',
+                  onRowClick && 'table-row-clickable'
                 )}
                 onClick={() => onRowClick && onRowClick(row)}
               >
                 {selectable && (
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="table-checkbox-cell">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      className="table-checkbox"
                       checked={selectedRows.includes(row.id)}
                       onChange={(e) => {
                         e.stopPropagation();
@@ -88,7 +89,7 @@ export function Table({
                     <td
                       key={column.key}
                       className={cn(
-                        'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
+                        'table-cell',
                         column.className
                       )}
                     >
@@ -106,7 +107,7 @@ export function Table({
 
   // Otherwise, render as before (manual table structure)
   return (
-    <div className="overflow-x-auto">
+    <div className="table-wrapper">
       <table className={cn('table', className)} {...props}>
         {children}
       </table>
@@ -115,21 +116,21 @@ export function Table({
 }
 
 export function TableHead({ children, className }) {
-  return <thead className={cn('bg-gray-50', className)}>{children}</thead>;
+  return <thead className={cn('table-thead', className)}>{children}</thead>;
 }
 
 export function TableBody({ children, className }) {
-  return <tbody className={cn('bg-white divide-y divide-gray-200', className)}>{children}</tbody>;
+  return <tbody className={cn('table-tbody', className)}>{children}</tbody>;
 }
 
 export function TableRow({ children, className, ...props }) {
-  return <tr className={cn('hover:bg-gray-50', className)} {...props}>{children}</tr>;
+  return <tr className={cn('table-row', className)} {...props}>{children}</tr>;
 }
 
 export function TableHeader({ children, className, ...props }) {
   return (
     <th
-      className={cn('px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider', className)}
+      className={cn('table-header', className)}
       {...props}
     >
       {children}
@@ -139,7 +140,7 @@ export function TableHeader({ children, className, ...props }) {
 
 export function TableCell({ children, className, ...props }) {
   return (
-    <td className={cn('px-6 py-4 whitespace-nowrap text-sm text-gray-900', className)} {...props}>
+    <td className={cn('table-cell', className)} {...props}>
       {children}
     </td>
   );

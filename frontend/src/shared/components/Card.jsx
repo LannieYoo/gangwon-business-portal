@@ -3,6 +3,7 @@
  */
 
 import { cn } from '@shared/utils/helpers';
+import './Card.css';
 
 export function Card({ children, hover = false, className, ...props }) {
   return (

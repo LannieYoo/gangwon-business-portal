@@ -19,16 +19,38 @@
       "other": "기타"
     },
     "subject": "제목",
+    "subjectLabel": "문의 제목",
     "subjectPlaceholder": "문의 제목을 입력하세요",
     "content": "내용",
+    "contentLabel": "문의 내용",
     "contentPlaceholder": "상세 내용을 입력하세요",
+    "name": "이름",
+    "namePlaceholder": "이름을 입력하세요",
+    "email": "이메일",
+    "emailPlaceholder": "이메일을 입력하세요",
+    "phone": "전화번호",
+    "phonePlaceholder": "전화번호를 입력하세요",
+    "user": "사용자",
+    "admin": "관리자",
+    "attachments": "첨부파일",
+    "attachmentNumber": "첨부파일 {{number}}",
+    "maxFiles": "최대 3개까지 업로드 가능",
+    "maxFilesLabel": "최대 3개",
+    "noContent": "내용 없음",
     "status": {
       "pending": "답변 대기",
       "answered": "답변 완료"
     },
     "createdDate": "작성일",
     "answeredDate": "답변일",
-    "views": "조회수"
+    "views": "조회수",
+    "viewsLabel": "회 조회",
+    "fillAllFields": "모든 필수 항목을 입력해주세요",
+    "consultationIdMissing": "문의 ID가 없습니다",
+    "notFound": "문의 기록이 존재하지 않습니다",
+    "loadFailed": "문의 상세 정보를 불러오는데 실패했습니다",
+    "pendingNotice": "문의가 처리 중입니다. 빠른 시일 내에 답변드리겠습니다.",
+    "backToHistory": "목록으로 돌아가기"
   }
 }
 

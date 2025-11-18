@@ -3,6 +3,7 @@
  */
 
 import { cn } from '@shared/utils/helpers';
+import './Badge.css';
 
 const variantStyles = {
   primary: 'badge-primary',

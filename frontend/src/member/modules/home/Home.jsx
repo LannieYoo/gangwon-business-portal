@@ -46,6 +46,7 @@ export default function Home() {
             <Banner
               bannerType={BANNER_TYPES.MAIN_SECONDARY}
               sectionClassName="secondary-banner-section"
+              height="300px"
             />
           </div>
         </div>

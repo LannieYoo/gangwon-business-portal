@@ -4,7 +4,7 @@
 
 import { http, HttpResponse } from 'msw';
 import { API_PREFIX, API_BASE_URL } from '@shared/utils/constants';
-import { delay, loadMockData, shouldSimulateError, getErrorStatus } from '../config.js';
+import { delay, loadMockData, shouldSimulateError, getErrorStatus, getCurrentLanguage } from '../config.js';
 
 // Base URL for performance API (use absolute paths - MSW best practice)
 const BASE_URL = `${API_BASE_URL}${API_PREFIX}/performance`;
@@ -12,12 +12,17 @@ const ADMIN_BASE_URL = `${API_BASE_URL}${API_PREFIX}/admin/performance`;
 
 // In-memory storage for performance records (simulates database)
 let performanceData = null;
+let currentDataLanguage = null; // Track the language of loaded data
 
-// Initialize data on first load
+// Initialize data on first load or when language changes
 async function initializeData() {
-  if (!performanceData) {
+  const currentLanguage = getCurrentLanguage();
+  
+  // Reload data if language has changed
+  if (!performanceData || currentDataLanguage !== currentLanguage) {
     const data = await loadMockData('performance');
     performanceData = [...data.performanceRecords];
+    currentDataLanguage = currentLanguage;
   }
 }
 

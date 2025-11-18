@@ -5,6 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
@@ -13,10 +14,23 @@ import Select from '@shared/components/Select';
 import { Tabs } from '@shared/components';
 import { apiService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import { PaperclipIcon, DocumentIcon, XIcon, PlusIcon } from '@shared/components/Icons';
-import './Performance.css';
+import { 
+  PaperclipIcon, 
+  DocumentIcon, 
+  XIcon, 
+  PlusIcon,
+  ChartIcon,
+  CurrencyDollarIcon,
+  BriefcaseIcon,
+  ClipboardDocumentCheckIcon,
+  SparklesIcon,
+  ReportIcon
+} from '@shared/components/Icons';
+import './PerformanceFormContent.css';
 
 export default function PerformanceFormContent() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('salesEmployment');
   const [formData, setFormData] = useState({
@@ -185,8 +199,7 @@ export default function PerformanceFormContent() {
       // TODO: API 调用提交成果数据
       console.log('Submitting performance:', formData);
       alert(t('message.submitSuccess') || '提交成功');
-      window.location.hash = 'query';
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
+      navigate('/member/performance/list');
     } catch (error) {
       console.error('Failed to submit:', error);
       alert(t('message.submitFailed') || '提交失败');
@@ -238,8 +251,11 @@ export default function PerformanceFormContent() {
     return (
       <div className="performance-form-tab">
         {/* 销售额 */}
-        <Card>
-          <h3>{t('performance.salesEmploymentFields.sales', '销售额')}</h3>
+        <Card className="info-card">
+          <div className="card-header">
+            <CurrencyDollarIcon className="section-icon" />
+            <h3>{t('performance.salesEmploymentFields.sales', '销售额')}</h3>
+          </div>
           <div className="form-section">
             <div className="form-group">
               <label>{t('performance.salesEmploymentFields.salesPerformance', '销售实绩')}</label>
@@ -268,8 +284,11 @@ export default function PerformanceFormContent() {
         </Card>
 
         {/* 出口额 */}
-        <Card>
-          <h3>{t('performance.salesEmploymentFields.export', '出口额')}</h3>
+        <Card className="info-card">
+          <div className="card-header">
+            <ChartIcon className="section-icon" />
+            <h3>{t('performance.salesEmploymentFields.export', '出口额')}</h3>
+          </div>
           <div className="form-section">
             <div className="form-group">
               <label>{t('performance.salesEmploymentFields.exchangeRate', '年报发行时汇率基准')}</label>
@@ -298,8 +317,11 @@ export default function PerformanceFormContent() {
         </Card>
 
         {/* 雇佣创造 */}
-        <Card>
-          <h3>{t('performance.salesEmploymentFields.employment', '雇佣创造')}</h3>
+        <Card className="info-card">
+          <div className="card-header">
+            <BriefcaseIcon className="section-icon" />
+            <h3>{t('performance.salesEmploymentFields.employment', '雇佣创造')}</h3>
+          </div>
           <div className="form-section">
             <div className="form-group">
               <label>{t('performance.salesEmploymentFields.employmentCount', '雇佣人数')}</label>
@@ -389,11 +411,14 @@ export default function PerformanceFormContent() {
   const renderGovernmentSupportTab = () => {
     return (
       <div className="performance-form-tab">
-        <Card>
+        <Card className="info-card">
           <div className="form-header">
-            <h3>{t('performance.tabs.governmentSupport', '政府支持受惠历史')}</h3>
+            <div className="card-header">
+              <SparklesIcon className="section-icon" />
+              <h3>{t('performance.tabs.governmentSupport', '政府支持受惠历史')}</h3>
+            </div>
             <Button onClick={addGovernmentSupport} variant="secondary" size="small">
-              <PlusIcon className="w-4 h-4" style={{ marginRight: '0.5rem' }} />
+              <PlusIcon className="w-4 h-4 icon-with-margin" />
               {t('performance.governmentSupportFields.add', '添加')}
             </Button>
           </div>
@@ -401,13 +426,13 @@ export default function PerformanceFormContent() {
           {formData.governmentSupport.length === 0 ? (
             <div className="empty-state">
               <p>{t('common.noData', '暂无数据')}</p>
-              <p className="hint">{t('performance.governmentSupportFields.add', '添加')} {t('performance.governmentSupportFields.add', '添加')} {t('common.click', '点击')} {t('performance.governmentSupportFields.add', '添加')} {t('common.button', '按钮')} {t('common.add', '添加')} {t('performance.governmentSupportFields.add', '添加')}</p>
+              <p className="hint">{t('performance.governmentSupportFields.emptyHint', '点击上方"添加"按钮添加政府支持受惠历史记录')}</p>
             </div>
           ) : (
             formData.governmentSupport.map((item, index) => (
               <Card key={index} className="government-support-item">
                 <div className="item-header">
-                  <h4>{t('performance.governmentSupportFields.add', '添加')} {index + 1}</h4>
+                  <h4>{t('performance.governmentSupportFields.item', '政府支持项目')} {index + 1}</h4>
                   <Button
                     onClick={() => removeGovernmentSupport(index)}
                     variant="text"
@@ -511,11 +536,14 @@ export default function PerformanceFormContent() {
 
     return (
       <div className="performance-form-tab">
-        <Card>
+        <Card className="info-card">
           <div className="form-header">
-            <h3>{t('performance.tabs.intellectualProperty', '知识产权')}</h3>
+            <div className="card-header">
+              <DocumentIcon className="section-icon" />
+              <h3>{t('performance.tabs.intellectualProperty', '知识产权')}</h3>
+            </div>
             <Button onClick={addIntellectualProperty} variant="secondary" size="small">
-              <PlusIcon className="w-4 h-4" style={{ marginRight: '0.5rem' }} />
+              <PlusIcon className="w-4 h-4 icon-with-margin" />
               {t('performance.governmentSupportFields.add', '添加')}
             </Button>
           </div>
@@ -523,6 +551,7 @@ export default function PerformanceFormContent() {
           {formData.intellectualProperty.length === 0 ? (
             <div className="empty-state">
               <p>{t('common.noData', '暂无数据')}</p>
+              <p className="hint">{t('performance.intellectualPropertyFields.emptyHint', '点击上方"添加"按钮添加知识产权记录')}</p>
             </div>
           ) : (
             formData.intellectualProperty.map((item, index) => (
@@ -624,7 +653,7 @@ export default function PerformanceFormContent() {
                       type="file"
                       accept="application/pdf"
                       onChange={(e) => handleFileUpload(index, e.target.files[0])}
-                      style={{ display: 'none' }}
+                      className="hidden-file-input"
                       id={`ip-file-${index}`}
                     />
                     <Button
@@ -632,7 +661,7 @@ export default function PerformanceFormContent() {
                       variant="secondary"
                       size="small"
                     >
-                      <PaperclipIcon className="w-4 h-4" style={{ marginRight: '0.5rem' }} />
+                      <PaperclipIcon className="w-4 h-4 icon-with-margin" />
                       {t('common.upload', '上传')}
                     </Button>
                     {item.proofDocument && (
@@ -657,12 +686,18 @@ export default function PerformanceFormContent() {
   return (
     <div className="performance-form-content">
       <div className="page-header">
-        <h1>{t('performance.input', '成果输入')}</h1>
+        <div className="page-title-wrapper">
+          <ClipboardDocumentCheckIcon className="page-title-icon" />
+          <h1>{t('performance.input', '成果输入')}</h1>
+        </div>
       </div>
 
       {/* 基本信息 */}
-      <Card>
-        <h2>{t('performance.sections.basicInfo', '基本信息')}</h2>
+      <Card className="info-card">
+        <div className="card-header">
+          <ReportIcon className="section-icon" />
+          <h2>{t('performance.sections.basicInfo', '基本信息')}</h2>
+        </div>
         <div className="form-grid">
           <div className="form-group">
             <label>{t('performance.year', '年度')} *</label>
@@ -704,10 +739,7 @@ export default function PerformanceFormContent() {
       {/* 操作按钮 */}
       <div className="action-buttons">
         <Button
-          onClick={() => {
-            window.location.hash = 'query';
-            window.dispatchEvent(new HashChangeEvent('hashchange'));
-          }}
+          onClick={() => navigate('/member/performance/list')}
           variant="secondary"
         >
           {t('common.cancel', '取消')}

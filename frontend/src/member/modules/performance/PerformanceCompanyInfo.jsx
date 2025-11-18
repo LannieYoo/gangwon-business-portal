@@ -14,11 +14,26 @@ import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
 import { apiService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import { UserIcon } from '@shared/components/Icons';
-import './Performance.css';
+import { 
+  UserIcon, 
+  BuildingIcon, 
+  LocationIcon, 
+  PhoneIcon, 
+  CalendarIcon,
+  BriefcaseIcon,
+  CurrencyDollarIcon,
+  TeamIcon,
+  GlobeIcon,
+  EditIcon,
+  CheckCircleIcon,
+  XIcon,
+  WarningIcon
+} from '@shared/components/Icons';
+import { formatNumber, parseFormattedNumber } from '@shared/utils/format';
+import './PerformanceCompanyInfo.css';
 
 export default function PerformanceCompanyInfo() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,14 +50,22 @@ export default function PerformanceCompanyInfo() {
     industry: '',
     description: '',
     website: '',
-    logo: null
+    logo: null,
+    // 业务信息字段（根据文档要求添加）
+    businessField: '',
+    sales: '',
+    employeeCount: '',
+    mainBusiness: '',
+    cooperationFields: [],
+    // 审批状态
+    approvalStatus: 'pending' // pending, approved, rejected
   });
 
   useEffect(() => {
     if (isAuthenticated) {
       loadProfile();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, i18n.language]); // Reload data when language changes
 
   const loadProfile = async () => {
     if (!isAuthenticated) return;
@@ -64,8 +87,16 @@ export default function PerformanceCompanyInfo() {
           category: m.category || '',
           industry: m.industry || '',
           description: m.description || '',
-          website: m.website || '',
-          logo: m.logo || null
+          website: m.website || m.websiteUrl || '',
+          logo: m.logo || null,
+          // 业务信息字段（从profile或member获取）
+          businessField: m.businessField || m.profile?.businessArea || '',
+          sales: (m.sales || m.profile?.annualRevenue) ? formatNumber(m.sales || m.profile?.annualRevenue) : '',
+          employeeCount: (m.employeeCount || m.profile?.employeeCount) ? formatNumber(m.employeeCount || m.profile?.employeeCount) : '',
+          mainBusiness: m.mainBusiness || m.profile?.mainBusiness || '',
+          cooperationFields: m.cooperationFields || (m.profile?.cooperationArea ? [m.profile.cooperationArea] : []),
+          // 审批状态
+          approvalStatus: m.approvalStatus || 'pending'
         });
       }
     } catch (error) {
@@ -76,15 +107,50 @@ export default function PerformanceCompanyInfo() {
   };
 
   const handleChange = (field, value) => {
+    // 处理数字字段的格式化
+    if (field === 'sales' || field === 'employeeCount') {
+      const numValue = parseFormattedNumber(value);
+      if (!isNaN(numValue) || value === '') {
+        setCompanyData(prev => ({
+          ...prev,
+          [field]: value === '' ? '' : formatNumber(numValue)
+        }));
+        return;
+      }
+    }
+    
     setCompanyData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
+  const handleCooperationFieldChange = (field, checked) => {
+    const fields = companyData.cooperationFields || [];
+    if (checked) {
+      setCompanyData(prev => ({
+        ...prev,
+        cooperationFields: [...fields, field]
+      }));
+    } else {
+      setCompanyData(prev => ({
+        ...prev,
+        cooperationFields: fields.filter(f => f !== field)
+      }));
+    }
+  };
+
   const handleSave = async () => {
     try {
-      await apiService.put(`${API_PREFIX}/member/profile`, companyData);
+      // 准备保存数据，将格式化的数字转换为原始数字
+      const saveData = {
+        ...companyData,
+        sales: companyData.sales ? parseFormattedNumber(companyData.sales) : null,
+        employeeCount: companyData.employeeCount ? parseFormattedNumber(companyData.employeeCount) : null,
+        websiteUrl: companyData.website || companyData.websiteUrl || ''
+      };
+      
+      await apiService.put(`${API_PREFIX}/member/profile`, saveData);
       setIsEditing(false);
       alert(t('message.saveSuccess') || '保存成功');
       loadProfile();
@@ -175,14 +241,22 @@ export default function PerformanceCompanyInfo() {
   return (
     <div className="performance-company-info">
       <div className="page-header">
-        <h1>{t('performance.companyInfo', '企业信息')}</h1>
+        <div className="page-header-content">
+          <div className="page-title-wrapper">
+            <BuildingIcon className="page-title-icon" />
+            <h1>{t('performance.companyInfo', '企业信息')}</h1>
+          </div>
+          {loading && <div className="loading-indicator">加载中...</div>}
+        </div>
         {!isEditing ? (
-          <Button onClick={() => setIsEditing(true)} variant="primary">
+          <Button onClick={() => setIsEditing(true)} variant="primary" className="edit-button">
+            <EditIcon className="button-icon" />
             {t('common.edit', '编辑')}
           </Button>
         ) : (
           <div className="button-group">
-            <Button onClick={handleSave} variant="primary">
+            <Button onClick={handleSave} variant="primary" className="save-button">
+              <CheckCircleIcon className="button-icon" />
               {t('common.save', '保存')}
             </Button>
             <Button onClick={handleCancel} variant="secondary">
@@ -193,8 +267,11 @@ export default function PerformanceCompanyInfo() {
       </div>
 
       {/* 基本信息 */}
-      <Card>
-        <h2>{t('profile.sections.basicInfo', '基本信息')}</h2>
+      <Card className="info-card">
+        <div className="card-header">
+          <BuildingIcon className="section-icon" />
+          <h2>{t('profile.sections.basicInfo', '基本信息')}</h2>
+        </div>
         <div className="form-grid">
           <div className="form-group">
             <label>{t('member.companyName', '企业名称')} *</label>
@@ -228,7 +305,10 @@ export default function PerformanceCompanyInfo() {
           </div>
 
           <div className="form-group">
-            <label>{t('member.establishedDate', '成立日期')} *</label>
+            <label>
+              <CalendarIcon className="label-icon" />
+              {t('member.establishedDate', '成立日期')} *
+            </label>
             <Input
               type="date"
               value={companyData.establishedDate}
@@ -239,7 +319,10 @@ export default function PerformanceCompanyInfo() {
           </div>
 
           <div className="form-group">
-            <label>{t('member.representativeName', '代表姓名')} *</label>
+            <label>
+              <UserIcon className="label-icon" />
+              {t('member.representativeName', '代表姓名')} *
+            </label>
             <Input
               value={companyData.representativeName}
               onChange={(e) => handleChange('representativeName', e.target.value)}
@@ -249,7 +332,10 @@ export default function PerformanceCompanyInfo() {
           </div>
 
           <div className="form-group">
-            <label>{t('member.phone', '电话')} *</label>
+            <label>
+              <PhoneIcon className="label-icon" />
+              {t('member.phone', '电话')} *
+            </label>
             <Input
               type="tel"
               value={companyData.phone}
@@ -262,11 +348,17 @@ export default function PerformanceCompanyInfo() {
       </Card>
 
       {/* 地址信息 */}
-      <Card>
-        <h2>{t('profile.sections.addressInfo', '地址信息')}</h2>
+      <Card className="info-card">
+        <div className="card-header">
+          <LocationIcon className="section-icon" />
+          <h2>{t('profile.sections.addressInfo', '地址信息')}</h2>
+        </div>
         <div className="form-grid">
           <div className="form-group full-width">
-            <label>{t('member.address', '地址')} *</label>
+            <label>
+              <LocationIcon className="label-icon" />
+              {t('member.address', '地址')} *
+            </label>
             <Input
               value={companyData.address}
               onChange={(e) => handleChange('address', e.target.value)}
@@ -287,8 +379,11 @@ export default function PerformanceCompanyInfo() {
       </Card>
 
       {/* 业务信息 */}
-      <Card>
-        <h2>{t('profile.sections.businessInfo', '业务信息')}</h2>
+      <Card className="info-card">
+        <div className="card-header">
+          <BriefcaseIcon className="section-icon" />
+          <h2>{t('profile.sections.businessInfo', '业务信息')}</h2>
+        </div>
         <div className="form-grid">
           <Select
             label={t('member.category', '类别')}
@@ -308,14 +403,65 @@ export default function PerformanceCompanyInfo() {
             required
           />
 
+          <div className="form-group">
+            <label>{t('member.businessField', '业务领域')}</label>
+            <Select
+              value={companyData.businessField}
+              onChange={(e) => handleChange('businessField', e.target.value)}
+              options={categoryOptions}
+              disabled={!isEditing}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>
+              <CurrencyDollarIcon className="label-icon" />
+              {t('member.sales', '销售额')}
+            </label>
+            <Input
+              type="text"
+              value={companyData.sales}
+              onChange={(e) => handleChange('sales', e.target.value)}
+              disabled={!isEditing}
+              placeholder="0"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>
+              <TeamIcon className="label-icon" />
+              {t('member.employeeCount', '员工数')}
+            </label>
+            <Input
+              type="text"
+              value={companyData.employeeCount}
+              onChange={(e) => handleChange('employeeCount', e.target.value)}
+              disabled={!isEditing}
+              placeholder="0"
+            />
+          </div>
+
           <div className="form-group full-width">
-            <label>{t('member.website', '网站')}</label>
+            <label>
+              <GlobeIcon className="label-icon" />
+              {t('member.website', '网站')}
+            </label>
             <Input
               type="url"
               value={companyData.website}
               onChange={(e) => handleChange('website', e.target.value)}
               disabled={!isEditing}
               placeholder="https://example.com"
+            />
+          </div>
+
+          <div className="form-group full-width">
+            <label>{t('member.mainBusiness', '主要业务及产品')}</label>
+            <Textarea
+              value={companyData.mainBusiness}
+              onChange={(e) => handleChange('mainBusiness', e.target.value)}
+              disabled={!isEditing}
+              rows={4}
             />
           </div>
 
@@ -332,12 +478,44 @@ export default function PerformanceCompanyInfo() {
               {companyData.description.length}/500
             </small>
           </div>
+
+          {isEditing && (
+            <div className="form-group full-width">
+              <label>{t('member.cooperationFields', '产业合作期望领域')}</label>
+              <div className="checkbox-group">
+                {/* TODO: 从设置API加载选项 */}
+                {['field1', 'field2', 'field3'].map(field => (
+                  <label key={field} className="checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={companyData.cooperationFields.includes(field)}
+                      onChange={(e) => handleCooperationFieldChange(field, e.target.checked)}
+                    />
+                    <span>{field}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!isEditing && companyData.cooperationFields && companyData.cooperationFields.length > 0 && (
+            <div className="form-group full-width">
+              <label>{t('member.cooperationFields', '产业合作期望领域')}</label>
+              <div className="cooperation-fields-display">
+                {companyData.cooperationFields.map((field, index) => (
+                  <span key={index} className="field-tag">{field}</span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 
       {/* Logo */}
-      <Card>
-        <h2>{t('profile.sections.logo', 'Logo')}</h2>
+      <Card className="info-card">
+        <div className="card-header">
+          <h2>{t('profile.sections.logo', 'Logo')}</h2>
+        </div>
         <div className="logo-upload">
           {companyData.logo ? (
             <div className="logo-preview">
@@ -373,15 +551,45 @@ export default function PerformanceCompanyInfo() {
       </Card>
 
       {/* 审批状态 */}
-      <Card>
-        <h2>{t('profile.sections.approvalStatus', '审批状态')}</h2>
+      <Card className="info-card approval-card">
+        <div className="card-header">
+          <CheckCircleIcon className="section-icon" />
+          <h2>{t('profile.sections.approvalStatus', '审批状态')}</h2>
+        </div>
         <div className="approval-status">
-          <div className="status-badge status-approved">
-            {t('member.approved', '已批准')}
-          </div>
-          <p className="status-description">
-            {t('profile.approvalStatusDesc', '您的企业信息已通过审核')}
-          </p>
+          {companyData.approvalStatus === 'approved' && (
+            <>
+              <div className="status-badge status-approved">
+                <CheckCircleIcon className="status-icon" />
+                {t('member.approved', '已批准')}
+              </div>
+              <p className="status-description">
+                {t('profile.approvalStatusDesc.approved', '您的企业信息已通过审核。')}
+              </p>
+            </>
+          )}
+          {companyData.approvalStatus === 'pending' && (
+            <>
+              <div className="status-badge status-pending">
+                <WarningIcon className="status-icon" />
+                {t('member.pending', '待审核')}
+              </div>
+              <p className="status-description">
+                {t('profile.approvalStatusDesc.pending', '您的企业信息正在审核中，请耐心等待。')}
+              </p>
+            </>
+          )}
+          {companyData.approvalStatus === 'rejected' && (
+            <>
+              <div className="status-badge status-rejected">
+                <XIcon className="status-icon" />
+                {t('member.rejected', '已拒绝')}
+              </div>
+              <p className="status-description">
+                {t('profile.approvalStatusDesc.rejected', '您的企业信息审核未通过，请修改后重新提交。')}
+              </p>
+            </>
+          )}
         </div>
       </Card>
     </div>

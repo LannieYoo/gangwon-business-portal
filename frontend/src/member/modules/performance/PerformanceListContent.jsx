@@ -5,18 +5,20 @@
 
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
-import Card from '@shared/components/Card';
+import { useNavigate } from 'react-router-dom';
+import Card, { CardHeader, CardBody } from '@shared/components/Card';
 import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Select from '@shared/components/Select';
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@shared/components/Table';
 import { apiService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import { SearchIcon, DownloadIcon, EditIcon, TrashIcon } from '@shared/components/Icons';
-import './Performance.css';
+import { DownloadIcon, EditIcon, TrashIcon, SearchIcon } from '@shared/components/Icons';
+import './PerformanceListContent.css';
 
 export default function PerformanceListContent() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [performances, setPerformances] = useState([]);
   const [filteredPerformances, setFilteredPerformances] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,7 +30,7 @@ export default function PerformanceListContent() {
 
   useEffect(() => {
     loadPerformances();
-  }, []);
+  }, [i18n.language]); // Reload data when language changes
 
   useEffect(() => {
     filterPerformances();
@@ -103,8 +105,7 @@ export default function PerformanceListContent() {
   };
 
   const handleEdit = (id) => {
-    window.location.hash = `input#edit-${id}`;
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    navigate(`/member/performance/edit/${id}`);
   };
 
   const handleDownload = async (fileUrl, fileName) => {
@@ -175,31 +176,20 @@ export default function PerformanceListContent() {
   return (
     <div className="performance-list-content">
       <div className="page-header">
-        <h1>{t('performance.query', '成果查询')}</h1>
-        <div className="header-actions">
-          <Button
-            onClick={() => {
-              window.location.hash = 'input';
-              window.dispatchEvent(new HashChangeEvent('hashchange'));
-            }}
-            variant="primary"
-          >
-            + {t('performance.input', '成果输入')}
-          </Button>
+        <div className="page-title-wrapper">
+          <SearchIcon className="page-title-icon" />
+          <h1>{t('performance.query', '成果查询')}</h1>
         </div>
       </div>
 
-      {/* 提示文字 */}
-      <Card className="info-card">
-        <p className="info-text">
-          {t('performance.approvalNotice', '管理员批准前只有管理员批准后才会在画面显示')}
-        </p>
-      </Card>
-
       {/* 搜索筛选 */}
       <Card>
-        <h2>{t('common.search', '搜索')}</h2>
-        <div className="search-filters">
+        <CardHeader>
+          <SearchIcon className="section-icon" />
+          <h2>{t('common.search', '搜索')}</h2>
+        </CardHeader>
+        <CardBody>
+          <div className="search-filters">
           <div className="form-group">
             <label>{t('performance.year', '年度')}</label>
             <Select
@@ -225,6 +215,7 @@ export default function PerformanceListContent() {
             />
           </div>
         </div>
+        </CardBody>
       </Card>
 
       {/* 成果列表 */}
@@ -242,86 +233,74 @@ export default function PerformanceListContent() {
             <p>{t('common.noData', '暂无数据')}</p>
           </div>
         ) : (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeader>{t('performance.documentType', '文档类型')}</TableHeader>
-                <TableHeader>{t('performance.fileName', '文件名')}</TableHeader>
-                <TableHeader>{t('performance.documentStatus', '文档状态')}</TableHeader>
-                <TableHeader>{t('performance.documentConfirm', '文档确认')}</TableHeader>
-                <TableHeader>{t('common.actions', '操作')}</TableHeader>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredPerformances.map((perf) => (
-                <TableRow key={perf.id}>
-                  <TableCell>
-                    {perf.year}{t('common.year', '年')} {perf.quarter ? `Q${perf.quarter}` : t('performance.annual', '年度')}
-                  </TableCell>
-                  <TableCell>{perf.fileName}</TableCell>
-                  <TableCell>
-                    <span className={getStatusBadgeClass(perf.status)}>
-                      {getStatusLabel(perf.status)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    {perf.status === 'approved' && perf.fileUrl ? (
-                      <Button
-                        onClick={() => handleDownload(perf.fileUrl, perf.fileName)}
-                        variant="secondary"
-                        size="small"
-                      >
-                        <DownloadIcon className="w-4 h-4" style={{ marginRight: '0.25rem' }} />
-                        {t('performance.download', '下载')}
-                      </Button>
-                    ) : (
-                      <span className="text-muted">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="action-buttons">
-                      {perf.isOwnUpload && perf.status !== 'approved' && (
-                        <>
-                          <Button
-                            onClick={() => handleEdit(perf.id)}
-                            variant="text"
-                            size="small"
-                            title={t('performance.modify', '修改')}
-                          >
-                            <EditIcon className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            onClick={() => handleDelete(perf.id)}
-                            variant="text"
-                            size="small"
-                            title={t('performance.delete', '删除')}
-                          >
-                            <TrashIcon className="w-4 h-4" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </TableCell>
+          <div className="table-wrapper">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeader>{t('performance.documentType', '文档类型')}</TableHeader>
+                  <TableHeader>{t('performance.fileName', '文件名')}</TableHeader>
+                  <TableHeader>{t('performance.documentStatus', '文档状态')}</TableHeader>
+                  <TableHeader>{t('performance.documentConfirm', '文档确认')}</TableHeader>
+                  <TableHeader>{t('common.actions', '操作')}</TableHeader>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {filteredPerformances.map((perf) => (
+                  <TableRow key={perf.id}>
+                    <TableCell>
+                      {perf.year}{t('common.year', '年')} {perf.quarter ? `Q${perf.quarter}` : t('performance.annual', '年度')}
+                    </TableCell>
+                    <TableCell>{perf.fileName}</TableCell>
+                    <TableCell>
+                      <span className={getStatusBadgeClass(perf.status)}>
+                        {getStatusLabel(perf.status)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {perf.status === 'approved' && perf.fileUrl ? (
+                        <Button
+                          onClick={() => handleDownload(perf.fileUrl, perf.fileName)}
+                          variant="secondary"
+                          size="small"
+                        >
+                          <DownloadIcon className="w-4 h-4" style={{ marginRight: '0.25rem' }} />
+                          {t('performance.download', '下载')}
+                        </Button>
+                      ) : (
+                        <span className="text-muted">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="action-buttons">
+                        {perf.isOwnUpload && perf.status !== 'approved' && (
+                          <>
+                            <Button
+                              onClick={() => handleEdit(perf.id)}
+                              variant="text"
+                              size="small"
+                              title={t('performance.modify', '修改')}
+                            >
+                              <EditIcon className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              onClick={() => handleDelete(perf.id)}
+                              variant="text"
+                              size="small"
+                              title={t('performance.delete', '删除')}
+                            >
+                              <TrashIcon className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </Card>
-
-      {/* 底部成果输入按钮 */}
-      <div className="bottom-actions">
-        <Button
-          onClick={() => {
-            window.location.hash = 'input';
-            window.dispatchEvent(new HashChangeEvent('hashchange'));
-          }}
-          variant="primary"
-          size="large"
-        >
-          + {t('performance.input', '成果输入')}
-        </Button>
-      </div>
     </div>
   );
 }

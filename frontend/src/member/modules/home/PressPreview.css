@@ -1,144 +1,104 @@
-.news-section {
-  margin-bottom: 0; /* 在 home-column 中由父容器控制间距 */
-  padding-top: 2rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-bottom: 1rem; /* 与 NoticesPreview 保持一致 */
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* 防止内容溢出 */
-}
+/**
+ * Press Preview Component Styles - Member Portal
+ * 新闻预览组件样式
+ */
 
-.news-card {
-  overflow: hidden;
-  flex: 1; /* 填充可用空间 */
-  display: flex;
-  flex-direction: column;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.news-card-link {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  color: inherit;
-  text-decoration: none;
-  transition: transform 0.2s ease;
-  height: 100%;
-  flex: 1;
-}
-
-.news-card-link:hover {
-  transform: translateY(-2px);
-}
-
-.news-card-thumbnail {
-  width: 100%;
-  height: 250px; /* 固定高度，与公告列表高度协调 */
-  overflow: hidden;
-  border-radius: 0.5rem 0.5rem 0 0;
-  background-color: #f3f4f6;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.news-card-thumbnail img {
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  flex-shrink: 0;
-}
-
-.news-card-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 1.5rem;
-  gap: 0.75rem;
-  min-height: 0; /* 允许 flex 子元素缩小 */
-}
-
-.news-card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
-  margin: 0;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.news-card-date {
-  font-size: 0.875rem;
-  color: #9ca3af;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  flex-shrink: 0; /* 防止标题被压缩 */
-}
-
-.section-header h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #111827;
-  margin: 0;
-}
-
-.view-all {
-  color: #2563eb;
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.view-all:hover {
-  color: #3b82f6;
-  text-decoration: underline;
-}
-
-.loading-state,
-.empty-state {
-  padding: 2rem;
-  text-align: center;
-  color: #6b7280;
-}
-
-@media (max-width: 768px) {
+@layer components {
   .news-section {
-    margin-bottom: 1.5rem;
-    padding: 1rem 0.5rem 0;
+    @apply mb-0 pt-8 px-4 pb-4 h-full flex flex-col overflow-hidden;
   }
 
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+  .news-card {
+    @apply overflow-hidden flex-1 flex flex-col;
+  }
+
+  .news-card-link {
+    @apply flex flex-col p-0 text-inherit no-underline h-full flex-1;
+    transition: transform 0.2s ease;
+  }
+
+  .news-card-link:hover {
+    @apply -translate-y-0.5;
   }
 
   .news-card-thumbnail {
-    height: 200px;
+    @apply w-full h-[250px] overflow-hidden rounded-t-lg bg-gray-100 relative flex-shrink-0;
+  }
+
+  .news-card-thumbnail img {
+    @apply !block !w-full !h-full flex-shrink-0;
+    object-fit: cover !important;
+    object-position: center !important;
   }
 
   .news-card-content {
-    padding: 1.25rem;
+    @apply flex-1 flex flex-col p-6 gap-3 min-h-0;
   }
 
   .news-card-title {
-    font-size: 1.125rem;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    @apply text-xl font-semibold text-gray-900 m-0 leading-normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .news-card-date {
+    @apply text-sm text-gray-400;
+  }
+
+  .section-header {
+    @apply flex items-center justify-between mb-6 flex-shrink-0;
+  }
+
+  .section-header h2 {
+    @apply text-2xl font-semibold text-gray-900 m-0;
+  }
+
+  .view-all {
+    @apply text-blue-600 no-underline text-sm font-medium;
+    transition: color 0.2s;
+  }
+
+  .view-all:hover {
+    @apply text-blue-500 underline;
+  }
+
+  .loading-state,
+  .empty-state {
+    @apply p-8 text-center text-gray-500;
   }
 }
 
+/* Responsive */
+@layer components {
+  @media (max-width: 768px) {
+    .news-section {
+      @apply mb-6 px-2 pt-4;
+    }
+
+    .section-header {
+      @apply flex-col items-start gap-2 mb-4;
+    }
+
+    .news-card-thumbnail {
+      @apply h-[200px];
+    }
+
+    .news-card-content {
+      @apply p-5;
+    }
+
+    .news-card-title {
+      @apply text-lg;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+    }
+  }
+}
