@@ -70,6 +70,7 @@
 | Content     | `frontend/src/admin/modules/content`     | 主横幅、滚动横幅、弹窗、新闻、FAQ、系统介绍等静态页维护                                                        |
 | Settings    | `frontend/src/admin/modules/settings`    | 系统配置管理（业务领域、产业合作领域、知识产权分类）、<br />条款管理（使用条款、个人信息收集等）、JSON配置维护 |
 | Reports     | `frontend/src/admin/modules/reports`     | 统计报表、Excel/CSV 导出、打印模板配置                                                                         |
+| Logging     | `frontend/src/admin/modules/logging`    | 应用日志查询、异常记录查看、按来源/级别/时间筛选、异常标记为已解决、日志导出                               |
 
 ### 共享层
 
@@ -78,7 +79,7 @@
 | Components | `frontend/src/shared/components` | UI 基础组件（表格、表单、图表、上传）、业务组件 |
 | Hooks      | `frontend/src/shared/hooks`      | 通用逻辑（认证守卫、表单校验、文件上传、分页）  |
 | Stores     | `frontend/src/shared/stores`     | Zustand 状态管理（认证状态、UI状态、全局配置）  |
-| Services   | `frontend/src/shared/services`   | Axios 客户端封装、API 定义、错误处理、缓存策略  |
+| Services   | `frontend/src/shared/services`   | Axios 客户端封装、API 定义、错误处理、缓存策略、日志与异常上报服务（logging.service.js）  |
 | Styles     | `frontend/src/shared/styles`     | 基础样式、主题变量、BEM 规范样式库              |
 | Utils      | `frontend/src/shared/utils`      | 辅助函数、常量、权限工具、日期与数字格式化      |
 | i18n       | `frontend/src/shared/i18n`       | 语言资源、语言切换逻辑、动态文案加载            |
@@ -113,9 +114,11 @@
 | 模块        | 目录建议                                 | 主要职责                                                                                               |
 | ----------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | Config      | `backend/src/common/modules/config`    | 环境变量加载、业务配置JSON管理、特性开关、外部服务地址管理                                             |
-| Logger      | `backend/src/common/modules/logger`    | 结构化日志、追踪 ID 注入、日志采集管道                                                                 |
+| Logger      | `backend/src/common/modules/logger`    | **已实现** 结构化日志（JSON格式）、标准化 Logger 命名（完整模块路径）、追踪 ID 注入、日志采集管道、符合行业标准（结构化日志、上下文信息、日志轮转、双重存储） |
 | Exception   | `backend/src/common/modules/exception` | 统一异常、HTTP 错误转换、业务错误码                                                                    |
-| DB          | `backend/src/common/modules/db`        | SQLAlchemy ORM、异步 Session、Supabase 迁移（SQL 文件）                                                |
+| Logging     | `backend/src/common/modules/logging`   | **已实现** 应用日志与异常记录、前后端日志统一存储、日志查询API、异常追踪与解决状态管理                             |
+| Audit       | `backend/src/common/modules/audit`     | 审计日志记录与查询（操作记录、IP、UA）                                                                 |
+| DB          | `backend/src/common/modules/db`        | SQLAlchemy ORM、异步 Session、Alembic 迁移管理                                                         |
 | Storage     | `backend/src/common/modules/storage`   | 统一文件上传下载、按企业ID分类存储、<br />文件名转换、附件生命周期管理、旧文件清理                     |
 | Auth        | `backend/src/modules/user`             | JWT/OAuth2 认证、角色权限、密码策略、审计日志                                                          |
 | Member      | `backend/src/modules/member`           | 企业资料CRUD、审批流、Nice D&B API 调用、企业信息维护                                                  |
@@ -125,25 +128,29 @@
 | Content     | `backend/src/modules/content`          | 主横幅、滚动横幅、弹窗、新闻资料、<br />系统介绍等静态页面、条款内容管理、可视化内容发布               |
 | Settings    | `backend/src/modules/settings`         | 系统配置项CRUD、业务领域配置、产业合作领域配置、<br />知识产权分类配置、条款版本管理、JSON配置导入导出 |
 | Report      | `backend/src/modules/report`           | 指标聚合、仪表盘数据、Excel/CSV 导出、打印模板                                                         |
-| Integration | `backend/src/modules/integration`      | 第三方服务封装 （Nice D&B、✅ 邮件服务已实现、短信、推送、韩国地址搜索API）                                         |
+| Integration | `backend/src/modules/integration`      | 第三方服务封装 （Nice D&B、邮件服务已实现、短信、推送、韩国地址搜索API）                                         |
 
 ## 数据层设计
 
-- **数据库**：PostgreSQL（Supabase）。采用命名空间 `public`，核心表包括 `members`、`member_profiles`、`projects`、`project_applications`、`performance_records`、`performance_reviews`、`attachments`、`notices`、`faqs`、`inquiries`、`audit_logs`。
+- **数据库**：PostgreSQL（Supabase）。采用命名空间 `public`，核心表包括 `members`、`member_profiles`、`projects`、`project_applications`、`performance_records`、`performance_reviews`、`attachments`、`notices`、`faqs`、`inquiries`、`audit_logs`、`application_logs`、`application_exceptions`。
+- **数据库迁移**：使用 Alembic 进行版本化管理，迁移文件位于 `backend/alembic/versions/`，包括初始 schema 和后续的增量迁移（如 `add_application_logs_and_exceptions_tables.py`）。
 - **关系约束**：
   - `members` 与 `performance_records` 为一对多，审批记录存储在 `performance_reviews`。
   - 附件统一挂载至 `attachments`，通过 `resource_type` + `resource_id` 建立多态关联。
   - 审计日志记录操作主体、资源、动作、IP、UA。
+  - `application_logs` **已实现**：记录前后端应用日志，包含日志级别（DEBUG/INFO/WARNING/ERROR/CRITICAL）、来源（backend/frontend）、标准化 Logger 名称（完整模块路径，如 `src.main`、`src.common.modules.logger.startup`）、模块、函数、行号、请求信息等字段。支持 `user_id` 类型自动转换（字符串/数字），通过 `source`、`level`、`trace_id`、`user_id`、`created_at` 建立索引，优化查询性能。符合行业标准的结构化日志设计。
+  - `application_exceptions` **已实现**：记录前后端异常，包含异常类型、异常消息、堆栈跟踪、错误码、HTTP 状态码、请求信息等字段。支持 `user_id` 类型自动转换（字符串/数字），支持 `resolved` 状态标记（true/false）、解析人员（resolved_by）、解析时间和解析备注。通过 `source`、`exception_type`、`trace_id`、`user_id`、`resolved`、`created_at` 建立索引，便于异常追踪与问题解决。
 - **缓存**：根据业务需求可引入 Redis 缓存热点配置、统计结果与验证码。
 - **对象存储**：附件与横幅图像通过 Supabase Storage，使用分目录策略按企业与功能分级。
 
 ## 集成与接口
 
 - **Nice D&B API**：管理员在企业审批与代表人检索时调用，采用 API Key 验证，结果缓存 24 小时，失败时回退人工输入。
-- **邮件服务** ✅ **已实现**：发送注册审批、绩效补正、项目通知、密码重置。使用 SMTP 协议（支持 Gmail/Outlook/SendGrid/AWS SES 等），位置：`backend/src/common/modules/email/`，已集成到 user、member、performance 模块。
+- **邮件服务** **已实现**：发送注册审批、绩效补正、项目通知、密码重置。使用 SMTP 协议（支持 Gmail/Outlook/SendGrid/AWS SES 等），位置：`backend/src/common/modules/email/`，已集成到 user、member、performance 模块。
 - **SMS 服务**：待实现，可接入 AWS SNS 或国内第三方服务，接口封装在 Integration 模块。
 - **认证网关**：所有接口需携带 Bearer Token；公共内容提供匿名访问版本（公告列表、FAQ）。
 - **审计与监控接口**：提供 `/healthz`、`/metrics` 端点，Prometheus 抓取指标，Grafana 展示。
+- **日志与异常查询接口** **已实现**：提供 `/api/v1/logging/logs`（查询应用日志）、`/api/v1/exceptions`（查询异常记录）端点，支持按来源（backend/frontend）、级别、异常类型、时间范围、用户ID、trace_id 等条件查询。管理员可标记异常为已解决状态，前端可通过 `/api/v1/logging/frontend/logs` 和 `/api/v1/exceptions/frontend` 端点上报日志和异常。所有查询接口需要管理员权限，上报接口无需认证（生产环境应添加速率限制）。前端日志和异常上报支持 `user_id` 的数字类型自动转换。
 
 ## 配置文件
 
@@ -224,8 +231,8 @@
 
 - ❌ 不引入自动化测试/代码检查/代码格式化工具，依赖人工 Code Review 与自测。
 - ❌ 前端保持纯 JavaScript，不使用 TypeScript。
-- ✅ 关注核心业务实现、代码可读性与可维护性。
-- ✅ 关键业务流程需提供设计文档与接口契约。
+- 关注核心业务实现、代码可读性与可维护性。
+- 关键业务流程需提供设计文档与接口契约。
 
 ## 设计风格约束
 
