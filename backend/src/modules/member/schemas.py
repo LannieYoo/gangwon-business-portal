@@ -85,3 +85,19 @@ class MemberListResponsePaginated(BaseModel):
     page_size: int
     total_pages: int
 
+
+class CompanyVerifyRequest(BaseModel):
+    """Company verification request schema."""
+
+    business_number: str = Field(..., min_length=10, max_length=20, description="Business registration number")
+    company_name: Optional[str] = Field(None, max_length=255, description="Company name to verify (optional)")
+
+
+class CompanyVerifyResponse(BaseModel):
+    """Company verification response schema."""
+
+    verified: bool = Field(..., description="Whether the company is verified")
+    business_number: str = Field(..., description="Business registration number")
+    company_name: Optional[str] = Field(None, description="Company name from Nice D&B")
+    message: str = Field(..., description="Verification message")
+    data: Optional[dict] = Field(None, description="Additional company data from Nice D&B (if available)")

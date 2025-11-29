@@ -308,6 +308,64 @@
   }
 }
 
+/* Mobile Menu Toggle Button */
+.mobile-menu-toggle {
+  @apply md:hidden bg-transparent border-none cursor-pointer py-2 px-3 text-white transition-all duration-200 rounded flex items-center justify-center mr-2;
+}
+
+.mobile-menu-toggle:hover {
+  @apply bg-white bg-opacity-10;
+}
+
+.mobile-menu-toggle svg {
+  @apply w-6 h-6;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-[999] md:hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  @apply fixed top-[60px] left-0 right-0 bg-white shadow-lg z-[1000] transform -translate-x-full transition-transform duration-300 ease-in-out md:hidden;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+
+.mobile-menu-open {
+  @apply translate-x-0;
+}
+
+.mobile-menu-list {
+  @apply list-none m-0 p-0;
+}
+
+.mobile-menu-item {
+  @apply border-b border-gray-200;
+}
+
+.mobile-menu-item:last-child {
+  @apply border-b-0;
+}
+
+.mobile-menu-link {
+  @apply flex items-center gap-3 px-6 py-4 text-gray-900 no-underline transition-colors duration-200;
+}
+
+.mobile-menu-link:hover {
+  @apply bg-gray-50;
+}
+
+.mobile-menu-link.active {
+  @apply bg-primary-50 text-primary-700 font-semibold border-l-4 border-primary-600;
+}
+
+.mobile-menu-icon {
+  @apply w-5 h-5 flex-shrink-0;
+}
+
 @media (max-width: 768px) {
   .member-header {
     @apply px-4;

@@ -17,7 +17,9 @@ import {
   DashboardIcon,
   FolderIcon,
   ChartIcon,
-  DocumentIcon
+  DocumentIcon,
+  MenuIcon,
+  XIcon
 } from '@shared/components';
 import './Header.css';
 
@@ -28,8 +30,10 @@ function Header() {
   const { user, logout } = useAuthStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const userMenuRef = useRef(null);
   const notificationsRef = useRef(null);
+  const mobileMenuRef = useRef(null);
 
   // 一级导航菜单
   const mainMenuItems = [
@@ -82,6 +86,9 @@ function Header() {
       if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
         setShowNotifications(false);
       }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+        setShowMobileMenu(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -109,6 +116,14 @@ function Header() {
   return (
     <header className="member-header">
       <div className="header-left">
+        <button 
+          className="mobile-menu-toggle"
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          aria-label="Toggle Menu"
+        >
+          {showMobileMenu ? <XIcon /> : <MenuIcon />}
+        </button>
+        
         <Link to="/member/home" className="header-logo">
           <span className="logo-text">{t('header.title')}</span>
         </Link>
@@ -139,6 +154,38 @@ function Header() {
           </ul>
         </nav>
       </div>
+
+      {/* Mobile Menu */}
+      {showMobileMenu && (
+        <div className="mobile-menu-overlay" onClick={() => setShowMobileMenu(false)} />
+      )}
+      <nav 
+        ref={mobileMenuRef}
+        className={`mobile-menu ${showMobileMenu ? 'mobile-menu-open' : ''}`}
+      >
+        <ul className="mobile-menu-list">
+          {mainMenuItems.map((item) => {
+            const Icon = item.icon;
+            const active = isMenuActive(item);
+            
+            return (
+              <li key={item.key} className="mobile-menu-item">
+                <NavLink
+                  to={item.path}
+                  end={item.exact}
+                  className={({ isActive }) =>
+                    `mobile-menu-link ${isActive || active ? 'active' : ''}`
+                  }
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  <Icon className="mobile-menu-icon" />
+                  <span>{item.label}</span>
+                </NavLink>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
 
       <div className="header-right">
         {/* 语言切换 */}

@@ -3,14 +3,18 @@ Performance router.
 
 API endpoints for performance record management.
 """
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
-from typing import Annotated
+from typing import Annotated, Optional
 from math import ceil
+from datetime import datetime
+
+from fastapi import Request
 
 from ...common.modules.db.session import get_db
 from ...common.modules.db.models import Member
+from ...common.modules.audit import audit_log_service, get_client_info
 from ..user.dependencies import get_current_active_user, get_current_admin_user
 from .service import PerformanceService
 from .schemas import (
@@ -99,6 +103,7 @@ async def get_performance_record(
 )
 async def create_performance_record(
     data: PerformanceRecordCreate,
+    request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -108,6 +113,23 @@ async def create_performance_record(
     The record can be edited until it is submitted for review.
     """
     record = await service.create_performance(current_user.id, data, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="create",
+            user_id=current_user.id,
+            resource_type="performance",
+            resource_id=record.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
     return PerformanceRecordResponse.from_orm_without_reviews(record)
 
 
@@ -120,6 +142,7 @@ async def create_performance_record(
 async def update_performance_record(
     performance_id: UUID,
     data: PerformanceRecordUpdate,
+    request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -131,6 +154,23 @@ async def update_performance_record(
     record = await service.update_performance(
         performance_id, current_user.id, data, db
     )
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="update",
+            user_id=current_user.id,
+            resource_type="performance",
+            resource_id=record.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
     return PerformanceRecordResponse.from_orm_without_reviews(record)
 
 
@@ -142,6 +182,7 @@ async def update_performance_record(
 )
 async def delete_performance_record(
     performance_id: UUID,
+    request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -151,6 +192,22 @@ async def delete_performance_record(
     Only draft records can be deleted.
     """
     await service.delete_performance(performance_id, current_user.id, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="delete",
+            user_id=current_user.id,
+            resource_type="performance",
+            resource_id=performance_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
 
 
 @router.post(
@@ -161,6 +218,7 @@ async def delete_performance_record(
 )
 async def submit_performance_record(
     performance_id: UUID,
+    request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -171,6 +229,23 @@ async def submit_performance_record(
     Once submitted, the record cannot be edited unless admin requests revision.
     """
     record = await service.submit_performance(performance_id, current_user.id, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="submit",
+            user_id=current_user.id,
+            resource_type="performance",
+            resource_id=record.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
     return PerformanceRecordResponse.from_orm_without_reviews(record)
 
 
@@ -237,6 +312,7 @@ async def get_performance_record_admin(
 async def approve_performance_record(
     performance_id: UUID,
     request: PerformanceApprovalRequest,
+    http_request: Request,
     current_admin: Annotated[Member, Depends(get_current_admin_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -248,6 +324,23 @@ async def approve_performance_record(
     record = await service.approve_performance(
         performance_id, current_admin.id, request.comments, db
     )
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(http_request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="approve",
+            user_id=current_admin.id,
+            resource_type="performance",
+            resource_id=record.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
     return PerformanceRecordResponse.from_orm_without_reviews(record)
 
 
@@ -260,6 +353,7 @@ async def approve_performance_record(
 async def request_fix_performance_record(
     performance_id: UUID,
     request: PerformanceApprovalRequest,
+    http_request: Request,
     current_admin: Annotated[Member, Depends(get_current_admin_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -272,6 +366,23 @@ async def request_fix_performance_record(
     record = await service.request_fix_performance(
         performance_id, current_admin.id, request.comments, db
     )
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(http_request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="request_fix",
+            user_id=current_admin.id,
+            resource_type="performance",
+            resource_id=record.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
     return PerformanceRecordResponse.from_orm_without_reviews(record)
 
 
@@ -284,6 +395,7 @@ async def request_fix_performance_record(
 async def reject_performance_record(
     performance_id: UUID,
     request: PerformanceApprovalRequest,
+    http_request: Request,
     current_admin: Annotated[Member, Depends(get_current_admin_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -295,24 +407,87 @@ async def reject_performance_record(
     record = await service.reject_performance(
         performance_id, current_admin.id, request.comments, db
     )
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(http_request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="reject",
+            user_id=current_admin.id,
+            resource_type="performance",
+            resource_id=record.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
     return PerformanceRecordResponse.from_orm_without_reviews(record)
 
 
 @router.get(
     "/api/admin/performance/export",
-    response_model=list[dict],
     tags=["admin-performance"],
     summary="Export performance data (Admin)",
 )
 async def export_performance_data(
     query: Annotated[PerformanceListQuery, Depends()],
+    request: Request,
     current_admin: Annotated[Member, Depends(get_current_admin_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
+    format: str = Query("excel", regex="^(excel|csv)$", description="Export format: excel or csv"),
 ):
     """
-    Export performance data for download (admin only).
+    Export performance data to Excel or CSV (admin only).
 
-    Returns all matching records as JSON for CSV/Excel export.
+    Supports the same filtering options as the list endpoint.
     """
+    from ...common.modules.export import ExportService
+    from ...common.modules.audit import audit_log_service, get_client_info
+    
+    # Get export data
     export_data = await service.export_performance_data(query, db)
-    return export_data
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="export",
+            user_id=current_admin.id,
+            resource_type="performance",
+            resource_id=None,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
+    # Generate export file
+    if format == "excel":
+        excel_bytes = ExportService.export_to_excel(
+            data=export_data,
+            sheet_name="Performance",
+            title=f"Performance Data Export - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        )
+        return Response(
+            content=excel_bytes,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f'attachment; filename="performance_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+            },
+        )
+    else:  # CSV
+        csv_content = ExportService.export_to_csv(
+            data=export_data,
+        )
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f'attachment; filename="performance_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+            },
+        )

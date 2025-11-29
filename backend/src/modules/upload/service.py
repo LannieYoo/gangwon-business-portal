@@ -19,28 +19,37 @@ from ...common.modules.exception import NotFoundError, UnauthorizedError, Valida
 class UploadService:
     """File upload service class."""
 
-    def _validate_file(self, file: UploadFile, file_size: Optional[int] = None) -> None:
+    def _validate_file(self, file: UploadFile, file_size: Optional[int] = None, check_size_first: bool = True) -> None:
         """
         Validate uploaded file.
 
         Args:
             file: UploadFile object
             file_size: Optional file size in bytes (if already read)
+            check_size_first: If True, check size before reading file content (more efficient)
 
         Raises:
             ValidationError: If file validation fails
         """
-        # Check file size
+        # Check file size first (before reading content) if possible
         size = file_size
-        if size is None:
-            # Try to get size from file object
+        if size is None and check_size_first:
+            # Try to get size from file object attributes
             if hasattr(file, 'size') and file.size:
                 size = file.size
+            # Try to get size from Content-Length header if available
+            elif hasattr(file, 'headers') and 'content-length' in file.headers:
+                try:
+                    size = int(file.headers['content-length'])
+                except (ValueError, TypeError):
+                    pass
         
+        # Validate file size
         if size and size > settings.MAX_UPLOAD_SIZE:
             max_size_mb = settings.MAX_UPLOAD_SIZE / 1024 / 1024
+            file_size_mb = size / 1024 / 1024
             raise ValidationError(
-                f"File size exceeds maximum allowed size of {max_size_mb}MB"
+                f"File size ({file_size_mb:.2f}MB) exceeds maximum allowed size of {max_size_mb}MB"
             )
 
         # Check file type
@@ -94,20 +103,23 @@ class UploadService:
         Returns:
             Attachment object
         """
-        # Read file content to get size
+        # Validate file size first (before reading content)
+        self._validate_file(file, check_size_first=True)
+        
+        # Read file content to get actual size
         file_content = await file.read()
         file_size = len(file_content)
         
         # Reset file pointer for storage service
         await file.seek(0)
 
-        # Validate file
-        self._validate_file(file, file_size=file_size)
+        # Validate file again with actual size (in case Content-Length was wrong)
+        self._validate_file(file, file_size=file_size, check_size_first=False)
 
-        # Determine file path (use business_id if available)
+        # Determine file path (use business_number if available)
         path = ""
-        if user.business_id:
-            path = str(user.business_id)
+        if hasattr(user, 'business_number') and user.business_number:
+            path = str(user.business_number)
 
         # Upload to Supabase Storage
         upload_result = await storage_service.upload_file(
@@ -156,20 +168,23 @@ class UploadService:
         Returns:
             Attachment object
         """
-        # Read file content to get size
+        # Validate file size first (before reading content)
+        self._validate_file(file, check_size_first=True)
+        
+        # Read file content to get actual size
         file_content = await file.read()
         file_size = len(file_content)
         
         # Reset file pointer for storage service
         await file.seek(0)
 
-        # Validate file
-        self._validate_file(file, file_size=file_size)
+        # Validate file again with actual size (in case Content-Length was wrong)
+        self._validate_file(file, file_size=file_size, check_size_first=False)
 
-        # Determine file path (use business_id if available)
+        # Determine file path (use business_number if available)
         path = ""
-        if user.business_id:
-            path = str(user.business_id)
+        if hasattr(user, 'business_number') and user.business_number:
+            path = str(user.business_number)
 
         # Upload to Supabase Storage (private)
         upload_result = await storage_service.upload_file(
@@ -321,9 +336,9 @@ class UploadService:
             if attachment.file_url.startswith("http"):
                 # Public URL - we need to extract the path
                 # Supabase public URLs typically have the path in them
-                # For now, reconstruct from stored_name and business_id if available
-                if user.business_id:
-                    path = f"{user.business_id}/{attachment.stored_name}"
+                # For now, reconstruct from stored_name and business_number if available
+                if hasattr(user, 'business_number') and user.business_number:
+                    path = f"{user.business_number}/{attachment.stored_name}"
                 else:
                     path = attachment.stored_name
             else:

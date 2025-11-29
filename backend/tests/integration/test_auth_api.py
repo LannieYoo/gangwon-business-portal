@@ -19,7 +19,7 @@ import sys
 # Configuration
 BASE_URL = os.environ.get("TEST_BASE_URL", "http://127.0.0.1:8000")
 
-# Test credentials (must match setup_test_data.py)
+# Test credentials (must match seed_data.py)
 MEMBER_CREDENTIALS = {
     "business_number": "123-45-67890",
     "password": "Member123!"

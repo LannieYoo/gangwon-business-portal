@@ -64,3 +64,15 @@ def get_trace_id(request: Any) -> str:
         request.state.trace_id = trace_id
     return trace_id
 
+
+
+
+
+
+
+
+
+
+
+
+

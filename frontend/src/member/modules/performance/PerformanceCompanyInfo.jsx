@@ -29,6 +29,7 @@ import {
   WarningIcon
 } from '@shared/components/Icons';
 import { formatNumber, parseFormattedNumber } from '@shared/utils/format';
+import { validateImageFile } from '@shared/utils/fileValidation';
 import './PerformanceCompanyInfo.css';
 
 export default function PerformanceCompanyInfo() {
@@ -36,6 +37,7 @@ export default function PerformanceCompanyInfo() {
   const { isAuthenticated } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [logoError, setLogoError] = useState('');
   const [companyData, setCompanyData] = useState({
     companyName: '',
     businessLicense: '',
@@ -171,10 +173,27 @@ export default function PerformanceCompanyInfo() {
 
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // TODO: 文件上传处理
-      console.log('Uploading logo:', file);
+    if (!file) return;
+    
+    // Validate file (type and size)
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      setLogoError(validation.error || t('profile.logoUploadError', '文件上传失败：仅支持图片格式，最大10MB'));
+      // Clear file input
+      e.target.value = '';
+      return;
     }
+    
+    // Clear error
+    setLogoError('');
+    
+    // TODO: 文件上传处理
+    console.log('Uploading logo:', file);
+    // Set file in companyData for now (actual upload will be handled in save)
+    setCompanyData(prev => ({
+      ...prev,
+      logo: file
+    }));
   };
 
   const regionOptions = [
@@ -547,8 +566,13 @@ export default function PerformanceCompanyInfo() {
                 {t('common.upload', '上传')}
               </Button>
               <small className="form-hint">
-                {t('profile.logoHint', '支持 JPG, PNG 格式，最大 5MB')}
+                {t('profile.logoHint', '支持 JPG, PNG, GIF 格式，最大 10MB')}
               </small>
+              {logoError && (
+                <div className="error-message" style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                  {logoError}
+                </div>
+              )}
             </div>
           )}
         </div>

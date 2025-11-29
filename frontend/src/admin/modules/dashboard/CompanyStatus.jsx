@@ -5,9 +5,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactECharts from 'echarts-for-react';
 
-import { Card, Select, Loading } from '@shared/components';
+import { Card, Select, Loading, MemberGrowthChart, MixedChart } from '@shared/components';
 import { BuildingIcon, CurrencyDollarIcon, UsersIcon, DocumentIcon } from '@shared/components/Icons';
 import { apiService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
@@ -81,174 +80,27 @@ export default function CompanyStatus() {
     }
   };
 
-  // 企业会员数趋势图表配置
-  const getMembersChartOption = () => {
-    if (!chartData.members || chartData.members.length === 0) {
-      return {};
-    }
-    const periods = chartData.members.map(item => item.period);
-    const values = chartData.members.map(item => item.value);
+  // 准备会员增长图表数据
+  const membersChartData = chartData.members || [];
 
-    return {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'line'
-        },
-        formatter: (params) => {
-          const param = params[0];
-          return `${param.name}<br/>${param.seriesName}: ${param.value.toLocaleString()}`;
-        }
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-      },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: periods,
-        axisLabel: {
-          rotate: periods.length > 6 ? 45 : 0,
-          interval: 0
-        }
-      },
-      yAxis: {
-        type: 'value',
-        axisLabel: {
-          formatter: (value) => value.toLocaleString()
-        }
-      },
-      series: [
-        {
-          name: t('admin.dashboard.stats.totalMembers'),
-          type: 'line',
-          data: values,
-          smooth: true,
-          itemStyle: {
-            color: '#3b82f6'
-          },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
-                { offset: 1, color: 'rgba(59, 130, 246, 0.05)' }
-              ]
-            }
-          }
-        }
-      ]
-    };
-  };
-
-  // 销售额及雇佣趋势图表配置
-  const getSalesEmploymentChartOption = () => {
-    if (!chartData.salesEmployment || chartData.salesEmployment.length === 0) {
-      return {};
-    }
-    const periods = chartData.salesEmployment.map(item => item.period);
-    const sales = chartData.salesEmployment.map(item => item.sales);
-    const employment = chartData.salesEmployment.map(item => item.employment);
-
-    return {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'cross'
-        },
-        formatter: (params) => {
-          let result = `${params[0].name}<br/>`;
-          params.forEach(param => {
-            if (param.seriesName === t('admin.dashboard.stats.totalSales')) {
-              const formatted = formatCurrencyCompact(param.value, { 
-                language: currentLanguage,
-                showCurrency: true 
-              });
-              result += `${param.seriesName}: ${formatted}<br/>`;
-            } else {
-              result += `${param.seriesName}: ${param.value.toLocaleString()}<br/>`;
-            }
-          });
-          return result;
-        }
-      },
-      legend: {
-        data: [
-          t('admin.dashboard.stats.totalSales'),
-          t('admin.dashboard.stats.totalEmployment')
-        ],
-        top: 10
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '15%', // 增加底部空间，避免标签被遮挡
-        containLabel: true
-      },
-      xAxis: {
-        type: 'category',
-        boundaryGap: true, // 改为true，让柱状图与坐标轴边界有间距
-        data: periods,
-        axisLabel: {
-          rotate: periods.length > 6 ? 45 : 0,
-          interval: 0,
-          margin: 10 // 增加标签与坐标轴的距离
-        }
-      },
-      yAxis: [
-        {
-          type: 'value',
-          name: t('admin.dashboard.stats.totalSales'),
-          position: 'left',
-          axisLabel: {
-            formatter: (value) => {
-              return formatCurrencyCompact(value, { 
-                language: currentLanguage,
-                showCurrency: false 
-              });
-            }
-          }
-        },
-        {
-          type: 'value',
-          name: t('admin.dashboard.stats.totalEmployment'),
-          position: 'right',
-          axisLabel: {
-            formatter: (value) => value.toLocaleString()
-          }
-        }
-      ],
-      series: [
-        {
-          name: t('admin.dashboard.stats.totalSales'),
-          type: 'bar',
-          yAxisIndex: 0,
-          data: sales,
-          barWidth: '40%', // 设置柱状图宽度为分类轴宽度的40%
-          barCategoryGap: '20%', // 设置柱状图之间的间距
-          itemStyle: {
-            color: '#10b981'
-          }
-        },
-        {
-          name: t('admin.dashboard.stats.totalEmployment'),
-          type: 'line',
-          yAxisIndex: 1,
-          data: employment,
-          smooth: true,
-          itemStyle: {
-            color: '#f59e0b'
-          }
-        }
-      ]
-    };
+  // 准备销售额和雇佣趋势图表数据
+  const salesEmploymentData = chartData.salesEmployment || [];
+  
+  // 销售额和雇佣趋势图表的格式化函数
+  const salesEmploymentFormatter = (params) => {
+    let result = `${params[0].name}<br/>`;
+    params.forEach(param => {
+      if (param.seriesName === t('admin.dashboard.stats.totalSales')) {
+        const formatted = formatCurrencyCompact(param.value, { 
+          language: currentLanguage,
+          showCurrency: true 
+        });
+        result += `${param.seriesName}: ${formatted}<br/>`;
+      } else {
+        result += `${param.seriesName}: ${param.value.toLocaleString()}<br/>`;
+      }
+    });
+    return result;
   };
 
   // 生成年份选项（全部 + 最近5年）
@@ -351,28 +203,62 @@ export default function CompanyStatus() {
           <div className="charts-section">
             <Card className="chart-card">
               <h2 className="chart-title">{t('admin.dashboard.charts.members')}</h2>
-              {chartData.members.length > 0 ? (
-                <ReactECharts
-                  key={`members-${selectedYear}-${selectedQuarter}`}
-                  option={getMembersChartOption()}
-                  style={{ height: '300px', width: '100%' }}
-                  opts={{ renderer: 'svg' }}
-                />
-              ) : (
-                <div className="chart-placeholder">
-                  <p>{t('admin.dashboard.charts.noData')}</p>
-                </div>
-              )}
+              <MemberGrowthChart
+                key={`members-${selectedYear}-${selectedQuarter}`}
+                data={membersChartData}
+                height="300px"
+              />
             </Card>
 
             <Card className="chart-card">
               <h2 className="chart-title">{t('admin.dashboard.charts.salesEmployment')}</h2>
-              {chartData.salesEmployment.length > 0 ? (
-                <ReactECharts
+              {salesEmploymentData.length > 0 ? (
+                <MixedChart
                   key={`sales-employment-${selectedYear}-${selectedQuarter}`}
-                  option={getSalesEmploymentChartOption()}
-                  style={{ height: '300px', width: '100%' }}
-                  opts={{ renderer: 'svg' }}
+                  categories={salesEmploymentData.map(item => item.period)}
+                  series={[
+                    {
+                      name: t('admin.dashboard.stats.totalSales'),
+                      type: 'bar',
+                      data: salesEmploymentData.map(item => item.sales),
+                      color: '#10b981',
+                      yAxisIndex: 0,
+                      barWidth: '40%'
+                    },
+                    {
+                      name: t('admin.dashboard.stats.totalEmployment'),
+                      type: 'line',
+                      data: salesEmploymentData.map(item => item.employment),
+                      color: '#f59e0b',
+                      yAxisIndex: 1,
+                      smooth: true
+                    }
+                  ]}
+                  height="300px"
+                  formatter={salesEmploymentFormatter}
+                  yAxis={[
+                    {
+                      type: 'value',
+                      name: t('admin.dashboard.stats.totalSales'),
+                      position: 'left',
+                      axisLabel: {
+                        formatter: (value) => {
+                          return formatCurrencyCompact(value, { 
+                            language: currentLanguage,
+                            showCurrency: false 
+                          });
+                        }
+                      }
+                    },
+                    {
+                      type: 'value',
+                      name: t('admin.dashboard.stats.totalEmployment'),
+                      position: 'right',
+                      axisLabel: {
+                        formatter: (value) => value.toLocaleString()
+                      }
+                    }
+                  ]}
                 />
               ) : (
                 <div className="chart-placeholder">

@@ -14,12 +14,13 @@ import {
   DocumentIcon,
   SettingsIcon,
   ReportIcon,
+  AuditLogIcon,
   ChevronDownIcon,
   ChevronRightIcon
 } from '@shared/components';
 import './Sidebar.css';
 
-export default function Sidebar({ collapsed }) {
+export default function Sidebar({ collapsed, mobileOpen = false, onClose }) {
   const { t } = useTranslation();
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState([]);
@@ -63,6 +64,12 @@ export default function Sidebar({ collapsed }) {
       label: t('admin.menu.reports')
     },
     {
+      key: 'auditLogs',
+      path: '/admin/audit-logs',
+      icon: AuditLogIcon,
+      label: t('admin.menu.auditLogs')
+    },
+    {
       key: 'settings',
       path: '/admin/settings',
       icon: SettingsIcon,
@@ -85,8 +92,14 @@ export default function Sidebar({ collapsed }) {
     return location.pathname.startsWith(item.path);
   };
 
+  const handleLinkClick = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <aside className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <aside className={`admin-sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'show' : ''}`}>
       <nav className="sidebar-nav">
         <ul className="nav-list">
           {menuItems.map((item) => {
@@ -125,6 +138,7 @@ export default function Sidebar({ collapsed }) {
                               className={({ isActive }) =>
                                 `nav-sublink ${isActive ? 'active' : ''}`
                               }
+                              onClick={handleLinkClick}
                             >
                               {subItem.label}
                             </NavLink>
@@ -141,6 +155,7 @@ export default function Sidebar({ collapsed }) {
                       `nav-link ${isActive ? 'active' : ''}`
                     }
                     title={collapsed ? item.label : undefined}
+                    onClick={handleLinkClick}
                   >
                     <span className="nav-icon">
                       <Icon />

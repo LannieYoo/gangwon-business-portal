@@ -92,6 +92,25 @@ export default function PerformanceList() {
     console.log('Downloading record:', recordId);
   };
 
+  const handleExport = async (format = 'excel') => {
+    try {
+      setLoading(true);
+      const params = {
+        format,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        memberId: memberId || undefined
+      };
+      await adminService.exportPerformance(params);
+      alert(t('admin.performance.exportSuccess', '导出成功') || '导出成功');
+    } catch (error) {
+      console.error('Failed to export performance:', error);
+      const errorMessage = error.response?.data?.detail || error.message || t('admin.performance.exportFailed', '导出失败');
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       key: 'year',
@@ -210,6 +229,22 @@ export default function PerformanceList() {
                 { value: 'approved', label: t('admin.performance.status.approved') }
               ]}
             />
+          </div>
+          <div className="flex items-center space-x-2 ml-4">
+            <Button 
+              onClick={() => handleExport('excel')} 
+              variant="outline"
+              disabled={loading}
+            >
+              {t('admin.performance.exportExcel', '导出 Excel')}
+            </Button>
+            <Button 
+              onClick={() => handleExport('csv')} 
+              variant="outline"
+              disabled={loading}
+            >
+              {t('admin.performance.exportCsv', '导出 CSV')}
+            </Button>
           </div>
         </div>
       </div>

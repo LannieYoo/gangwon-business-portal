@@ -179,6 +179,27 @@ class MemberService:
         await db.commit()
         await db.refresh(member)
 
+        # Send approval notification email
+        try:
+            from ...common.modules.email import email_service
+            await email_service.send_approval_notification_email(
+                to_email=member.email,
+                company_name=member.company_name,
+                approval_type="회원가입",
+                status="approved",
+            )
+        except Exception as e:
+            from ...common.modules.logger import logger
+            logger.warning(
+                "Failed to send approval notification email",
+                extra={
+                    "module_name": __name__,
+                    "member_id": str(member.id),
+                    "email": member.email,
+                    "error": str(e),
+                },
+            )
+
         return member
 
     async def reject_member(
@@ -207,6 +228,28 @@ class MemberService:
         member.status = "suspended"
         await db.commit()
         await db.refresh(member)
+
+        # Send rejection notification email
+        try:
+            from ...common.modules.email import email_service
+            await email_service.send_approval_notification_email(
+                to_email=member.email,
+                company_name=member.company_name,
+                approval_type="회원가입",
+                status="rejected",
+                comments=reason,
+            )
+        except Exception as e:
+            from ...common.modules.logger import logger
+            logger.warning(
+                "Failed to send rejection notification email",
+                extra={
+                    "module_name": __name__,
+                    "member_id": str(member.id),
+                    "email": member.email,
+                    "error": str(e),
+                },
+            )
 
         return member
 

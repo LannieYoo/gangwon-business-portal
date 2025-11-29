@@ -40,8 +40,15 @@ ENV/
 
 # Testing
 .pytest_cache/
-.coverage
-htmlcov/
+tests/.pytest_cache/
+.coverage                    # Coverage data file (should be in tests/ only)
+tests/.coverage             # Coverage data file in tests directory
+htmlcov/                    # HTML coverage reports (legacy location)
+tests/htmlcov/              # HTML coverage reports
+coverage.json               # Coverage JSON report (legacy location)
+coverage.xml                # Coverage XML report (legacy location)
+tests/coverage.json         # Coverage JSON report
+tests/coverage.xml          # Coverage XML report
 .tox/
 
 # Alembic

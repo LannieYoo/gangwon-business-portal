@@ -16,10 +16,8 @@ import {
   formatNumber,
   parseFormattedNumber
 } from '@shared/utils/format';
+import { validateImageFile, validateFile, ALLOWED_FILE_TYPES } from '@shared/utils/fileValidation';
 import './Auth.css';
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 
 export default function Register() {
   const { t } = useTranslation();
@@ -157,30 +155,36 @@ export default function Register() {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Check file size
-    if (file.size > MAX_FILE_SIZE) {
+    // Validate file using utility functions
+    let validation;
+    if (acceptImagesOnly) {
+      // For logo: validate as image
+      validation = validateImageFile(file);
+    } else {
+      // For business license: validate as any allowed file type
+      validation = validateFile(file, {
+        allowedTypes: ALLOWED_FILE_TYPES.all
+      });
+    }
+    
+    if (!validation.valid) {
       setFileErrors(prev => ({
         ...prev,
-        [fieldName]: t('auth.fileSizeError')
+        [fieldName]: validation.error || t('auth.fileUploadError', '文件上传失败')
       }));
+      // Clear file input
+      e.target.value = '';
       return;
     }
     
-    // Check file type
-    if (acceptImagesOnly && !IMAGE_TYPES.includes(file.type)) {
-      setFileErrors(prev => ({
-        ...prev,
-        [fieldName]: t('auth.imageOnly')
-      }));
-      return;
-    }
-    
+    // Clear any previous errors
     setFileErrors(prev => {
       const newErrors = { ...prev };
       delete newErrors[fieldName];
       return newErrors;
     });
     
+    // Set file in form data
     setFormData(prev => ({
       ...prev,
       [fieldName]: file

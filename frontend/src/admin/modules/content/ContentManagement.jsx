@@ -6,8 +6,10 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Button, Tabs, Input, Textarea, Select, Badge, Alert } from '@shared/components';
+import UploadProgress from '@shared/components/UploadProgress';
 import { apiService, contentService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
+import { validateImageFile } from '@shared/utils/fileValidation';
 import './ContentManagement.css';
 
 export default function ContentManagement() {
@@ -254,31 +256,38 @@ export default function ContentManagement() {
     }
   };
 
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   const handleImageUpload = async (event, setForm, setMessage, setMessageVariant) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    // Validate file using utility function
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
       setMessageVariant('error');
-      setMessage(t('admin.content.popups.messages.invalidImageType', '请选择图片文件'));
-      event.target.value = '';
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      setMessageVariant('error');
-      setMessage(t('admin.content.popups.messages.imageTooLarge', '图片大小不能超过 5MB'));
+      setMessage(validation.error || t('admin.content.popups.messages.invalidImageType', '请选择图片文件'));
       event.target.value = '';
       return;
     }
 
     setImageUploading(true);
+    setUploadProgress(0);
     setMessage(null);
+    
     try {
-      const response = await apiService.upload(`${API_PREFIX}/upload/public`, file);
+      // Upload with progress tracking
+      const response = await apiService.upload(
+        `${API_PREFIX}/upload/public`, 
+        file,
+        (progressEvent) => {
+          if (progressEvent.total) {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(progress);
+          }
+        }
+      );
+      
       const uploadedFile = response.file || response.files?.[0];
       if (uploadedFile?.url) {
         setForm((prev) => ({
@@ -297,11 +306,11 @@ export default function ContentManagement() {
     } catch (error) {
       console.error('Failed to upload image', error);
       setMessageVariant('error');
-      setMessage(
-        error.message || t('admin.content.popups.messages.imageUploadFailed', '图片上传失败')
-      );
+      const errorMessage = error.message || error.details || t('admin.content.popups.messages.imageUploadFailed', '图片上传失败');
+      setMessage(errorMessage);
     } finally {
       setImageUploading(false);
+      setUploadProgress(0);
       event.target.value = '';
     }
   };

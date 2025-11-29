@@ -39,22 +39,7 @@ export default function Login() {
       const redirectPath = response.user.role === 'admin' ? '/admin' : '/member';
       navigate(redirectPath);
     } catch (err) {
-      const status = err.response?.status;
-      const detail = err.response?.data?.detail || err.response?.data?.message;
-
-      // Backend returns specific messages for approval / status issues
-      if (status === 401 && typeof detail === 'string') {
-        if (detail.includes('Account pending approval')) {
-          setError(t('auth.approvalPending'));
-          return;
-        }
-        if (detail.includes('Account is suspended')) {
-          setError(t('auth.accountSuspended'));
-          return;
-        }
-      }
-
-      setError(detail || t('auth.loginFailed'));
+      setError(err.response?.data?.message || t('auth.loginFailed'));
     }
   };
   

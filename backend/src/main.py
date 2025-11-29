@@ -101,6 +101,7 @@ from .modules.project.router import router as project_router
 from .modules.content.router import router as content_router
 from .modules.support.router import router as support_router
 from .modules.upload.router import router as upload_router
+from .common.modules.audit.router import router as audit_router
 
 app.include_router(auth_router)
 app.include_router(member_router)
@@ -109,6 +110,7 @@ app.include_router(project_router)
 app.include_router(content_router)
 app.include_router(support_router)
 app.include_router(upload_router)
+app.include_router(audit_router)
 
 
 # Health check endpoints

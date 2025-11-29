@@ -107,3 +107,51 @@
   @apply flex items-center justify-end space-x-3 mt-6;
 }
 
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .modal-content {
+    @apply max-w-full mx-0 rounded-none sm:rounded-lg;
+    margin: 0;
+    min-height: 100vh;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-wrapper {
+    @apply px-0 pt-0 pb-0;
+    min-height: 100vh;
+    align-items: stretch;
+  }
+
+  .modal-spacer {
+    @apply hidden;
+  }
+
+  .modal-header {
+    @apply px-4 py-3;
+    flex-shrink: 0;
+  }
+
+  .modal-title {
+    @apply text-base;
+  }
+
+  .modal-body {
+    @apply px-4 py-4;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-footer {
+    @apply flex-col-reverse gap-2 px-4 py-3 mt-0;
+    flex-shrink: 0;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .modal-footer > * {
+    @apply w-full;
+  }
+}
+

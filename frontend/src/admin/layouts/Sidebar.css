@@ -185,15 +185,36 @@
   opacity: 1;
 }
 
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-[998] md:hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .admin-sidebar {
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
   }
 
   .admin-sidebar.show {
     transform: translateX(0);
+  }
+
+  .admin-sidebar.collapsed {
+    width: var(--sidebar-width, 256px);
   }
 }
 

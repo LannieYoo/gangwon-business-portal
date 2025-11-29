@@ -131,6 +131,23 @@
     "thirdPartySharing": "개인정보 제3자 제공",
     "marketingConsent": "선택 정보 수집 및 이용 동의"
   },
+  "admin": {
+    "auth": {
+      "loginTitle": "관리자 로그인",
+      "loginSubtitle": "관리자 자격 증명을 입력하여 관리 패널에 액세스하세요",
+      "username": "사용자명",
+      "usernamePlaceholder": "관리자 사용자명 또는 이메일을 입력하세요",
+      "password": "비밀번호",
+      "passwordPlaceholder": "비밀번호를 입력하세요",
+      "rememberMe": "로그인 상태 유지",
+      "forgotPassword": "비밀번호 찾기",
+      "login": "로그인",
+      "loginFailed": "로그인 실패",
+      "invalidCredentials": "사용자명 또는 비밀번호가 올바르지 않습니다",
+      "notAdminUser": "관리자 사용자가 아니신가요?",
+      "goToMemberLogin": "회원 로그인으로 이동"
+    }
+  },
   "member": {
     "companyName": "기업명",
     "businessLicense": "사업자등록번호",
@@ -297,6 +314,25 @@
     "privacyPolicy": "개인정보처리방침",
     "loading": "로딩 중...",
     "error": "약관을 불러오는데 실패했습니다"
+  },
+  "error": {
+    "boundary": {
+      "title": "오류가 발생했습니다",
+      "message": "죄송합니다. 애플리케이션에서 예기치 않은 오류가 발생했습니다. 페이지를 새로고침하거나 홈으로 돌아가주세요.",
+      "details": "오류 상세 정보 (개발 모드)",
+      "reload": "페이지 새로고침",
+      "home": "홈으로 돌아가기",
+      "retry": "다시 시도"
+    },
+    "network": {
+      "title": "네트워크 오류",
+      "message": "네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인하고 다시 시도해주세요.",
+      "retry": "다시 시도"
+    },
+    "generic": {
+      "title": "오류 발생",
+      "message": "작업을 완료하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+    }
   }
 }
 

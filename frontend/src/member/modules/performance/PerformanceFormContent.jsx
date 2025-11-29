@@ -13,6 +13,7 @@ import Textarea from "@shared/components/Textarea";
 import Select from "@shared/components/Select";
 import { Tabs } from "@shared/components";
 import { performanceService } from "@shared/services";
+import { validatePdfFile, formatFileSize } from "@shared/utils/fileValidation";
 import {
   PaperclipIcon,
   DocumentIcon,
@@ -276,10 +277,17 @@ export default function PerformanceFormContent() {
 
   // 处理文件上传
   const handleFileUpload = (index, file) => {
-    if (file && file.type !== "application/pdf") {
-      alert(t("performance.fileUploadHint", "仅支持PDF格式"));
+    if (!file) return;
+    
+    // Validate file (type and size)
+    const validation = validatePdfFile(file);
+    if (!validation.valid) {
+      // Use a more user-friendly error message
+      const errorMessage = validation.error || t("performance.fileUploadHint", "仅支持PDF格式，最大10MB");
+      alert(errorMessage);
       return;
     }
+    
     updateIntellectualProperty(index, "proofDocument", file);
   };
 

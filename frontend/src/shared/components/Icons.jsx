@@ -60,6 +60,15 @@ export function ReportIcon({ className = "w-5 h-5" }) {
   );
 }
 
+export function AuditLogIcon({ className = "w-5 h-5" }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+      <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+    </svg>
+  );
+}
+
 export function MenuIcon({ className = "w-6 h-6" }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 20 20">
@@ -147,6 +156,9 @@ export function XIcon({ className = "w-5 h-5" }) {
     </svg>
   );
 }
+
+// Alias for XIcon (commonly used as CloseIcon)
+export const CloseIcon = XIcon;
 
 export function BuildingIcon({ className = "w-5 h-5" }) {
   return (
@@ -388,6 +400,22 @@ export function TrashIcon({ className = "w-5 h-5" }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
+  );
+}
+
+export function RefreshIcon({ className = "w-5 h-5" }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>
+  );
+}
+
+export function HomeIcon({ className = "w-5 h-5" }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
     </svg>
   );
 }

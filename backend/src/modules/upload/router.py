@@ -3,20 +3,29 @@ Upload router.
 
 API endpoints for file upload and management.
 """
-from fastapi import APIRouter, Depends, UploadFile, File, Query, status
+from fastapi import APIRouter, Depends, UploadFile, File, Query, status, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, Annotated
 from uuid import UUID
 
+from fastapi import Request
+
 from ...common.modules.db.session import get_db
 from ...common.modules.db.models import Member
+from ...common.modules.audit import audit_log_service, get_client_info
+from ...common.modules.exception import AppException
 from ..user.dependencies import get_current_active_user
 from .service import UploadService
 from .schemas import FileUploadResponse, FileDownloadResponse
 
 router = APIRouter()
 service = UploadService()
+
+
+def _handle_app_exception(exc: AppException) -> None:
+    """Convert internal AppException into FastAPI HTTPException."""
+    raise HTTPException(status_code=exc.status_code, detail=exc.message)
 
 
 @router.post(
@@ -28,6 +37,7 @@ service = UploadService()
 )
 async def upload_public_file(
     file: Annotated[UploadFile, File(description="File to upload")],
+    request: Request,
     resource_type: Annotated[Optional[str], Query(description="Resource type (e.g., 'banner', 'notice')")] = None,
     resource_id: Annotated[Optional[UUID], Query(description="Associated resource ID")] = None,
     current_user: Annotated[Member, Depends(get_current_active_user)] = None,
@@ -41,13 +51,34 @@ async def upload_public_file(
     - **resource_id**: Optional associated resource ID
     - Requires authentication
     """
-    attachment = await service.upload_public_file(
-        file=file,
-        user=current_user,
-        resource_type=resource_type,
-        resource_id=resource_id,
-        db=db,
-    )
+    try:
+        attachment = await service.upload_public_file(
+            file=file,
+            user=current_user,
+            resource_type=resource_type,
+            resource_id=resource_id,
+            db=db,
+        )
+    except AppException as exc:  # pragma: no cover - exercised via tests
+        _handle_app_exception(exc)
+    
+    # Record audit log
+    if current_user:
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="upload",
+                user_id=current_user.id,
+                resource_type="file",
+                resource_id=attachment.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            from ...common.modules.logger import logger
+            logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
     return FileUploadResponse.model_validate(attachment)
 
 
@@ -60,6 +91,7 @@ async def upload_public_file(
 )
 async def upload_private_file(
     file: Annotated[UploadFile, File(description="File to upload")],
+    request: Request,
     resource_type: Annotated[Optional[str], Query(description="Resource type (e.g., 'performance', 'project')")] = None,
     resource_id: Annotated[Optional[UUID], Query(description="Associated resource ID")] = None,
     current_user: Annotated[Member, Depends(get_current_active_user)] = None,
@@ -74,13 +106,34 @@ async def upload_private_file(
     - Requires authentication
     - File will be stored privately and require authentication to access
     """
-    attachment = await service.upload_private_file(
-        file=file,
-        user=current_user,
-        resource_type=resource_type,
-        resource_id=resource_id,
-        db=db,
-    )
+    try:
+        attachment = await service.upload_private_file(
+            file=file,
+            user=current_user,
+            resource_type=resource_type,
+            resource_id=resource_id,
+            db=db,
+        )
+    except AppException as exc:  # pragma: no cover - exercised via tests
+        _handle_app_exception(exc)
+    
+    # Record audit log
+    if current_user:
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="upload",
+                user_id=current_user.id,
+                resource_type="file",
+                resource_id=attachment.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            from ...common.modules.logger import logger
+            logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
     return FileUploadResponse.model_validate(attachment)
 
 
@@ -92,6 +145,7 @@ async def upload_private_file(
 )
 async def download_file(
     file_id: UUID,
+    request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)] = None,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
@@ -104,11 +158,31 @@ async def download_file(
     - Requires authentication
     - Checks permissions (user must own the file or be admin)
     """
-    attachment = await service.get_file(
-        file_id=file_id,
-        user=current_user,
-        db=db,
-    )
+    try:
+        attachment = await service.get_file(
+            file_id=file_id,
+            user=current_user,
+            db=db,
+        )
+    except AppException as exc:
+        _handle_app_exception(exc)
+    
+    # Record audit log
+    if current_user:
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="download",
+                user_id=current_user.id,
+                resource_type="file",
+                resource_id=attachment.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            from ...common.modules.logger import logger
+            logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
     
     return FileDownloadResponse(
         file_url=attachment.file_url,
@@ -136,11 +210,14 @@ async def redirect_to_file(
     - Requires authentication
     - Checks permissions
     """
-    attachment = await service.get_file(
-        file_id=file_id,
-        user=current_user,
-        db=db,
-    )
+    try:
+        attachment = await service.get_file(
+            file_id=file_id,
+            user=current_user,
+            db=db,
+        )
+    except AppException as exc:
+        _handle_app_exception(exc)
     
     return RedirectResponse(url=attachment.file_url, status_code=status.HTTP_302_FOUND)
 
@@ -153,6 +230,7 @@ async def redirect_to_file(
 )
 async def delete_file(
     file_id: UUID,
+    request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)] = None,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ):
@@ -164,10 +242,31 @@ async def delete_file(
     - Checks permissions (user must own the file or be admin)
     - Deletes file from storage and database
     """
-    await service.delete_file(
-        file_id=file_id,
-        user=current_user,
-        db=db,
-    )
+    try:
+        await service.delete_file(
+            file_id=file_id,
+            user=current_user,
+            db=db,
+        )
+    except AppException as exc:  # pragma: no cover - tested indirectly
+        _handle_app_exception(exc)
+    
+    # Record audit log
+    if current_user:
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="delete",
+                user_id=current_user.id,
+                resource_type="file",
+                resource_id=file_id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            from ...common.modules.logger import logger
+            logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+    
     return None
 

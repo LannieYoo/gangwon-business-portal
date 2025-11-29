@@ -8,7 +8,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '@shared/i18n';
 import { router } from './router';
 import { useAuth } from '@shared/hooks';
-import { LoadingOverlay } from '@shared/components';
+import { LoadingOverlay, ErrorBoundary } from '@shared/components';
 import { useUIStore } from '@shared/stores/uiStore';
 
 export default function App() {
@@ -39,14 +39,16 @@ export default function App() {
   }
   
   return (
-    <I18nextProvider i18n={i18n}>
-      <RouterProvider 
-        router={router}
-        future={{
-          v7_startTransition: true,
-        }}
-      />
-    </I18nextProvider>
+    <ErrorBoundary>
+      <I18nextProvider i18n={i18n}>
+        <RouterProvider 
+          router={router}
+          future={{
+            v7_startTransition: true,
+          }}
+        />
+      </I18nextProvider>
+    </ErrorBoundary>
   );
 }
 

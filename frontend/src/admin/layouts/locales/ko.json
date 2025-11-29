@@ -15,7 +15,8 @@
       "projects": "프로젝트",
       "content": "콘텐츠 관리",
       "settings": "시스템 설정",
-      "reports": "통계 리포트"
+      "reports": "통계 리포트",
+      "auditLogs": "감사 로그"
     },
     "footer": {
       "copyright": "강원창업포털. All rights reserved.",

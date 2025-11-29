@@ -17,6 +17,8 @@ const ProjectList = lazy(() => import('./modules/projects/ProjectList'));
 const ContentManagement = lazy(() => import('./modules/content/ContentManagement'));
 const Settings = lazy(() => import('./modules/settings'));
 const Reports = lazy(() => import('./modules/reports'));
+const AuditLogList = lazy(() => import('./modules/audit-logs/AuditLogList'));
+const AuditLogDetail = lazy(() => import('./modules/audit-logs/AuditLogDetail'));
 
 // Wrapper component for lazy-loaded routes with Suspense
 function LazyRoute({ children }) {
@@ -105,6 +107,24 @@ export default function AdminRoutes() {
           element={
             <LazyRoute>
               <Reports />
+            </LazyRoute>
+          } 
+        />
+        
+        {/* 审计日志 */}
+        <Route 
+          path="audit-logs" 
+          element={
+            <LazyRoute>
+              <AuditLogList />
+            </LazyRoute>
+          } 
+        />
+        <Route 
+          path="audit-logs/:id" 
+          element={
+            <LazyRoute>
+              <AuditLogDetail />
             </LazyRoute>
           } 
         />

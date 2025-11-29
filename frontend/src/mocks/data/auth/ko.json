@@ -39,6 +39,16 @@
       "name": "박민수",
       "companyName": "강원그린에너지",
       "memberId": 3
+    },
+    {
+      "id": 5,
+      "email": "test@gwstartup.kr",
+      "businessLicense": "1234567890",
+      "password": "Member123!",
+      "role": "member",
+      "name": "테스트 사용자",
+      "companyName": "테스트 회사",
+      "memberId": 4
     }
   ]
 }

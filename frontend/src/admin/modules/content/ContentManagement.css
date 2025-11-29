@@ -241,3 +241,89 @@
   color: #6b7280;
 }
 
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-content-management {
+    padding: 0;
+  }
+
+  .page-header {
+    margin-bottom: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .tab-content {
+    padding: 1rem 0;
+  }
+
+  .popup-management-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .popup-list-panel,
+  .popup-form-panel {
+    padding: 1rem;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .popup-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .popup-item-body {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .popup-form {
+    gap: 0.75rem;
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions > * {
+    width: 100%;
+  }
+
+  .image-upload-actions {
+    gap: 0.5rem;
+  }
+
+  .popup-image-preview {
+    max-height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .popup-list-panel,
+  .popup-form-panel {
+    padding: 0.75rem;
+  }
+
+  .popup-item {
+    padding: 0.75rem;
+  }
+}
+

@@ -53,10 +53,24 @@ export default function MemberList() {
     setCurrentPage(1);
   }, []);
 
-  const handleExport = useCallback(() => {
-    // TODO: 实现 Excel 导出
-    console.log('Exporting members...');
-  }, []);
+  const handleExport = useCallback(async (format = 'excel') => {
+    try {
+      setLoading(true);
+      const params = {
+        format,
+        approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
+        search: searchTerm || undefined
+      };
+      await adminService.exportMembers(params);
+      alert(t('admin.members.exportSuccess', '导出成功') || '导出成功');
+    } catch (error) {
+      console.error('Failed to export members:', error);
+      const errorMessage = error.response?.data?.detail || error.message || t('admin.members.exportFailed', '导出失败');
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [statusFilter, searchTerm, t]);
 
   const handleApprove = useCallback(async (memberId) => {
     try {
@@ -170,9 +184,22 @@ export default function MemberList() {
               />
             </div>
           </div>
-          <Button onClick={handleExport} className="ml-4">
-            {t('admin.members.export')}
-          </Button>
+          <div className="flex items-center space-x-2 ml-4">
+            <Button 
+              onClick={() => handleExport('excel')} 
+              variant="outline"
+              disabled={loading}
+            >
+              {t('admin.members.exportExcel', '导出 Excel')}
+            </Button>
+            <Button 
+              onClick={() => handleExport('csv')} 
+              variant="outline"
+              disabled={loading}
+            >
+              {t('admin.members.exportCsv', '导出 CSV')}
+            </Button>
+          </div>
         </div>
       </div>
 

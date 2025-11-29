@@ -35,7 +35,7 @@ class PerformanceService:
         logger.debug(
             "List performance records",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member_id),
                 "year": query.year,
                 "quarter": query.quarter,
@@ -76,7 +76,7 @@ class PerformanceService:
         logger.debug(
             "List performance records result",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member_id),
                 "total": total,
                 "returned": len(records),
@@ -106,7 +106,7 @@ class PerformanceService:
         logger.debug(
             "Get performance record by id",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(performance_id),
                 "member_id": str(member_id),
             },
@@ -121,7 +121,7 @@ class PerformanceService:
             logger.warning(
                 "Performance record not found",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "performance_id": str(performance_id),
                 },
             )
@@ -131,7 +131,7 @@ class PerformanceService:
             logger.warning(
                 "Forbidden access to performance record",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "performance_id": str(performance_id),
                     "owner_member_id": str(record.member_id),
                     "request_member_id": str(member_id),
@@ -161,7 +161,7 @@ class PerformanceService:
         logger.info(
             "Create performance record request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member_id),
                 "year": data.year,
                 "quarter": data.quarter,
@@ -186,7 +186,7 @@ class PerformanceService:
         logger.info(
             "Performance record created",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(record.id),
                 "member_id": str(member_id),
             },
@@ -221,7 +221,7 @@ class PerformanceService:
         logger.info(
             "Update performance record request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(performance_id),
                 "member_id": str(member_id),
             },
@@ -234,7 +234,7 @@ class PerformanceService:
             logger.warning(
                 "Update performance failed: invalid status",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "performance_id": str(performance_id),
                     "status": record.status,
                 },
@@ -260,7 +260,7 @@ class PerformanceService:
         logger.info(
             "Performance record updated",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(record.id),
                 "member_id": str(member_id),
             },
@@ -287,7 +287,7 @@ class PerformanceService:
         logger.info(
             "Delete performance record request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(performance_id),
                 "member_id": str(member_id),
             },
@@ -300,7 +300,7 @@ class PerformanceService:
             logger.warning(
                 "Delete performance failed: invalid status",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "performance_id": str(performance_id),
                     "status": record.status,
                 },
@@ -316,7 +316,7 @@ class PerformanceService:
         logger.info(
             "Performance record deleted",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(performance_id),
                 "member_id": str(member_id),
             },
@@ -344,7 +344,7 @@ class PerformanceService:
         logger.info(
             "Submit performance record request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(performance_id),
                 "member_id": str(member_id),
             },
@@ -357,7 +357,7 @@ class PerformanceService:
             logger.warning(
                 "Submit performance failed: invalid status",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "performance_id": str(performance_id),
                     "status": record.status,
                 },
@@ -376,7 +376,7 @@ class PerformanceService:
         logger.info(
             "Performance record submitted",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(record.id),
                 "member_id": str(member_id),
                 "status": record.status,
@@ -403,7 +403,7 @@ class PerformanceService:
         logger.debug(
             "Admin list all performance records",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(query.member_id) if query.member_id else None,
                 "year": query.year,
                 "quarter": query.quarter,
@@ -446,7 +446,7 @@ class PerformanceService:
         logger.debug(
             "Admin list all performance records result",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "total": total,
                 "returned": len(records),
             },
@@ -473,7 +473,7 @@ class PerformanceService:
         logger.debug(
             "Admin get performance record by id",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(performance_id),
             },
         )
@@ -487,7 +487,7 @@ class PerformanceService:
             logger.warning(
                 "Admin get performance failed: record not found",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "performance_id": str(performance_id),
                 },
             )
@@ -521,7 +521,7 @@ class PerformanceService:
         logger.info(
             "Approve performance record request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(performance_id),
                 "reviewer_id": str(reviewer_id),
             },
@@ -534,7 +534,7 @@ class PerformanceService:
             logger.warning(
                 "Approve performance failed: invalid status",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "performance_id": str(performance_id),
                     "status": record.status,
                 },
@@ -562,12 +562,38 @@ class PerformanceService:
         logger.info(
             "Performance record approved",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(record.id),
                 "reviewer_id": str(reviewer_id),
                 "status": record.status,
             },
         )
+
+        # Send approval notification email
+        try:
+            from ...common.modules.email import email_service
+            # Get member email
+            member_result = await db.execute(
+                select(Member).where(Member.id == record.member_id)
+            )
+            member = member_result.scalar_one_or_none()
+            if member:
+                await email_service.send_approval_notification_email(
+                    to_email=member.email,
+                    company_name=member.company_name,
+                    approval_type="성과 데이터",
+                    status="approved",
+                    comments=comments,
+                )
+        except Exception as e:
+            logger.warning(
+                "Failed to send approval notification email",
+                extra={
+                    "module_name": __name__,
+                    "performance_id": str(record.id),
+                    "error": str(e),
+                },
+            )
 
         return record
 
@@ -597,7 +623,7 @@ class PerformanceService:
         logger.info(
             "Request fix for performance record",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(performance_id),
                 "reviewer_id": str(reviewer_id),
             },
@@ -610,7 +636,7 @@ class PerformanceService:
             logger.warning(
                 "Request fix performance failed: invalid status",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "performance_id": str(performance_id),
                     "status": record.status,
                 },
@@ -638,12 +664,40 @@ class PerformanceService:
         logger.info(
             "Performance record marked as revision_requested",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(record.id),
                 "reviewer_id": str(reviewer_id),
                 "status": record.status,
             },
         )
+
+        # Send revision request email
+        try:
+            from ...common.modules.email import email_service
+            # Get member email
+            member_result = await db.execute(
+                select(Member).where(Member.id == record.member_id)
+            )
+            member = member_result.scalar_one_or_none()
+            if member and comments:
+                from ...common.modules.config.settings import settings
+                revision_url = f"{settings.FRONTEND_URL}/member/performance/{record.id}"
+                await email_service.send_revision_request_email(
+                    to_email=member.email,
+                    company_name=member.company_name,
+                    request_type="성과 데이터",
+                    comments=comments,
+                    revision_url=revision_url,
+                )
+        except Exception as e:
+            logger.warning(
+                "Failed to send revision request email",
+                extra={
+                    "module_name": __name__,
+                    "performance_id": str(record.id),
+                    "error": str(e),
+                },
+            )
 
         return record
 
@@ -673,7 +727,7 @@ class PerformanceService:
         logger.info(
             "Reject performance record request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(performance_id),
                 "reviewer_id": str(reviewer_id),
             },
@@ -686,7 +740,7 @@ class PerformanceService:
             logger.warning(
                 "Reject performance failed: invalid status",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "performance_id": str(performance_id),
                     "status": record.status,
                 },
@@ -714,7 +768,7 @@ class PerformanceService:
         logger.info(
             "Performance record rejected",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "performance_id": str(record.id),
                 "reviewer_id": str(reviewer_id),
                 "status": record.status,
@@ -739,7 +793,7 @@ class PerformanceService:
         logger.info(
             "Export performance data request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "year": query.year,
                 "quarter": query.quarter,
                 "status": query.status,
@@ -780,7 +834,7 @@ class PerformanceService:
         logger.info(
             "Export performance data completed",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "records_count": len(export_data),
             },
         )

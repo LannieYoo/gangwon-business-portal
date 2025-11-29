@@ -5,7 +5,8 @@ This module uses Pydantic Settings to manage environment variables
 and application configuration.
 """
 from pydantic_settings import BaseSettings
-from typing import List
+from pydantic import field_validator
+from typing import List, Union
 
 
 class Settings(BaseSettings):
@@ -31,13 +32,35 @@ class Settings(BaseSettings):
 
     # CORS Configuration
     # Default allows both Vite dev ports (5173 and 3000)
-    ALLOWED_ORIGINS: List[str] = [
+    # Can be set as comma-separated string in .env: "http://localhost:5173,http://localhost:3000"
+    ALLOWED_ORIGINS: Union[List[str], str] = [
         "http://localhost:5173",
         "http://localhost:3000",
     ]
 
+    @field_validator('ALLOWED_ORIGINS', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, v):
+        """Parse CORS origins from comma-separated string or list."""
+        if isinstance(v, str):
+            # Split by comma and strip whitespace
+            return [origin.strip() for origin in v.split(',') if origin.strip()]
+        return v
+
     # Nice D&B API (Optional)
     NICE_DNB_API_KEY: str | None = None
+    NICE_DNB_API_SECRET_KEY: str | None = None
+    NICE_DNB_API_URL: str | None = None  # API base URL (defaults to https://api.nicednb.com if not set)
+
+    # Email Configuration
+    EMAIL_SMTP_HOST: str = "smtp.gmail.com"
+    EMAIL_SMTP_PORT: int = 587
+    EMAIL_SMTP_USER: str = ""
+    EMAIL_SMTP_PASSWORD: str = ""
+    EMAIL_SMTP_USE_TLS: bool = True
+    EMAIL_FROM: str = "noreply@gangwon-portal.kr"
+    EMAIL_FROM_NAME: str = "Gangwon Business Portal"
+    FRONTEND_URL: str = "http://localhost:5173"  # Frontend URL for email links
 
     # File Upload Configuration
     MAX_UPLOAD_SIZE: int = 10485760  # 10MB

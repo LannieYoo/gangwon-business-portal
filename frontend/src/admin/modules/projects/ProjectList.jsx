@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Card, Table, Button, Badge } from '@shared/components';
-import { apiService } from '@shared/services';
+import { apiService, adminService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import './ProjectList.css';
 
@@ -53,6 +53,23 @@ export default function ProjectList() {
     } catch (error) {
       console.error('Failed to delete project:', error);
       alert(t('admin.projects.deleteFailed'));
+    }
+  };
+
+  const handleExport = async (format = 'excel') => {
+    try {
+      setLoading(true);
+      const params = {
+        format
+      };
+      await adminService.exportProjects(params);
+      alert(t('admin.projects.exportSuccess', '导出成功') || '导出成功');
+    } catch (error) {
+      console.error('Failed to export projects:', error);
+      const errorMessage = error.response?.data?.detail || error.message || t('admin.projects.exportFailed', '导出失败');
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,9 +148,25 @@ export default function ProjectList() {
               />
             </div>
           </div>
-          <Button onClick={handleCreate} className="ml-4">
-            {t('admin.projects.create')}
-          </Button>
+          <div className="flex items-center space-x-2 ml-4">
+            <Button 
+              onClick={() => handleExport('excel')} 
+              variant="outline"
+              disabled={loading}
+            >
+              {t('admin.projects.exportExcel', '导出 Excel')}
+            </Button>
+            <Button 
+              onClick={() => handleExport('csv')} 
+              variant="outline"
+              disabled={loading}
+            >
+              {t('admin.projects.exportCsv', '导出 CSV')}
+            </Button>
+            <Button onClick={handleCreate}>
+              {t('admin.projects.create')}
+            </Button>
+          </div>
         </div>
       </div>
 

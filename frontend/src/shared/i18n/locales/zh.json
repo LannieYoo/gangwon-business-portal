@@ -131,6 +131,23 @@
     "thirdPartySharing": "个人信息第三方提供",
     "marketingConsent": "选择信息收集及使用同意"
   },
+  "admin": {
+    "auth": {
+      "loginTitle": "管理员登录",
+      "loginSubtitle": "请输入管理员凭据以访问管理面板",
+      "username": "用户名",
+      "usernamePlaceholder": "请输入管理员用户名或邮箱",
+      "password": "密码",
+      "passwordPlaceholder": "请输入密码",
+      "rememberMe": "记住登录状态",
+      "forgotPassword": "忘记密码",
+      "login": "登录",
+      "loginFailed": "登录失败",
+      "invalidCredentials": "用户名或密码不正确",
+      "notAdminUser": "不是管理员用户？",
+      "goToMemberLogin": "前往会员登录"
+    }
+  },
   "member": {
     "companyName": "企业名称",
     "businessLicense": "营业执照号码",
@@ -297,6 +314,25 @@
     "privacyPolicy": "个人信息处理方针",
     "loading": "加载中...",
     "error": "加载条款失败"
+  },
+  "error": {
+    "boundary": {
+      "title": "发生错误",
+      "message": "抱歉，应用程序遇到了意外错误。请尝试刷新页面或返回首页。",
+      "details": "错误详情（开发模式）",
+      "reload": "刷新页面",
+      "home": "返回首页",
+      "retry": "重试"
+    },
+    "network": {
+      "title": "网络错误",
+      "message": "网络连接出现问题。请检查您的互联网连接并重试。",
+      "retry": "重试"
+    },
+    "generic": {
+      "title": "发生错误",
+      "message": "完成操作时发生错误。请稍后重试。"
+    }
   }
 }
 

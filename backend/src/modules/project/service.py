@@ -6,6 +6,7 @@ Business logic for project and application management operations.
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_, and_
 from uuid import UUID
+from typing import Optional
 from datetime import datetime
 
 from ...common.modules.db.models import Project, ProjectApplication
@@ -42,7 +43,7 @@ class ProjectService:
         logger.debug(
             "List projects",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "status": query.status.value if query.status else None,
                 "search": query.search,
                 "page": query.page,
@@ -85,7 +86,7 @@ class ProjectService:
         logger.debug(
             "List projects result",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "total": total,
                 "returned": len(projects),
             },
@@ -112,7 +113,7 @@ class ProjectService:
         logger.debug(
             "Get project by id",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "project_id": str(project_id),
             },
         )
@@ -126,7 +127,7 @@ class ProjectService:
             logger.warning(
                 "Project not found",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "project_id": str(project_id),
                 },
             )
@@ -160,7 +161,7 @@ class ProjectService:
         logger.info(
             "Apply to project request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member_id),
                 "project_id": str(project_id),
             },
@@ -173,7 +174,7 @@ class ProjectService:
             logger.warning(
                 "Project application failed: project not active",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "member_id": str(member_id),
                     "project_id": str(project_id),
                     "status": project.status,
@@ -197,7 +198,7 @@ class ProjectService:
             logger.warning(
                 "Project application failed: duplicate application",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "member_id": str(member_id),
                     "project_id": str(project_id),
                 },
@@ -222,7 +223,7 @@ class ProjectService:
         logger.info(
             "Project application created",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "application_id": str(application.id),
                 "member_id": str(member_id),
                 "project_id": str(project_id),
@@ -248,7 +249,7 @@ class ProjectService:
         logger.debug(
             "Get my project applications",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member_id),
                 "status": query.status.value if query.status else None,
                 "page": query.page,
@@ -282,7 +283,7 @@ class ProjectService:
         logger.debug(
             "Get my applications result",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member_id),
                 "total": total,
                 "returned": len(applications),
@@ -309,7 +310,7 @@ class ProjectService:
         logger.info(
             "Create project request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "title": data.title,
                 "status": data.status.value if data.status else "active",
             },
@@ -332,7 +333,7 @@ class ProjectService:
         logger.info(
             "Project created",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "project_id": str(project.id),
                 "title": project.title,
             },
@@ -360,7 +361,7 @@ class ProjectService:
         logger.info(
             "Update project request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "project_id": str(project_id),
             },
         )
@@ -389,7 +390,7 @@ class ProjectService:
         logger.info(
             "Project updated",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "project_id": str(project.id),
                 "title": project.title,
             },
@@ -413,7 +414,7 @@ class ProjectService:
         logger.info(
             "Delete project request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "project_id": str(project_id),
             },
         )
@@ -426,7 +427,7 @@ class ProjectService:
         logger.info(
             "Project deleted",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "project_id": str(project_id),
             },
         )
@@ -451,7 +452,7 @@ class ProjectService:
         logger.debug(
             "List project applications",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "project_id": str(project_id),
                 "status": query.status.value if query.status else None,
                 "page": query.page,
@@ -488,7 +489,7 @@ class ProjectService:
         logger.debug(
             "List project applications result",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "project_id": str(project_id),
                 "total": total,
                 "returned": len(applications),
@@ -520,7 +521,7 @@ class ProjectService:
         logger.info(
             "Update application status request",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "application_id": str(application_id),
                 "new_status": status.value,
             },
@@ -535,7 +536,7 @@ class ProjectService:
             logger.warning(
                 "Update application status failed: application not found",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "application_id": str(application_id),
                 },
             )
@@ -552,10 +553,134 @@ class ProjectService:
         logger.info(
             "Application status updated",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "application_id": str(application.id),
                 "status": application.status,
             },
         )
 
         return application
+
+    async def export_projects_data(
+        self, query: ProjectListQuery, db: AsyncSession
+    ) -> list[dict]:
+        """
+        Export projects data for download (admin only).
+
+        Args:
+            query: Filter parameters
+            db: Database session
+
+        Returns:
+            List of project records as dictionaries
+        """
+        logger.info(
+            "Export projects data request",
+            extra={
+                "module_name": __name__,
+                "status": query.status.value if query.status else None,
+                "search": query.search,
+            },
+        )
+
+        # Get all matching records without pagination
+        query_no_page = ProjectListQuery(
+            page=1,
+            page_size=10000,  # Large limit for export
+            status=query.status,
+            search=query.search,
+        )
+
+        projects, _ = await self.list_projects(query_no_page, db)
+
+        # Convert to dict format for export
+        export_data = []
+        for project in projects:
+            # Get applications count
+            app_count_stmt = select(func.count()).where(
+                ProjectApplication.project_id == project.id
+            )
+            app_count_result = await db.execute(app_count_stmt)
+            app_count = app_count_result.scalar() or 0
+
+            export_data.append({
+                "id": str(project.id),
+                "title": project.title,
+                "description": project.description,
+                "target_audience": project.target_audience,
+                "start_date": project.start_date.isoformat() if project.start_date else None,
+                "end_date": project.end_date.isoformat() if project.end_date else None,
+                "image_url": project.image_url,
+                "status": project.status,
+                "applications_count": app_count,
+                "created_at": project.created_at.isoformat() if project.created_at else None,
+                "updated_at": project.updated_at.isoformat() if project.updated_at else None,
+            })
+
+        return export_data
+
+    async def export_applications_data(
+        self, project_id: Optional[UUID], query: ApplicationListQuery, db: AsyncSession
+    ) -> list[dict]:
+        """
+        Export project applications data for download (admin only).
+
+        Args:
+            project_id: Optional project ID to filter by
+            query: Filter parameters
+            db: Database session
+
+        Returns:
+            List of application records as dictionaries
+        """
+        logger.info(
+            "Export applications data request",
+            extra={
+                "module_name": __name__,
+                "project_id": str(project_id) if project_id else None,
+                "status": query.status.value if query.status else None,
+            },
+        )
+
+        # Build query for all applications
+        stmt = select(ProjectApplication)
+        
+        if project_id:
+            stmt = stmt.where(ProjectApplication.project_id == project_id)
+        
+        if query.status:
+            stmt = stmt.where(ProjectApplication.status == query.status.value)
+
+        # Execute query
+        result = await db.execute(stmt)
+        applications = result.scalars().all()
+
+        # Convert to dict format for export
+        export_data = []
+        for application in applications:
+            # Get project and member info
+            project_result = await db.execute(
+                select(Project).where(Project.id == application.project_id)
+            )
+            project = project_result.scalar_one_or_none()
+
+            from ...common.modules.db.models import Member
+            member_result = await db.execute(
+                select(Member).where(Member.id == application.member_id)
+            )
+            member = member_result.scalar_one_or_none()
+
+            export_data.append({
+                "id": str(application.id),
+                "project_id": str(application.project_id),
+                "project_title": project.title if project else None,
+                "member_id": str(application.member_id),
+                "company_name": member.company_name if member else None,
+                "business_number": member.business_number if member else None,
+                "status": application.status,
+                "application_reason": application.application_reason,
+                "submitted_at": application.submitted_at.isoformat() if application.submitted_at else None,
+                "reviewed_at": application.reviewed_at.isoformat() if application.reviewed_at else None,
+            })
+
+        return export_data

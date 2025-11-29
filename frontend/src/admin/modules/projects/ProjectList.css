@@ -6,3 +6,15 @@
   padding: 0;
 }
 
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-project-list {
+    padding: 0;
+  }
+
+  .admin-project-list h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+}
+

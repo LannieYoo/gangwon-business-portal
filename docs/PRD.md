@@ -2,8 +2,8 @@
 
 # Gangwon Business Portal - 江原创业门户
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-11-25  
+**Version:** 1.0.3  
+**Last Updated:** 2025-01-29  
 **Document Owner:** Development Team  
 **Project Type:** B2B Performance Management Portal
 
@@ -88,7 +88,7 @@ The Gangwon Business Portal is a responsive web-based B2B performance management
 6. **Administrative Dashboard**
    - Real-time enterprise status monitoring
    - Performance data approval workflow
-   - Analytics and reporting with Excel export
+   - Analytics and reporting with Excel/CSV export ✅ **已实现**
    - Company search and verification
 
 ### Technology Stack
@@ -516,11 +516,36 @@ The system follows a three-tier architecture:
   - WCAG 2.1 Level AA compliance
   - Keyboard navigation support
   - Screen reader compatibility
-  - Minimum touch target size: 44x44px
-- **Responsive Design**: 
-  - Mobile: ≥ 360px width
-  - Tablet: ≥ 768px width
-  - Desktop: ≥ 1280px width
+  - Minimum touch target size: 44x44px (✅ **已实现**)
+- **Responsive Design**: ✅ **已完成移动端优化** (2025-01-28)
+  - **Mobile Devices** (≥ 360px width):
+    - All pages optimized for mobile display
+    - Grid layouts automatically switch to single column
+    - Form fields stack vertically for better usability
+    - Button groups stack vertically on small screens
+    - Tab components support horizontal scrolling
+    - Modal dialogs optimized for mobile viewport
+    - Touch-friendly interface with appropriate spacing
+  - **Tablet Devices** (≥ 768px width):
+    - Optimized layouts for medium screens
+    - Two-column layouts where appropriate
+    - Enhanced touch interactions
+  - **Desktop** (≥ 1280px width):
+    - Full multi-column layouts
+    - Maximum content width for readability
+    - Hover states and advanced interactions
+  - **Responsive Breakpoints**:
+    - `480px`: Small mobile devices
+    - `768px`: Tablets and large mobile devices
+    - `1024px`: Small desktops
+    - `1280px+`: Large desktops
+  - **Optimized Components**:
+    - ✅ Pagination component with mobile-friendly buttons
+    - ✅ Tab navigation with horizontal scroll
+    - ✅ Form layouts with responsive field arrangements
+    - ✅ Data tables with mobile-optimized display
+    - ✅ Modal dialogs with mobile-first design
+    - ✅ Navigation menus with mobile hamburger menu
 - **Internationalization**: 
   - Korean and Chinese language support
   - Date and number formatting per locale
@@ -646,20 +671,43 @@ The system follows a three-tier architecture:
 - **Modals**: Confirmation dialogs, information displays
 - **Tooltips**: Contextual help information
 
-### UI4: Responsive Design
+### UI4: Responsive Design ✅ **已完成移动端优化** (2025-01-28)
 
 #### UI4.1: Breakpoints
-- **Mobile**: < 640px
-- **Small**: 640px+
-- **Medium**: 768px+
-- **Large**: 1024px+
-- **XLarge**: 1280px+
+- **Small Mobile**: < 480px (小屏手机)
+- **Mobile**: 480px - 767px (标准手机)
+- **Tablet**: 768px - 1023px (平板设备)
+- **Desktop**: 1024px - 1279px (小桌面)
+- **Large Desktop**: 1280px+ (大桌面)
 
-#### UI4.2: Responsive Behavior
-- **Navigation**: Collapsible menu on mobile
-- **Tables**: Horizontal scroll or card layout on mobile
-- **Forms**: Stack vertically on mobile, horizontal on desktop
-- **Images**: Responsive sizing with lazy loading
+#### UI4.2: Responsive Behavior ✅ **已实现**
+- **Navigation**: 
+  - ✅ Collapsible hamburger menu on mobile
+  - ✅ Horizontal navigation on desktop
+- **Tables**: 
+  - ✅ Horizontal scroll on mobile
+  - ✅ Card layout option for mobile (where applicable)
+- **Forms**: 
+  - ✅ Stack vertically on mobile
+  - ✅ Multi-column layout on desktop
+  - ✅ Touch-friendly input fields (minimum 44px height)
+- **Grid Layouts**: 
+  - ✅ Automatically switch to single column on mobile
+  - ✅ Two-column on tablet
+  - ✅ Multi-column on desktop
+- **Buttons**: 
+  - ✅ Stack vertically on mobile for button groups
+  - ✅ Full width buttons on mobile for primary actions
+  - ✅ Minimum 44px × 44px touch target size
+- **Tabs**: 
+  - ✅ Horizontal scrolling on mobile
+  - ✅ Full width display on desktop
+- **Modals**: 
+  - ✅ Full-screen or optimized viewport on mobile
+  - ✅ Centered dialog on desktop
+- **Images**: 
+  - ✅ Responsive sizing with lazy loading
+  - ✅ Maintain aspect ratio across devices
 
 ### UI5: Interaction Design
 
@@ -740,15 +788,46 @@ The system follows a three-tier architecture:
 ### DM4: Data Export
 
 #### DM4.1: Export Formats
-- **Excel**: .xlsx format with formatting
-- **CSV**: Comma-separated values for data import
+- **Excel**: .xlsx format with formatting ✅ **已实现**
+  - 使用 openpyxl 库生成
+  - 包含标题行样式和自动列宽调整
+  - 文件名包含时间戳（格式: `{resource}_{timestamp}.xlsx`）
+- **CSV**: Comma-separated values for data import ✅ **已实现**
+  - 标准 CSV 格式，UTF-8 编码
+  - 文件名包含时间戳（格式: `{resource}_{timestamp}.csv`）
 - **PDF**: Reports and documents (future enhancement)
 
-#### DM4.2: Export Functionality
-- **Dashboard Data**: Summary statistics export
-- **Performance Data**: Filtered performance records export
-- **Enterprise List**: Company information export
-- **Custom Reports**: Date range and filter-based exports
+#### DM4.2: Export Functionality ✅ **已实现**
+- **Performance Data**: Filtered performance records export ✅
+  - API 端点: `/api/admin/performance/export`
+  - 支持筛选参数: status, memberId
+  - 支持格式: excel, csv
+- **Enterprise List**: Company information export ✅
+  - API 端点: `/api/admin/members/export`
+  - 支持筛选参数: status, search
+  - 支持格式: excel, csv
+- **Project Data**: Project information export ✅
+  - API 端点: `/api/admin/projects/export`
+  - 支持筛选参数: status, search
+  - 支持格式: excel, csv
+- **Application Data**: Project application export ✅
+  - API 端点: `/api/admin/applications/export`
+  - 支持筛选参数: status, projectId
+  - 支持格式: excel, csv
+- **Dashboard Data**: Summary statistics export (future enhancement)
+- **Custom Reports**: Date range and filter-based exports (future enhancement)
+
+#### DM4.3: Export Implementation Details
+- **Backend**: 
+  - 通用导出服务: `backend/src/common/modules/export/exporter.py`
+  - 使用 FastAPI `Response` 类型返回文件流
+  - 自动记录审计日志
+  - 支持与列表端点相同的筛选参数
+- **Frontend**:
+  - 导出按钮位于各列表页面（MemberList, PerformanceList, ProjectList）
+  - 支持 Excel 和 CSV 两种格式选择
+  - 错误处理和加载状态提示
+  - 自动下载文件（通过响应头 Content-Disposition）
 
 ---
 
@@ -765,14 +844,20 @@ The system follows a three-tier architecture:
 - **Fallback**: Manual input if API unavailable
 - **Authentication**: API key-based
 
-#### INT1.2: Email Service
+#### INT1.2: Email Service ✅ **已实现**
 - **Purpose**: Notifications and password reset
 - **Use Cases**: 
-  - Registration approval notifications
-  - Password reset links
-  - Performance correction requests
-  - Inquiry responses
-- **Service Options**: AWS SES, SendGrid, or local SMTP
+  - Registration approval notifications ✅
+  - Password reset links ✅
+  - Performance correction requests ✅
+  - Approval notifications ✅
+  - Revision request notifications ✅
+- **Service Options**: SMTP (支持 Gmail/Outlook/SendGrid/AWS SES 等)
+- **Implementation**: 
+  - 位置: `backend/src/common/modules/email/`
+  - 模板: HTML + 文本格式
+  - 异步发送: 使用 `aiosmtplib`
+  - 已集成: user, member, performance 模块
 
 #### INT1.3: SMS Service (Optional)
 - **Purpose**: Critical notifications
@@ -1001,9 +1086,14 @@ The system follows a three-tier architecture:
 - `JWT_ALGORITHM`: JWT algorithm (HS256)
 - `CORS_ORIGINS`: Allowed CORS origins
 - `NICE_DNB_API_KEY`: Nice D&B API key
-- `EMAIL_SMTP_HOST`: SMTP server host
+- `EMAIL_SMTP_HOST`: SMTP server host (e.g., smtp.gmail.com)
+- `EMAIL_SMTP_PORT`: SMTP server port (e.g., 587)
 - `EMAIL_SMTP_USER`: SMTP username
-- `EMAIL_SMTP_PASSWORD`: SMTP password
+- `EMAIL_SMTP_PASSWORD`: SMTP password (Gmail 需要使用应用专用密码)
+- `EMAIL_SMTP_USE_TLS`: Use TLS (true/false)
+- `EMAIL_FROM`: Sender email address
+- `EMAIL_FROM_NAME`: Sender display name
+- `FRONTEND_URL`: Frontend URL for email links
 
 #### DEP2.2: Configuration Management
 - **Development**: Local `.env` files

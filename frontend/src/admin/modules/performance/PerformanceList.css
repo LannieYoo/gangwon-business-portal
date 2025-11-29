@@ -19,3 +19,23 @@
   margin-top: 1rem;
 }
 
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-performance-list {
+    padding: 0;
+  }
+
+  .revision-modal-content {
+    gap: 0.75rem;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  .modal-actions > * {
+    width: 100%;
+  }
+}
+

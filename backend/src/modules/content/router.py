@@ -9,8 +9,11 @@ from typing import Annotated, Optional
 from uuid import UUID
 from math import ceil
 
+from fastapi import Request
+
 from ...common.modules.db.session import get_db
 from ...common.modules.db.models import Member
+from ...common.modules.audit import audit_log_service, get_client_info
 from ..user.dependencies import get_current_admin_user
 from .service import ContentService
 from .schemas import (
@@ -133,11 +136,28 @@ async def get_notice(
 )
 async def create_notice(
     data: NoticeCreate,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new notice (admin only)."""
     notice = await service.create_notice(data, current_user.id, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="create",
+            user_id=current_user.id,
+            resource_type="notice",
+            resource_id=notice.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
     
     return NoticeResponse(
         id=notice.id,
@@ -161,11 +181,28 @@ async def create_notice(
 async def update_notice(
     notice_id: UUID,
     data: NoticeUpdate,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Update a notice (admin only)."""
     notice = await service.update_notice(notice_id, data, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="update",
+            user_id=current_user.id,
+            resource_type="notice",
+            resource_id=notice.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
     
     # Get author name if available
     author_name = None
@@ -198,11 +235,28 @@ async def update_notice(
 )
 async def delete_notice(
     notice_id: UUID,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Delete a notice (admin only)."""
     await service.delete_notice(notice_id, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="delete",
+            user_id=current_user.id,
+            resource_type="notice",
+            resource_id=notice_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
 
 
 # Public Press Release Endpoints
@@ -314,11 +368,28 @@ async def get_press_release(
 )
 async def create_press_release(
     data: PressReleaseCreate,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new press release (admin only)."""
     press = await service.create_press_release(data, current_user.id, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="create",
+            user_id=current_user.id,
+            resource_type="press_release",
+            resource_id=press.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
     
     return PressReleaseResponse(
         id=press.id,
@@ -339,11 +410,28 @@ async def create_press_release(
 async def update_press_release(
     press_id: UUID,
     data: PressReleaseUpdate,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Update a press release (admin only)."""
     press = await service.update_press_release(press_id, data, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="update",
+            user_id=current_user.id,
+            resource_type="press_release",
+            resource_id=press.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
     
     # Get author name if available
     author_name = None
@@ -373,11 +461,28 @@ async def update_press_release(
 )
 async def delete_press_release(
     press_id: UUID,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Delete a press release (admin only)."""
     await service.delete_press_release(press_id, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="delete",
+            user_id=current_user.id,
+            resource_type="press_release",
+            resource_id=press_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
 
 
 # Public Banner Endpoints
@@ -457,11 +562,28 @@ async def get_all_banners(
 )
 async def create_banner(
     data: BannerCreate,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new banner (admin only)."""
     banner = await service.create_banner(data, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="create",
+            user_id=current_user.id,
+            resource_type="banner",
+            resource_id=banner.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
     
     return BannerResponse(
         id=banner.id,
@@ -484,11 +606,28 @@ async def create_banner(
 async def update_banner(
     banner_id: UUID,
     data: BannerUpdate,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Update a banner (admin only)."""
     banner = await service.update_banner(banner_id, data, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="update",
+            user_id=current_user.id,
+            resource_type="banner",
+            resource_id=banner.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
     
     return BannerResponse(
         id=banner.id,
@@ -510,11 +649,28 @@ async def update_banner(
 )
 async def delete_banner(
     banner_id: UUID,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Delete a banner (admin only)."""
     await service.delete_banner(banner_id, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="delete",
+            user_id=current_user.id,
+            resource_type="banner",
+            resource_id=banner_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
 
 
 # Public SystemInfo Endpoints
@@ -564,11 +720,28 @@ async def get_system_info(
 )
 async def update_system_info(
     data: SystemInfoUpdate,
+    request: Request,
     current_user: Member = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Update system introduction content (admin only, upsert pattern)."""
     system_info = await service.update_system_info(data, current_user.id, db)
+    
+    # Record audit log
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="update",
+            user_id=current_user.id,
+            resource_type="system_info",
+            resource_id=system_info.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
     
     return SystemInfoResponse(
         id=system_info.id,

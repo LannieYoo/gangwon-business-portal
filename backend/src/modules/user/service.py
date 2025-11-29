@@ -94,7 +94,7 @@ class AuthService:
         logger.info(
             "Register member request received",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "business_number": data.business_number,
                 "email": data.email,
             },
@@ -108,7 +108,7 @@ class AuthService:
             logger.warning(
                 "Registration failed: business number already registered",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "business_number": data.business_number,
                 },
             )
@@ -120,11 +120,52 @@ class AuthService:
             logger.warning(
                 "Registration failed: email already registered",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "email": data.email,
                 },
             )
             raise ValidationError("Email already registered")
+
+        # Verify company information with Nice D&B API (optional, non-blocking)
+        # This helps ensure data accuracy but doesn't block registration if API is unavailable
+        try:
+            from ...common.modules.integrations.nice_dnb import nice_dnb_client
+            
+            # Attempt to verify company information
+            verified = await nice_dnb_client.verify_company(
+                data.business_number, data.company_name
+            )
+            
+            if not verified:
+                logger.warning(
+                    "Company verification failed with Nice D&B API",
+                    extra={
+                        "module_name": __name__,
+                        "business_number": data.business_number,
+                        "company_name": data.company_name,
+                    },
+                )
+                # Note: We don't raise an error here - registration can still proceed
+                # The admin will review the registration during approval
+            else:
+                logger.info(
+                    "Company verified successfully with Nice D&B API",
+                    extra={
+                        "module_name": __name__,
+                        "business_number": data.business_number,
+                        "company_name": data.company_name,
+                    },
+                )
+        except Exception as e:
+            # Log error but don't block registration
+            logger.warning(
+                "Nice D&B API verification failed (non-blocking)",
+                extra={
+                    "module_name": __name__,
+                    "business_number": data.business_number,
+                    "error": str(e),
+                },
+            )
 
         # Create member record
         member = Member(
@@ -158,11 +199,31 @@ class AuthService:
         logger.info(
             "Member registered successfully",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member.id),
                 "business_number": member.business_number,
             },
         )
+
+        # Send registration confirmation email
+        try:
+            from ...common.modules.email import email_service
+            await email_service.send_registration_confirmation_email(
+                to_email=member.email,
+                company_name=member.company_name,
+                business_number=member.business_number,
+            )
+        except Exception as e:
+            # Log error but don't fail registration if email fails
+            logger.warning(
+                "Failed to send registration confirmation email",
+                extra={
+                    "module_name": __name__,
+                    "member_id": str(member.id),
+                    "email": member.email,
+                    "error": str(e),
+                },
+            )
 
         return member
 
@@ -186,7 +247,7 @@ class AuthService:
         logger.info(
             "Authentication attempt",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "business_number": business_number,
             },
         )
@@ -201,7 +262,7 @@ class AuthService:
             logger.warning(
                 "Authentication failed: invalid credentials",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "business_number": business_number,
                 },
             )
@@ -211,7 +272,7 @@ class AuthService:
             logger.warning(
                 "Authentication failed: account pending approval",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "member_id": str(member.id),
                     "business_number": member.business_number,
                 },
@@ -222,7 +283,7 @@ class AuthService:
             logger.warning(
                 "Authentication failed: account suspended",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "member_id": str(member.id),
                     "business_number": member.business_number,
                 },
@@ -232,7 +293,7 @@ class AuthService:
         logger.info(
             "Authentication successful",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member.id),
                 "business_number": member.business_number,
             },
@@ -296,7 +357,7 @@ class AuthService:
         logger.info(
             "Admin authentication attempt",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "username": username,
             },
         )
@@ -311,7 +372,7 @@ class AuthService:
             logger.warning(
                 "Admin authentication failed: invalid credentials",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "username": username,
                 },
             )
@@ -322,7 +383,7 @@ class AuthService:
             logger.warning(
                 "Admin authentication failed: not an admin account",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "member_id": str(member.id),
                     "business_number": member.business_number,
                 },
@@ -333,7 +394,7 @@ class AuthService:
             logger.warning(
                 "Admin authentication failed: account suspended",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "member_id": str(member.id),
                     "business_number": member.business_number,
                 },
@@ -343,7 +404,7 @@ class AuthService:
         logger.info(
             "Admin authentication successful",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member.id),
                 "business_number": member.business_number,
             },
@@ -382,7 +443,7 @@ class AuthService:
         logger.info(
             "Password reset request received",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "business_number": business_number,
                 "email": email,
             },
@@ -399,7 +460,7 @@ class AuthService:
             logger.warning(
                 "Password reset request failed: member not found or email mismatch",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "business_number": business_number,
                     "email": email,
                 },
@@ -420,7 +481,7 @@ class AuthService:
         logger.info(
             "Password reset token generated",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member.id),
                 "business_number": member.business_number,
             },
@@ -449,7 +510,7 @@ class AuthService:
         logger.info(
             "Password reset with token attempt",
             extra={
-                "module": __name__,
+                "module_name": __name__,
             },
         )
 
@@ -471,7 +532,7 @@ class AuthService:
             logger.warning(
                 "Password reset failed: token expired",
                 extra={
-                    "module": __name__,
+                    "module_name": __name__,
                     "member_id": str(member.id),
                 },
             )
@@ -490,7 +551,7 @@ class AuthService:
         logger.info(
             "Password reset successful",
             extra={
-                "module": __name__,
+                "module_name": __name__,
                 "member_id": str(member.id),
                 "business_number": member.business_number,
             },

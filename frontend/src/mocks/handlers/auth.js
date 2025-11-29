@@ -65,22 +65,30 @@ async function login(req) {
   
   const users = await getUsers();
   const body = await req.request.json();
-  const { email, businessLicense, password } = body;
+  // Support both business_number (from frontend) and businessLicense (legacy)
+  const { email, businessLicense, business_number, password } = body;
   
-  // Find user: admin by email, member by businessLicense
+  // Trim password to handle accidental spaces
+  const passwordClean = password ? password.trim() : '';
+  
+  // Find user: admin by email, member by businessLicense or business_number
   let user = null;
   
   if (email) {
     // Try to find admin by email
-    user = users.find(u => u.email === email && u.password === password);
-  } else if (businessLicense) {
-    // Try to find member by businessLicense (support both with and without dashes)
-    const businessLicenseClean = businessLicense.replace(/-/g, '');
-    user = users.find(u => {
-      if (!u.businessLicense) return false;
-      const userLicense = u.businessLicense.replace(/-/g, '');
-      return userLicense === businessLicenseClean && u.password === password;
-    });
+    user = users.find(u => u.email === email && u.password === passwordClean);
+  } else {
+    // Try to find member by businessLicense or business_number
+    // Support both field names and with/without dashes
+    const licenseNumber = business_number || businessLicense;
+    if (licenseNumber) {
+      const licenseClean = licenseNumber.replace(/-/g, '').trim();
+      user = users.find(u => {
+        if (!u.businessLicense) return false;
+        const userLicense = u.businessLicense.replace(/-/g, '');
+        return userLicense === licenseClean && u.password === passwordClean;
+      });
+    }
   }
   
   if (!user) {
@@ -225,6 +233,81 @@ async function getCurrentUser(req) {
   }
 }
 
+// Admin login handler
+async function adminLogin(req) {
+  await delay();
+  
+  if (shouldSimulateError(BASE_URL)) {
+    return HttpResponse.json(
+      { message: 'Internal server error', code: 'SERVER_ERROR' },
+      { status: getErrorStatus() }
+    );
+  }
+  
+  const users = await getUsers();
+  const body = await req.request.json();
+  const { username, email, password } = body;
+  
+  // Trim password to handle accidental spaces
+  const passwordClean = password ? password.trim() : '';
+  
+  // Find admin user by username or email
+  // Admin can login with either username (business_number) or email
+  const loginIdentifier = username || email;
+  if (!loginIdentifier) {
+    return HttpResponse.json(
+      { message: 'Username or email is required', code: 'MISSING_CREDENTIALS' },
+      { status: 400 }
+    );
+  }
+  
+  // Find user: check by email first, then by username (if username is provided)
+  let user = null;
+  
+  // Try to find by email
+  if (email || loginIdentifier.includes('@')) {
+    user = users.find(u => u.email === loginIdentifier && u.password === passwordClean && u.role === 'admin');
+  }
+  
+  // If not found by email, try to find by username (business_number) for admin
+  // Note: Admin users typically don't have businessLicense, so we check by email only
+  // But we can also support username if it matches the email
+  if (!user && username) {
+    user = users.find(u => {
+      // Check if username matches email or if user has matching identifier
+      return (u.email === username || u.name === username) && 
+             u.password === passwordClean && 
+             u.role === 'admin';
+    });
+  }
+  
+  if (!user || user.role !== 'admin') {
+    return HttpResponse.json(
+      { message: 'Invalid admin credentials', code: 'INVALID_CREDENTIALS' },
+      { status: 401 }
+    );
+  }
+  
+  // Generate tokens
+  const accessToken = generateToken(user);
+  const refreshToken = generateToken({ ...user, exp: Math.floor(Date.now() / 1000) + 86400 * 7 }); // 7 days
+  
+  const userInfo = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    name: user.name,
+    companyName: user.companyName,
+    memberId: user.memberId
+  };
+  
+  return HttpResponse.json({
+    access_token: accessToken,
+    token_type: 'bearer',
+    user: userInfo
+  });
+}
+
 // Logout handler
 async function logout(req) {
   await delay();
@@ -268,6 +351,7 @@ async function refreshToken(req) {
 // Use absolute paths (MSW best practice)
 export const authHandlers = [
   http.post(`${FULL_BASE_URL}/login`, login),
+  http.post(`${FULL_BASE_URL}/admin-login`, adminLogin),
   http.post(`${FULL_BASE_URL}/register`, register),
   http.get(`${FULL_BASE_URL}/me`, getCurrentUser),
   http.post(`${FULL_BASE_URL}/logout`, logout),

@@ -39,6 +39,16 @@
       "name": "朴民洙",
       "companyName": "江原绿色能源",
       "memberId": 3
+    },
+    {
+      "id": 5,
+      "email": "test@gwstartup.kr",
+      "businessLicense": "1234567890",
+      "password": "Member123!",
+      "role": "member",
+      "name": "测试用户",
+      "companyName": "测试公司",
+      "memberId": 4
     }
   ]
 }

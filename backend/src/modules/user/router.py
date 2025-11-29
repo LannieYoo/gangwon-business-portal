@@ -3,12 +3,13 @@ Authentication router.
 
 API endpoints for user authentication and authorization.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...common.modules.db.session import get_db
 from ...common.modules.db.models import Member
 from ...common.modules.exception import UnauthorizedError
+from ...common.modules.audit import audit_log_service, get_client_info
 from .schemas import (
     MemberRegisterRequest,
     LoginRequest,
@@ -19,7 +20,7 @@ from .schemas import (
     UserInfo,
 )
 from .service import AuthService
-from .dependencies import get_current_user, get_current_active_user
+from .dependencies import get_current_active_user
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
@@ -53,6 +54,7 @@ async def register(
 @router.post("/login", response_model=TokenResponse)
 async def login(
     data: LoginRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -67,6 +69,23 @@ async def login(
         access_token = auth_service.create_access_token(
             data={"sub": str(member.id), "role": "member"}
         )
+
+        # Record audit log for successful login
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="login",
+                user_id=member.id,
+                resource_type="member",
+                resource_id=member.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            # Log error but don't fail the login
+            from ...common.modules.logger import logger
+            logger.error(f"Failed to create audit log for login: {str(e)}", exc_info=True)
 
         return TokenResponse(
             access_token=access_token,
@@ -90,6 +109,7 @@ async def login(
 @router.post("/admin-login", response_model=TokenResponse)
 async def admin_login(
     data: AdminLoginRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -104,6 +124,23 @@ async def admin_login(
         access_token = auth_service.create_access_token(
             data={"sub": str(member.id), "role": "admin"}
         )
+
+        # Record audit log for successful admin login
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="admin_login",
+                user_id=member.id,
+                resource_type="member",
+                resource_id=member.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            # Log error but don't fail the login
+            from ...common.modules.logger import logger
+            logger.error(f"Failed to create audit log for admin login: {str(e)}", exc_info=True)
 
         return TokenResponse(
             access_token=access_token,
@@ -139,18 +176,29 @@ async def password_reset_request(
             data.business_number, data.email, db
         )
 
-        # TODO: Send email with reset link
-        # For now, log the token (DEVELOPMENT ONLY)
-        from ...common.modules.logger import logger
-        logger.info(f"Password reset requested for {data.business_number}")
-        logger.info(f"Reset token: {reset_token}")
+        # Send password reset email
+        from ...common.modules.email import email_service
+        email_sent = await email_service.send_password_reset_email(
+            to_email=data.email,
+            reset_token=reset_token,
+            business_number=data.business_number,
+        )
+
+        if not email_sent:
+            from ...common.modules.logger import logger
+            logger.warning(
+                "Password reset email failed to send",
+                extra={
+                    "module_name": __name__,
+                    "business_number": data.business_number,
+                    "email": data.email,
+                },
+            )
 
         return {
             "message": "If your email is registered, you will receive a password reset link.",
-            # Include token in response for development/testing only
-            "reset_token": reset_token,  # Remove this in production!
         }
-    except Exception as e:
+    except Exception:
         # Don't reveal whether email exists (security best practice)
         # Always return the same message
         return {
@@ -169,7 +217,7 @@ async def password_reset(
     Resets the user's password using a valid reset token.
     """
     try:
-        member = await auth_service.reset_password_with_token(
+        await auth_service.reset_password_with_token(
             data.token, data.new_password, db
         )
 
@@ -181,7 +229,7 @@ async def password_reset(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to reset password. Please try again.",
@@ -210,7 +258,9 @@ async def get_current_user_info(
 
 @router.post("/logout", response_model=dict)
 async def logout(
+    request: Request,
     current_user: Member = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Logout current user.
@@ -218,6 +268,23 @@ async def logout(
     Note: With JWT tokens, logout is typically handled client-side by removing the token.
     This endpoint can be used for audit logging or token blacklisting in the future.
     """
+    # Record audit log for logout
+    try:
+        ip_address, user_agent = get_client_info(request)
+        await audit_log_service.create_audit_log(
+            db=db,
+            action="logout",
+            user_id=current_user.id,
+            resource_type="member",
+            resource_id=current_user.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+    except Exception as e:
+        # Log error but don't fail the logout
+        from ...common.modules.logger import logger
+        logger.error(f"Failed to create audit log for logout: {str(e)}", exc_info=True)
+
     # TODO: Implement token blacklisting if needed
     return {"message": "Logged out successfully"}
 

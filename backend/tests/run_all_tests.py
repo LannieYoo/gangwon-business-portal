@@ -21,6 +21,7 @@ TEST_MODULES = [
     ("project_management", "integration.test_project_api"),
     ("content_management", "integration.test_content_api"),
     ("support", "integration.test_support_api"),
+    ("nice_dnb_api", "integration.test_nice_dnb_api"),
 ]
 
 

@@ -712,10 +712,47 @@ select.auth-input {
 
   .auth-form-actions {
     flex-direction: column;
+    gap: 12px;
   }
 
   .auth-form-actions .auth-button {
     width: 100%;
+  }
+
+  .auth-input-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .auth-input-group .auth-button-secondary {
+    width: 100%;
+  }
+
+  .auth-file-upload {
+    padding: 20px 16px;
+  }
+
+  .auth-file-upload-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .auth-file-upload-text {
+    font-size: 13px;
+  }
+
+  .auth-card-large {
+    padding: 32px 24px;
+  }
+
+  .auth-steps {
+    padding: 0 10px;
+    margin-bottom: 24px;
+  }
+
+  .auth-step-label {
+    font-size: 10px;
+    margin-top: 4px;
   }
 }
 

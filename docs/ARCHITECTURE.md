@@ -125,7 +125,7 @@
 | Content     | `backend/src/modules/content`          | 主横幅、滚动横幅、弹窗、新闻资料、<br />系统介绍等静态页面、条款内容管理、可视化内容发布               |
 | Settings    | `backend/src/modules/settings`         | 系统配置项CRUD、业务领域配置、产业合作领域配置、<br />知识产权分类配置、条款版本管理、JSON配置导入导出 |
 | Report      | `backend/src/modules/report`           | 指标聚合、仪表盘数据、Excel/CSV 导出、打印模板                                                         |
-| Integration | `backend/src/modules/integration`      | 第三方服务封装 （Nice D&B、邮件、短信、推送、韩国地址搜索API）                                         |
+| Integration | `backend/src/modules/integration`      | 第三方服务封装 （Nice D&B、✅ 邮件服务已实现、短信、推送、韩国地址搜索API）                                         |
 
 ## 数据层设计
 
@@ -140,7 +140,8 @@
 ## 集成与接口
 
 - **Nice D&B API**：管理员在企业审批与代表人检索时调用，采用 API Key 验证，结果缓存 24 小时，失败时回退人工输入。
-- **邮件/SMS 服务**：发送注册审批、绩效补正、项目通知。可接入 AWS SES + SNS 或国内第三方服务，接口封装在 Integration 模块。
+- **邮件服务** ✅ **已实现**：发送注册审批、绩效补正、项目通知、密码重置。使用 SMTP 协议（支持 Gmail/Outlook/SendGrid/AWS SES 等），位置：`backend/src/common/modules/email/`，已集成到 user、member、performance 模块。
+- **SMS 服务**：待实现，可接入 AWS SNS 或国内第三方服务，接口封装在 Integration 模块。
 - **认证网关**：所有接口需携带 Bearer Token；公共内容提供匿名访问版本（公告列表、FAQ）。
 - **审计与监控接口**：提供 `/healthz`、`/metrics` 端点，Prometheus 抓取指标，Grafana 展示。
 

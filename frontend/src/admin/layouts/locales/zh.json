@@ -15,7 +15,8 @@
       "projects": "项目管理",
       "content": "内容管理",
       "settings": "系统设置",
-      "reports": "统计报表"
+      "reports": "统计报表",
+      "auditLogs": "审计日志"
     },
     "footer": {
       "copyright": "江原创业门户. 版权所有.",

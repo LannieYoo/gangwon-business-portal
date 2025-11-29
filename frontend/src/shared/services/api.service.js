@@ -45,6 +45,10 @@ apiClient.interceptors.request.use(
 // Response interceptor
 apiClient.interceptors.response.use(
   (response) => {
+    // For blob responses, return the response object directly
+    if (response.config.responseType === 'blob') {
+      return response;
+    }
     return response.data;
   },
   async (error) => {
@@ -179,20 +183,44 @@ class ApiService {
   
   /**
    * Download file
+   * @param {string} url - Download URL
+   * @param {Object} params - Query parameters
+   * @param {string} [filename] - Optional filename (if not provided, will use Content-Disposition header)
    */
-  async download(url, filename) {
+  async download(url, params = {}, filename = null) {
     const response = await apiClient.get(url, {
+      params,
       responseType: 'blob'
     });
     
-    const blob = new Blob([response]);
+    // Get filename from Content-Disposition header if not provided
+    let downloadFilename = filename;
+    if (!downloadFilename && response.headers) {
+      const contentDisposition = response.headers['content-disposition'] || response.headers['Content-Disposition'];
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (filenameMatch && filenameMatch[1]) {
+          downloadFilename = filenameMatch[1].replace(/['"]/g, '');
+        }
+      }
+    }
+    
+    // If still no filename, generate one
+    if (!downloadFilename) {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      downloadFilename = `download-${timestamp}`;
+    }
+    
+    const blob = new Blob([response.data]);
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
-    link.download = filename;
+    link.download = downloadFilename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(link.href);
+    
+    return response;
   }
 }
 

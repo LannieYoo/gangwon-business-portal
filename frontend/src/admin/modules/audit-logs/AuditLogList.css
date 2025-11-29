@@ -1,0 +1,40 @@
+/**
+ * Audit Log List Styles
+ */
+
+.admin-audit-log-list,
+.admin-audit-log-detail {
+  padding: 0;
+}
+
+/* Filters Section */
+.admin-audit-log-list .grid {
+  gap: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-audit-log-list h1,
+  .admin-audit-log-detail h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-audit-log-list .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-audit-log-detail .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-audit-log-list .flex.gap-2 {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .admin-audit-log-list .flex.gap-2 button {
+    width: 100%;
+  }
+}
+
