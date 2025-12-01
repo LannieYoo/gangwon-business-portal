@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '@shared/components/Card';
-import { contentService } from '@shared/services';
+import { contentService, loggerService, exceptionService } from '@shared/services';
 import { ROUTES } from '@shared/utils/constants';
 
 function NoticesPreview() {
@@ -34,7 +34,16 @@ function NoticesPreview() {
         setNotices([]);
       }
     } catch (error) {
-      console.error('Failed to load notices:', error);
+      loggerService.error('Failed to load notices', {
+        module: 'NoticesPreview',
+        function: 'loadNotices',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOAD_NOTICES_FAILED'
+      });
       setNotices([]);
     } finally {
       setLoading(false);
@@ -43,7 +52,8 @@ function NoticesPreview() {
 
   useEffect(() => {
     loadNotices();
-  }, [loadNotices]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language]); // 直接依赖 i18n.language，避免 loadNotices 变化导致重复请求
 
   return (
     <section className="notices-section">

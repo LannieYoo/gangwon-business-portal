@@ -10,6 +10,7 @@ from typing import Optional
 from uuid import UUID
 
 from ..db.models import AuditLog, Member
+from ..logger.file_writer import file_log_writer
 from .schemas import AuditLogListQuery, AuditLogListResponse, AuditLogResponse
 
 
@@ -53,6 +54,26 @@ class AuditLogService:
         db.add(audit_log)
         await db.commit()
         await db.refresh(audit_log)
+
+        # Write to audit log file (non-blocking, fire-and-forget)
+        try:
+            file_log_writer.write_audit_log(
+                action=action,
+                user_id=user_id,
+                resource_type=resource_type,
+                resource_id=resource_id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                extra_data={
+                    "audit_log_id": str(audit_log.id),
+                    "created_at": audit_log.created_at.isoformat() if audit_log.created_at else None,
+                },
+            )
+        except Exception as e:
+            # Log error but don't fail the audit log creation
+            # Use standard logging to avoid circular dependency
+            import logging
+            logging.warning(f"Failed to write audit log to file: {str(e)}")
 
         return audit_log
 

@@ -6,7 +6,7 @@ API endpoints for performance record management.
 from fastapi import APIRouter, Depends, status, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
-from typing import Annotated, Optional
+from typing import Annotated
 from math import ceil
 from datetime import datetime
 
@@ -15,6 +15,8 @@ from fastapi import Request
 from ...common.modules.db.session import get_db
 from ...common.modules.db.models import Member
 from ...common.modules.audit import audit_log_service, get_client_info
+from ...common.modules.logger import logging_service
+from ...common.modules.exception.responses import get_trace_id
 from ..user.dependencies import get_current_active_user, get_current_admin_user
 from .service import PerformanceService
 from .schemas import (
@@ -43,6 +45,7 @@ service = PerformanceService()
 )
 async def list_my_performance_records(
     query: Annotated[PerformanceListQuery, Depends()],
+    request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -56,17 +59,50 @@ async def list_my_performance_records(
     - **page**: Page number (default: 1)
     - **page_size**: Items per page (default: 20, max: 100)
     """
-    records, total = await service.list_performance_records(
-        current_user.id, query, db
-    )
+    trace_id = get_trace_id(request)
+    try:
+        records, total = await service.list_performance_records(
+            current_user.id, query, db
+        )
 
-    return PerformanceListResponsePaginated(
-        items=[PerformanceListItem.model_validate(r) for r in records],
-        total=total,
-        page=query.page,
-        page_size=query.page_size,
-        total_pages=ceil(total / query.page_size) if total > 0 else 0,
-    )
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"List my performance records succeeded: {total} records found",
+            module=__name__,
+            function="list_my_performance_records",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+
+        return PerformanceListResponsePaginated(
+            items=[PerformanceListItem.model_validate(r) for r in records],
+            total=total,
+            page=query.page,
+            page_size=query.page_size,
+            total_pages=ceil(total / query.page_size) if total > 0 else 0,
+        )
+    except Exception as e:
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"List my performance records failed: {str(e)}",
+            module=__name__,
+            function="list_my_performance_records",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.get(
@@ -77,6 +113,7 @@ async def list_my_performance_records(
 )
 async def get_performance_record(
     performance_id: UUID,
+    request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -85,13 +122,48 @@ async def get_performance_record(
 
     Only the owner can access their own records.
     """
-    record = await service.get_performance_by_id(performance_id, current_user.id, db)
-    # NOTE:
-    # Use the helper that builds the response from ORM fields without
-    # traversing relationships. This avoids unexpected serialization
-    # issues with lazy-loaded relations while still returning all fields
-    # required by the current API consumers and tests.
-    return PerformanceRecordResponse.from_orm_without_reviews(record)
+    trace_id = get_trace_id(request)
+    try:
+        record = await service.get_performance_by_id(performance_id, current_user.id, db)
+
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Get performance record succeeded: {performance_id}",
+            module=__name__,
+            function="get_performance_record",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+        
+        # NOTE:
+        # Use the helper that builds the response from ORM fields without
+        # traversing relationships. This avoids unexpected serialization
+        # issues with lazy-loaded relations while still returning all fields
+        # required by the current API consumers and tests.
+        return PerformanceRecordResponse.from_orm_without_reviews(record)
+    except Exception as e:
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Get performance record failed: {str(e)}",
+            module=__name__,
+            function="get_performance_record",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "performance_id": str(performance_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.post(
@@ -112,25 +184,72 @@ async def create_performance_record(
 
     The record can be edited until it is submitted for review.
     """
-    record = await service.create_performance(current_user.id, data, db)
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="create",
+        record = await service.create_performance(current_user.id, data, db)
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="create",
+                user_id=current_user.id,
+                resource_type="performance",
+                resource_id=record.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="create_performance_record",
+                trace_id=trace_id,
+                user_id=current_user.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=201,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Create performance record succeeded: {record.id}",
+            module=__name__,
+            function="create_performance_record",
+            trace_id=trace_id,
             user_id=current_user.id,
-            resource_type="performance",
-            resource_id=record.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=201,
         )
+        
+        return PerformanceRecordResponse.from_orm_without_reviews(record)
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    return PerformanceRecordResponse.from_orm_without_reviews(record)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Create performance record failed: {str(e)}",
+            module=__name__,
+            function="create_performance_record",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.put(
@@ -151,27 +270,75 @@ async def update_performance_record(
 
     Only draft or revision_requested records can be edited.
     """
-    record = await service.update_performance(
-        performance_id, current_user.id, data, db
-    )
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="update",
-            user_id=current_user.id,
-            resource_type="performance",
-            resource_id=record.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+        record = await service.update_performance(
+            performance_id, current_user.id, data, db
         )
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="update",
+                user_id=current_user.id,
+                resource_type="performance",
+                resource_id=record.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="update_performance_record",
+                trace_id=trace_id,
+                user_id=current_user.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Update performance record succeeded: {performance_id}",
+            module=__name__,
+            function="update_performance_record",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+        
+        return PerformanceRecordResponse.from_orm_without_reviews(record)
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    return PerformanceRecordResponse.from_orm_without_reviews(record)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Update performance record failed: {str(e)}",
+            module=__name__,
+            function="update_performance_record",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "performance_id": str(performance_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.delete(
@@ -191,23 +358,71 @@ async def delete_performance_record(
 
     Only draft records can be deleted.
     """
-    await service.delete_performance(performance_id, current_user.id, db)
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="delete",
+        await service.delete_performance(performance_id, current_user.id, db)
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="delete",
+                user_id=current_user.id,
+                resource_type="performance",
+                resource_id=performance_id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="delete_performance_record",
+                trace_id=trace_id,
+                user_id=current_user.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=204,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Delete performance record succeeded: {performance_id}",
+            module=__name__,
+            function="delete_performance_record",
+            trace_id=trace_id,
             user_id=current_user.id,
-            resource_type="performance",
-            resource_id=performance_id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=204,
         )
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Delete performance record failed: {str(e)}",
+            module=__name__,
+            function="delete_performance_record",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "performance_id": str(performance_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.post(
@@ -228,25 +443,73 @@ async def submit_performance_record(
     Changes status from draft/revision_requested to submitted.
     Once submitted, the record cannot be edited unless admin requests revision.
     """
-    record = await service.submit_performance(performance_id, current_user.id, db)
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="submit",
+        record = await service.submit_performance(performance_id, current_user.id, db)
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="submit",
+                user_id=current_user.id,
+                resource_type="performance",
+                resource_id=record.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="submit_performance_record",
+                trace_id=trace_id,
+                user_id=current_user.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Submit performance record succeeded: {performance_id}",
+            module=__name__,
+            function="submit_performance_record",
+            trace_id=trace_id,
             user_id=current_user.id,
-            resource_type="performance",
-            resource_id=record.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
         )
+        
+        return PerformanceRecordResponse.from_orm_without_reviews(record)
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    return PerformanceRecordResponse.from_orm_without_reviews(record)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Submit performance record failed: {str(e)}",
+            module=__name__,
+            function="submit_performance_record",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "performance_id": str(performance_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 # Admin endpoints
@@ -260,6 +523,7 @@ async def submit_performance_record(
 )
 async def list_all_performance_records(
     query: Annotated[PerformanceListQuery, Depends()],
+    request: Request,
     current_admin: Annotated[Member, Depends(get_current_admin_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -274,15 +538,48 @@ async def list_all_performance_records(
     - **page**: Page number
     - **page_size**: Items per page
     """
-    records, total = await service.list_all_performance_records(query, db)
+    trace_id = get_trace_id(request)
+    try:
+        records, total = await service.list_all_performance_records(query, db)
 
-    return PerformanceListResponsePaginated(
-        items=[PerformanceListItem.model_validate(r) for r in records],
-        total=total,
-        page=query.page,
-        page_size=query.page_size,
-        total_pages=ceil(total / query.page_size) if total > 0 else 0,
-    )
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"List all performance records succeeded: {total} records found",
+            module=__name__,
+            function="list_all_performance_records",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+
+        return PerformanceListResponsePaginated(
+            items=[PerformanceListItem.model_validate(r) for r in records],
+            total=total,
+            page=query.page,
+            page_size=query.page_size,
+            total_pages=ceil(total / query.page_size) if total > 0 else 0,
+        )
+    except Exception as e:
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"List all performance records failed: {str(e)}",
+            module=__name__,
+            function="list_all_performance_records",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.get(
@@ -293,14 +590,50 @@ async def list_all_performance_records(
 )
 async def get_performance_record_admin(
     performance_id: UUID,
+    request: Request,
     current_admin: Annotated[Member, Depends(get_current_admin_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """
     Get detailed information about any performance record (admin only).
     """
-    record = await service.get_performance_by_id_admin(performance_id, db)
-    return PerformanceRecordResponse.from_orm_without_reviews(record)
+    trace_id = get_trace_id(request)
+    try:
+        record = await service.get_performance_by_id_admin(performance_id, db)
+
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Get performance record admin succeeded: {performance_id}",
+            module=__name__,
+            function="get_performance_record_admin",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+        
+        return PerformanceRecordResponse.from_orm_without_reviews(record)
+    except Exception as e:
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Get performance record admin failed: {str(e)}",
+            module=__name__,
+            function="get_performance_record_admin",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "performance_id": str(performance_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.post(
@@ -321,27 +654,75 @@ async def approve_performance_record(
 
     Creates a review record and changes status to approved.
     """
-    record = await service.approve_performance(
-        performance_id, current_admin.id, request.comments, db
-    )
-    
-    # Record audit log
+    trace_id = get_trace_id(http_request)
     try:
-        ip_address, user_agent = get_client_info(http_request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="approve",
-            user_id=current_admin.id,
-            resource_type="performance",
-            resource_id=record.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+        record = await service.approve_performance(
+            performance_id, current_admin.id, request.comments, db
         )
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(http_request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="approve",
+                user_id=current_admin.id,
+                resource_type="performance",
+                resource_id=record.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="approve_performance_record",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=http_request.url.path,
+                request_method=http_request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Approve performance record succeeded: {performance_id}",
+            module=__name__,
+            function="approve_performance_record",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=http_request.url.path,
+            request_method=http_request.method,
+            response_status=200,
+        )
+        
+        return PerformanceRecordResponse.from_orm_without_reviews(record)
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    return PerformanceRecordResponse.from_orm_without_reviews(record)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Approve performance record failed: {str(e)}",
+            module=__name__,
+            function="approve_performance_record",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=http_request.url.path,
+            request_method=http_request.method,
+            response_status=500,
+            extra_data={
+                "performance_id": str(performance_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.post(
@@ -363,27 +744,75 @@ async def request_fix_performance_record(
     Creates a review record and changes status to revision_requested.
     Member will be able to edit the record again.
     """
-    record = await service.request_fix_performance(
-        performance_id, current_admin.id, request.comments, db
-    )
-    
-    # Record audit log
+    trace_id = get_trace_id(http_request)
     try:
-        ip_address, user_agent = get_client_info(http_request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="request_fix",
-            user_id=current_admin.id,
-            resource_type="performance",
-            resource_id=record.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+        record = await service.request_fix_performance(
+            performance_id, current_admin.id, request.comments, db
         )
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(http_request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="request_fix",
+                user_id=current_admin.id,
+                resource_type="performance",
+                resource_id=record.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="request_fix_performance_record",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=http_request.url.path,
+                request_method=http_request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Request fix performance record succeeded: {performance_id}",
+            module=__name__,
+            function="request_fix_performance_record",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=http_request.url.path,
+            request_method=http_request.method,
+            response_status=200,
+        )
+        
+        return PerformanceRecordResponse.from_orm_without_reviews(record)
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    return PerformanceRecordResponse.from_orm_without_reviews(record)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Request fix performance record failed: {str(e)}",
+            module=__name__,
+            function="request_fix_performance_record",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=http_request.url.path,
+            request_method=http_request.method,
+            response_status=500,
+            extra_data={
+                "performance_id": str(performance_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.post(
@@ -404,27 +833,75 @@ async def reject_performance_record(
 
     Creates a review record and changes status to rejected.
     """
-    record = await service.reject_performance(
-        performance_id, current_admin.id, request.comments, db
-    )
-    
-    # Record audit log
+    trace_id = get_trace_id(http_request)
     try:
-        ip_address, user_agent = get_client_info(http_request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="reject",
-            user_id=current_admin.id,
-            resource_type="performance",
-            resource_id=record.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+        record = await service.reject_performance(
+            performance_id, current_admin.id, request.comments, db
         )
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(http_request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="reject",
+                user_id=current_admin.id,
+                resource_type="performance",
+                resource_id=record.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="reject_performance_record",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=http_request.url.path,
+                request_method=http_request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Reject performance record succeeded: {performance_id}",
+            module=__name__,
+            function="reject_performance_record",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=http_request.url.path,
+            request_method=http_request.method,
+            response_status=200,
+        )
+        
+        return PerformanceRecordResponse.from_orm_without_reviews(record)
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    return PerformanceRecordResponse.from_orm_without_reviews(record)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Reject performance record failed: {str(e)}",
+            module=__name__,
+            function="reject_performance_record",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=http_request.url.path,
+            request_method=http_request.method,
+            response_status=500,
+            extra_data={
+                "performance_id": str(performance_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.get(
@@ -445,49 +922,96 @@ async def export_performance_data(
     Supports the same filtering options as the list endpoint.
     """
     from ...common.modules.export import ExportService
-    from ...common.modules.audit import audit_log_service, get_client_info
     
-    # Get export data
-    export_data = await service.export_performance_data(query, db)
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="export",
+        # Get export data
+        export_data = await service.export_performance_data(query, db)
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="export",
+                user_id=current_admin.id,
+                resource_type="performance",
+                resource_id=None,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="export_performance_data",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Export performance data succeeded: {len(export_data)} records, format={format}",
+            module=__name__,
+            function="export_performance_data",
+            trace_id=trace_id,
             user_id=current_admin.id,
-            resource_type="performance",
-            resource_id=None,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
         )
+        
+        # Generate export file
+        if format == "excel":
+            excel_bytes = ExportService.export_to_excel(
+                data=export_data,
+                sheet_name="Performance",
+                title=f"Performance Data Export - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            )
+            return Response(
+                content=excel_bytes,
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                headers={
+                    "Content-Disposition": f'attachment; filename="performance_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+                },
+            )
+        else:  # CSV
+            csv_content = ExportService.export_to_csv(
+                data=export_data,
+            )
+            return Response(
+                content=csv_content,
+                media_type="text/csv",
+                headers={
+                    "Content-Disposition": f'attachment; filename="performance_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+                },
+            )
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    # Generate export file
-    if format == "excel":
-        excel_bytes = ExportService.export_to_excel(
-            data=export_data,
-            sheet_name="Performance",
-            title=f"Performance Data Export - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-        )
-        return Response(
-            content=excel_bytes,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={
-                "Content-Disposition": f'attachment; filename="performance_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Export performance data failed: {str(e)}",
+            module=__name__,
+            function="export_performance_data",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "format": format,
+                "error": str(e),
+                "error_type": type(e).__name__,
             },
         )
-    else:  # CSV
-        csv_content = ExportService.export_to_csv(
-            data=export_data,
-        )
-        return Response(
-            content=csv_content,
-            media_type="text/csv",
-            headers={
-                "Content-Disposition": f'attachment; filename="performance_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
-            },
-        )
+        raise

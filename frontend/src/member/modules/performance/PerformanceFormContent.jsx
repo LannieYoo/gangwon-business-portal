@@ -12,7 +12,7 @@ import Input from "@shared/components/Input";
 import Textarea from "@shared/components/Textarea";
 import Select from "@shared/components/Select";
 import { Tabs } from "@shared/components";
-import { performanceService } from "@shared/services";
+import { performanceService, loggerService, exceptionService } from "@shared/services";
 import { validatePdfFile, formatFileSize } from "@shared/utils/fileValidation";
 import {
   PaperclipIcon,
@@ -147,7 +147,18 @@ export default function PerformanceFormContent() {
         setActiveTab('salesEmployment');
       }
     } catch (error) {
-      console.error('Failed to load record:', error);
+      loggerService.error('Failed to load record', {
+        module: 'PerformanceFormContent',
+        function: 'loadRecord',
+        record_id: id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOAD_RECORD_FAILED',
+        context_data: { record_id: id }
+      });
       const errorMessage = error.response?.data?.detail || error.message || t("message.loadFailed") || "加载失败";
       alert(errorMessage);
       navigate("/member/performance/list");
@@ -344,7 +355,18 @@ export default function PerformanceFormContent() {
       alert(t("message.submitSuccess") || "提交成功");
       navigate("/member/performance/list");
     } catch (error) {
-      console.error("Failed to submit:", error);
+      loggerService.error('Failed to submit performance record', {
+        module: 'PerformanceFormContent',
+        function: 'handleSubmit',
+        record_id: id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'SUBMIT_PERFORMANCE_FAILED',
+        context_data: { record_id: id }
+      });
       const errorMessage = error.response?.data?.detail || error.message || t("message.submitFailed") || "提交失败";
       alert(errorMessage);
     }
@@ -365,7 +387,18 @@ export default function PerformanceFormContent() {
       
       alert(t("message.saveSuccess") || "保存成功");
     } catch (error) {
-      console.error("Failed to save draft:", error);
+      loggerService.error('Failed to save draft', {
+        module: 'PerformanceFormContent',
+        function: 'handleSaveDraft',
+        record_id: id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'SAVE_DRAFT_FAILED',
+        context_data: { record_id: id }
+      });
       const errorMessage = error.response?.data?.detail || error.message || t("message.saveFailed") || "保存失败";
       alert(errorMessage);
     }

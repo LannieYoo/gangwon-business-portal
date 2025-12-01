@@ -7,6 +7,17 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import '@shared/styles/index.css';
 
+// 禁用 React DevTools 提示
+if (typeof window !== 'undefined') {
+  const originalConsoleWarn = console.warn;
+  console.warn = (...args) => {
+    if (args[0] && typeof args[0] === 'string' && args[0].includes('Download the React DevTools')) {
+      return; // 忽略 React DevTools 提示
+    }
+    originalConsoleWarn.apply(console, args);
+  };
+}
+
 // Enable MSW in development (disabled by default - use real backend API)
 async function enableMocking() {
   // MSW is disabled by default. Set VITE_USE_MOCK=true in .env to enable

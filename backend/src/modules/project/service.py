@@ -11,7 +11,6 @@ from datetime import datetime
 
 from ...common.modules.db.models import Project, ProjectApplication
 from ...common.modules.exception import NotFoundError, ValidationError
-from ...common.modules.logger import logger
 from .schemas import (
     ProjectCreate,
     ProjectUpdate,
@@ -40,17 +39,6 @@ class ProjectService:
         Returns:
             Tuple of (projects list, total count)
         """
-        logger.debug(
-            "List projects",
-            extra={
-                "module_name": __name__,
-                "status": query.status.value if query.status else None,
-                "search": query.search,
-                "page": query.page,
-                "page_size": query.page_size,
-            },
-        )
-
         # Build base query
         stmt = select(Project)
 
@@ -83,15 +71,6 @@ class ProjectService:
         result = await db.execute(stmt)
         projects = result.scalars().all()
 
-        logger.debug(
-            "List projects result",
-            extra={
-                "module_name": __name__,
-                "total": total,
-                "returned": len(projects),
-            },
-        )
-
         return list(projects), total
 
     async def get_project_by_id(
@@ -110,27 +89,12 @@ class ProjectService:
         Raises:
             NotFoundError: If project not found
         """
-        logger.debug(
-            "Get project by id",
-            extra={
-                "module_name": __name__,
-                "project_id": str(project_id),
-            },
-        )
-
         result = await db.execute(
             select(Project).where(Project.id == project_id)
         )
         project = result.scalar_one_or_none()
 
         if not project:
-            logger.warning(
-                "Project not found",
-                extra={
-                    "module_name": __name__,
-                    "project_id": str(project_id),
-                },
-            )
             raise NotFoundError("Project")
 
         return project
@@ -158,28 +122,10 @@ class ProjectService:
             NotFoundError: If project not found
             ValidationError: If project inactive or duplicate application
         """
-        logger.info(
-            "Apply to project request",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member_id),
-                "project_id": str(project_id),
-            },
-        )
-
         # Check if project exists and is active
         project = await self.get_project_by_id(project_id, db)
 
         if project.status != "active":
-            logger.warning(
-                "Project application failed: project not active",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member_id),
-                    "project_id": str(project_id),
-                    "status": project.status,
-                },
-            )
             raise ValidationError(
                 f"Cannot apply to project with status '{project.status}'. "
                 "Only active projects accept applications."
@@ -195,14 +141,6 @@ class ProjectService:
             )
         )
         if existing.scalar_one_or_none():
-            logger.warning(
-                "Project application failed: duplicate application",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member_id),
-                    "project_id": str(project_id),
-                },
-            )
             raise ValidationError(
                 "You have already applied to this project. "
                 "Duplicate applications are not allowed."
@@ -220,16 +158,6 @@ class ProjectService:
         await db.commit()
         await db.refresh(application)
 
-        logger.info(
-            "Project application created",
-            extra={
-                "module_name": __name__,
-                "application_id": str(application.id),
-                "member_id": str(member_id),
-                "project_id": str(project_id),
-            },
-        )
-
         return application
 
     async def get_my_applications(
@@ -246,17 +174,6 @@ class ProjectService:
         Returns:
             Tuple of (applications list, total count)
         """
-        logger.debug(
-            "Get my project applications",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member_id),
-                "status": query.status.value if query.status else None,
-                "page": query.page,
-                "page_size": query.page_size,
-            },
-        )
-
         # Build base query
         stmt = select(ProjectApplication).where(
             ProjectApplication.member_id == member_id
@@ -280,16 +197,6 @@ class ProjectService:
         result = await db.execute(stmt)
         applications = result.scalars().all()
 
-        logger.debug(
-            "Get my applications result",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member_id),
-                "total": total,
-                "returned": len(applications),
-            },
-        )
-
         return list(applications), total
 
     # Admin operations
@@ -307,15 +214,6 @@ class ProjectService:
         Returns:
             Created project
         """
-        logger.info(
-            "Create project request",
-            extra={
-                "module_name": __name__,
-                "title": data.title,
-                "status": data.status.value if data.status else "active",
-            },
-        )
-
         project = Project(
             title=data.title,
             description=data.description,
@@ -329,15 +227,6 @@ class ProjectService:
         db.add(project)
         await db.commit()
         await db.refresh(project)
-
-        logger.info(
-            "Project created",
-            extra={
-                "module_name": __name__,
-                "project_id": str(project.id),
-                "title": project.title,
-            },
-        )
 
         return project
 
@@ -358,14 +247,6 @@ class ProjectService:
         Raises:
             NotFoundError: If project not found
         """
-        logger.info(
-            "Update project request",
-            extra={
-                "module_name": __name__,
-                "project_id": str(project_id),
-            },
-        )
-
         project = await self.get_project_by_id(project_id, db)
 
         # Update fields
@@ -387,15 +268,6 @@ class ProjectService:
         await db.commit()
         await db.refresh(project)
 
-        logger.info(
-            "Project updated",
-            extra={
-                "module_name": __name__,
-                "project_id": str(project.id),
-                "title": project.title,
-            },
-        )
-
         return project
 
     async def delete_project(
@@ -411,26 +283,10 @@ class ProjectService:
         Raises:
             NotFoundError: If project not found
         """
-        logger.info(
-            "Delete project request",
-            extra={
-                "module_name": __name__,
-                "project_id": str(project_id),
-            },
-        )
-
         project = await self.get_project_by_id(project_id, db)
 
         await db.delete(project)
         await db.commit()
-
-        logger.info(
-            "Project deleted",
-            extra={
-                "module_name": __name__,
-                "project_id": str(project_id),
-            },
-        )
 
     async def list_project_applications(
         self, project_id: UUID, query: ApplicationListQuery, db: AsyncSession
@@ -449,17 +305,6 @@ class ProjectService:
         Raises:
             NotFoundError: If project not found
         """
-        logger.debug(
-            "List project applications",
-            extra={
-                "module_name": __name__,
-                "project_id": str(project_id),
-                "status": query.status.value if query.status else None,
-                "page": query.page,
-                "page_size": query.page_size,
-            },
-        )
-
         # Verify project exists
         await self.get_project_by_id(project_id, db)
 
@@ -486,16 +331,6 @@ class ProjectService:
         result = await db.execute(stmt)
         applications = result.scalars().all()
 
-        logger.debug(
-            "List project applications result",
-            extra={
-                "module_name": __name__,
-                "project_id": str(project_id),
-                "total": total,
-                "returned": len(applications),
-            },
-        )
-
         return list(applications), total
 
     async def update_application_status(
@@ -518,28 +353,12 @@ class ProjectService:
         Raises:
             NotFoundError: If application not found
         """
-        logger.info(
-            "Update application status request",
-            extra={
-                "module_name": __name__,
-                "application_id": str(application_id),
-                "new_status": status.value,
-            },
-        )
-
         result = await db.execute(
             select(ProjectApplication).where(ProjectApplication.id == application_id)
         )
         application = result.scalar_one_or_none()
 
         if not application:
-            logger.warning(
-                "Update application status failed: application not found",
-                extra={
-                    "module_name": __name__,
-                    "application_id": str(application_id),
-                },
-            )
             raise NotFoundError("Project application")
 
         # Update status
@@ -549,15 +368,6 @@ class ProjectService:
 
         await db.commit()
         await db.refresh(application)
-
-        logger.info(
-            "Application status updated",
-            extra={
-                "module_name": __name__,
-                "application_id": str(application.id),
-                "status": application.status,
-            },
-        )
 
         return application
 
@@ -574,15 +384,6 @@ class ProjectService:
         Returns:
             List of project records as dictionaries
         """
-        logger.info(
-            "Export projects data request",
-            extra={
-                "module_name": __name__,
-                "status": query.status.value if query.status else None,
-                "search": query.search,
-            },
-        )
-
         # Get all matching records without pagination
         query_no_page = ProjectListQuery(
             page=1,
@@ -633,15 +434,6 @@ class ProjectService:
         Returns:
             List of application records as dictionaries
         """
-        logger.info(
-            "Export applications data request",
-            extra={
-                "module_name": __name__,
-                "project_id": str(project_id) if project_id else None,
-                "status": query.status.value if query.status else None,
-            },
-        )
-
         # Build query for all applications
         stmt = select(ProjectApplication)
         

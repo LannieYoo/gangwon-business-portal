@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, Select, Input } from '@shared/components';
-import { apiClient } from '@shared/services';
+import { apiClient, loggerService, exceptionService } from '@shared/services';
 import './ExceptionList.css';
 
 export default function ExceptionList() {
@@ -48,8 +48,22 @@ export default function ExceptionList() {
         setTotalCount(response.total || 0);
         setTotalPages(response.total_pages || 0);
       }
+      loggerService.info('Exceptions loaded successfully', {
+        module: 'ExceptionList',
+        function: 'loadExceptions',
+        count: response.items?.length || 0
+      });
     } catch (error) {
-      console.error('Failed to load exceptions:', error);
+      loggerService.error('Failed to load exceptions', {
+        module: 'ExceptionList',
+        function: 'loadExceptions',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_EXCEPTIONS_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.exceptions.loadFailed', '加载异常失败');
       alert(errorMessage);
     } finally {
@@ -89,9 +103,24 @@ export default function ExceptionList() {
       await apiClient.post(`/api/v1/exceptions/${exceptionId}/resolve`, {
         resolution_notes: '',
       });
+      loggerService.info('Exception resolved successfully', {
+        module: 'ExceptionList',
+        function: 'handleResolve',
+        exception_id: exceptionId
+      });
       loadExceptions();
     } catch (error) {
-      console.error('Failed to resolve exception:', error);
+      loggerService.error('Failed to resolve exception', {
+        module: 'ExceptionList',
+        function: 'handleResolve',
+        exception_id: exceptionId,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'RESOLVE_EXCEPTION_ERROR'
+      });
       alert(t('admin.exceptions.resolveFailed', '标记失败'));
     }
   };

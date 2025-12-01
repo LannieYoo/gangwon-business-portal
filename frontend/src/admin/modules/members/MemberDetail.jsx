@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Badge, Loading } from '@shared/components';
-import { adminService } from '@shared/services';
+import { adminService, loggerService, exceptionService } from '@shared/services';
 import './MemberDetail.css';
 
 export default function MemberDetail() {
@@ -27,12 +27,32 @@ export default function MemberDetail() {
   const loadMemberDetail = async () => {
     setLoading(true);
     try {
+      loggerService.info('Loading member detail', {
+        module: 'MemberDetail',
+        function: 'loadMemberDetail',
+        member_id: id
+      });
       const memberData = await adminService.getMemberDetail(id);
       if (memberData) {
         setMember(memberData);
+        loggerService.info('Member detail loaded successfully', {
+          module: 'MemberDetail',
+          function: 'loadMemberDetail',
+          member_id: id
+        });
       }
     } catch (error) {
-      console.error('Failed to load member detail:', error);
+      loggerService.error('Failed to load member detail', {
+        module: 'MemberDetail',
+        function: 'loadMemberDetail',
+        member_id: id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_MEMBER_DETAIL_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.members.detail.loadFailed', '加载会员详情失败');
       alert(errorMessage);
     } finally {
@@ -42,11 +62,31 @@ export default function MemberDetail() {
 
   const handleApprove = async () => {
     try {
+      loggerService.info('Approving member', {
+        module: 'MemberDetail',
+        function: 'handleApprove',
+        member_id: id
+      });
       await adminService.approveMember(id);
+      loggerService.info('Member approved successfully', {
+        module: 'MemberDetail',
+        function: 'handleApprove',
+        member_id: id
+      });
       loadMemberDetail();
       alert(t('admin.members.approveSuccess', '批准成功') || '批准成功');
     } catch (error) {
-      console.error('Failed to approve member:', error);
+      loggerService.error('Failed to approve member', {
+        module: 'MemberDetail',
+        function: 'handleApprove',
+        member_id: id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'APPROVE_MEMBER_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.members.approveFailed', '批准失败');
       alert(errorMessage);
     }
@@ -55,11 +95,31 @@ export default function MemberDetail() {
   const handleReject = async () => {
     const reason = prompt(t('admin.members.rejectReason', '请输入拒绝原因（可选）') || '请输入拒绝原因（可选）');
     try {
+      loggerService.info('Rejecting member', {
+        module: 'MemberDetail',
+        function: 'handleReject',
+        member_id: id
+      });
       await adminService.rejectMember(id, reason || null);
+      loggerService.info('Member rejected successfully', {
+        module: 'MemberDetail',
+        function: 'handleReject',
+        member_id: id
+      });
       loadMemberDetail();
       alert(t('admin.members.rejectSuccess', '拒绝成功') || '拒绝成功');
     } catch (error) {
-      console.error('Failed to reject member:', error);
+      loggerService.error('Failed to reject member', {
+        module: 'MemberDetail',
+        function: 'handleReject',
+        member_id: id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'REJECT_MEMBER_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.members.rejectFailed', '拒绝失败');
       alert(errorMessage);
     }
@@ -75,10 +135,30 @@ export default function MemberDetail() {
     setNiceDnbError(null);
     
     try {
+      loggerService.info('Searching Nice D&B', {
+        module: 'MemberDetail',
+        function: 'handleSearchNiceDnb',
+        business_number: member.businessNumber
+      });
       const data = await adminService.searchNiceDnb(member.businessNumber);
       setNiceDnbData(data);
+      loggerService.info('Nice D&B search succeeded', {
+        module: 'MemberDetail',
+        function: 'handleSearchNiceDnb',
+        business_number: member.businessNumber
+      });
     } catch (error) {
-      console.error('Failed to search Nice D&B:', error);
+      loggerService.error('Failed to search Nice D&B', {
+        module: 'MemberDetail',
+        function: 'handleSearchNiceDnb',
+        business_number: member.businessNumber,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'SEARCH_NICE_DNB_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.members.detail.nicednbSearchFailed', '查询 Nice D&B 信息失败');
       setNiceDnbError(errorMessage);
       alert(errorMessage);

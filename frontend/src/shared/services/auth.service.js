@@ -3,6 +3,8 @@
  */
 
 import apiService from './api.service';
+import loggerService from './logger.service';
+import exceptionService from './exception.service';
 import { API_PREFIX, ACCESS_TOKEN_KEY, USER_ROLES } from '@shared/utils/constants';
 import { setStorage, getStorage, removeStorage } from '@shared/utils/storage';
 
@@ -15,26 +17,55 @@ class AuthService {
    * @param {string} credentials.password - Password
    */
   async login(credentials) {
-    // Convert businessNumber (camelCase) to business_number (snake_case) for backend API
-    const requestData = {
-      business_number: credentials.businessNumber || credentials.business_number,
-      password: credentials.password
-    };
-    
-    const response = await apiService.post(`${API_PREFIX}/auth/login`, requestData);
-    
-    if (response.access_token) {
-      setStorage(ACCESS_TOKEN_KEY, response.access_token);
-      // Backend doesn't return refresh_token or expires_at yet
-      // Store user info with role from response
-      const userInfo = {
-        ...response.user,
-        role: response.user.role || 'member' // Default to member if not provided
+    try {
+      loggerService.info('Login attempt', {
+        module: 'AuthService',
+        function: 'login',
+        request_path: `${API_PREFIX}/auth/login`
+      });
+
+      // Convert businessNumber (camelCase) to business_number (snake_case) for backend API
+      const requestData = {
+        business_number: credentials.businessNumber || credentials.business_number,
+        password: credentials.password
       };
-      setStorage('user_info', userInfo);
+      
+      const response = await apiService.post(`${API_PREFIX}/auth/login`, requestData);
+      
+      if (response.access_token) {
+        setStorage(ACCESS_TOKEN_KEY, response.access_token);
+        // Backend doesn't return refresh_token or expires_at yet
+        // Store user info with role from response
+        const userInfo = {
+          ...response.user,
+          role: response.user.role || 'member' // Default to member if not provided
+        };
+        setStorage('user_info', userInfo);
+        
+        loggerService.info('Login successful', {
+          module: 'AuthService',
+          function: 'login',
+          user_id: userInfo.id,
+          response_status: 200
+        });
+      }
+      
+      return response;
+    } catch (error) {
+      loggerService.error('Login failed', {
+        module: 'AuthService',
+        function: 'login',
+        request_path: `${API_PREFIX}/auth/login`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/login`,
+        error_code: error.code || 'LOGIN_FAILED'
+      });
+      throw error;
     }
-    
-    return response;
   }
   
   /**
@@ -45,29 +76,58 @@ class AuthService {
    * @param {string} credentials.password - Password
    */
   async adminLogin(credentials) {
-    const requestData = {
-      username: credentials.username || credentials.email, // Support both username and email
-      password: credentials.password
-    };
-    
-    const response = await apiService.post(`${API_PREFIX}/auth/admin-login`, requestData);
-    
-    if (response.access_token) {
-      setStorage(ACCESS_TOKEN_KEY, response.access_token);
-      const userInfo = {
-        ...response.user,
-        role: 'admin' // Ensure role is set to admin
+    try {
+      loggerService.info('Admin login attempt', {
+        module: 'AuthService',
+        function: 'adminLogin',
+        request_path: `${API_PREFIX}/auth/admin-login`
+      });
+
+      const requestData = {
+        username: credentials.username || credentials.email, // Support both username and email
+        password: credentials.password
       };
-      setStorage('user_info', userInfo);
       
-      // Return response with updated user info that includes role
-      return {
-        ...response,
-        user: userInfo
-      };
+      const response = await apiService.post(`${API_PREFIX}/auth/admin-login`, requestData);
+      
+      if (response.access_token) {
+        setStorage(ACCESS_TOKEN_KEY, response.access_token);
+        const userInfo = {
+          ...response.user,
+          role: 'admin' // Ensure role is set to admin
+        };
+        setStorage('user_info', userInfo);
+        
+        loggerService.info('Admin login successful', {
+          module: 'AuthService',
+          function: 'adminLogin',
+          user_id: userInfo.id,
+          response_status: 200
+        });
+        
+        // Return response with updated user info that includes role
+        return {
+          ...response,
+          user: userInfo
+        };
+      }
+      
+      return response;
+    } catch (error) {
+      loggerService.error('Admin login failed', {
+        module: 'AuthService',
+        function: 'adminLogin',
+        request_path: `${API_PREFIX}/auth/admin-login`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/admin-login`,
+        error_code: error.code || 'ADMIN_LOGIN_FAILED'
+      });
+      throw error;
     }
-    
-    return response;
   }
 
   /**
@@ -113,7 +173,10 @@ class AuthService {
       // Skip file uploads during registration (requires authentication)
       // Users can upload files after registration when they log in
       if (files.logo || files.businessLicenseFile) {
-        console.info('File uploads will be skipped during registration. Users can upload files after login.');
+        loggerService.info('File uploads will be skipped during registration. Users can upload files after login.', {
+          module: 'AuthService',
+          function: 'register'
+        });
       }
       
       // Map frontend fields to backend fields
@@ -152,8 +215,37 @@ class AuthService {
     }
     
     // Send registration request as JSON
-    const response = await apiService.post(`${API_PREFIX}/auth/register`, registrationData);
-    return response;
+    try {
+      loggerService.info('Registration attempt', {
+        module: 'AuthService',
+        function: 'register',
+        request_path: `${API_PREFIX}/auth/register`
+      });
+
+      const response = await apiService.post(`${API_PREFIX}/auth/register`, registrationData);
+      
+      loggerService.info('Registration successful', {
+        module: 'AuthService',
+        function: 'register',
+        response_status: 200
+      });
+      
+      return response;
+    } catch (error) {
+      loggerService.error('Registration failed', {
+        module: 'AuthService',
+        function: 'register',
+        request_path: `${API_PREFIX}/auth/register`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/register`,
+        error_code: error.code || 'REGISTRATION_FAILED'
+      });
+      throw error;
+    }
   }
   
   /**
@@ -161,9 +253,32 @@ class AuthService {
    */
   async logout() {
     try {
+      loggerService.info('Logout attempt', {
+        module: 'AuthService',
+        function: 'logout',
+        request_path: `${API_PREFIX}/auth/logout`
+      });
+
       await apiService.post(`${API_PREFIX}/auth/logout`);
+      
+      loggerService.info('Logout successful', {
+        module: 'AuthService',
+        function: 'logout',
+        response_status: 200
+      });
     } catch (error) {
-      console.error('Logout error:', error);
+      loggerService.error('Logout error', {
+        module: 'AuthService',
+        function: 'logout',
+        request_path: `${API_PREFIX}/auth/logout`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/logout`,
+        error_code: error.code || 'LOGOUT_FAILED'
+      });
     } finally {
       this.clearAuth();
     }
@@ -173,46 +288,170 @@ class AuthService {
    * Refresh token
    */
   async refreshToken() {
-    const refreshToken = getStorage('refresh_token');
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
+    try {
+      loggerService.info('Token refresh attempt', {
+        module: 'AuthService',
+        function: 'refreshToken',
+        request_path: `${API_PREFIX}/auth/refresh`
+      });
+
+      const refreshToken = getStorage('refresh_token');
+      if (!refreshToken) {
+        const error = new Error('No refresh token available');
+        loggerService.warn('Token refresh failed: no refresh token', {
+          module: 'AuthService',
+          function: 'refreshToken',
+          error_message: error.message
+        });
+        throw error;
+      }
+      
+      const response = await apiService.post(`${API_PREFIX}/auth/refresh`, {
+        refresh_token: refreshToken
+      });
+      
+      if (response.access_token) {
+        setStorage(ACCESS_TOKEN_KEY, response.access_token);
+        setStorage('token_expiry', response.expires_at);
+        
+        loggerService.info('Token refresh successful', {
+          module: 'AuthService',
+          function: 'refreshToken',
+          response_status: 200
+        });
+      }
+      
+      return response;
+    } catch (error) {
+      loggerService.error('Token refresh failed', {
+        module: 'AuthService',
+        function: 'refreshToken',
+        request_path: `${API_PREFIX}/auth/refresh`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/refresh`,
+        error_code: error.code || 'TOKEN_REFRESH_FAILED'
+      });
+      throw error;
     }
-    
-    const response = await apiService.post(`${API_PREFIX}/auth/refresh`, {
-      refresh_token: refreshToken
-    });
-    
-    if (response.access_token) {
-      setStorage(ACCESS_TOKEN_KEY, response.access_token);
-      setStorage('token_expiry', response.expires_at);
-    }
-    
-    return response;
   }
   
   /**
    * Get current user
    */
   async getCurrentUser() {
-    const response = await apiService.get(`${API_PREFIX}/auth/me`);
-    setStorage('user_info', response);
-    return response;
+    try {
+      loggerService.info('Get current user', {
+        module: 'AuthService',
+        function: 'getCurrentUser',
+        request_path: `${API_PREFIX}/auth/me`
+      });
+
+      const response = await apiService.get(`${API_PREFIX}/auth/me`);
+      setStorage('user_info', response);
+      
+      loggerService.info('Get current user successful', {
+        module: 'AuthService',
+        function: 'getCurrentUser',
+        user_id: response.id,
+        response_status: 200
+      });
+      
+      return response;
+    } catch (error) {
+      loggerService.error('Get current user failed', {
+        module: 'AuthService',
+        function: 'getCurrentUser',
+        request_path: `${API_PREFIX}/auth/me`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'GET',
+        request_path: `${API_PREFIX}/auth/me`,
+        error_code: error.code || 'GET_CURRENT_USER_FAILED'
+      });
+      throw error;
+    }
   }
   
   /**
    * Update profile
    */
   async updateProfile(userData) {
-    const response = await apiService.put(`${API_PREFIX}/auth/profile`, userData);
-    setStorage('user_info', response);
-    return response;
+    try {
+      loggerService.info('Update profile attempt', {
+        module: 'AuthService',
+        function: 'updateProfile',
+        request_path: `${API_PREFIX}/auth/profile`
+      });
+
+      const response = await apiService.put(`${API_PREFIX}/auth/profile`, userData);
+      setStorage('user_info', response);
+      
+      loggerService.info('Update profile successful', {
+        module: 'AuthService',
+        function: 'updateProfile',
+        user_id: response.id,
+        response_status: 200
+      });
+      
+      return response;
+    } catch (error) {
+      loggerService.error('Update profile failed', {
+        module: 'AuthService',
+        function: 'updateProfile',
+        request_path: `${API_PREFIX}/auth/profile`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'PUT',
+        request_path: `${API_PREFIX}/auth/profile`,
+        error_code: error.code || 'UPDATE_PROFILE_FAILED'
+      });
+      throw error;
+    }
   }
   
   /**
    * Change password
    */
   async changePassword(passwordData) {
-    return await apiService.post(`${API_PREFIX}/auth/change-password`, passwordData);
+    try {
+      loggerService.info('Change password attempt', {
+        module: 'AuthService',
+        function: 'changePassword',
+        request_path: `${API_PREFIX}/auth/change-password`
+      });
+
+      const response = await apiService.post(`${API_PREFIX}/auth/change-password`, passwordData);
+      
+      loggerService.info('Change password successful', {
+        module: 'AuthService',
+        function: 'changePassword',
+        response_status: 200
+      });
+      
+      return response;
+    } catch (error) {
+      loggerService.error('Change password failed', {
+        module: 'AuthService',
+        function: 'changePassword',
+        request_path: `${API_PREFIX}/auth/change-password`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/change-password`,
+        error_code: error.code || 'CHANGE_PASSWORD_FAILED'
+      });
+      throw error;
+    }
   }
   
   /**
@@ -223,13 +462,43 @@ class AuthService {
    * @param {string} data.email - Email address
    */
   async forgotPassword(data) {
-    // Convert businessNumber (camelCase) to business_number (snake_case) for backend API
-    const requestData = {
-      business_number: data.businessNumber?.replace(/-/g, '') || data.business_number,
-      email: data.email
-    };
-    
-    return await apiService.post(`${API_PREFIX}/auth/password-reset-request`, requestData);
+    try {
+      loggerService.info('Forgot password request', {
+        module: 'AuthService',
+        function: 'forgotPassword',
+        request_path: `${API_PREFIX}/auth/password-reset-request`
+      });
+
+      // Convert businessNumber (camelCase) to business_number (snake_case) for backend API
+      const requestData = {
+        business_number: data.businessNumber?.replace(/-/g, '') || data.business_number,
+        email: data.email
+      };
+      
+      const response = await apiService.post(`${API_PREFIX}/auth/password-reset-request`, requestData);
+      
+      loggerService.info('Forgot password request successful', {
+        module: 'AuthService',
+        function: 'forgotPassword',
+        response_status: 200
+      });
+      
+      return response;
+    } catch (error) {
+      loggerService.error('Forgot password request failed', {
+        module: 'AuthService',
+        function: 'forgotPassword',
+        request_path: `${API_PREFIX}/auth/password-reset-request`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/password-reset-request`,
+        error_code: error.code || 'FORGOT_PASSWORD_FAILED'
+      });
+      throw error;
+    }
   }
   
   /**
@@ -239,10 +508,40 @@ class AuthService {
    * @param {string} newPassword - New password
    */
   async resetPassword(token, newPassword) {
-    return await apiService.post(`${API_PREFIX}/auth/password-reset`, {
-      token,
-      new_password: newPassword
-    });
+    try {
+      loggerService.info('Reset password attempt', {
+        module: 'AuthService',
+        function: 'resetPassword',
+        request_path: `${API_PREFIX}/auth/password-reset`
+      });
+
+      const response = await apiService.post(`${API_PREFIX}/auth/password-reset`, {
+        token,
+        new_password: newPassword
+      });
+      
+      loggerService.info('Reset password successful', {
+        module: 'AuthService',
+        function: 'resetPassword',
+        response_status: 200
+      });
+      
+      return response;
+    } catch (error) {
+      loggerService.error('Reset password failed', {
+        module: 'AuthService',
+        function: 'resetPassword',
+        request_path: `${API_PREFIX}/auth/password-reset`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/password-reset`,
+        error_code: error.code || 'RESET_PASSWORD_FAILED'
+      });
+      throw error;
+    }
   }
   
   /**

@@ -9,7 +9,7 @@ import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
-import { supportService } from '@shared/services';
+import { supportService, loggerService, exceptionService } from '@shared/services';
 import './ConsultationForm.css';
 
 export default function ConsultationForm({ onSubmitSuccess }) {
@@ -59,7 +59,16 @@ export default function ConsultationForm({ onSubmitSuccess }) {
         onSubmitSuccess();
       }
     } catch (error) {
-      console.error('Failed to submit consultation:', error);
+      loggerService.error('Failed to submit consultation', {
+        module: 'ConsultationForm',
+        function: 'handleSubmit',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'SUBMIT_CONSULTATION_FAILED'
+      });
       const errorMessage = error?.response?.data?.detail || error?.message || t('message.submitFailed');
       setError(errorMessage);
       alert(errorMessage);

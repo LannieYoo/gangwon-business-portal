@@ -8,6 +8,7 @@ import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import useAuthStore from '@shared/stores/authStore';
 import LanguageSwitcher from '@shared/components/LanguageSwitcher';
+import { loggerService, exceptionService } from '@shared/services';
 import {
   BellIcon,
   UserIcon,
@@ -101,7 +102,16 @@ function Header() {
       await logout();
       navigate('/login', { replace: true });
     } catch (error) {
-      console.error('Logout error:', error);
+      loggerService.error('Logout error', {
+        module: 'MemberHeader',
+        function: 'handleLogout',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOGOUT_FAILED'
+      });
       // Even if logout API fails, clear local auth and redirect
       const { clearAuth } = useAuthStore.getState();
       clearAuth();

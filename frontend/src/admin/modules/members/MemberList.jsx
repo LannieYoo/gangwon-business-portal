@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination } from '@shared/components';
-import { adminService } from '@shared/services';
+import { adminService, loggerService, exceptionService } from '@shared/services';
 import './MemberList.css';
 
 export default function MemberList() {
@@ -25,6 +25,13 @@ export default function MemberList() {
   const loadMembers = useCallback(async () => {
     setLoading(true);
     try {
+      loggerService.info('Loading members', {
+        module: 'MemberList',
+        function: 'loadMembers',
+        page: currentPage,
+        pageSize: pageSize,
+        statusFilter: statusFilter
+      });
       const params = {
         page: currentPage,
         pageSize: pageSize,
@@ -35,9 +42,23 @@ export default function MemberList() {
       if (response.members) {
         setMembers(response.members);
         setTotalCount(response.pagination?.total || response.total || 0);
+        loggerService.info('Members loaded successfully', {
+          module: 'MemberList',
+          function: 'loadMembers',
+          count: response.members.length
+        });
       }
     } catch (error) {
-      console.error('Failed to load members:', error);
+      loggerService.error('Failed to load members', {
+        module: 'MemberList',
+        function: 'loadMembers',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_MEMBERS_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.members.loadFailed', '加载会员列表失败');
       alert(errorMessage);
     } finally {
@@ -56,15 +77,35 @@ export default function MemberList() {
   const handleExport = useCallback(async (format = 'excel') => {
     try {
       setLoading(true);
+      loggerService.info('Exporting members', {
+        module: 'MemberList',
+        function: 'handleExport',
+        format: format
+      });
       const params = {
         format,
         approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
         search: searchTerm || undefined
       };
       await adminService.exportMembers(params);
+      loggerService.info('Members exported successfully', {
+        module: 'MemberList',
+        function: 'handleExport',
+        format: format
+      });
       alert(t('admin.members.exportSuccess', '导出成功') || '导出成功');
     } catch (error) {
-      console.error('Failed to export members:', error);
+      loggerService.error('Failed to export members', {
+        module: 'MemberList',
+        function: 'handleExport',
+        format: format,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'EXPORT_MEMBERS_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.members.exportFailed', '导出失败');
       alert(errorMessage);
     } finally {
@@ -74,11 +115,31 @@ export default function MemberList() {
 
   const handleApprove = useCallback(async (memberId) => {
     try {
+      loggerService.info('Approving member', {
+        module: 'MemberList',
+        function: 'handleApprove',
+        member_id: memberId
+      });
       await adminService.approveMember(memberId);
+      loggerService.info('Member approved successfully', {
+        module: 'MemberList',
+        function: 'handleApprove',
+        member_id: memberId
+      });
       loadMembers();
       alert(t('admin.members.approveSuccess', '批准成功') || '批准成功');
     } catch (error) {
-      console.error('Failed to approve member:', error);
+      loggerService.error('Failed to approve member', {
+        module: 'MemberList',
+        function: 'handleApprove',
+        member_id: memberId,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'APPROVE_MEMBER_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.members.approveFailed', '批准失败');
       alert(errorMessage);
     }

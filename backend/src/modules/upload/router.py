@@ -14,7 +14,9 @@ from fastapi import Request
 from ...common.modules.db.session import get_db
 from ...common.modules.db.models import Member
 from ...common.modules.audit import audit_log_service, get_client_info
+from ...common.modules.logger import logging_service
 from ...common.modules.exception import AppException
+from ...common.modules.exception.responses import get_trace_id
 from ..user.dependencies import get_current_active_user
 from .service import UploadService
 from .schemas import FileUploadResponse, FileDownloadResponse
@@ -51,6 +53,7 @@ async def upload_public_file(
     - **resource_id**: Optional associated resource ID
     - Requires authentication
     """
+    trace_id = get_trace_id(request)
     try:
         attachment = await service.upload_public_file(
             file=file,
@@ -76,8 +79,22 @@ async def upload_public_file(
                 user_agent=user_agent,
             )
         except Exception as e:
-            from ...common.modules.logger import logger
-            logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="upload_public_file",
+                trace_id=trace_id,
+                user_id=current_user.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=201,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
     
     return FileUploadResponse.model_validate(attachment)
 
@@ -106,6 +123,7 @@ async def upload_private_file(
     - Requires authentication
     - File will be stored privately and require authentication to access
     """
+    trace_id = get_trace_id(request)
     try:
         attachment = await service.upload_private_file(
             file=file,
@@ -131,8 +149,22 @@ async def upload_private_file(
                 user_agent=user_agent,
             )
         except Exception as e:
-            from ...common.modules.logger import logger
-            logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="upload_private_file",
+                trace_id=trace_id,
+                user_id=current_user.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=201,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
     
     return FileUploadResponse.model_validate(attachment)
 
@@ -158,6 +190,7 @@ async def download_file(
     - Requires authentication
     - Checks permissions (user must own the file or be admin)
     """
+    trace_id = get_trace_id(request)
     try:
         attachment = await service.get_file(
             file_id=file_id,
@@ -181,8 +214,22 @@ async def download_file(
                 user_agent=user_agent,
             )
         except Exception as e:
-            from ...common.modules.logger import logger
-            logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="download_file",
+                trace_id=trace_id,
+                user_id=current_user.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
     
     return FileDownloadResponse(
         file_url=attachment.file_url,
@@ -242,6 +289,7 @@ async def delete_file(
     - Checks permissions (user must own the file or be admin)
     - Deletes file from storage and database
     """
+    trace_id = get_trace_id(request)
     try:
         await service.delete_file(
             file_id=file_id,
@@ -265,8 +313,22 @@ async def delete_file(
                 user_agent=user_agent,
             )
         except Exception as e:
-            from ...common.modules.logger import logger
-            logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="delete_file",
+                trace_id=trace_id,
+                user_id=current_user.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=204,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
     
     return None
 

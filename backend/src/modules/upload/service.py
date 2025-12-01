@@ -281,11 +281,8 @@ class UploadService:
             try:
                 signed_url = storage_service.create_signed_url(bucket, path, expires_in=3600)
                 download_url = signed_url
-            except Exception as e:
+            except Exception:
                 # Fallback to public URL if signed URL generation fails
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.warning(f"Failed to generate signed URL: {str(e)}")
                 download_url = attachment.file_url
 
         # Create a temporary attachment object with download URL
@@ -353,11 +350,9 @@ class UploadService:
         # Try to delete, but don't fail if file doesn't exist in storage
         try:
             await storage_service.delete_file(bucket, path)
-        except Exception as e:
-            # Log error but continue with database deletion
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.warning(f"Failed to delete file from storage: {str(e)}")
+        except Exception:
+            # Continue with database deletion even if storage deletion fails
+            pass
 
         # Delete from database
         await db.delete(attachment)

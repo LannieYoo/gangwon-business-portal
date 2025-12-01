@@ -10,7 +10,7 @@ import Card from '@shared/components/Card';
 import LazyImage from '@shared/components/LazyImage';
 import { Pagination } from '@shared/components';
 import { PageContainer } from '@member/layouts';
-import { apiService } from '@shared/services';
+import { apiService, loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX, DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@shared/utils/constants';
 
 function PressList() {
@@ -43,7 +43,16 @@ function PressList() {
         setTotalCount(response.totalCount || response.pagination?.total || formattedNews.length);
       }
     } catch (error) {
-      console.error('Failed to load news:', error);
+      loggerService.error('Failed to load news', {
+        module: 'PressList',
+        function: 'loadNews',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOAD_NEWS_FAILED'
+      });
     } finally {
       setLoading(false);
     }

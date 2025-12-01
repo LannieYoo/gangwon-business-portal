@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@shared/hooks';
 import { Button, Input, Alert, LanguageSwitcher } from '@shared/components';
+import { loggerService, exceptionService } from '@shared/services';
 
 export default function AdminLogin() {
   const { t } = useTranslation();
@@ -25,10 +26,31 @@ export default function AdminLogin() {
     setError('');
     
     try {
+      loggerService.info('Admin login attempt', {
+        module: 'AdminLogin',
+        function: 'handleSubmit',
+        username: formData.username
+      });
       await adminLogin(formData);
+      loggerService.info('Admin login succeeded', {
+        module: 'AdminLogin',
+        function: 'handleSubmit',
+        username: formData.username
+      });
       // Redirect to admin dashboard
       navigate('/admin');
     } catch (err) {
+      loggerService.error('Admin login failed', {
+        module: 'AdminLogin',
+        function: 'handleSubmit',
+        username: formData.username,
+        error_message: err.message,
+        error_code: err.code
+      });
+      exceptionService.recordException(err, {
+        request_path: window.location.pathname,
+        error_code: 'ADMIN_LOGIN_ERROR'
+      });
       setError(err.message || err.response?.data?.detail || t('admin.auth.loginFailed'));
     }
   };

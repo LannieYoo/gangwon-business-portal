@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Button, Tabs, Input, Textarea, Select, Badge, Alert } from '@shared/components';
 import UploadProgress from '@shared/components/UploadProgress';
-import { apiService, contentService } from '@shared/services';
+import { apiService, contentService, loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import { validateImageFile } from '@shared/utils/fileValidation';
 import './ContentManagement.css';
@@ -80,10 +80,28 @@ export default function ContentManagement() {
   const loadPopups = useCallback(async () => {
     setLoadingPopups(true);
     try {
+      loggerService.info('Loading popups', {
+        module: 'ContentManagement',
+        function: 'loadPopups'
+      });
       const response = await apiService.get(`${API_PREFIX}/admin/content/popups`);
       setPopups(response.popups || []);
+      loggerService.info('Popups loaded successfully', {
+        module: 'ContentManagement',
+        function: 'loadPopups',
+        count: response.popups?.length || 0
+      });
     } catch (error) {
-      console.error('Failed to load popups', error);
+      loggerService.error('Failed to load popups', {
+        module: 'ContentManagement',
+        function: 'loadPopups',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_POPUPS_ERROR'
+      });
       setPopupMessageVariant('error');
       setPopupMessage(t('admin.content.popups.messages.loadFailed'));
     } finally {
@@ -95,10 +113,28 @@ export default function ContentManagement() {
   const loadBanners = useCallback(async () => {
     setLoadingBanners(true);
     try {
+      loggerService.info('Loading banners', {
+        module: 'ContentManagement',
+        function: 'loadBanners'
+      });
       const bannersData = await contentService.getAllBanners();
       setBanners(bannersData || []);
+      loggerService.info('Banners loaded successfully', {
+        module: 'ContentManagement',
+        function: 'loadBanners',
+        count: bannersData?.length || 0
+      });
     } catch (error) {
-      console.error('Failed to load banners', error);
+      loggerService.error('Failed to load banners', {
+        module: 'ContentManagement',
+        function: 'loadBanners',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_BANNERS_ERROR'
+      });
       setBannerMessageVariant('error');
       setBannerMessage(t('admin.content.banners.messages.loadFailed', '加载横幅失败'));
     } finally {
@@ -114,8 +150,24 @@ export default function ContentManagement() {
       setNotices(response.items || []);
       setNoticesTotal(response.total || 0);
       setNoticesPage(page);
+      loggerService.info('Notices loaded successfully', {
+        module: 'ContentManagement',
+        function: 'loadNotices',
+        page: page,
+        count: response.items?.length || 0
+      });
     } catch (error) {
-      console.error('Failed to load notices', error);
+      loggerService.error('Failed to load notices', {
+        module: 'ContentManagement',
+        function: 'loadNotices',
+        page: page,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_NOTICES_ERROR'
+      });
       setNoticeMessageVariant('error');
       setNoticeMessage(t('admin.content.notices.messages.loadFailed', '加载公告失败'));
     } finally {
@@ -131,8 +183,24 @@ export default function ContentManagement() {
       setNews(response.items || []);
       setNewsTotal(response.total || 0);
       setNewsPage(page);
+      loggerService.info('News loaded successfully', {
+        module: 'ContentManagement',
+        function: 'loadNews',
+        page: page,
+        count: response.items?.length || 0
+      });
     } catch (error) {
-      console.error('Failed to load news', error);
+      loggerService.error('Failed to load news', {
+        module: 'ContentManagement',
+        function: 'loadNews',
+        page: page,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_NEWS_ERROR'
+      });
       setNewsMessageVariant('error');
       setNewsMessage(t('admin.content.news.messages.loadFailed', '加载新闻失败'));
     } finally {
@@ -224,7 +292,17 @@ export default function ContentManagement() {
         setPopupMessage(null);
       }, 3000);
     } catch (error) {
-      console.error('Failed to save popup', error);
+      loggerService.error('Failed to save popup', {
+        module: 'ContentManagement',
+        function: 'handlePopupSubmit',
+        popup_id: popupForm.id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'SAVE_POPUP_ERROR'
+      });
       setPopupMessageVariant('error');
       setPopupMessage(t('admin.content.popups.messages.saveFailed'));
     } finally {
@@ -250,7 +328,17 @@ export default function ContentManagement() {
         setPopupMessage(null);
       }, 3000);
     } catch (error) {
-      console.error('Failed to delete popup', error);
+      loggerService.error('Failed to delete popup', {
+        module: 'ContentManagement',
+        function: 'handlePopupDelete',
+        popup_id: popupId,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'DELETE_POPUP_ERROR'
+      });
       setPopupMessageVariant('error');
       setPopupMessage(t('admin.content.popups.messages.deleteFailed'));
     }
@@ -304,7 +392,16 @@ export default function ContentManagement() {
         throw new Error('Upload response missing file URL');
       }
     } catch (error) {
-      console.error('Failed to upload image', error);
+      loggerService.error('Failed to upload image', {
+        module: 'ContentManagement',
+        function: 'handleImageUpload',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'UPLOAD_IMAGE_ERROR'
+      });
       setMessageVariant('error');
       const errorMessage = error.message || error.details || t('admin.content.popups.messages.imageUploadFailed', '图片上传失败');
       setMessage(errorMessage);
@@ -376,7 +473,17 @@ export default function ContentManagement() {
       setBannerMessage(t('admin.content.banners.messages.saved', '保存成功'));
       setTimeout(() => setBannerMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to save banner', error);
+      loggerService.error('Failed to save banner', {
+        module: 'ContentManagement',
+        function: 'handleBannerSubmit',
+        banner_id: bannerForm.id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'SAVE_BANNER_ERROR'
+      });
       setBannerMessageVariant('error');
       setBannerMessage(error?.response?.data?.detail || error?.message || t('admin.content.banners.messages.saveFailed', '保存失败'));
     } finally {
@@ -399,7 +506,17 @@ export default function ContentManagement() {
       setBannerMessage(t('admin.content.banners.messages.deleted', '删除成功'));
       setTimeout(() => setBannerMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to delete banner', error);
+      loggerService.error('Failed to delete banner', {
+        module: 'ContentManagement',
+        function: 'handleBannerDelete',
+        banner_id: bannerId,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'DELETE_BANNER_ERROR'
+      });
       setBannerMessageVariant('error');
       setBannerMessage(t('admin.content.banners.messages.deleteFailed', '删除失败'));
     }
@@ -463,7 +580,17 @@ export default function ContentManagement() {
       setNoticeMessage(t('admin.content.notices.messages.saved', '保存成功'));
       setTimeout(() => setNoticeMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to save notice', error);
+      loggerService.error('Failed to save notice', {
+        module: 'ContentManagement',
+        function: 'handleNoticeSubmit',
+        notice_id: noticeForm.id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'SAVE_NOTICE_ERROR'
+      });
       setNoticeMessageVariant('error');
       setNoticeMessage(error?.response?.data?.detail || error?.message || t('admin.content.notices.messages.saveFailed', '保存失败'));
     } finally {
@@ -486,7 +613,17 @@ export default function ContentManagement() {
       setNoticeMessage(t('admin.content.notices.messages.deleted', '删除成功'));
       setTimeout(() => setNoticeMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to delete notice', error);
+      loggerService.error('Failed to delete notice', {
+        module: 'ContentManagement',
+        function: 'handleNoticeDelete',
+        notice_id: noticeId,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'DELETE_NOTICE_ERROR'
+      });
       setNoticeMessageVariant('error');
       setNoticeMessage(t('admin.content.notices.messages.deleteFailed', '删除失败'));
     }
@@ -549,7 +686,17 @@ export default function ContentManagement() {
       setNewsMessage(t('admin.content.news.messages.saved', '保存成功'));
       setTimeout(() => setNewsMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to save news', error);
+      loggerService.error('Failed to save news', {
+        module: 'ContentManagement',
+        function: 'handleNewsSubmit',
+        news_id: newsForm.id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'SAVE_NEWS_ERROR'
+      });
       setNewsMessageVariant('error');
       setNewsMessage(error?.response?.data?.detail || error?.message || t('admin.content.news.messages.saveFailed', '保存失败'));
     } finally {
@@ -572,7 +719,17 @@ export default function ContentManagement() {
       setNewsMessage(t('admin.content.news.messages.deleted', '删除成功'));
       setTimeout(() => setNewsMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to delete news', error);
+      loggerService.error('Failed to delete news', {
+        module: 'ContentManagement',
+        function: 'handleNewsDelete',
+        news_id: newsId,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'DELETE_NEWS_ERROR'
+      });
       setNewsMessageVariant('error');
       setNewsMessage(t('admin.content.news.messages.deleteFailed', '删除失败'));
     }

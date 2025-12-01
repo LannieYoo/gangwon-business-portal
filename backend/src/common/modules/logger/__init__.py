@@ -12,8 +12,7 @@ Usage:
     logger.error("Error occurred", exc_info=True)
     
     # Application log recording
-    await logging_service.create_log(
-        db=db,
+    logging_service.create_log(
         source="backend",
         level="ERROR",
         message="Something went wrong",

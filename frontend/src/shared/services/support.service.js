@@ -4,6 +4,8 @@
  */
 
 import { apiService } from './index';
+import loggerService from './logger.service';
+import exceptionService from './exception.service';
 import { API_PREFIX } from '@shared/utils/constants';
 
 /**
@@ -71,7 +73,18 @@ const supportService = {
       const items = response.items || response.records || response.faqs || [];
       return toCamelCase(items);
     } catch (error) {
-      console.error('Failed to list FAQs:', error);
+      loggerService.error('Failed to list FAQs', {
+        module: 'SupportService',
+        function: 'listFAQs',
+        request_path: `${API_PREFIX}/faqs`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'GET',
+        request_path: `${API_PREFIX}/faqs`,
+        error_code: error.code || 'LIST_FAQS_FAILED'
+      });
       throw error;
     }
   },
@@ -105,7 +118,18 @@ const supportService = {
       }
       return result;
     } catch (error) {
-      console.error('Failed to create inquiry:', error);
+      loggerService.error('Failed to create inquiry', {
+        module: 'SupportService',
+        function: 'createInquiry',
+        request_path: `${API_PREFIX}/inquiries`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/inquiries`,
+        error_code: error.code || 'CREATE_INQUIRY_FAILED'
+      });
       throw error;
     }
   },
@@ -143,7 +167,18 @@ const supportService = {
       
       return result;
     } catch (error) {
-      console.error('Failed to list inquiries:', error);
+      loggerService.error('Failed to list inquiries', {
+        module: 'SupportService',
+        function: 'listMyInquiries',
+        request_path: `${API_PREFIX}/inquiries`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'GET',
+        request_path: `${API_PREFIX}/inquiries`,
+        error_code: error.code || 'LIST_INQUIRIES_FAILED'
+      });
       throw error;
     }
   },
@@ -180,7 +215,18 @@ const supportService = {
       
       return result;
     } catch (error) {
-      console.error('Failed to get inquiry:', error);
+      loggerService.error('Failed to get inquiry', {
+        module: 'SupportService',
+        function: 'getInquiry',
+        request_path: `${API_PREFIX}/inquiries/${inquiryId}`,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'GET',
+        request_path: `${API_PREFIX}/inquiries/${inquiryId}`,
+        error_code: error.code || 'GET_INQUIRY_FAILED'
+      });
       throw error;
     }
   }

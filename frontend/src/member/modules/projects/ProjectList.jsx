@@ -12,7 +12,7 @@ import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Select from '@shared/components/Select';
 import { Pagination } from '@shared/components';
-import { projectService } from '@shared/services';
+import { projectService, loggerService, exceptionService } from '@shared/services';
 import { SearchIcon } from '@shared/components/Icons';
 import ApplicationModal from './ApplicationModal';
 import './ProjectList.css';
@@ -48,7 +48,16 @@ export default function ProjectList() {
         setTotal(response.total || 0);
       }
     } catch (error) {
-      console.error('Failed to load projects:', error);
+      loggerService.error('Failed to load projects', {
+        module: 'ProjectList',
+        function: 'loadProjects',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOAD_PROJECTS_FAILED'
+      });
       setProjects([]);
       setTotalPages(0);
       setTotal(0);

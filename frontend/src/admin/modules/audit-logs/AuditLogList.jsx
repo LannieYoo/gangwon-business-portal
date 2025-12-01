@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, Select, Input } from '@shared/components';
-import { adminService } from '@shared/services';
+import { adminService, loggerService, exceptionService } from '@shared/services';
 import './AuditLogList.css';
 
 export default function AuditLogList() {
@@ -43,8 +43,22 @@ export default function AuditLogList() {
         setTotalCount(response.total || 0);
         setTotalPages(response.totalPages || 0);
       }
+      loggerService.info('Audit logs loaded successfully', {
+        module: 'AuditLogList',
+        function: 'loadLogs',
+        count: response.logs?.length || 0
+      });
     } catch (error) {
-      console.error('Failed to load audit logs:', error);
+      loggerService.error('Failed to load audit logs', {
+        module: 'AuditLogList',
+        function: 'loadLogs',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_AUDIT_LOGS_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.auditLogs.loadFailed', '加载审计日志失败');
       alert(errorMessage);
     } finally {

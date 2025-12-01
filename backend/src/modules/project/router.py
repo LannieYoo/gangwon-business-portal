@@ -15,6 +15,8 @@ from fastapi import Request
 from ...common.modules.db.session import get_db
 from ...common.modules.db.models import Member
 from ...common.modules.audit import audit_log_service, get_client_info
+from ...common.modules.logger import logging_service
+from ...common.modules.exception.responses import get_trace_id
 from ..user.dependencies import get_current_active_user, get_current_admin_user
 from .service import ProjectService
 from .schemas import (
@@ -48,6 +50,7 @@ service = ProjectService()
 )
 async def list_projects(
     query: Annotated[ProjectListQuery, Depends()],
+    request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """
@@ -58,15 +61,46 @@ async def list_projects(
     - **page**: Page number (default: 1)
     - **page_size**: Items per page (default: 20, max: 100)
     """
-    projects, total = await service.list_projects(query, db)
+    trace_id = get_trace_id(request)
+    try:
+        projects, total = await service.list_projects(query, db)
 
-    return ProjectListResponsePaginated(
-        items=[ProjectListItem.model_validate(p) for p in projects],
-        total=total,
-        page=query.page,
-        page_size=query.page_size,
-        total_pages=ceil(total / query.page_size) if total > 0 else 0,
-    )
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"List projects succeeded: {total} projects found",
+            module=__name__,
+            function="list_projects",
+            trace_id=trace_id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+
+        return ProjectListResponsePaginated(
+            items=[ProjectListItem.model_validate(p) for p in projects],
+            total=total,
+            page=query.page,
+            page_size=query.page_size,
+            total_pages=ceil(total / query.page_size) if total > 0 else 0,
+        )
+    except Exception as e:
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"List projects failed: {str(e)}",
+            module=__name__,
+            function="list_projects",
+            trace_id=trace_id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.get(
@@ -77,13 +111,47 @@ async def list_projects(
 )
 async def get_project(
     project_id: UUID,
+    request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """
     Get detailed information about a specific project (public access).
     """
-    project = await service.get_project_by_id(project_id, db)
-    return ProjectResponse.model_validate(project)
+    trace_id = get_trace_id(request)
+    try:
+        project = await service.get_project_by_id(project_id, db)
+
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Get project succeeded: {project_id}",
+            module=__name__,
+            function="get_project",
+            trace_id=trace_id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+        
+        return ProjectResponse.model_validate(project)
+    except Exception as e:
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Get project failed: {str(e)}",
+            module=__name__,
+            function="get_project",
+            trace_id=trace_id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "project_id": str(project_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.post(
@@ -105,41 +173,89 @@ async def apply_to_project(
 
     Requires authentication. Member must not have already applied to this project.
     """
-    application = await service.apply_to_project(
-        current_user.id, project_id, data, db
-    )
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="apply",
+        application = await service.apply_to_project(
+            current_user.id, project_id, data, db
+        )
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="apply",
+                user_id=current_user.id,
+                resource_type="project_application",
+                resource_id=application.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="apply_to_project",
+                trace_id=trace_id,
+                user_id=current_user.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=201,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Apply to project succeeded: application_id={application.id}, project_id={project_id}",
+            module=__name__,
+            function="apply_to_project",
+            trace_id=trace_id,
             user_id=current_user.id,
-            resource_type="project_application",
-            resource_id=application.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=201,
+        )
+        # NOTE:
+        # Avoid letting Pydantic introspect SQLAlchemy relationships on async
+        # models (which can trigger lazy-loading errors). We construct the
+        # response explicitly from scalar fields without loading nested
+        # project details, which is sufficient for current API consumers
+        # and keeps the endpoint stable.
+        return ProjectApplicationResponse(
+            id=application.id,
+            member_id=application.member_id,
+            project_id=application.project_id,
+            project=None,
+            status=application.status,
+            application_reason=application.application_reason,
+            submitted_at=application.submitted_at,
+            reviewed_at=application.reviewed_at,
         )
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    # NOTE:
-    # Avoid letting Pydantic introspect SQLAlchemy relationships on async
-    # models (which can trigger lazy-loading errors). We construct the
-    # response explicitly from scalar fields without loading nested
-    # project details, which is sufficient for current API consumers
-    # and keeps the endpoint stable.
-    return ProjectApplicationResponse(
-        id=application.id,
-        member_id=application.member_id,
-        project_id=application.project_id,
-        project=None,
-        status=application.status,
-        application_reason=application.application_reason,
-        submitted_at=application.submitted_at,
-        reviewed_at=application.reviewed_at,
-    )
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Apply to project failed: {str(e)}",
+            module=__name__,
+            function="apply_to_project",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "project_id": str(project_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.get(
@@ -150,6 +266,7 @@ async def apply_to_project(
 )
 async def get_my_applications(
     query: Annotated[ApplicationListQuery, Depends()],
+    request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -160,17 +277,50 @@ async def get_my_applications(
     - **page**: Page number
     - **page_size**: Items per page
     """
-    applications, total = await service.get_my_applications(
-        current_user.id, query, db
-    )
+    trace_id = get_trace_id(request)
+    try:
+        applications, total = await service.get_my_applications(
+            current_user.id, query, db
+        )
 
-    return ApplicationListResponsePaginated(
-        items=[ProjectApplicationListItem.model_validate(a) for a in applications],
-        total=total,
-        page=query.page,
-        page_size=query.page_size,
-        total_pages=ceil(total / query.page_size) if total > 0 else 0,
-    )
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Get my applications succeeded: {total} applications found",
+            module=__name__,
+            function="get_my_applications",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+
+        return ApplicationListResponsePaginated(
+            items=[ProjectApplicationListItem.model_validate(a) for a in applications],
+            total=total,
+            page=query.page,
+            page_size=query.page_size,
+            total_pages=ceil(total / query.page_size) if total > 0 else 0,
+        )
+    except Exception as e:
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Get my applications failed: {str(e)}",
+            module=__name__,
+            function="get_my_applications",
+            trace_id=trace_id,
+            user_id=current_user.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 # Admin endpoints
@@ -192,25 +342,72 @@ async def create_project(
     """
     Create a new project (admin only).
     """
-    project = await service.create_project(data, db)
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="create",
+        project = await service.create_project(data, db)
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="create",
+                user_id=current_admin.id,
+                resource_type="project",
+                resource_id=project.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="create_project",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=201,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Create project succeeded: {project.id}",
+            module=__name__,
+            function="create_project",
+            trace_id=trace_id,
             user_id=current_admin.id,
-            resource_type="project",
-            resource_id=project.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=201,
         )
+        
+        return ProjectResponse.model_validate(project)
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    return ProjectResponse.model_validate(project)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Create project failed: {str(e)}",
+            module=__name__,
+            function="create_project",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.put(
@@ -229,25 +426,73 @@ async def update_project(
     """
     Update project details (admin only).
     """
-    project = await service.update_project(project_id, data, db)
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="update",
+        project = await service.update_project(project_id, data, db)
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="update",
+                user_id=current_admin.id,
+                resource_type="project",
+                resource_id=project.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="update_project",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Update project succeeded: {project_id}",
+            module=__name__,
+            function="update_project",
+            trace_id=trace_id,
             user_id=current_admin.id,
-            resource_type="project",
-            resource_id=project.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
         )
+        
+        return ProjectResponse.model_validate(project)
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    return ProjectResponse.model_validate(project)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Update project failed: {str(e)}",
+            module=__name__,
+            function="update_project",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "project_id": str(project_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.delete(
@@ -267,23 +512,71 @@ async def delete_project(
 
     WARNING: This will cascade delete all applications related to this project.
     """
-    await service.delete_project(project_id, db)
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="delete",
+        await service.delete_project(project_id, db)
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="delete",
+                user_id=current_admin.id,
+                resource_type="project",
+                resource_id=project_id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="delete_project",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=204,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Delete project succeeded: {project_id}",
+            module=__name__,
+            function="delete_project",
+            trace_id=trace_id,
             user_id=current_admin.id,
-            resource_type="project",
-            resource_id=project_id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=204,
         )
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Delete project failed: {str(e)}",
+            module=__name__,
+            function="delete_project",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "project_id": str(project_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.get(
@@ -295,6 +588,7 @@ async def delete_project(
 async def list_project_applications(
     project_id: UUID,
     query: Annotated[ApplicationListQuery, Depends()],
+    request: Request,
     current_admin: Annotated[Member, Depends(get_current_admin_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -305,17 +599,51 @@ async def list_project_applications(
     - **page**: Page number
     - **page_size**: Items per page
     """
-    applications, total = await service.list_project_applications(
-        project_id, query, db
-    )
+    trace_id = get_trace_id(request)
+    try:
+        applications, total = await service.list_project_applications(
+            project_id, query, db
+        )
 
-    return ApplicationListResponsePaginated(
-        items=[ProjectApplicationListItem.model_validate(a) for a in applications],
-        total=total,
-        page=query.page,
-        page_size=query.page_size,
-        total_pages=ceil(total / query.page_size) if total > 0 else 0,
-    )
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"List project applications succeeded: {total} applications found for project {project_id}",
+            module=__name__,
+            function="list_project_applications",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+
+        return ApplicationListResponsePaginated(
+            items=[ProjectApplicationListItem.model_validate(a) for a in applications],
+            total=total,
+            page=query.page,
+            page_size=query.page_size,
+            total_pages=ceil(total / query.page_size) if total > 0 else 0,
+        )
+    except Exception as e:
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"List project applications failed: {str(e)}",
+            module=__name__,
+            function="list_project_applications",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "project_id": str(project_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.put(
@@ -336,37 +664,85 @@ async def update_application_status(
 
     Change application status to: submitted, under_review, approved, or rejected.
     """
-    application = await service.update_application_status(
-        application_id, data.status, db
-    )
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action=f"update_status_{data.status}",
+        application = await service.update_application_status(
+            application_id, data.status, db
+        )
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action=f"update_status_{data.status}",
+                user_id=current_admin.id,
+                resource_type="project_application",
+                resource_id=application.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="update_application_status",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Update application status succeeded: application_id={application_id}, status={data.status}",
+            module=__name__,
+            function="update_application_status",
+            trace_id=trace_id,
             user_id=current_admin.id,
-            resource_type="project_application",
-            resource_id=application.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
+        )
+        # See note in apply_to_project: build response explicitly to avoid
+        # async lazy-loading of relationships during serialization.
+        return ProjectApplicationResponse(
+            id=application.id,
+            member_id=application.member_id,
+            project_id=application.project_id,
+            project=None,
+            status=application.status,
+            application_reason=application.application_reason,
+            submitted_at=application.submitted_at,
+            reviewed_at=application.reviewed_at,
         )
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    # See note in apply_to_project: build response explicitly to avoid
-    # async lazy-loading of relationships during serialization.
-    return ProjectApplicationResponse(
-        id=application.id,
-        member_id=application.member_id,
-        project_id=application.project_id,
-        project=None,
-        status=application.status,
-        application_reason=application.application_reason,
-        submitted_at=application.submitted_at,
-        reviewed_at=application.reviewed_at,
-    )
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Update application status failed: {str(e)}",
+            module=__name__,
+            function="update_application_status",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "application_id": str(application_id),
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
+        )
+        raise
 
 
 @router.get(
@@ -387,52 +763,99 @@ async def export_projects(
     Supports the same filtering options as the list endpoint.
     """
     from ...common.modules.export import ExportService
-    from ...common.modules.audit import audit_log_service, get_client_info
     
-    # Get export data
-    export_data = await service.export_projects_data(query, db)
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="export",
+        # Get export data
+        export_data = await service.export_projects_data(query, db)
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="export",
+                user_id=current_admin.id,
+                resource_type="project",
+                resource_id=None,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="export_projects",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Export projects succeeded: {len(export_data)} records, format={format}",
+            module=__name__,
+            function="export_projects",
+            trace_id=trace_id,
             user_id=current_admin.id,
-            resource_type="project",
-            resource_id=None,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
         )
+        
+        # Generate export file
+        if format == "excel":
+            excel_bytes = ExportService.export_to_excel(
+                data=export_data,
+                sheet_name="Projects",
+                title=f"Projects Export - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            )
+            return Response(
+                content=excel_bytes,
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                headers={
+                    "Content-Disposition": f'attachment; filename="projects_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+                },
+            )
+        else:  # CSV
+            csv_content = ExportService.export_to_csv(
+                data=export_data,
+            )
+            return Response(
+                content=csv_content,
+                media_type="text/csv",
+                headers={
+                    "Content-Disposition": f'attachment; filename="projects_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+                },
+            )
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    # Generate export file
-    if format == "excel":
-        excel_bytes = ExportService.export_to_excel(
-            data=export_data,
-            sheet_name="Projects",
-            title=f"Projects Export - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-        )
-        return Response(
-            content=excel_bytes,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={
-                "Content-Disposition": f'attachment; filename="projects_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Export projects failed: {str(e)}",
+            module=__name__,
+            function="export_projects",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "format": format,
+                "error": str(e),
+                "error_type": type(e).__name__,
             },
         )
-    else:  # CSV
-        csv_content = ExportService.export_to_csv(
-            data=export_data,
-        )
-        return Response(
-            content=csv_content,
-            media_type="text/csv",
-            headers={
-                "Content-Disposition": f'attachment; filename="projects_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
-            },
-        )
+        raise
 
 
 @router.get(
@@ -454,49 +877,97 @@ async def export_applications(
     Supports filtering by project ID and application status.
     """
     from ...common.modules.export import ExportService
-    from ...common.modules.audit import audit_log_service, get_client_info
     
-    # Get export data
-    export_data = await service.export_applications_data(project_id, query, db)
-    
-    # Record audit log
+    trace_id = get_trace_id(request)
     try:
-        ip_address, user_agent = get_client_info(request)
-        await audit_log_service.create_audit_log(
-            db=db,
-            action="export",
+        # Get export data
+        export_data = await service.export_applications_data(project_id, query, db)
+        
+        # Record audit log
+        try:
+            ip_address, user_agent = get_client_info(request)
+            await audit_log_service.create_audit_log(
+                db=db,
+                action="export",
+                user_id=current_admin.id,
+                resource_type="project_application",
+                resource_id=None,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        except Exception as e:
+            logging_service.create_log(
+                source="backend",
+                level="ERROR",
+                message=f"Failed to create audit log: {str(e)}",
+                module=__name__,
+                function="export_applications",
+                trace_id=trace_id,
+                user_id=current_admin.id,
+                request_path=request.url.path,
+                request_method=request.method,
+                response_status=200,
+                extra_data={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+        
+        logging_service.create_log(
+            source="backend",
+            level="INFO",
+            message=f"Export applications succeeded: {len(export_data)} records, format={format}",
+            module=__name__,
+            function="export_applications",
+            trace_id=trace_id,
             user_id=current_admin.id,
-            resource_type="project_application",
-            resource_id=None,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=200,
         )
+        
+        # Generate export file
+        if format == "excel":
+            excel_bytes = ExportService.export_to_excel(
+                data=export_data,
+                sheet_name="Applications",
+                title=f"Project Applications Export - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            )
+            return Response(
+                content=excel_bytes,
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                headers={
+                    "Content-Disposition": f'attachment; filename="applications_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+                },
+            )
+        else:  # CSV
+            csv_content = ExportService.export_to_csv(
+                data=export_data,
+            )
+            return Response(
+                content=csv_content,
+                media_type="text/csv",
+                headers={
+                    "Content-Disposition": f'attachment; filename="applications_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+                },
+            )
     except Exception as e:
-        from ...common.modules.logger import logger
-        logger.error(f"Failed to create audit log: {str(e)}", exc_info=True)
-    
-    # Generate export file
-    if format == "excel":
-        excel_bytes = ExportService.export_to_excel(
-            data=export_data,
-            sheet_name="Applications",
-            title=f"Project Applications Export - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-        )
-        return Response(
-            content=excel_bytes,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={
-                "Content-Disposition": f'attachment; filename="applications_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+        logging_service.create_log(
+            source="backend",
+            level="ERROR",
+            message=f"Export applications failed: {str(e)}",
+            module=__name__,
+            function="export_applications",
+            trace_id=trace_id,
+            user_id=current_admin.id,
+            request_path=request.url.path,
+            request_method=request.method,
+            response_status=500,
+            extra_data={
+                "format": format,
+                "project_id": str(project_id) if project_id else None,
+                "error": str(e),
+                "error_type": type(e).__name__,
             },
         )
-    else:  # CSV
-        csv_content = ExportService.export_to_csv(
-            data=export_data,
-        )
-        return Response(
-            content=csv_content,
-            media_type="text/csv",
-            headers={
-                "Content-Disposition": f'attachment; filename="applications_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
-            },
-        )
+        raise

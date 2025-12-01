@@ -258,7 +258,6 @@ async def resolve_exception(
 @router.post("/api/v1/exceptions/frontend")
 async def create_frontend_exception(
     exception_data: FrontendExceptionCreate,
-    db: AsyncSession = Depends(get_db),
 ):
     """
     Create a frontend application exception entry.
@@ -279,8 +278,7 @@ async def create_frontend_exception(
             pass
     
     # Force source to be frontend
-    await exception_service.create_exception(
-        db=db,
+    exception_service.create_exception(
         source="frontend",  # Always frontend for this endpoint
         exception_type=exception_data.exception_type,
         exception_message=exception_data.exception_message,

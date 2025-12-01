@@ -10,6 +10,8 @@ import { useAuth } from '@shared/hooks';
 import { LanguageSwitcher } from '@shared/components';
 import { EyeIcon, EyeOffIcon } from '@shared/components/Icons';
 import { formatBusinessLicense } from '@shared/utils/format';
+import { loggerService, exceptionService } from '@shared/services';
+import { API_PREFIX } from '@shared/utils/constants';
 import './Auth.css';
 
 export default function Login() {
@@ -35,11 +37,73 @@ export default function Login() {
         businessNumber: businessNumberClean,
         password: formData.password
       });
+      
+      // Log successful login
+      // Mask business number for security (show only first 3 digits)
+      const maskedBusinessNumber = businessNumberClean.length > 3 
+        ? `${businessNumberClean.substring(0, 3)}-${businessNumberClean.substring(3, 5)}-*****`
+        : '***-***-*****';
+      loggerService.info('Member login successful', {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/login`,
+        response_status: 200,
+        extra_data: {
+          component: 'Login',
+          action: 'handleSubmit',
+          user_role: response.user?.role,
+          business_number_masked: maskedBusinessNumber,
+        },
+      });
+      
       // Redirect based on role
       const redirectPath = response.user.role === 'admin' ? '/admin' : '/member';
       navigate(redirectPath);
     } catch (err) {
-      setError(err.response?.data?.message || t('auth.loginFailed'));
+      // Extract error message properly
+      const errorMessage = err.response?.data?.message || err.response?.data?.detail || err.message || (typeof err === 'string' ? err : JSON.stringify(err)) || t('auth.loginFailed');
+      setError(errorMessage);
+      
+      // Log login failure
+      const businessNumberClean = formData.businessNumber.replace(/-/g, '');
+      // Mask business number for security (show only first 3 digits)
+      const maskedBusinessNumber = businessNumberClean.length > 3 
+        ? `${businessNumberClean.substring(0, 3)}-${businessNumberClean.substring(3, 5)}-*****`
+        : '***-***-*****';
+      
+      // Create proper Error object with meaningful message
+      const errorObj = err instanceof Error 
+        ? err 
+        : new Error(errorMessage || 'Login failed');
+      
+      // Ensure error object has proper message
+      if (!errorObj.message || errorObj.message === '[object Object]') {
+        errorObj.message = errorMessage;
+      }
+      
+      exceptionService.recordException(errorObj, {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/login`,
+        error_code: err.response?.data?.code || err.code || 'LOGIN_FAILED',
+        status_code: err.response?.status || err.status,
+        context_data: {
+          component: 'Login',
+          action: 'handleSubmit',
+          business_number_masked: maskedBusinessNumber,
+        },
+      });
+      
+      loggerService.warn('Member login failed', {
+        request_method: 'POST',
+        request_path: `${API_PREFIX}/auth/login`,
+        response_status: err.response?.status || err.status,
+        error_code: err.response?.data?.code || err.code || 'LOGIN_FAILED',
+        error_message: errorMessage,
+        extra_data: {
+          component: 'Login',
+          action: 'handleSubmit',
+          business_number_masked: maskedBusinessNumber,
+        },
+      });
     }
   };
   
@@ -80,7 +144,7 @@ export default function Login() {
           </div>
         )}
         
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} className="auth-form" autoComplete="on">
           <div className="auth-form-group">
             <label htmlFor="businessNumber">
               {t('auth.businessLicense')}
@@ -95,6 +159,7 @@ export default function Login() {
               required
               maxLength={12}
               placeholder={t('auth.businessLicensePlaceholder')}
+              autoComplete="username"
             />
             <span className="auth-help-text">
               {t('auth.businessLicenseHelp')}
@@ -126,6 +191,7 @@ export default function Login() {
                 onChange={handlePasswordChange}
                 required
                 autoComplete="current-password"
+                data-form-type="password"
               />
               <button
                 type="button"

@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Card from '@shared/components/Card';
 import { EyeIcon, ChevronDownIcon, ChevronUpIcon } from '@shared/components/Icons';
-import { supportService } from '@shared/services';
+import { supportService, loggerService, exceptionService } from '@shared/services';
 import './FAQList.css';
 
 export default function FAQList() {
@@ -23,7 +23,16 @@ export default function FAQList() {
         const items = await supportService.listFAQs();
         setFaqs(items || []);
       } catch (error) {
-        console.error('Failed to load FAQs:', error);
+        loggerService.error('Failed to load FAQs', {
+          module: 'FAQList',
+          function: 'loadFAQs',
+          error_message: error.message,
+          error_code: error.code
+        });
+        exceptionService.recordException(error, {
+          request_path: window.location.pathname,
+          error_code: error.code || 'LOAD_FAQS_FAILED'
+        });
         setFaqs([]);
       } finally {
         setLoading(false);

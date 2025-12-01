@@ -4,6 +4,8 @@
  */
 
 import apiService from './api.service';
+import loggerService from './logger.service';
+import exceptionService from './exception.service';
 import { API_PREFIX } from '@shared/utils/constants';
 
 class UploadService {
@@ -96,7 +98,18 @@ class UploadService {
       const downloadFilename = filename || fileInfo.original_name || `file-${fileId}`;
       await apiService.download(fileInfo.file_url, {}, downloadFilename);
     } catch (error) {
-      console.error('Failed to download file:', error);
+      loggerService.error('Failed to download file', {
+        module: 'UploadService',
+        function: 'downloadFile',
+        file_id: fileId,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_method: 'GET',
+        request_path: `${API_PREFIX}/upload/${fileId}`,
+        error_code: error.code || 'DOWNLOAD_FILE_FAILED'
+      });
       throw error;
     }
   }

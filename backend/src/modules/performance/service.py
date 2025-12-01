@@ -4,14 +4,13 @@ Performance service.
 Business logic for performance record management operations.
 """
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, or_, and_
+from sqlalchemy import select, func
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
 
 from ...common.modules.db.models import PerformanceRecord, PerformanceReview, Member
 from ...common.modules.exception import NotFoundError, ValidationError, ForbiddenError
-from ...common.modules.logger import logger
 from .schemas import PerformanceRecordCreate, PerformanceRecordUpdate, PerformanceListQuery
 
 
@@ -32,20 +31,6 @@ class PerformanceService:
         Returns:
             Tuple of (performance records list, total count)
         """
-        logger.debug(
-            "List performance records",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member_id),
-                "year": query.year,
-                "quarter": query.quarter,
-                "status": query.status,
-                "type": query.type,
-                "page": query.page,
-                "page_size": query.page_size,
-            },
-        )
-
         # Build base query
         stmt = select(PerformanceRecord).where(PerformanceRecord.member_id == member_id)
 
@@ -73,16 +58,6 @@ class PerformanceService:
         result = await db.execute(stmt)
         records = result.scalars().all()
 
-        logger.debug(
-            "List performance records result",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member_id),
-                "total": total,
-                "returned": len(records),
-            },
-        )
-
         return list(records), total
 
     async def get_performance_by_id(
@@ -103,40 +78,15 @@ class PerformanceService:
             NotFoundError: If record not found
             ForbiddenError: If member doesn't own the record
         """
-        logger.debug(
-            "Get performance record by id",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(performance_id),
-                "member_id": str(member_id),
-            },
-        )
-
         result = await db.execute(
             select(PerformanceRecord).where(PerformanceRecord.id == performance_id)
         )
         record = result.scalar_one_or_none()
 
         if not record:
-            logger.warning(
-                "Performance record not found",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(performance_id),
-                },
-            )
             raise NotFoundError("Performance record")
 
         if record.member_id != member_id:
-            logger.warning(
-                "Forbidden access to performance record",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(performance_id),
-                    "owner_member_id": str(record.member_id),
-                    "request_member_id": str(member_id),
-                },
-            )
             raise ForbiddenError("You don't have permission to access this record")
 
         return record
@@ -158,17 +108,6 @@ class PerformanceService:
         Raises:
             ValidationError: If validation fails
         """
-        logger.info(
-            "Create performance record request",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member_id),
-                "year": data.year,
-                "quarter": data.quarter,
-                "type": data.type,
-            },
-        )
-
         # Create performance record
         record = PerformanceRecord(
             member_id=member_id,
@@ -182,15 +121,6 @@ class PerformanceService:
         db.add(record)
         await db.commit()
         await db.refresh(record)
-
-        logger.info(
-            "Performance record created",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(record.id),
-                "member_id": str(member_id),
-            },
-        )
 
         return record
 
@@ -218,27 +148,10 @@ class PerformanceService:
             ForbiddenError: If member doesn't own the record
             ValidationError: If record status doesn't allow editing
         """
-        logger.info(
-            "Update performance record request",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(performance_id),
-                "member_id": str(member_id),
-            },
-        )
-
         record = await self.get_performance_by_id(performance_id, member_id, db)
 
         # Only allow editing draft or revision_requested records
         if record.status not in ["draft", "revision_requested"]:
-            logger.warning(
-                "Update performance failed: invalid status",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(performance_id),
-                    "status": record.status,
-                },
-            )
             raise ValidationError(
                 f"Cannot edit performance record with status '{record.status}'. "
                 "Only 'draft' or 'revision_requested' records can be edited."
@@ -256,15 +169,6 @@ class PerformanceService:
 
         await db.commit()
         await db.refresh(record)
-
-        logger.info(
-            "Performance record updated",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(record.id),
-                "member_id": str(member_id),
-            },
-        )
 
         return record
 
@@ -284,27 +188,10 @@ class PerformanceService:
             ForbiddenError: If member doesn't own the record
             ValidationError: If record is not draft
         """
-        logger.info(
-            "Delete performance record request",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(performance_id),
-                "member_id": str(member_id),
-            },
-        )
-
         record = await self.get_performance_by_id(performance_id, member_id, db)
 
         # Only allow deleting draft records
         if record.status != "draft":
-            logger.warning(
-                "Delete performance failed: invalid status",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(performance_id),
-                    "status": record.status,
-                },
-            )
             raise ValidationError(
                 f"Cannot delete performance record with status '{record.status}'. "
                 "Only 'draft' records can be deleted."
@@ -312,15 +199,6 @@ class PerformanceService:
 
         await db.delete(record)
         await db.commit()
-
-        logger.info(
-            "Performance record deleted",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(performance_id),
-                "member_id": str(member_id),
-            },
-        )
 
     async def submit_performance(
         self, performance_id: UUID, member_id: UUID, db: AsyncSession
@@ -341,27 +219,10 @@ class PerformanceService:
             ForbiddenError: If member doesn't own the record
             ValidationError: If record is not draft
         """
-        logger.info(
-            "Submit performance record request",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(performance_id),
-                "member_id": str(member_id),
-            },
-        )
-
         record = await self.get_performance_by_id(performance_id, member_id, db)
 
         # Only allow submitting draft or revision_requested records
         if record.status not in ["draft", "revision_requested"]:
-            logger.warning(
-                "Submit performance failed: invalid status",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(performance_id),
-                    "status": record.status,
-                },
-            )
             raise ValidationError(
                 f"Cannot submit performance record with status '{record.status}'. "
                 "Only 'draft' or 'revision_requested' records can be submitted."
@@ -372,16 +233,6 @@ class PerformanceService:
 
         await db.commit()
         await db.refresh(record)
-
-        logger.info(
-            "Performance record submitted",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(record.id),
-                "member_id": str(member_id),
-                "status": record.status,
-            },
-        )
 
         return record
 
@@ -400,20 +251,6 @@ class PerformanceService:
         Returns:
             Tuple of (performance records list, total count)
         """
-        logger.debug(
-            "Admin list all performance records",
-            extra={
-                "module_name": __name__,
-                "member_id": str(query.member_id) if query.member_id else None,
-                "year": query.year,
-                "quarter": query.quarter,
-                "status": query.status,
-                "type": query.type,
-                "page": query.page,
-                "page_size": query.page_size,
-            },
-        )
-
         # Build base query
         stmt = select(PerformanceRecord)
 
@@ -443,15 +280,6 @@ class PerformanceService:
         result = await db.execute(stmt)
         records = result.scalars().all()
 
-        logger.debug(
-            "Admin list all performance records result",
-            extra={
-                "module_name": __name__,
-                "total": total,
-                "returned": len(records),
-            },
-        )
-
         return list(records), total
 
     async def get_performance_by_id_admin(
@@ -470,27 +298,12 @@ class PerformanceService:
         Raises:
             NotFoundError: If record not found
         """
-        logger.debug(
-            "Admin get performance record by id",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(performance_id),
-            },
-        )
-
         result = await db.execute(
             select(PerformanceRecord).where(PerformanceRecord.id == performance_id)
         )
         record = result.scalar_one_or_none()
 
         if not record:
-            logger.warning(
-                "Admin get performance failed: record not found",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(performance_id),
-                },
-            )
             raise NotFoundError("Performance record")
 
         return record
@@ -518,27 +331,10 @@ class PerformanceService:
             NotFoundError: If record not found
             ValidationError: If record is not submitted
         """
-        logger.info(
-            "Approve performance record request",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(performance_id),
-                "reviewer_id": str(reviewer_id),
-            },
-        )
-
         record = await self.get_performance_by_id_admin(performance_id, db)
 
         # Only allow approving submitted records
         if record.status != "submitted":
-            logger.warning(
-                "Approve performance failed: invalid status",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(performance_id),
-                    "status": record.status,
-                },
-            )
             raise ValidationError(
                 f"Cannot approve performance record with status '{record.status}'. "
                 "Only 'submitted' records can be approved."
@@ -559,16 +355,6 @@ class PerformanceService:
         await db.commit()
         await db.refresh(record)
 
-        logger.info(
-            "Performance record approved",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(record.id),
-                "reviewer_id": str(reviewer_id),
-                "status": record.status,
-            },
-        )
-
         # Send approval notification email
         try:
             from ...common.modules.email import email_service
@@ -585,15 +371,9 @@ class PerformanceService:
                     status="approved",
                     comments=comments,
                 )
-        except Exception as e:
-            logger.warning(
-                "Failed to send approval notification email",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(record.id),
-                    "error": str(e),
-                },
-            )
+        except Exception:
+            # Ignore errors - don't fail approval if email fails
+            pass
 
         return record
 
@@ -620,27 +400,10 @@ class PerformanceService:
             NotFoundError: If record not found
             ValidationError: If record is not submitted
         """
-        logger.info(
-            "Request fix for performance record",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(performance_id),
-                "reviewer_id": str(reviewer_id),
-            },
-        )
-
         record = await self.get_performance_by_id_admin(performance_id, db)
 
         # Only allow requesting revision for submitted records
         if record.status != "submitted":
-            logger.warning(
-                "Request fix performance failed: invalid status",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(performance_id),
-                    "status": record.status,
-                },
-            )
             raise ValidationError(
                 f"Cannot request revision for performance record with status '{record.status}'. "
                 "Only 'submitted' records can be sent back for revision."
@@ -661,16 +424,6 @@ class PerformanceService:
         await db.commit()
         await db.refresh(record)
 
-        logger.info(
-            "Performance record marked as revision_requested",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(record.id),
-                "reviewer_id": str(reviewer_id),
-                "status": record.status,
-            },
-        )
-
         # Send revision request email
         try:
             from ...common.modules.email import email_service
@@ -689,15 +442,9 @@ class PerformanceService:
                     comments=comments,
                     revision_url=revision_url,
                 )
-        except Exception as e:
-            logger.warning(
-                "Failed to send revision request email",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(record.id),
-                    "error": str(e),
-                },
-            )
+        except Exception:
+            # Ignore errors - don't fail if email fails
+            pass
 
         return record
 
@@ -724,27 +471,10 @@ class PerformanceService:
             NotFoundError: If record not found
             ValidationError: If record is not submitted
         """
-        logger.info(
-            "Reject performance record request",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(performance_id),
-                "reviewer_id": str(reviewer_id),
-            },
-        )
-
         record = await self.get_performance_by_id_admin(performance_id, db)
 
         # Only allow rejecting submitted records
         if record.status != "submitted":
-            logger.warning(
-                "Reject performance failed: invalid status",
-                extra={
-                    "module_name": __name__,
-                    "performance_id": str(performance_id),
-                    "status": record.status,
-                },
-            )
             raise ValidationError(
                 f"Cannot reject performance record with status '{record.status}'. "
                 "Only 'submitted' records can be rejected."
@@ -765,16 +495,6 @@ class PerformanceService:
         await db.commit()
         await db.refresh(record)
 
-        logger.info(
-            "Performance record rejected",
-            extra={
-                "module_name": __name__,
-                "performance_id": str(record.id),
-                "reviewer_id": str(reviewer_id),
-                "status": record.status,
-            },
-        )
-
         return record
 
     async def export_performance_data(
@@ -790,18 +510,6 @@ class PerformanceService:
         Returns:
             List of performance records as dictionaries
         """
-        logger.info(
-            "Export performance data request",
-            extra={
-                "module_name": __name__,
-                "year": query.year,
-                "quarter": query.quarter,
-                "status": query.status,
-                "type": query.type,
-                "member_id": str(query.member_id) if query.member_id else None,
-            },
-        )
-
         # Get all matching records without pagination
         query_no_page = PerformanceListQuery(
             page=1,
@@ -830,13 +538,5 @@ class PerformanceService:
                 "created_at": record.created_at.isoformat(),
                     "updated_at": record.updated_at.isoformat(),
             })
-
-        logger.info(
-            "Export performance data completed",
-            extra={
-                "module_name": __name__,
-                "records_count": len(export_data),
-            },
-        )
 
         return export_data

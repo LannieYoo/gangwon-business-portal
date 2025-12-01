@@ -4,11 +4,7 @@ Startup tasks for logging module.
 This module handles log cleanup and initialization tasks when the application starts.
 """
 import logging
-from sqlalchemy import delete
-
 from ..config import settings
-from ..db.session import AsyncSessionLocal
-from ..db.models import ApplicationLog, ApplicationException
 from .file_writer import file_log_writer
 from .service import LoggingService
 
@@ -17,17 +13,24 @@ logger = logging.getLogger(__name__)
 
 async def clear_logs_on_startup() -> tuple[list[str], int, int]:
     """
-    Clear log files and database records on startup.
+    Clear log files on startup.
     
     Returns:
         Tuple of (cleared_file_names, logs_count, exceptions_count)
+        Note: logs_count and exceptions_count are always 0 now (no database clearing)
     """
-    # Clear all log files (including exception logs)
+    from pathlib import Path
+    
+    # Determine backend directory path
+    backend_dir = Path(__file__).resolve().parent.parent.parent.parent.parent
+    logs_dir = backend_dir / "logs"
+    
+    # Clear all log files (using actual file paths from file_log_writer)
     log_files = [
-        ("backend_logs.log", file_log_writer.backend_logs_file),
-        ("frontend_logs.log", file_log_writer.frontend_logs_file),
-        ("backend_exceptions.log", file_log_writer.backend_exceptions_file),
-        ("frontend_exceptions.log", file_log_writer.frontend_exceptions_file),
+        ("application_logs.log", file_log_writer.application_logs_file),
+        ("application_exceptions.log", file_log_writer.application_exceptions_file),
+        ("audit_logs.log", file_log_writer.audit_logs_file),
+        ("db_pool.log", logs_dir / "db_pool.log"),
     ]
     
     cleared_files = []
@@ -36,29 +39,21 @@ async def clear_logs_on_startup() -> tuple[list[str], int, int]:
             log_file.write_text("")  # Clear file content
             cleared_files.append(log_name)
     
-    # Clear database records (application logs and exceptions)
+    # Database clearing is no longer performed
     logs_count = 0
     exceptions_count = 0
-    async with AsyncSessionLocal() as db:
-        # Delete all application logs
-        logs_deleted = await db.execute(delete(ApplicationLog))
-        logs_count = logs_deleted.rowcount
-        # Delete all application exceptions
-        exceptions_deleted = await db.execute(delete(ApplicationException))
-        exceptions_count = exceptions_deleted.rowcount
-        await db.commit()
     
     return cleared_files, logs_count, exceptions_count
 
 
-async def write_startup_logs(
+def write_startup_logs(
     startup_message: str,
     debug_mode_message: str,
     log_clear_message: str | None = None,
     db_clear_message: str | None = None,
 ) -> None:
     """
-    Write startup logs to both file and database.
+    Write startup logs to file.
     
     Args:
         startup_message: Application startup message
@@ -68,48 +63,43 @@ async def write_startup_logs(
     """
     logging_service = LoggingService()
     
-    async with AsyncSessionLocal() as db:
-        # Write startup messages (from main.py lifespan)
-        await logging_service.create_log(
-            db=db,
+    # Write startup messages (from main.py lifespan)
+    logging_service.create_log(
+        source="backend",
+        level="INFO",
+        message=startup_message,
+        module="src.main",
+        function="lifespan",
+        line_number=30,
+    )
+    logging_service.create_log(
+        source="backend",
+        level="INFO",
+        message=debug_mode_message,
+        module="src.main",
+        function="lifespan",
+        line_number=31,
+    )
+    
+    # Write cleanup messages (from logger.startup module)
+    if log_clear_message:
+        logging_service.create_log(
             source="backend",
             level="INFO",
-            message=startup_message,
-            module="src.main",
-            function="lifespan",
-            line_number=30,
+            message=log_clear_message,
+            module=__name__,
+            function="write_startup_logs",
+            line_number=96,
         )
-        await logging_service.create_log(
-            db=db,
+    if db_clear_message:
+        logging_service.create_log(
             source="backend",
             level="INFO",
-            message=debug_mode_message,
-            module="src.main",
-            function="lifespan",
-            line_number=31,
+            message=db_clear_message,
+            module=__name__,
+            function="write_startup_logs",
+            line_number=107,
         )
-        
-        # Write cleanup messages (from logger.startup module)
-        if log_clear_message:
-            await logging_service.create_log(
-                db=db,
-                source="backend",
-                level="INFO",
-                message=log_clear_message,
-                module=__name__,
-                function="write_startup_logs",
-                line_number=96,
-            )
-        if db_clear_message:
-            await logging_service.create_log(
-                db=db,
-                source="backend",
-                level="INFO",
-                message=db_clear_message,
-                module=__name__,
-                function="write_startup_logs",
-                line_number=107,
-            )
 
 
 async def handle_startup_logging() -> None:
@@ -123,10 +113,7 @@ async def handle_startup_logging() -> None:
     startup_message = f"Starting {settings.APP_NAME} v{settings.APP_VERSION}"
     debug_mode_message = f"Debug mode: {settings.DEBUG}"
     
-    # Log to console immediately
-    logger.info(startup_message)
-    logger.info(debug_mode_message)
-    
+    # Logs are written to files only (no console output)
     should_clear_logs = settings.LOG_CLEAR_ON_STARTUP
     
     if should_clear_logs:
@@ -146,12 +133,8 @@ async def handle_startup_logging() -> None:
                 f"{exceptions_count} application exceptions"
             )
             
-            # Log to console
-            logger.info(log_clear_message)
-            logger.info(db_clear_message)
-            
-            # Write startup logs to both file and database after clearing
-            await write_startup_logs(
+            # Write startup logs to file after clearing
+            write_startup_logs(
                 startup_message=startup_message,
                 debug_mode_message=debug_mode_message,
                 log_clear_message=log_clear_message,
@@ -161,19 +144,19 @@ async def handle_startup_logging() -> None:
             logger.warning(f"Failed to clear logs on startup: {str(e)}")
             # Still try to write startup messages even if cleanup failed
             try:
-                await write_startup_logs(
+                write_startup_logs(
                     startup_message=startup_message,
                     debug_mode_message=debug_mode_message,
                 )
             except Exception as log_error:
                 logger.warning(f"Failed to write startup logs: {str(log_error)}")
     else:
-        # Even if not clearing logs, write startup messages to both file and database
+        # Even if not clearing logs, write startup messages to file
         try:
-            await write_startup_logs(
+            write_startup_logs(
                 startup_message=startup_message,
                 debug_mode_message=debug_mode_message,
             )
         except Exception as e:
-            logger.warning(f"Failed to write startup logs to file/database: {str(e)}")
+            logger.warning(f"Failed to write startup logs to file: {str(e)}")
 

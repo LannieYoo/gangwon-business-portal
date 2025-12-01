@@ -1,10 +1,9 @@
 """File log writer for application logs and exceptions.
 
 This module provides thread-safe file writing for:
-- backend_logs.log - Backend application logs
-- frontend_logs.log - Frontend application logs
-- backend_exceptions.log - Backend exceptions
-- frontend_exceptions.log - Frontend exceptions
+- application_logs.log - Combined backend and frontend application logs (merged for easier debugging)
+- application_exceptions.log - Combined backend and frontend exceptions (merged for easier debugging)
+- audit_logs.log - Audit logs (compliance and security tracking)
 """
 import json
 import threading
@@ -41,17 +40,17 @@ class FileLogWriter:
         self.logs_dir.mkdir(parents=True, exist_ok=True)
 
         # File paths
-        self.backend_logs_file = self.logs_dir / "backend_logs.log"
-        self.frontend_logs_file = self.logs_dir / "frontend_logs.log"
-        self.backend_exceptions_file = self.logs_dir / "backend_exceptions.log"
-        self.frontend_exceptions_file = self.logs_dir / "frontend_exceptions.log"
+        # Merged application logs (backend + frontend) for easier debugging with trace_id correlation
+        self.application_logs_file = self.logs_dir / "application_logs.log"
+        # Merged exceptions (backend + frontend) for easier debugging with trace_id correlation
+        self.application_exceptions_file = self.logs_dir / "application_exceptions.log"
+        self.audit_logs_file = self.logs_dir / "audit_logs.log"
 
         # Initialize log files (create empty files if they don't exist)
         for log_file in [
-            self.backend_logs_file,
-            self.frontend_logs_file,
-            self.backend_exceptions_file,
-            self.frontend_exceptions_file,
+            self.application_logs_file,
+            self.application_exceptions_file,
+            self.audit_logs_file,
         ]:
             if not log_file.exists():
                 log_file.touch()
@@ -92,11 +91,13 @@ class FileLogWriter:
         self,
         level: str,
         message: str,
+        source: Optional[str] = None,
         extra_data: Optional[dict[str, Any]] = None,
     ) -> str:
         """Format a log entry as JSON."""
         entry = {
             "timestamp": datetime.now().isoformat(),
+            "source": source,  # backend or frontend
             "level": level,
             "message": message,
         }
@@ -108,11 +109,13 @@ class FileLogWriter:
         self,
         exception_type: str,
         exception_message: str,
+        source: Optional[str] = None,
         extra_data: Optional[dict[str, Any]] = None,
     ) -> str:
         """Format an exception entry as JSON."""
         entry = {
             "timestamp": datetime.now().isoformat(),
+            "source": source,  # backend or frontend
             "exception_type": exception_type,
             "exception_message": exception_message,
         }
@@ -178,17 +181,16 @@ class FileLogWriter:
         if extra_data:
             log_data["extra_data"] = extra_data
 
-        formatted_entry = self._format_log_entry(level, message, log_data)
+        formatted_entry = self._format_log_entry(level, message, source=source, extra_data=log_data)
 
         with self.write_lock:
             try:
-                file_path = (
-                    self.backend_logs_file if source == "backend" else self.frontend_logs_file
-                )
+                # Write all logs (backend + frontend) to the same file for easier debugging
+                # Use source field to distinguish between backend and frontend logs
                 # Rotate if needed
-                self._rotate_file_if_needed(file_path)
+                self._rotate_file_if_needed(self.application_logs_file)
                 # Write to file
-                with open(file_path, "a", encoding="utf-8") as f:
+                with open(self.application_logs_file, "a", encoding="utf-8") as f:
                     f.write(formatted_entry + "\n")
             except Exception as e:
                 # Fallback to standard logging if file write fails
@@ -249,24 +251,92 @@ class FileLogWriter:
         exception_data = {k: v for k, v in exception_data.items() if v is not None}
 
         formatted_entry = self._format_exception_entry(
-            exception_type, exception_message, exception_data
+            exception_type, exception_message, source=source, extra_data=exception_data
         )
 
         with self.write_lock:
             try:
-                file_path = (
-                    self.backend_exceptions_file
-                    if source == "backend"
-                    else self.frontend_exceptions_file
-                )
+                # Write all exceptions (backend + frontend) to the same file for easier debugging
+                # Use source field to distinguish between backend and frontend exceptions
                 # Rotate if needed
-                self._rotate_file_if_needed(file_path)
+                self._rotate_file_if_needed(self.application_exceptions_file)
                 # Write to file
-                with open(file_path, "a", encoding="utf-8") as f:
+                with open(self.application_exceptions_file, "a", encoding="utf-8") as f:
                     f.write(formatted_entry + "\n")
             except Exception as e:
                 # Fallback to standard logging if file write fails
                 logging.error(f"Failed to write exception to file: {e}")
+
+    def _format_audit_entry(
+        self,
+        action: str,
+        user_id: Optional[str] = None,
+        resource_type: Optional[str] = None,
+        resource_id: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        extra_data: Optional[dict[str, Any]] = None,
+    ) -> str:
+        """Format an audit log entry as JSON."""
+        entry = {
+            "timestamp": datetime.now().isoformat(),
+            "action": action,
+        }
+        if user_id:
+            entry["user_id"] = user_id
+        if resource_type:
+            entry["resource_type"] = resource_type
+        if resource_id:
+            entry["resource_id"] = resource_id
+        if ip_address:
+            entry["ip_address"] = ip_address
+        if user_agent:
+            entry["user_agent"] = user_agent
+        if extra_data:
+            entry.update(extra_data)
+        return json.dumps(entry, ensure_ascii=False)
+
+    def write_audit_log(
+        self,
+        action: str,
+        user_id: Optional[str] = None,
+        resource_type: Optional[str] = None,
+        resource_id: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        extra_data: Optional[dict[str, Any]] = None,
+    ) -> None:
+        """Write an audit log entry to audit_logs.log file.
+
+        Args:
+            action: Action type (e.g., 'login', 'create', 'update', 'delete', 'approve')
+            user_id: User ID who performed the action
+            resource_type: Type of resource (e.g., 'member', 'performance', 'project')
+            resource_id: ID of the affected resource
+            ip_address: IP address of the user
+            user_agent: User agent string
+            extra_data: Additional context data
+        """
+        formatted_entry = self._format_audit_entry(
+            action=action,
+            user_id=str(user_id) if user_id else None,
+            resource_type=resource_type,
+            resource_id=str(resource_id) if resource_id else None,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            extra_data=extra_data,
+        )
+
+        with self.write_lock:
+            try:
+                # Rotate if needed
+                self._rotate_file_if_needed(self.audit_logs_file)
+                # Write to file
+                with open(self.audit_logs_file, "a", encoding="utf-8") as f:
+                    f.write(formatted_entry + "\n")
+            except Exception as e:
+                # Fallback to standard logging if file write fails
+                logging.error(f"Failed to write audit log to file: {e}")
 
     def close(self) -> None:
         """Close file writer (no-op for direct file writes)."""

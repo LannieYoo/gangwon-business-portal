@@ -6,8 +6,8 @@
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { apiService } from '@shared/services';
-import { API_PREFIX, BANNER_TYPES, ROUTES } from '@shared/utils/constants';
+import { contentService, loggerService, exceptionService } from '@shared/services';
+import { BANNER_TYPES, ROUTES } from '@shared/utils/constants';
 import './Banner.css';
 
 // Banner 数据缓存 - 在模块级别缓存，避免重复请求
@@ -157,28 +157,20 @@ export default function Banner({
     setIsLoading(true);
     
     try {
-      const response = await apiService.get(`${API_PREFIX}/content/banners`);
+      // 使用 contentService 获取横幅，传入 bannerType 参数
+      const banners = await contentService.getBanners({ bannerType });
       let newBanners = [];
       
-      if (response.banners) {
-        const filteredBanners = response.banners
-          .filter(b => b.type === bannerType)
-          .map(b => ({
-            id: b.id,
-            imageUrl: b.imageUrl,
-            link: b.linkUrl || null,
-            title: b.title || null,
-            subtitle: b.subtitle || b.description || null
-          }));
-        
-        newBanners = filteredBanners.length > 0 ? filteredBanners : [{
-          id: 'default',
-          imageUrl: finalDefaultBannerImages[bannerType] || '/uploads/banners/default.png',
-          link: null,
-          title: null,
-          subtitle: null
-        }];
+      if (Array.isArray(banners) && banners.length > 0) {
+        newBanners = banners.map(b => ({
+          id: b.id,
+          imageUrl: b.imageUrl,
+          link: b.linkUrl || null,
+          title: b.title || null,
+          subtitle: b.subtitle || b.description || null
+        }));
       } else {
+        // 如果没有横幅，使用默认图片
         newBanners = [{
           id: 'default',
           imageUrl: finalDefaultBannerImages[bannerType] || '/uploads/banners/default.png',
@@ -192,7 +184,11 @@ export default function Banner({
       try {
         await Promise.all(newBanners.map(banner => preloadImage(banner.imageUrl)));
       } catch (error) {
-        console.warn('Some banner images failed to preload:', error);
+        loggerService.warn('Some banner images failed to preload', {
+          module: 'Banner',
+          function: 'loadBanners',
+          error_message: error.message
+        });
         // 即使预加载失败，也继续显示
       }
 
@@ -207,7 +203,19 @@ export default function Banner({
       setDisplayBanners(newBanners);
       setCurrentBanner(0); // 重置到第一个 banner
     } catch (error) {
-      console.error('Failed to load banners:', error);
+      loggerService.error('Failed to load banners', {
+        module: 'Banner',
+        function: 'loadBanners',
+        banner_type: bannerType,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOAD_BANNERS_FAILED',
+        context_data: { banner_type: bannerType }
+      });
+      
       const fallbackBanner = [{
         id: 'default',
         imageUrl: finalDefaultBannerImages[bannerType] || '/uploads/banners/default.png',
@@ -219,7 +227,11 @@ export default function Banner({
       try {
         await preloadImage(fallbackBanner[0].imageUrl);
       } catch (preloadError) {
-        console.warn('Fallback banner image failed to preload:', preloadError);
+        loggerService.warn('Fallback banner image failed to preload', {
+          module: 'Banner',
+          function: 'loadBanners',
+          error_message: preloadError.message
+        });
       }
       
       setMainBanners(fallbackBanner);
@@ -234,11 +246,25 @@ export default function Banner({
   useEffect(() => {
     // 只有当 bannerType 改变时才重新加载
     // 保留当前的 displayBanners 直到新数据加载完成
-    loadBanners().catch(error => {
-      console.error('Failed to load banners:', error);
-      setIsLoading(false);
-    });
-  }, [i18n.language, bannerType, loadBanners]); // 包含 loadBanners 依赖
+    if (bannerType) {
+      loadBanners().catch(error => {
+        loggerService.error('Failed to load banners', {
+          module: 'Banner',
+          function: 'useEffect',
+          banner_type: bannerType,
+          error_message: error.message,
+          error_code: error.code
+        });
+        exceptionService.recordException(error, {
+          request_path: window.location.pathname,
+          error_code: error.code || 'LOAD_BANNERS_FAILED',
+          context_data: { banner_type: bannerType }
+        });
+        setIsLoading(false);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language, bannerType]); // 移除 loadBanners 依赖，避免无限循环
 
   // 横幅自动切换
   useEffect(() => {

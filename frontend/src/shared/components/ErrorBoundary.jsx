@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import loggerService from '@shared/services/logger.service';
 import exceptionService from '@shared/services/exception.service';
 import './ErrorBoundary.css';
 
@@ -26,6 +27,13 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // Log the error to our exception service
+    loggerService.error('Error caught by boundary', {
+      module: 'ErrorBoundary',
+      function: 'componentDidCatch',
+      error_message: error.message,
+      error_name: error.name
+    });
+    
     exceptionService.recordException(error, {
       request_path: window.location.pathname,
       context_data: {
@@ -33,11 +41,6 @@ class ErrorBoundary extends React.Component {
         errorBoundary: true,
       },
     });
-
-    // Also log to console in development
-    if (import.meta.env.DEV) {
-      console.error('Error caught by boundary:', error, errorInfo);
-    }
 
     this.setState({
       error,

@@ -12,7 +12,7 @@ import { PageContainer } from '@member/layouts';
 import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
 import { ArrowLeftIcon, DocumentIcon, DownloadIcon } from '@shared/components/Icons';
-import { supportService } from '@shared/services';
+import { supportService, loggerService, exceptionService } from '@shared/services';
 import './ConsultationDetail.css';
 import './Support.css';
 
@@ -30,7 +30,16 @@ export default function ConsultationDetail() {
   useEffect(() => {
     const loadConsultation = async () => {
       if (!id) {
-        console.error('Consultation ID is missing');
+        const error = new Error('Consultation ID is missing');
+        loggerService.error('Consultation ID is missing', {
+          module: 'ConsultationDetail',
+          function: 'loadConsultation',
+          error_message: error.message
+        });
+        exceptionService.recordException(error, {
+          request_path: window.location.pathname,
+          error_code: 'CONSULTATION_ID_MISSING'
+        });
         setError(t('support.consultationIdMissing'));
         setLoading(false);
         return;
@@ -46,7 +55,18 @@ export default function ConsultationDetail() {
           setError(t('support.notFound'));
         }
       } catch (error) {
-        console.error('Failed to load consultation:', error);
+        loggerService.error('Failed to load consultation', {
+          module: 'ConsultationDetail',
+          function: 'loadConsultation',
+          consultation_id: id,
+          error_message: error.message,
+          error_code: error.code
+        });
+        exceptionService.recordException(error, {
+          request_path: window.location.pathname,
+          error_code: error.code || 'LOAD_CONSULTATION_FAILED',
+          context_data: { consultation_id: id }
+        });
         const errorMessage = error?.response?.data?.detail || error?.message || t('support.loadFailed');
         setError(errorMessage);
       } finally {

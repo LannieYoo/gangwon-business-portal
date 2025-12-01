@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
-import { projectService } from '@shared/services';
+import { projectService, loggerService, exceptionService } from '@shared/services';
 import { ArrowLeftIcon } from '@shared/components/Icons';
 import ApplicationModal from './ApplicationModal';
 import './ProjectDetail.css';
@@ -31,7 +31,18 @@ export default function ProjectDetail() {
         setProject(projectData);
       }
     } catch (error) {
-      console.error('Failed to load project detail:', error);
+      loggerService.error('Failed to load project detail', {
+        module: 'ProjectDetail',
+        function: 'loadProjectDetail',
+        project_id: id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOAD_PROJECT_DETAIL_FAILED',
+        context_data: { project_id: id }
+      });
     } finally {
       setLoading(false);
     }

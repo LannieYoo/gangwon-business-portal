@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Card, Button, Input, Loading } from '@shared/components';
-import { apiService } from '@shared/services';
+import { apiService, loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 
 import './Dashboard.css';
@@ -31,6 +31,10 @@ export default function BannerManagement() {
   const loadBanners = async () => {
     setLoading(true);
     try {
+      loggerService.info('Loading banners', {
+        module: 'BannerManagement',
+        function: 'loadBanners'
+      });
       const response = await apiService.get(`${API_PREFIX}/admin/banners`);
       if (response && response.banners) {
         const bannerKeys = ['main', 'systemIntro', 'projects', 'performance', 'support'];
@@ -44,9 +48,22 @@ export default function BannerManagement() {
           };
         });
         setBanners(normalizedBanners);
+        loggerService.info('Banners loaded successfully', {
+          module: 'BannerManagement',
+          function: 'loadBanners'
+        });
       }
     } catch (error) {
-      console.error('Failed to load banners:', error);
+      loggerService.error('Failed to load banners', {
+        module: 'BannerManagement',
+        function: 'loadBanners',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_BANNERS_ERROR'
+      });
     } finally {
       setLoading(false);
     }
@@ -116,8 +133,23 @@ export default function BannerManagement() {
           }
         }));
       }
+      loggerService.info('Banner saved successfully', {
+        module: 'BannerManagement',
+        function: 'handleSave',
+        banner_key: bannerKey
+      });
     } catch (error) {
-      console.error('Failed to save banner:', error);
+      loggerService.error('Failed to save banner', {
+        module: 'BannerManagement',
+        function: 'handleSave',
+        banner_key: bannerKey,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'SAVE_BANNER_ERROR'
+      });
       alert(t('admin.dashboard.banner.saveError') || '保存失败，请重试');
     } finally {
       setLoading(false);

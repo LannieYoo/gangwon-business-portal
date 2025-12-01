@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Badge, Loading } from '@shared/components';
-import { adminService } from '@shared/services';
+import { adminService, loggerService, exceptionService } from '@shared/services';
 import './AuditLogList.css';
 
 export default function AuditLogDetail() {
@@ -24,10 +24,30 @@ export default function AuditLogDetail() {
   const loadLogDetail = async () => {
     setLoading(true);
     try {
+      loggerService.info('Loading audit log detail', {
+        module: 'AuditLogDetail',
+        function: 'loadLogDetail',
+        log_id: id
+      });
       const response = await adminService.getAuditLog(id);
       setLog(response);
+      loggerService.info('Audit log detail loaded successfully', {
+        module: 'AuditLogDetail',
+        function: 'loadLogDetail',
+        log_id: id
+      });
     } catch (error) {
-      console.error('Failed to load audit log:', error);
+      loggerService.error('Failed to load audit log', {
+        module: 'AuditLogDetail',
+        function: 'loadLogDetail',
+        log_id: id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_AUDIT_LOG_DETAIL_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.auditLogs.loadFailed', '加载审计日志失败');
       alert(errorMessage);
     } finally {

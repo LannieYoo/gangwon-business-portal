@@ -8,6 +8,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import useAuthStore from '@shared/stores/authStore';
 import LanguageSwitcher from '@shared/components/LanguageSwitcher';
+import { loggerService, exceptionService } from '@shared/services';
 import {
   MenuIcon,
   BellIcon,
@@ -49,9 +50,22 @@ export default function Header({ onToggleSidebar }) {
     try {
       setShowUserMenu(false);
       await logout();
+      loggerService.info('Admin logout succeeded', {
+        module: 'AdminHeader',
+        function: 'handleLogout'
+      });
       navigate('/admin/login', { replace: true });
     } catch (error) {
-      console.error('Logout error:', error);
+      loggerService.error('Admin logout failed', {
+        module: 'AdminHeader',
+        function: 'handleLogout',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOGOUT_ERROR'
+      });
       // Even if logout API fails, clear local auth and redirect
       const { clearAuth } = useAuthStore.getState();
       clearAuth();

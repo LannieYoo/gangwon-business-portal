@@ -11,7 +11,7 @@ import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Select from '@shared/components/Select';
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@shared/components/Table';
-import { performanceService, uploadService } from '@shared/services';
+import { performanceService, uploadService, loggerService, exceptionService } from '@shared/services';
 import { DownloadIcon, EditIcon, TrashIcon, SearchIcon } from '@shared/components/Icons';
 import './PerformanceListContent.css';
 
@@ -70,7 +70,12 @@ export default function PerformanceListContent() {
                 });
               }
             } catch (e) {
-              console.warn('Failed to parse data_json for attachments:', e);
+              loggerService.warn('Failed to parse data_json for attachments', {
+                module: 'PerformanceListContent',
+                function: 'loadPerformances',
+                record_id: r.id,
+                error_message: e.message
+              });
             }
           }
           
@@ -96,7 +101,16 @@ export default function PerformanceListContent() {
         setPerformances(formatted);
       }
     } catch (error) {
-      console.error('Failed to load performances:', error);
+      loggerService.error('Failed to load performances', {
+        module: 'PerformanceListContent',
+        function: 'loadPerformances',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOAD_PERFORMANCES_FAILED'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('message.loadFailed', '加载失败');
       alert(errorMessage);
     } finally {
@@ -139,7 +153,18 @@ export default function PerformanceListContent() {
       alert(t('message.deleteSuccess', '删除成功'));
       loadPerformances();
     } catch (error) {
-      console.error('Failed to delete:', error);
+      loggerService.error('Failed to delete performance record', {
+        module: 'PerformanceListContent',
+        function: 'handleDelete',
+        record_id: id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'DELETE_PERFORMANCE_FAILED',
+        context_data: { record_id: id }
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('message.deleteFailed', '删除失败');
       alert(errorMessage);
     }
@@ -159,7 +184,18 @@ export default function PerformanceListContent() {
       // Use upload service to download file
       await uploadService.downloadFile(fileId, fileName);
     } catch (error) {
-      console.error('Failed to download:', error);
+      loggerService.error('Failed to download file', {
+        module: 'PerformanceListContent',
+        function: 'handleDownload',
+        file_id: fileId,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'DOWNLOAD_FILE_FAILED',
+        context_data: { file_id: fileId }
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('message.downloadFailed', '下载失败');
       alert(errorMessage);
     }
@@ -175,7 +211,18 @@ export default function PerformanceListContent() {
       // Use upload service to download file by URL
       await uploadService.downloadFileByUrl(fileUrl, fileName);
     } catch (error) {
-      console.error('Failed to download:', error);
+      loggerService.error('Failed to download file by URL', {
+        module: 'PerformanceListContent',
+        function: 'handleDownloadByUrl',
+        file_url: fileUrl,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'DOWNLOAD_FILE_BY_URL_FAILED',
+        context_data: { file_url: fileUrl }
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('message.downloadFailed', '下载失败');
       alert(errorMessage);
     }

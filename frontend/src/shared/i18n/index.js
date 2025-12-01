@@ -145,7 +145,7 @@ i18n
     resources,
     fallbackLng: 'ko', // 默认语言
     supportedLngs: ['ko', 'zh'],
-    debug: import.meta.env.DEV,
+    debug: false, // 关闭调试日志
     interpolation: {
       escapeValue: false // React 已经安全处理
     },

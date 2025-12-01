@@ -22,9 +22,8 @@ from .schemas import (
 class LoggingService:
     """Logging service class."""
 
-    async def create_log(
+    def create_log(
         self,
-        db: AsyncSession,
         source: str,  # backend, frontend
         level: str,  # DEBUG, INFO, WARNING, ERROR, CRITICAL
         message: str,
@@ -41,12 +40,11 @@ class LoggingService:
         response_status: Optional[int] = None,
         duration_ms: Optional[int] = None,
         extra_data: Optional[dict[str, Any]] = None,
-    ) -> ApplicationLog:
+    ) -> None:
         """
-        Create an application log entry.
+        Create an application log entry (file only).
 
         Args:
-            db: Database session
             source: Source of the log (backend/frontend)
             level: Log level (DEBUG/INFO/WARNING/ERROR/CRITICAL)
             message: Log message
@@ -63,33 +61,7 @@ class LoggingService:
             response_status: HTTP status code
             duration_ms: Request duration in milliseconds
             extra_data: Additional context data
-
-        Returns:
-            Created ApplicationLog instance
         """
-        app_log = ApplicationLog(
-            source=source,
-            level=level,
-            message=message,
-            module=module,
-            function=function,
-            line_number=line_number,
-            trace_id=trace_id,
-            user_id=user_id,
-            ip_address=ip_address,
-            user_agent=user_agent,
-            request_method=request_method,
-            request_path=request_path,
-            request_data=request_data,
-            response_status=response_status,
-            duration_ms=duration_ms,
-            extra_data=extra_data,
-        )
-
-        db.add(app_log)
-        await db.commit()
-        await db.refresh(app_log)
-
         # Write to file log
         try:
             file_log_writer.write_log(
@@ -113,8 +85,6 @@ class LoggingService:
         except Exception:
             # Don't fail if file write fails
             pass
-
-        return app_log
 
     async def list_logs(
         self,

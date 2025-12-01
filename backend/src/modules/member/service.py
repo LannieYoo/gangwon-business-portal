@@ -188,17 +188,9 @@ class MemberService:
                 approval_type="회원가입",
                 status="approved",
             )
-        except Exception as e:
-            from ...common.modules.logger import logger
-            logger.warning(
-                "Failed to send approval notification email",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member.id),
-                    "email": member.email,
-                    "error": str(e),
-                },
-            )
+        except Exception:
+            # Ignore errors - don't fail approval if email fails
+            pass
 
         return member
 
@@ -239,17 +231,9 @@ class MemberService:
                 status="rejected",
                 comments=reason,
             )
-        except Exception as e:
-            from ...common.modules.logger import logger
-            logger.warning(
-                "Failed to send rejection notification email",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member.id),
-                    "email": member.email,
-                    "error": str(e),
-                },
-            )
+        except Exception:
+            # Ignore errors - don't fail rejection if email fails
+            pass
 
         return member
 

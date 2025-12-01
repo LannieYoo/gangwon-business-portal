@@ -61,7 +61,6 @@ async def log_http_requests(request: Request, call_next):
     """
     from .common.modules.exception.responses import get_trace_id
     from .common.modules.logger import logging_service
-    from .common.modules.db.session import AsyncSessionLocal
 
     # Skip logging for health check endpoints, static files, and logging/exception endpoints
     # to avoid infinite recursion (logging the logging API itself)
@@ -112,27 +111,24 @@ async def log_http_requests(request: Request, call_next):
         },
     )
 
-    # Business log recording (file + database) - async, non-blocking
+    # Business log recording (file only) - non-blocking
     if should_log:
         try:
-            async with AsyncSessionLocal() as db:
-                await logging_service.create_log(
-                    db=db,
-                    source="backend",
-                    level=log_level,
-                    message=f"{request.method} {request.url.path} -> {response.status_code}",
-                    module=logger.name,
-                    function="log_http_requests",
-                    trace_id=trace_id,
-                    user_id=user_id,
-                    ip_address=ip_address,
-                    user_agent=user_agent,
-                    request_method=request.method,
-                    request_path=request.url.path,
-                    response_status=response.status_code,
-                    duration_ms=int(process_time_ms),
-                )
-                await db.commit()
+            logging_service.create_log(
+                source="backend",
+                level=log_level,
+                message=f"{request.method} {request.url.path} -> {response.status_code}",
+                module=logger.name,
+                function="log_http_requests",
+                trace_id=trace_id,
+                user_id=user_id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                request_method=request.method,
+                request_path=request.url.path,
+                response_status=response.status_code,
+                duration_ms=int(process_time_ms),
+            )
         except Exception as e:
             # Don't fail the request if logging fails
             logger.warning(f"Failed to record business log: {str(e)}")
@@ -166,6 +162,7 @@ from .modules.project.router import router as project_router
 from .modules.content.router import router as content_router
 from .modules.support.router import router as support_router
 from .modules.upload.router import router as upload_router
+from .modules.dashboard.router import router as dashboard_router
 from .common.modules.audit.router import router as audit_router
 from .common.modules.logger import logging_router
 from .common.modules.exception import exception_router
@@ -177,6 +174,7 @@ app.include_router(project_router)
 app.include_router(content_router)
 app.include_router(support_router)
 app.include_router(upload_router)
+app.include_router(dashboard_router)
 app.include_router(audit_router)
 app.include_router(logging_router)
 app.include_router(exception_router)

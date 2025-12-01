@@ -122,6 +122,7 @@ class UserInfo(BaseModel):
     email: str
     status: str
     approval_status: str
+    role: str  # User role: 'member' or 'admin'
     created_at: datetime
 
     class Config:

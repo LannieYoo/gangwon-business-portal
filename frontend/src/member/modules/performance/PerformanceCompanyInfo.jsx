@@ -12,7 +12,7 @@ import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
-import { memberService } from '@shared/services';
+import { memberService, loggerService, exceptionService } from '@shared/services';
 import { 
   UserIcon, 
   BuildingIcon, 
@@ -100,7 +100,16 @@ export default function PerformanceCompanyInfo() {
         });
       }
     } catch (error) {
-      console.error('Failed to load profile:', error);
+      loggerService.error('Failed to load profile', {
+        module: 'PerformanceCompanyInfo',
+        function: 'loadProfile',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOAD_PROFILE_FAILED'
+      });
     } finally {
       setLoading(false);
     }
@@ -160,7 +169,16 @@ export default function PerformanceCompanyInfo() {
       alert(t('message.saveSuccess') || '保存成功');
       loadProfile();
     } catch (error) {
-      console.error('Failed to save:', error);
+      loggerService.error('Failed to save profile', {
+        module: 'PerformanceCompanyInfo',
+        function: 'handleSave',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'SAVE_PROFILE_FAILED'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('message.saveFailed') || '保存失败';
       alert(errorMessage);
     }

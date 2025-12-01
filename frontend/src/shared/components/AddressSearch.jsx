@@ -5,6 +5,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import loggerService from '@shared/services/logger.service';
+import exceptionService from '@shared/services/exception.service';
 import './AddressSearch.css';
 
 /**
@@ -41,10 +43,22 @@ export function AddressSearch({ value, onSelect, className = '', disabled = fals
     script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
     script.async = true;
     script.onload = () => {
-      console.log('Daum Postcode API loaded');
+      loggerService.info('Daum Postcode API loaded', {
+        module: 'AddressSearch',
+        function: 'loadDaumPostcodeScript'
+      });
     };
     script.onerror = () => {
-      console.error('Failed to load Daum Postcode API');
+      const error = new Error('Failed to load Daum Postcode API');
+      loggerService.error('Failed to load Daum Postcode API', {
+        module: 'AddressSearch',
+        function: 'loadDaumPostcodeScript',
+        error_message: error.message
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_DAUM_POSTCODE_API_FAILED'
+      });
     };
     document.head.appendChild(script);
   };

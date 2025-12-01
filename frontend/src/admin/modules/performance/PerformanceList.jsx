@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Table, Button, Select, Badge, Modal, Textarea } from '@shared/components';
-import { adminService } from '@shared/services';
+import { adminService, loggerService, exceptionService } from '@shared/services';
 import './PerformanceList.css';
 
 export default function PerformanceList() {
@@ -39,12 +39,32 @@ export default function PerformanceList() {
         page: 1,
         pageSize: 100 // Load all records for now
       };
+      loggerService.info('Loading performance records', {
+        module: 'PerformanceList',
+        function: 'loadPerformanceRecords',
+        status: statusFilter,
+        member_id: memberId
+      });
       const response = await adminService.listPerformanceRecords(params);
       if (response.records) {
         setRecords(response.records);
+        loggerService.info('Performance records loaded successfully', {
+          module: 'PerformanceList',
+          function: 'loadPerformanceRecords',
+          count: response.records.length
+        });
       }
     } catch (error) {
-      console.error('Failed to load performance records:', error);
+      loggerService.error('Failed to load performance records', {
+        module: 'PerformanceList',
+        function: 'loadPerformanceRecords',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_PERFORMANCE_RECORDS_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('message.loadFailed', '加载失败');
       alert(errorMessage);
     } finally {
@@ -54,11 +74,31 @@ export default function PerformanceList() {
 
   const handleApprove = async (record) => {
     try {
+      loggerService.info('Approving performance record', {
+        module: 'PerformanceList',
+        function: 'handleApprove',
+        record_id: record.id
+      });
       await adminService.approvePerformance(record.id);
+      loggerService.info('Performance record approved successfully', {
+        module: 'PerformanceList',
+        function: 'handleApprove',
+        record_id: record.id
+      });
       alert(t('admin.performance.approveSuccess', '批准成功') || '批准成功');
       loadPerformanceRecords();
     } catch (error) {
-      console.error('Failed to approve record:', error);
+      loggerService.error('Failed to approve record', {
+        module: 'PerformanceList',
+        function: 'handleApprove',
+        record_id: record.id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'APPROVE_PERFORMANCE_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.performance.approveFailed', '批准失败');
       alert(errorMessage);
     }
@@ -71,13 +111,33 @@ export default function PerformanceList() {
     }
 
     try {
+      loggerService.info('Requesting performance revision', {
+        module: 'PerformanceList',
+        function: 'handleRequestRevision',
+        record_id: selectedRecord.id
+      });
       await adminService.requestPerformanceRevision(selectedRecord.id, reviewComment);
+      loggerService.info('Performance revision requested successfully', {
+        module: 'PerformanceList',
+        function: 'handleRequestRevision',
+        record_id: selectedRecord.id
+      });
       alert(t('admin.performance.revisionSuccess', '修改请求已发送') || '修改请求已发送');
       setShowReviewModal(false);
       setReviewComment('');
       loadPerformanceRecords();
     } catch (error) {
-      console.error('Failed to request revision:', error);
+      loggerService.error('Failed to request revision', {
+        module: 'PerformanceList',
+        function: 'handleRequestRevision',
+        record_id: selectedRecord.id,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'REQUEST_PERFORMANCE_REVISION_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.performance.revisionFailed', '请求修改失败');
       alert(errorMessage);
     }
@@ -100,10 +160,30 @@ export default function PerformanceList() {
         status: statusFilter !== 'all' ? statusFilter : undefined,
         memberId: memberId || undefined
       };
+      loggerService.info('Exporting performance', {
+        module: 'PerformanceList',
+        function: 'handleExport',
+        format: format
+      });
       await adminService.exportPerformance(params);
+      loggerService.info('Performance exported successfully', {
+        module: 'PerformanceList',
+        function: 'handleExport',
+        format: format
+      });
       alert(t('admin.performance.exportSuccess', '导出成功') || '导出成功');
     } catch (error) {
-      console.error('Failed to export performance:', error);
+      loggerService.error('Failed to export performance', {
+        module: 'PerformanceList',
+        function: 'handleExport',
+        format: format,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'EXPORT_PERFORMANCE_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.performance.exportFailed', '导出失败');
       alert(errorMessage);
     } finally {

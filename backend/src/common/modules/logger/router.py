@@ -132,7 +132,6 @@ async def list_frontend_logs(
 @router.post("/api/v1/logging/frontend/logs")
 async def create_frontend_log(
     log_data: FrontendLogCreate,
-    db: AsyncSession = Depends(get_db),
 ):
     """
     Create a frontend application log entry.
@@ -153,8 +152,7 @@ async def create_frontend_log(
             pass
     
     # Force source to be frontend
-    await logging_service.create_log(
-        db=db,
+    logging_service.create_log(
         source="frontend",  # Always frontend for this endpoint
         level=log_data.level,
         message=log_data.message,

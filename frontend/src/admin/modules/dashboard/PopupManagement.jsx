@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Card, Button, Input, Loading } from '@shared/components';
-import { apiService } from '@shared/services';
+import { apiService, loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 
 import './Dashboard.css';
@@ -32,12 +32,29 @@ export default function PopupManagement() {
   const loadPopup = async () => {
     setLoading(true);
     try {
+      loggerService.info('Loading popup', {
+        module: 'PopupManagement',
+        function: 'loadPopup'
+      });
       const response = await apiService.get(`${API_PREFIX}/admin/popup`);
       if (response && response.popup) {
         setPopup(response.popup);
+        loggerService.info('Popup loaded successfully', {
+          module: 'PopupManagement',
+          function: 'loadPopup'
+        });
       }
     } catch (error) {
-      console.error('Failed to load popup:', error);
+      loggerService.error('Failed to load popup', {
+        module: 'PopupManagement',
+        function: 'loadPopup',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_POPUP_ERROR'
+      });
     } finally {
       setLoading(false);
     }
@@ -102,8 +119,21 @@ export default function PopupManagement() {
           ...response.popup
         }));
       }
+      loggerService.info('Popup saved successfully', {
+        module: 'PopupManagement',
+        function: 'handleSave'
+      });
     } catch (error) {
-      console.error('Failed to save popup:', error);
+      loggerService.error('Failed to save popup', {
+        module: 'PopupManagement',
+        function: 'handleSave',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'SAVE_POPUP_ERROR'
+      });
       alert(t('admin.dashboard.popup.saveError') || '保存失败，请重试');
     } finally {
       setLoading(false);

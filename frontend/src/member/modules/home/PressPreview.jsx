@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '@shared/components/Card';
 import LazyImage from '@shared/components/LazyImage';
-import { contentService } from '@shared/services';
+import { contentService, loggerService, exceptionService } from '@shared/services';
 import { ROUTES } from '@shared/utils/constants';
 
 function PressPreview() {
@@ -29,7 +29,16 @@ function PressPreview() {
         setNews(null);
       }
     } catch (error) {
-      console.error('Failed to load news:', error);
+      loggerService.error('Failed to load news', {
+        module: 'PressPreview',
+        function: 'loadNews',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: error.code || 'LOAD_NEWS_FAILED'
+      });
       setNews(null);
     } finally {
       setLoading(false);
@@ -38,7 +47,8 @@ function PressPreview() {
 
   useEffect(() => {
     loadNews();
-  }, [loadNews]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language]); // 直接依赖 i18n.language，避免 loadNews 变化导致重复请求
 
   return (
     <section className="news-section">

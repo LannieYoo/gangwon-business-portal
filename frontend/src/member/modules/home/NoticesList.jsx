@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import Card from '@shared/components/Card';
 import { Pagination } from '@shared/components';
 import { PageContainer } from '@member/layouts';
-import { apiService } from '@shared/services';
+import { apiService, loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX, DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@shared/utils/constants';
 
 function NoticesList() {
@@ -51,7 +51,16 @@ function NoticesList() {
           setTotalCount(0);
         }
       } catch (error) {
-        console.error('Failed to load notices:', error);
+        loggerService.error('Failed to load notices', {
+          module: 'NoticesList',
+          function: 'loadNotices',
+          error_message: error.message,
+          error_code: error.code
+        });
+        exceptionService.recordException(error, {
+          request_path: window.location.pathname,
+          error_code: error.code || 'LOAD_NOTICES_FAILED'
+        });
         setError(error.message || t('common.error.loadFailed', '加载失败，请稍后重试'));
         setNotices([]);
         setTotalCount(0);
@@ -115,7 +124,16 @@ function NoticesList() {
                     setTotalCount(0);
                   }
                 } catch (error) {
-                  console.error('Failed to load notices:', error);
+                  loggerService.error('Failed to load notices (retry)', {
+                    module: 'NoticesList',
+                    function: 'loadNotices',
+                    error_message: error.message,
+                    error_code: error.code
+                  });
+                  exceptionService.recordException(error, {
+                    request_path: window.location.pathname,
+                    error_code: error.code || 'LOAD_NOTICES_FAILED'
+                  });
                   setError(error.message || t('common.error.loadFailed', '加载失败，请稍后重试'));
                   setNotices([]);
                   setTotalCount(0);

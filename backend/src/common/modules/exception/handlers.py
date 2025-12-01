@@ -17,7 +17,7 @@ from .exceptions import AppException
 from .responses import create_error_response, get_trace_id
 
 
-async def _record_exception_to_db(
+def _record_exception_to_file(
     request: Request,
     exc: Exception,
     error_code: Optional[str] = None,
@@ -25,13 +25,12 @@ async def _record_exception_to_db(
     user_id: Optional[UUID] = None,
 ):
     """
-    Record exception to database asynchronously.
+    Record exception to file log.
     
     This function attempts to record the exception but doesn't fail if it can't
     (to avoid recursive errors).
     """
     try:
-        from ..db.session import AsyncSessionLocal
         from .service import ExceptionService
         
         trace_id = get_trace_id(request)
@@ -49,27 +48,25 @@ async def _record_exception_to_db(
         except Exception:
             pass  # Ignore errors when reading request body
         
-        async with AsyncSessionLocal() as db:
-            exception_service = ExceptionService()
-            await exception_service.create_exception(
-                db=db,
-                source="backend",
-                exception_type=type(exc).__name__,
-                exception_message=str(exc),
-                error_code=error_code,
-                status_code=status_code,
-                trace_id=trace_id,
-                user_id=user_id,
-                ip_address=ip_address,
-                user_agent=user_agent,
-                request_method=request.method,
-                request_path=request.url.path,
-                request_data=request_data,
-                exc=exc,
-            )
+        exception_service = ExceptionService()
+        exception_service.create_exception(
+            source="backend",
+            exception_type=type(exc).__name__,
+            exception_message=str(exc),
+            error_code=error_code,
+            status_code=status_code,
+            trace_id=trace_id,
+            user_id=user_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            request_method=request.method,
+            request_path=request.url.path,
+            request_data=request_data,
+            exc=exc,
+        )
     except Exception as e:
         # Silently fail to avoid recursive errors
-        logger.debug(f"Failed to record exception to database: {str(e)}")
+        logger.debug(f"Failed to record exception to file: {str(e)}")
 
 
 async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
@@ -88,8 +85,8 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
         log_level = logger.error
         log_message = f"Application error: {exc.message}"
         include_exc_info = True
-        # Record 5xx errors to database
-        await _record_exception_to_db(
+        # Record 5xx errors to file
+        _record_exception_to_file(
             request=request,
             exc=exc,
             error_code=exc.error_code,
@@ -215,8 +212,8 @@ async def sqlalchemy_exception_handler(
             },
         )
     
-    # Record database errors to database
-    await _record_exception_to_db(
+    # Record database errors to file
+    _record_exception_to_file(
         request=request,
         exc=exc,
         error_code=error_code,
@@ -262,8 +259,8 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
         },
     )
     
-    # Record unexpected exceptions to database
-    await _record_exception_to_db(
+    # Record unexpected exceptions to file
+    _record_exception_to_file(
         request=request,
         exc=exc,
         error_code="INTERNAL_SERVER_ERROR",

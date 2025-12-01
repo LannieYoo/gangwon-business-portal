@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Card, Select, Loading, MemberGrowthChart, MixedChart } from '@shared/components';
 import { BuildingIcon, CurrencyDollarIcon, UsersIcon, DocumentIcon } from '@shared/components/Icons';
-import { apiService } from '@shared/services';
+import { apiService, loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import { formatCurrencyCompact } from '@shared/utils/format';
 
@@ -56,7 +56,11 @@ export default function CompanyStatus() {
           setChartData({ members: [], salesEmployment: [] });
         }
       } else {
-        console.warn('Company Status response missing stats:', response);
+        loggerService.warning('Company Status response missing stats', {
+          module: 'CompanyStatus',
+          function: 'loadDashboardStats',
+          response: response
+        });
         setStats({
           totalMembers: 0,
           totalSales: 0,
@@ -66,7 +70,16 @@ export default function CompanyStatus() {
         setChartData({ members: [], salesEmployment: [] });
       }
     } catch (error) {
-      console.error('Failed to load company status stats:', error);
+      loggerService.error('Failed to load company status stats', {
+        module: 'CompanyStatus',
+        function: 'loadDashboardStats',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_COMPANY_STATUS_ERROR'
+      });
       setStats({
         totalMembers: 0,
         totalSales: 0,

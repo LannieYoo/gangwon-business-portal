@@ -23,9 +23,8 @@ from .schemas import (
 class ExceptionService:
     """Exception service class."""
 
-    async def create_exception(
+    def create_exception(
         self,
-        db: AsyncSession,
         source: str,  # backend, frontend
         exception_type: str,
         exception_message: str,
@@ -42,12 +41,11 @@ class ExceptionService:
         exception_details: Optional[dict[str, Any]] = None,
         context_data: Optional[dict[str, Any]] = None,
         exc: Optional[Exception] = None,
-    ) -> ApplicationException:
+    ) -> None:
         """
-        Create an application exception entry.
+        Create an application exception entry (file only).
 
         Args:
-            db: Database session
             source: Source of the exception (backend/frontend)
             exception_type: Exception class name
             exception_message: Exception message
@@ -64,35 +62,10 @@ class ExceptionService:
             exception_details: Additional exception details
             context_data: Additional context data
             exc: Exception object (for extracting stack trace if not provided)
-
-        Returns:
-            Created ApplicationException instance
         """
         # Extract stack trace from exception if not provided
         if not stack_trace and exc:
             stack_trace = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
-
-        app_exception = ApplicationException(
-            source=source,
-            exception_type=exception_type,
-            exception_message=exception_message,
-            error_code=error_code,
-            status_code=status_code,
-            trace_id=trace_id,
-            user_id=user_id,
-            ip_address=ip_address,
-            user_agent=user_agent,
-            request_method=request_method,
-            request_path=request_path,
-            request_data=request_data,
-            stack_trace=stack_trace,
-            exception_details=exception_details,
-            context_data=context_data,
-        )
-
-        db.add(app_exception)
-        await db.commit()
-        await db.refresh(app_exception)
 
         # Write to file log
         try:
@@ -116,8 +89,6 @@ class ExceptionService:
         except Exception:
             # Don't fail if file write fails
             pass
-
-        return app_exception
 
     async def list_exceptions(
         self,

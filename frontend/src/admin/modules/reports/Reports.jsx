@@ -6,7 +6,7 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Select, Input, Button, Table, Badge, Alert } from '@shared/components';
-import { apiService } from '@shared/services';
+import { apiService, loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import './Reports.css';
 
@@ -67,7 +67,17 @@ export default function Reports() {
       setSelectedCompany(null);
       setDnbData(null);
     } catch (error) {
-      console.error('Failed to search companies', error);
+      loggerService.error('Failed to search companies', {
+        module: 'Reports',
+        function: 'handleSearch',
+        filters: filters,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'SEARCH_COMPANIES_ERROR'
+      });
       setMessageVariant('error');
       setMessage(t('admin.reports.messages.searchFailed'));
     } finally {
@@ -117,7 +127,17 @@ export default function Reports() {
         throw new Error('Invalid response format');
       }
     } catch (error) {
-      console.error('Failed to load Nice D&B data', error);
+      loggerService.error('Failed to load Nice D&B data', {
+        module: 'Reports',
+        function: 'fetchNiceDnb',
+        business_number: businessNumber,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'FETCH_NICE_DNB_ERROR'
+      });
       setMessageVariant('error');
       const errorMessage = error.response?.data?.message || error.message;
       setMessage(t('admin.reports.messages.dnbFailed', { error: errorMessage }));

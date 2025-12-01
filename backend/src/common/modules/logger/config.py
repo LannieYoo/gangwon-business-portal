@@ -5,7 +5,8 @@ from pathlib import Path
 from ..config import settings
 from .filters import SensitiveDataFilter, ContextFilter
 from .formatter import JSONFormatter
-from .handlers import create_console_handler, create_file_handler
+from .handlers import create_file_handler
+# from .handlers import create_console_handler  # Uncomment if console logging is needed
 
 
 def get_log_level(level_name: str) -> int:
@@ -67,12 +68,13 @@ def setup_logging() -> None:
     )
     context_filter = ContextFilter()
 
-    # Console handler (for development and debugging)
-    if getattr(settings, "LOG_ENABLE_CONSOLE", True) or settings.DEBUG:
-        console_handler = create_console_handler(formatter, level)
-        console_handler.addFilter(sensitive_filter)
-        console_handler.addFilter(context_filter)
-        root_logger.addHandler(console_handler)
+    # Console handler disabled - logs only go to files
+    # Uncomment the following block if you need console output for debugging
+    # if getattr(settings, "LOG_ENABLE_CONSOLE", False) or settings.DEBUG:
+    #     console_handler = create_console_handler(formatter, level)
+    #     console_handler.addFilter(sensitive_filter)
+    #     console_handler.addFilter(context_filter)
+    #     root_logger.addHandler(console_handler)
 
     # File handler (only enabled if LOG_ENABLE_FILE is explicitly set to True)
     # Note: Application logs go to backend_logs.log/frontend_logs.log via logging_service

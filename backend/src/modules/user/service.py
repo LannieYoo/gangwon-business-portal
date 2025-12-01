@@ -9,13 +9,11 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from fastapi import HTTPException, status
 
 from ...common.modules.config import settings
 from ...common.modules.db.models import Member, MemberProfile
 from ...common.modules.exception import UnauthorizedError, ValidationError, NotFoundError
-from ...common.modules.logger import logger
-from .schemas import MemberRegisterRequest, LoginRequest
+from .schemas import MemberRegisterRequest
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -91,39 +89,16 @@ class AuthService:
         Raises:
             ValidationError: If business number or email already exists
         """
-        logger.info(
-            "Register member request received",
-            extra={
-                "module_name": __name__,
-                "business_number": data.business_number,
-                "email": data.email,
-            },
-        )
-
         # Check if business number already exists
         result = await db.execute(
             select(Member).where(Member.business_number == data.business_number)
         )
         if result.scalar_one_or_none():
-            logger.warning(
-                "Registration failed: business number already registered",
-                extra={
-                    "module_name": __name__,
-                    "business_number": data.business_number,
-                },
-            )
             raise ValidationError("Business number already registered")
 
         # Check if email already exists
         result = await db.execute(select(Member).where(Member.email == data.email))
         if result.scalar_one_or_none():
-            logger.warning(
-                "Registration failed: email already registered",
-                extra={
-                    "module_name": __name__,
-                    "email": data.email,
-                },
-            )
             raise ValidationError("Email already registered")
 
         # Verify company information with Nice D&B API (optional, non-blocking)
@@ -131,41 +106,15 @@ class AuthService:
         try:
             from ...common.modules.integrations.nice_dnb import nice_dnb_client
             
-            # Attempt to verify company information
-            verified = await nice_dnb_client.verify_company(
+            # Attempt to verify company information (non-blocking)
+            await nice_dnb_client.verify_company(
                 data.business_number, data.company_name
             )
-            
-            if not verified:
-                logger.warning(
-                    "Company verification failed with Nice D&B API",
-                    extra={
-                        "module_name": __name__,
-                        "business_number": data.business_number,
-                        "company_name": data.company_name,
-                    },
-                )
-                # Note: We don't raise an error here - registration can still proceed
-                # The admin will review the registration during approval
-            else:
-                logger.info(
-                    "Company verified successfully with Nice D&B API",
-                    extra={
-                        "module_name": __name__,
-                        "business_number": data.business_number,
-                        "company_name": data.company_name,
-                    },
-                )
-        except Exception as e:
-            # Log error but don't block registration
-            logger.warning(
-                "Nice D&B API verification failed (non-blocking)",
-                extra={
-                    "module_name": __name__,
-                    "business_number": data.business_number,
-                    "error": str(e),
-                },
-            )
+            # Note: We don't raise an error here - registration can still proceed
+            # The admin will review the registration during approval
+        except Exception:
+            # Ignore errors - don't block registration
+            pass
 
         # Create member record
         member = Member(
@@ -196,15 +145,6 @@ class AuthService:
         await db.commit()
         await db.refresh(member)
 
-        logger.info(
-            "Member registered successfully",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member.id),
-                "business_number": member.business_number,
-            },
-        )
-
         # Send registration confirmation email
         try:
             from ...common.modules.email import email_service
@@ -213,17 +153,9 @@ class AuthService:
                 company_name=member.company_name,
                 business_number=member.business_number,
             )
-        except Exception as e:
-            # Log error but don't fail registration if email fails
-            logger.warning(
-                "Failed to send registration confirmation email",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member.id),
-                    "email": member.email,
-                    "error": str(e),
-                },
-            )
+        except Exception:
+            # Ignore errors - don't fail registration if email fails
+            pass
 
         return member
 
@@ -244,60 +176,28 @@ class AuthService:
         Raises:
             UnauthorizedError: If credentials are invalid or account not approved
         """
-        logger.info(
-            "Authentication attempt",
-            extra={
-                "module_name": __name__,
-                "business_number": business_number,
-            },
-        )
-
-        # Find member by business number
+        # Normalize business number (remove dashes for comparison)
+        # Database may store with dashes (999-99-99999) but user may input without (9999999999)
+        normalized_input = business_number.replace("-", "").replace(" ", "")
+        
+        # Find member by business number (compare normalized versions)
+        # Use func.replace to normalize database values for comparison
+        from sqlalchemy import func
         result = await db.execute(
-            select(Member).where(Member.business_number == business_number)
+            select(Member).where(
+                func.replace(func.replace(Member.business_number, "-", ""), " ", "") == normalized_input
+            )
         )
         member = result.scalar_one_or_none()
 
         if not member or not self.verify_password(password, member.password_hash):
-            logger.warning(
-                "Authentication failed: invalid credentials",
-                extra={
-                    "module_name": __name__,
-                    "business_number": business_number,
-                },
-            )
             raise UnauthorizedError("Invalid credentials")
 
         if member.approval_status != "approved":
-            logger.warning(
-                "Authentication failed: account pending approval",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member.id),
-                    "business_number": member.business_number,
-                },
-            )
             raise UnauthorizedError("Account pending approval")
 
         if member.status != "active":
-            logger.warning(
-                "Authentication failed: account suspended",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member.id),
-                    "business_number": member.business_number,
-                },
-            )
             raise UnauthorizedError("Account is suspended")
-
-        logger.info(
-            "Authentication successful",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member.id),
-                "business_number": member.business_number,
-            },
-        )
 
         return member
 
@@ -354,14 +254,6 @@ class AuthService:
         Raises:
             UnauthorizedError: If credentials are invalid or user is not admin
         """
-        logger.info(
-            "Admin authentication attempt",
-            extra={
-                "module_name": __name__,
-                "username": username,
-            },
-        )
-
         # Find member by business number or email (username)
         # Try business_number first, then email
         result = await db.execute(
@@ -372,46 +264,14 @@ class AuthService:
         member = result.scalar_one_or_none()
 
         if not member or not self.verify_password(password, member.password_hash):
-            logger.warning(
-                "Admin authentication failed: invalid credentials",
-                extra={
-                    "module_name": __name__,
-                    "username": username,
-                },
-            )
             raise UnauthorizedError("Invalid admin credentials")
 
         # Verify user is admin
         if not self.is_admin(member):
-            logger.warning(
-                "Admin authentication failed: not an admin account",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member.id),
-                    "business_number": member.business_number,
-                },
-            )
             raise UnauthorizedError("Admin access required")
 
         if member.status != "active":
-            logger.warning(
-                "Admin authentication failed: account suspended",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member.id),
-                    "business_number": member.business_number,
-                },
-            )
             raise UnauthorizedError("Account is suspended")
-
-        logger.info(
-            "Admin authentication successful",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member.id),
-                "business_number": member.business_number,
-            },
-        )
 
         return member
 
@@ -443,15 +303,6 @@ class AuthService:
         Raises:
             NotFoundError: If member not found or email doesn't match
         """
-        logger.info(
-            "Password reset request received",
-            extra={
-                "module_name": __name__,
-                "business_number": business_number,
-                "email": email,
-            },
-        )
-
         # Find member by business number
         result = await db.execute(
             select(Member).where(Member.business_number == business_number)
@@ -460,14 +311,6 @@ class AuthService:
 
         if not member or member.email != email:
             # Don't reveal whether the member exists (security best practice)
-            logger.warning(
-                "Password reset request failed: member not found or email mismatch",
-                extra={
-                    "module_name": __name__,
-                    "business_number": business_number,
-                    "email": email,
-                },
-            )
             raise NotFoundError("Member with matching email")
 
         # Generate reset token
@@ -480,15 +323,6 @@ class AuthService:
         member.reset_token = reset_token
         member.reset_token_expires = token_expires
         await db.commit()
-
-        logger.info(
-            "Password reset token generated",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member.id),
-                "business_number": member.business_number,
-            },
-        )
 
         return reset_token
 
@@ -510,13 +344,6 @@ class AuthService:
             UnauthorizedError: If token is invalid or expired
             ValidationError: If password is invalid
         """
-        logger.info(
-            "Password reset with token attempt",
-            extra={
-                "module_name": __name__,
-            },
-        )
-
         # Find member by reset token
         result = await db.execute(
             select(Member).where(Member.reset_token == token)
@@ -524,21 +351,10 @@ class AuthService:
         member = result.scalar_one_or_none()
 
         if not member:
-            logger.warning(
-                "Password reset failed: invalid reset token",
-                extra={"module": __name__},
-            )
             raise UnauthorizedError("Invalid reset token")
 
         # Check if token has expired
         if not member.reset_token_expires or member.reset_token_expires < datetime.utcnow():
-            logger.warning(
-                "Password reset failed: token expired",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member.id),
-                },
-            )
             raise UnauthorizedError("Reset token has expired")
 
         # Update password
@@ -550,15 +366,6 @@ class AuthService:
         
         await db.commit()
         await db.refresh(member)
-
-        logger.info(
-            "Password reset successful",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member.id),
-                "business_number": member.business_number,
-            },
-        )
 
         return member
 
@@ -581,38 +388,14 @@ class AuthService:
             UnauthorizedError: If current password is incorrect
             ValidationError: If new password is invalid
         """
-        logger.info(
-            "Password change request received",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member.id),
-            },
-        )
-
         # Verify current password
         if not self.verify_password(current_password, member.password_hash):
-            logger.warning(
-                "Password change failed: incorrect current password",
-                extra={
-                    "module_name": __name__,
-                    "member_id": str(member.id),
-                },
-            )
             raise UnauthorizedError("Current password is incorrect")
 
         # Update password
         member.password_hash = self.get_password_hash(new_password)
         await db.commit()
         await db.refresh(member)
-
-        logger.info(
-            "Password changed successfully",
-            extra={
-                "module_name": __name__,
-                "member_id": str(member.id),
-                "business_number": member.business_number,
-            },
-        )
 
         return member
 

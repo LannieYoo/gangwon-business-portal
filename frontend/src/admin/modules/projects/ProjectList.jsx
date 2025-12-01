@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Card, Table, Button, Badge } from '@shared/components';
-import { apiService, adminService } from '@shared/services';
+import { apiService, adminService, loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import './ProjectList.css';
 
@@ -24,12 +24,30 @@ export default function ProjectList() {
   const loadProjects = async () => {
     setLoading(true);
     try {
+      loggerService.info('Loading projects', {
+        module: 'ProjectList',
+        function: 'loadProjects'
+      });
       const response = await apiService.get(`${API_PREFIX}/admin/projects`);
       if (response.projects) {
         setProjects(response.projects);
+        loggerService.info('Projects loaded successfully', {
+          module: 'ProjectList',
+          function: 'loadProjects',
+          count: response.projects.length
+        });
       }
     } catch (error) {
-      console.error('Failed to load projects:', error);
+      loggerService.error('Failed to load projects', {
+        module: 'ProjectList',
+        function: 'loadProjects',
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'LOAD_PROJECTS_ERROR'
+      });
     } finally {
       setLoading(false);
     }
@@ -48,10 +66,30 @@ export default function ProjectList() {
       return;
     }
     try {
+      loggerService.info('Deleting project', {
+        module: 'ProjectList',
+        function: 'handleDelete',
+        project_id: projectId
+      });
       await apiService.delete(`${API_PREFIX}/admin/projects/${projectId}`);
+      loggerService.info('Project deleted successfully', {
+        module: 'ProjectList',
+        function: 'handleDelete',
+        project_id: projectId
+      });
       loadProjects();
     } catch (error) {
-      console.error('Failed to delete project:', error);
+      loggerService.error('Failed to delete project', {
+        module: 'ProjectList',
+        function: 'handleDelete',
+        project_id: projectId,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'DELETE_PROJECT_ERROR'
+      });
       alert(t('admin.projects.deleteFailed'));
     }
   };
@@ -62,10 +100,30 @@ export default function ProjectList() {
       const params = {
         format
       };
+      loggerService.info('Exporting projects', {
+        module: 'ProjectList',
+        function: 'handleExport',
+        format: format
+      });
       await adminService.exportProjects(params);
+      loggerService.info('Projects exported successfully', {
+        module: 'ProjectList',
+        function: 'handleExport',
+        format: format
+      });
       alert(t('admin.projects.exportSuccess', '导出成功') || '导出成功');
     } catch (error) {
-      console.error('Failed to export projects:', error);
+      loggerService.error('Failed to export projects', {
+        module: 'ProjectList',
+        function: 'handleExport',
+        format: format,
+        error_message: error.message,
+        error_code: error.code
+      });
+      exceptionService.recordException(error, {
+        request_path: window.location.pathname,
+        error_code: 'EXPORT_PROJECTS_ERROR'
+      });
       const errorMessage = error.response?.data?.detail || error.message || t('admin.projects.exportFailed', '导出失败');
       alert(errorMessage);
     } finally {

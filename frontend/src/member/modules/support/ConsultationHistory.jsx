@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Card from '@shared/components/Card';
-import { supportService } from '@shared/services';
+import { supportService, loggerService, exceptionService } from '@shared/services';
 import './ConsultationHistory.css';
 
 export default function ConsultationHistory() {
@@ -25,7 +25,16 @@ export default function ConsultationHistory() {
         });
         setInquiries(response.items || []);
       } catch (error) {
-        console.error('Failed to load inquiries:', error);
+        loggerService.error('Failed to load inquiries', {
+          module: 'ConsultationHistory',
+          function: 'loadInquiries',
+          error_message: error.message,
+          error_code: error.code
+        });
+        exceptionService.recordException(error, {
+          request_path: window.location.pathname,
+          error_code: error.code || 'LOAD_INQUIRIES_FAILED'
+        });
         setInquiries([]);
       } finally {
         setLoading(false);
@@ -51,7 +60,11 @@ export default function ConsultationHistory() {
           {inquiries.map((inquiry) => {
             // 确保 inquiry.id 存在
             if (!inquiry.id) {
-              console.warn('Inquiry missing id:', inquiry);
+              loggerService.warn('Inquiry missing id', {
+                module: 'ConsultationHistory',
+                function: 'render',
+                inquiry_data: inquiry
+              });
               return null;
             }
             return (

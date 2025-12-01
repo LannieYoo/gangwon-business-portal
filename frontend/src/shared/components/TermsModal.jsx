@@ -9,6 +9,8 @@ import { Modal } from './Modal';
 import { Loading } from './Loading';
 import { Alert } from './Alert';
 import contentService from '@shared/services/content.service';
+import loggerService from '@shared/services/logger.service';
+import exceptionService from '@shared/services/exception.service';
 import './TermsModal.css';
 
 /**
@@ -86,7 +88,18 @@ export function TermsModal({ isOpen, termType, onClose }) {
       const placeholderContent = getPlaceholderContent(type, language);
       setContent(placeholderContent);
     } catch (err) {
-      console.error('Failed to load terms content:', err);
+      loggerService.error('Failed to load terms content', {
+        module: 'TermsModal',
+        function: 'loadTermsContent',
+        term_type: type,
+        error_message: err.message,
+        error_code: err.code
+      });
+      exceptionService.recordException(err, {
+        request_path: window.location.pathname,
+        error_code: err.code || 'LOAD_TERMS_CONTENT_FAILED',
+        context_data: { term_type: type }
+      });
       setError(t('auth.termsLoadError', '条款加载失败，请稍后重试'));
     } finally {
       setLoading(false);
