@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '@shared/components';
 import apiService from '@shared/services/api.service';
-import { loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 
 export default function Footer() {
@@ -38,18 +37,6 @@ export default function Footer() {
         setError(t('footer.error'));
       }
     } catch (err) {
-      loggerService.error('Error fetching term', {
-        module: 'AdminFooter',
-        function: 'handleOpenModal',
-        term_type: type,
-        error_message: err.message,
-        error_code: err.code
-      });
-      exceptionService.recordException(err, {
-        request_path: window.location.pathname,
-        error_code: err.code || 'FETCH_TERM_FAILED',
-        context_data: { term_type: type }
-      });
       setError(t('footer.error'));
     } finally {
       setIsLoading(false);

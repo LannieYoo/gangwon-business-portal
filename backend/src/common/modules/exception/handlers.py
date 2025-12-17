@@ -78,8 +78,10 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
     if hasattr(request.state, "user_id"):
         user_id = request.state.user_id
 
-    # Record 5xx errors to database (no terminal logging)
-    if exc.status_code >= 500:
+    # Record server errors and important authorization errors to exception log
+    # - 5xx: all server-side errors
+    # - 403: forbidden access attempts (security/audit relevant)
+    if exc.status_code >= 500 or exc.status_code == 403:
         _record_exception_to_file(
             request=request,
             exc=exc,
@@ -122,16 +124,6 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     else:
         message = str(detail) if detail else "HTTP error"
     
-    # Record 5xx errors to database (no terminal logging)
-    if exc.status_code >= 500:
-        _record_exception_to_file(
-            request=request,
-            exc=exc,
-            error_code="HTTP_SERVER_ERROR",
-            status_code=exc.status_code,
-            user_id=user_id,
-        )
-    
     # Include details only in debug mode
     include_details = settings.DEBUG
     
@@ -147,6 +139,18 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
         error_code = "FORBIDDEN"
     elif exc.status_code == 400:
         error_code = "BAD_REQUEST"
+    
+    # Record 5xx errors and 403 forbidden errors to exception log
+    # - 5xx: server-side failures
+    # - 403: access denied events (security/audit relevant)
+    if exc.status_code >= 500 or exc.status_code == 403:
+        _record_exception_to_file(
+            request=request,
+            exc=exc,
+            error_code=error_code,
+            status_code=exc.status_code,
+            user_id=user_id,
+        )
     
     response = create_error_response(
         message=message,

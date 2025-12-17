@@ -5,8 +5,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Alert } from '@shared/components';
-import { apiService, contentService, loggerService, exceptionService } from '@shared/services';
+import { Button, Input, Alert, Card, Modal, ModalFooter } from '@shared/components';
+import { apiService, contentService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import { validateImageFile } from '@shared/utils/fileValidation';
 import { validateNewsForm } from './utils';
@@ -25,38 +25,16 @@ export default function NewsManagement() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [imageUploading, setImageUploading] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, newsId: null });
 
   // Load news
   const loadNews = useCallback(async (pageNum = 1) => {
     setLoading(true);
-    try {
-      const response = await contentService.listPressReleases({ page: pageNum, pageSize: 20 });
-      setNews(response.items || []);
-      setTotal(response.total || 0);
-      setPage(pageNum);
-      loggerService.info('News loaded successfully', {
-        module: 'NewsManagement',
-        function: 'loadNews',
-        page: pageNum,
-        count: response.items?.length || 0
-      });
-    } catch (error) {
-      loggerService.error('Failed to load news', {
-        module: 'NewsManagement',
-        function: 'loadNews',
-        page: pageNum,
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'LOAD_NEWS_ERROR'
-      });
-      setMessageVariant('error');
-      setMessage(t('admin.content.news.messages.loadFailed', '加载新闻失败'));
-    } finally {
-      setLoading(false);
-    }
+    const response = await contentService.listPressReleases({ page: pageNum, pageSize: 20 });
+    setNews(response.items || []);
+    setTotal(response.total || 0);
+    setPage(pageNum);
+    setLoading(false);
   }, [t]);
 
   useEffect(() => {
@@ -81,11 +59,11 @@ export default function NewsManagement() {
     try {
       const response = await apiService.upload(`${API_PREFIX}/upload/public`, file);
       
-      const uploadedFile = response.file || response.files?.[0];
-      if (uploadedFile?.url) {
+      // Backend returns FileUploadResponse with file_url directly
+      if (response?.file_url) {
         setForm((prev) => ({
           ...prev,
-          imageUrl: uploadedFile.url
+          imageUrl: response.file_url
         }));
         setMessageVariant('success');
         setMessage(t('admin.content.news.messages.imageUploaded', '图片上传成功'));
@@ -96,19 +74,11 @@ export default function NewsManagement() {
         throw new Error('Upload response missing file URL');
       }
     } catch (error) {
-      loggerService.error('Failed to upload image', {
-        module: 'NewsManagement',
-        function: 'handleImageUpload',
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'UPLOAD_IMAGE_ERROR'
-      });
       setMessageVariant('error');
-      const errorMessage = error.message || error.details || t('admin.content.news.messages.imageUploadFailed', '图片上传失败');
-      setMessage(errorMessage);
+      setMessage(error.message || t('admin.content.news.messages.uploadFailed', '图片上传失败'));
+      setTimeout(() => {
+        setMessage(null);
+      }, 3000);
     } finally {
       setImageUploading(false);
       event.target.value = '';
@@ -157,66 +127,38 @@ export default function NewsManagement() {
     }
     
     setSaving(true);
-    try {
-      let savedNews;
-      if (form.id) {
-        savedNews = await contentService.updatePressRelease(form.id, form);
-      } else {
-        savedNews = await contentService.createPressRelease(form);
-      }
-      await loadNews(page);
-      setForm(savedNews);
-      setMessageVariant('success');
-      setMessage(t('admin.content.news.messages.saved', '保存成功'));
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      loggerService.error('Failed to save news', {
-        module: 'NewsManagement',
-        function: 'handleSubmit',
-        news_id: form.id,
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'SAVE_NEWS_ERROR'
-      });
-      setMessageVariant('error');
-      setMessage(error?.response?.data?.detail || error?.message || t('admin.content.news.messages.saveFailed', '保存失败'));
-    } finally {
-      setSaving(false);
+    let savedNews;
+    if (form.id) {
+      savedNews = await contentService.updatePressRelease(form.id, form);
+    } else {
+      savedNews = await contentService.createPressRelease(form);
     }
+    await loadNews(page);
+    setForm(savedNews);
+    setMessageVariant('success');
+    setMessage(t('admin.content.news.messages.saved', '保存成功'));
+    setTimeout(() => setMessage(null), 3000);
+    setSaving(false);
   };
 
-  const handleDelete = async (newsId) => {
+  const handleDelete = (newsId) => {
     if (!newsId) return;
-    if (!window.confirm(t('admin.content.news.actions.confirmDelete', '确定要删除这条新闻吗？'))) {
-      return;
+    setDeleteConfirm({ open: true, newsId });
+  };
+
+  const confirmDelete = async () => {
+    const { newsId } = deleteConfirm;
+    if (!newsId) return;
+    
+    await contentService.deletePressRelease(newsId);
+    await loadNews(page);
+    if (form.id === newsId) {
+      setForm(createEmptyForm());
     }
-    try {
-      await contentService.deletePressRelease(newsId);
-      await loadNews(page);
-      if (form.id === newsId) {
-        setForm(createEmptyForm());
-      }
-      setMessageVariant('success');
-      setMessage(t('admin.content.news.messages.deleted', '删除成功'));
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      loggerService.error('Failed to delete news', {
-        module: 'NewsManagement',
-        function: 'handleDelete',
-        news_id: newsId,
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'DELETE_NEWS_ERROR'
-      });
-      setMessageVariant('error');
-      setMessage(t('admin.content.news.messages.deleteFailed', '删除失败'));
-    }
+    setMessageVariant('success');
+    setMessage(t('admin.content.news.messages.deleted', '删除成功'));
+    setTimeout(() => setMessage(null), 3000);
+    setDeleteConfirm({ open: false, newsId: null });
   };
 
   return (
@@ -228,8 +170,9 @@ export default function NewsManagement() {
       )}
       
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6">
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-          <div className="flex justify-between items-center mb-4 gap-4">
+        <Card>
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-4 gap-4">
             <div>
               <h2 className="m-0 text-lg font-semibold text-gray-900">{t('admin.content.news.list.title', '新闻列表')}</h2>
               <p className="m-0 text-gray-500 text-sm">{t('admin.content.news.list.description', '管理新闻稿')}</p>
@@ -240,9 +183,9 @@ export default function NewsManagement() {
           </div>
 
           {loading ? (
-            <div className="p-6 text-center text-gray-500">{t('common.loading', '加载中...')}</div>
+            <div className="text-center text-gray-500">{t('common.loading', '加载中...')}</div>
           ) : news.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
+            <div className="text-center text-gray-500">
               <p>{t('admin.content.news.list.empty', '暂无新闻')}</p>
             </div>
           ) : (
@@ -280,10 +223,12 @@ export default function NewsManagement() {
               ))}
             </ul>
           )}
-        </div>
+          </div>
+        </Card>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-          <h3 className="mt-0 mb-4 text-lg font-semibold text-gray-900">
+        <Card>
+          <div className="p-6">
+            <h3 className="mt-0 mb-4 text-lg font-semibold text-gray-900">
             {form.id
               ? t('admin.content.news.form.editTitle', '编辑新闻')
               : t('admin.content.news.form.newTitle', '新建新闻')}
@@ -304,11 +249,13 @@ export default function NewsManagement() {
               <div className="flex flex-col gap-3">
                 {form.imageUrl && (
                   <div className="relative flex flex-col gap-2">
-                    <img
-                      src={form.imageUrl}
-                      alt="News preview"
-                      className="w-full max-h-[180px] object-cover rounded-lg border border-gray-200"
-                    />
+                    <div className="w-full max-h-[300px] overflow-hidden rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center">
+                      <img
+                        src={form.imageUrl}
+                        alt="News preview"
+                        className="max-w-full max-h-[300px] object-contain rounded-lg"
+                      />
+                    </div>
                     <div className="flex gap-2">
                       <input
                         id="news-image-input"
@@ -373,15 +320,6 @@ export default function NewsManagement() {
               </div>
             </div>
             
-            <Input
-              label={t('admin.content.news.form.fields.imageUrl', '图片URL')}
-              value={form.imageUrl}
-              onChange={handleFieldChange('imageUrl')}
-              placeholder="https://example.com/image.jpg"
-              required
-              error={errors.imageUrl}
-              helperText={t('admin.content.news.form.fields.imageUrlHelper', '或直接输入图片URL地址')}
-            />
             <div className="flex justify-end">
               <Button
                 type="submit"
@@ -394,8 +332,31 @@ export default function NewsManagement() {
               </Button>
             </div>
           </form>
-        </div>
+          </div>
+        </Card>
       </div>
+
+      {/* 删除确认对话框 */}
+      <Modal
+        isOpen={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, newsId: null })}
+        title={t('admin.content.news.actions.confirmDelete', '确定要删除这条新闻吗？')}
+        size="sm"
+      >
+        <div className="py-4">
+          <p className="text-gray-600">
+            {t('admin.content.news.actions.confirmDeleteMessage', '此操作不可撤销，确定要继续吗？')}
+          </p>
+        </div>
+        <ModalFooter>
+          <Button variant="outline" onClick={() => setDeleteConfirm({ open: false, newsId: null })}>
+            {t('common.cancel', '取消')}
+          </Button>
+          <Button variant="primary" onClick={confirmDelete}>
+            {t('common.delete', '删除')}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
+import { Badge } from '@shared/components';
 import { memberService, loggerService, exceptionService } from '@shared/services';
 import {
   UserIcon,
@@ -359,24 +360,27 @@ export default function PerformanceCompanyInfo() {
         <div className="flex flex-col gap-4 p-6 sm:p-8 lg:p-10">
           {companyData.approvalStatus === 'approved' && (
             <>
-              <div className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg w-fit bg-green-100 text-green-800 border border-green-200 shadow-sm">
-                <CheckCircleIcon className="w-5 h-5" />{t('member.approved', 'Approved')}
+              <div className="flex items-center gap-2">
+                <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                <Badge variant="success">{t('member.approved', 'Approved')}</Badge>
               </div>
               <p className="text-sm text-gray-600 m-0">{t('profile.approvalStatusDesc.approved', 'Your company info has been approved.')}</p>
             </>
           )}
           {companyData.approvalStatus === 'pending' && (
             <>
-              <div className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg w-fit bg-yellow-100 text-yellow-800 border border-yellow-200 shadow-sm">
-                <WarningIcon className="w-5 h-5" />{t('member.pending', 'Pending')}
+              <div className="flex items-center gap-2">
+                <WarningIcon className="w-5 h-5 text-yellow-600" />
+                <Badge variant="warning">{t('member.pending', 'Pending')}</Badge>
               </div>
               <p className="text-sm text-gray-600 m-0">{t('profile.approvalStatusDesc.pending', 'Your company info is under review.')}</p>
             </>
           )}
           {companyData.approvalStatus === 'rejected' && (
             <>
-              <div className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg w-fit bg-red-100 text-red-800 border border-red-200 shadow-sm">
-                <XIcon className="w-5 h-5" />{t('member.rejected', 'Rejected')}
+              <div className="flex items-center gap-2">
+                <XIcon className="w-5 h-5 text-red-600" />
+                <Badge variant="danger">{t('member.rejected', 'Rejected')}</Badge>
               </div>
               <p className="text-sm text-gray-600 m-0">{t('profile.approvalStatusDesc.rejected', 'Your company info was rejected. Please modify and resubmit.')}</p>
             </>

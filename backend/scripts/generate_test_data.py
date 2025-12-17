@@ -29,6 +29,21 @@ from typing import List, Dict, Any
 from uuid import uuid4
 import random
 
+
+def weighted_random_choice(distribution: Dict[str, float]) -> str:
+    """
+    根据权重分布随机选择一个值
+    
+    Args:
+        distribution: 字典，键为选项，值为权重（0-1之间的浮点数）
+    
+    Returns:
+        随机选择的键
+    """
+    choices = list(distribution.keys())
+    weights = list(distribution.values())
+    return random.choices(choices, weights=weights, k=1)[0]
+
 from faker import Faker
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -134,7 +149,7 @@ async def create_test_account(session: AsyncSession, config: Dict[str, Any], acc
                 founding_date=fake.date_between(start_date=f"-{data_ranges['founding_date_years_ago']}y", end_date="today"),
                 region=random.choice(data_defs["regions"]),
                 address=fake.address(),
-                representative=fake.name(),
+                representative="김대표",
                 legal_number=f"{random.randint(100, 999)}-{random.randint(10, 99)}-{random.randint(10000, 99999)}",
                 phone=f"0{random.randint(2, 9)}-{random.randint(1000, 9999)}-{random.randint(1000, 9999)}",
                 website=test_config["profile"].get("website"),
@@ -204,16 +219,28 @@ async def generate_members(session: AsyncSession, config: Dict[str, Any], count:
     test_password = config["accounts"]["test"]["password"]
     print(f"Test account created: business_number={test_member.business_number}, password={test_password}")
     
+    # Track how many fixed test accounts we create (besides the base 'test')
+    extra_account_keys = []
+    
     # Create second test account for modification tests (if configured)
     if "test_modify" in config["accounts"]:
         test_modify_member = await create_test_account(session, config, "test_modify")
         members.append(test_modify_member)
         test_modify_password = config["accounts"]["test_modify"]["password"]
         print(f"Test modify account created: business_number={test_modify_member.business_number}, password={test_modify_password}")
-        # Adjust count to account for both test accounts
-        count_adjustment = 2
-    else:
-        count_adjustment = 1
+        extra_account_keys.append("test_modify")
+    
+    # Optional: create Nice DNB-linked member accounts if configured
+    for key in ("nice_1", "nice_2"):
+        if key in config["accounts"]:
+            nice_member = await create_test_account(session, config, key)
+            members.append(nice_member)
+            nice_password = config["accounts"][key]["password"]
+            print(f"Nice DNB test account created: business_number={nice_member.business_number}, password={nice_password}")
+            extra_account_keys.append(key)
+    
+    # Base 'test' account + all extra fixed accounts
+    count_adjustment = 1 + len(extra_account_keys)
     
     # Get status distributions if available
     status_dist = data_defs.get("member_status_distribution", {})
@@ -243,7 +270,42 @@ async def generate_members(session: AsyncSession, config: Dict[str, Any], count:
                business_number.replace("-", "") == normalized_modify):
             business_number = f"{random.randint(1000000000, 9999999999)}"
         
-        company_name = fake.company()
+        # 使用真实的韩国企业名称
+        korean_company_names = [
+            # 제조업
+            "한국정밀기계주식회사", "대한금속공업주식회사", "서울플라스틱주식회사", "부산화학공업주식회사",
+            "인천철강주식회사", "광주전자부품주식회사", "대구섬유주식회사", "울산석유화학주식회사",
+            "경기정밀주식회사", "강원기계공업주식회사", "충북전자주식회사", "충남화학주식회사",
+            
+            # IT/소프트웨어
+            "코리아소프트주식회사", "디지털코리아주식회사", "한국정보시스템주식회사", "서울IT솔루션주식회사",
+            "부산소프트웨어주식회사", "대구정보기술주식회사", "인천디지털주식회사", "광주테크놀로지주식회사",
+            "스마트시스템코리아주식회사", "이노베이션소프트주식회사", "퓨처테크놀로지주식회사", "어드밴스드IT주식회사",
+            
+            # 건설업
+            "한국건설주식회사", "대한건축주식회사", "서울건설주식회사", "부산건축주식회사",
+            "인천토목주식회사", "대구건설주식회사", "광주건축주식회사", "울산건설주식회사",
+            "경기건설주식회사", "강원건축주식회사", "충북토목주식회사", "충남건설주식회사",
+            
+            # 서비스업
+            "한국물류주식회사", "대한유통주식회사", "서울서비스주식회사", "부산물류주식회사",
+            "인천유통주식회사", "대구서비스주식회사", "광주물류주식회사", "울산유통주식회사",
+            "코리아로지스틱스주식회사", "글로벌서비스주식회사", "프리미엄물류주식회사", "스마트유통주식회사",
+            
+            # 바이오/의료
+            "한국바이오주식회사", "대한의료기기주식회사", "서울제약주식회사", "부산바이오텍주식회사",
+            "바이오메드코리아주식회사", "메디컬시스템주식회사", "헬스케어솔루션주식회사", "라이프사이언스주식회사",
+            
+            # 에너지/환경
+            "한국에너지주식회사", "그린에너지코리아주식회사", "친환경시스템주식회사", "신재생에너지주식회사",
+            "클린테크놀로지주식회사", "에코시스템주식회사", "환경솔루션주식회사", "그린테크주식회사",
+            
+            # 농업/식품
+            "한국농산주식회사", "대한식품주식회사", "서울농업주식회사", "부산수산주식회사",
+            "코리아푸드주식회사", "프레시푸드주식회사", "오가닉팜주식회사", "스마트팜시스템주식회사"
+        ]
+        
+        company_name = random.choice(korean_company_names)
         email = fake.unique.email()
         password_hash = pwd_context.hash("password123")
         
@@ -309,8 +371,21 @@ async def generate_members(session: AsyncSession, config: Dict[str, Any], count:
                 address = fake.address()
         
         # Generate representative name (Korean name)
+        # 真实的韩国人名列表
+        korean_names = [
+            # 男性姓名
+            "김민수", "이준호", "박성민", "최동현", "정우진", "강태현", "조현우", "윤상호",
+            "임재현", "한동욱", "오세훈", "신민철", "배준영", "송현수", "노태우", "홍길동",
+            "김철수", "이영수", "박영호", "최민호", "정성훈", "강민수", "조성민", "윤태영",
+            
+            # 여성姓名  
+            "김민정", "이수진", "박지영", "최은영", "정미경", "강혜진", "조윤아", "윤서연",
+            "임소영", "한지민", "오혜원", "신예진", "배수정", "송미나", "노은주", "홍수민",
+            "김영희", "이미영", "박선영", "최정아", "정은정", "강미선", "조은희", "윤정숙"
+        ]
+        
         # Ensure most members have representative (95% instead of 90%)
-        representative = fake.name() if random.random() > 0.05 else None
+        representative = random.choice(korean_names) if random.random() > 0.05 else None
         
         # Generate legal number (법인번호) - 13 digits format: XXX-XX-XXXXX
         legal_number = None
@@ -360,12 +435,27 @@ async def generate_performance_records(
     current_year = datetime.now(timezone.utc).year
     year_range = data_ranges["year_range"]
     
+    # Get status distribution if available
+    status_dist = data_defs.get("performance_status_distribution", {})
+    
+    # Helper function to select status based on distribution
+    def select_status_by_distribution():
+        if not status_dist:
+            return random.choice(statuses)
+        rand = random.random()
+        cumulative = 0.0
+        for key, prob in status_dist.items():
+            cumulative += prob
+            if rand <= cumulative:
+                return key
+        return random.choice(statuses)
+    
     for i in range(count):
         member = random.choice(members)
         year = random.randint(current_year - year_range, current_year)
         quarter = random.choice([1, 2, 3, 4, None])
         type_ = random.choice(types)
-        status = random.choice(statuses)
+        status = select_status_by_distribution()
         
         type_ranges = data_ranges[type_]
         if type_ == "sales":
@@ -387,9 +477,8 @@ async def generate_performance_records(
                 "copyrights": random.randint(type_ranges["copyrights_min"], type_ranges["copyrights_max"]),
             }
         
-        submitted_at = None
-        if status in ["submitted", "approved", "rejected", "revision_requested"]:
-            submitted_at = datetime.now(timezone.utc) - timedelta(days=random.randint(0, data_ranges["submitted_days_ago_max"]))
+        # 所有状态都需要有提交时间（不能为空）
+        submitted_at = datetime.now(timezone.utc) - timedelta(days=random.randint(0, data_ranges["submitted_days_ago_max"]))
         
         record = PerformanceRecord(
             id=uuid4(),
@@ -415,7 +504,7 @@ async def generate_performance_records(
                     reviewer_id=admin_member.id,
                     status=status,
                     comments=fake.text(max_nb_chars=200) if random.random() > probs["performance_review_comments_null"] else None,
-                    reviewed_at=submitted_at + timedelta(days=random.randint(data_ranges["review_days_min"], data_ranges["review_days_max"])) if submitted_at else datetime.now(timezone.utc),
+                    reviewed_at=submitted_at + timedelta(days=random.randint(data_ranges["review_days_min"], data_ranges["review_days_max"])),
                 )
                 session.add(review)
     
@@ -432,6 +521,30 @@ async def generate_projects(session: AsyncSession, config: Dict[str, Any], count
     data_ranges = config["data_ranges"]["project"]
     
     statuses = data_defs["project_statuses"]
+    status_distribution = data_defs.get("project_status_distribution", {
+        "active": 0.6,
+        "inactive": 0.3,
+        "archived": 0.1
+    })
+    
+    # 项目标题模板
+    project_titles = [
+        "2024년 중소기업 디지털 전환 지원사업",
+        "스타트업 창업 지원 프로그램",
+        "제조업 혁신 기술 개발 지원",
+        "수출기업 해외진출 지원사업",
+        "청년창업 인큐베이팅 프로그램",
+        "여성기업 성장 지원사업",
+        "사회적 기업 육성 프로그램",
+        "IT 기업 기술혁신 지원",
+        "농업 스마트팜 구축 지원",
+        "친환경 에너지 기업 지원사업",
+        "바이오 의료기기 개발 지원",
+        "문화콘텐츠 기업 육성",
+        "건설업 안전기술 개발 지원",
+        "서비스업 디지털화 지원",
+        "지역 특화산업 육성사업"
+    ]
     
     for i in range(count):
         start_date = fake.date_between(
@@ -440,15 +553,86 @@ async def generate_projects(session: AsyncSession, config: Dict[str, Any], count
         )
         end_date = start_date + timedelta(days=random.randint(data_ranges["duration_days_min"], data_ranges["duration_days_max"]))
         
+        # 选择项目标题（如果有预定义的，否则生成随机的）
+        if i < len(project_titles):
+            title = project_titles[i]
+        else:
+            title = f"{random.choice(['기업', '스타트업', '중소기업'])} {random.choice(['지원', '육성', '개발'])} 프로그램 {i+1}"
+        
+        # 随机选择一个会员作为受理对象（如果有会员的话）
+        target_company_name = None
+        target_business_number = None
+        
+        # 真实的韩国企业名称列表
+        real_korean_companies = [
+            # 大企业
+            "삼성전자주식회사",
+            "현대자동차주식회사", 
+            "LG전자주식회사",
+            "SK하이닉스주식회사",
+            "포스코홀딩스주식회사",
+            "네이버주식회사",
+            "카카오주식회사",
+            "쿠팡주식회사",
+            "배달의민족주식회사",
+            "우아한형제들주식회사",
+            # 중견기업
+            "한화시스템주식회사",
+            "두산중공업주식회사",
+            "롯데케미칼주식회사",
+            "GS칼텍스주식회사",
+            "현대건설주식회사",
+            "대우건설주식회사",
+            "삼성물산주식회사",
+            "현대중공업주식회사",
+            "한국전력공사",
+            "KT주식회사",
+            # 중소기업 (실제 존재하는 형태)
+            "테크노밸리주식회사",
+            "이노베이션테크주식회사",
+            "스마트솔루션주식회사",
+            "그린에너지주식회사",
+            "바이오메드주식회사",
+            "디지털웨이브주식회사",
+            "퓨처테크주식회사",
+            "글로벌시스템주식회사",
+            "어드밴스드머티리얼주식회사",
+            "프리미엄소프트주식회사"
+        ]
+        
+        # 30% 의 프로젝트는 특정 기업을 대상으로 함
+        if random.random() < 0.3:
+            target_company_name = random.choice(real_korean_companies)
+            # 실제 사업자등록번호 형식 생성 (XXX-XX-XXXXX)
+            target_business_number = f"{random.randint(100, 999)}-{random.randint(10, 99)}-{random.randint(10000, 99999)}"
+        
+        # 根据项目日期逻辑设置状态
+        current_date = datetime.now(timezone.utc).date()
+        
+        # 根据项目时间线确定状态
+        if end_date < current_date:
+            # 项目已结束
+            if random.random() < 0.8:  # 80%的已结束项目为inactive
+                status = "inactive"
+            else:  # 20%为archived（归档）
+                status = "archived"
+        elif start_date > current_date:
+            # 项目还未开始，但已发布
+            status = "active"  # 可以申请的状态
+        else:
+            # 项目正在进行中
+            status = "active"
+        
         project = Project(
             id=uuid4(),
-            title=fake.sentence(nb_words=4),
+            title=title,
             description=fake.text(max_nb_chars=500),
-            target_audience=fake.text(max_nb_chars=200),
+            target_company_name=target_company_name,
+            target_business_number=target_business_number,
             start_date=start_date,
             end_date=end_date,
-            image_url=f"https://example.com/images/project_{i+1}.jpg",
-            status=random.choice(statuses),
+            image_url=None,
+            status=status,
             created_at=datetime.now(timezone.utc) - timedelta(days=random.randint(0, data_ranges["created_days_ago_max"])),
         )
         projects.append(project)
@@ -1030,7 +1214,7 @@ async def generate_content(session: AsyncSession, members: List['Member'], confi
                 id=uuid4(),
                 banner_type=banner_config_name,
                 image_url=image_url,
-                link_url=f"https://example.com/{banner_type.lower()}" if random.random() > probs["banner_link_url_null"] else None,
+                link_url=None,
                 title_ko=banner_config.get('title_ko', ''),
                 title_zh=banner_config.get('title_zh', ''),
                 subtitle_ko=banner_config.get('subtitle_ko', ''),
@@ -1042,12 +1226,50 @@ async def generate_content(session: AsyncSession, members: List['Member'], confi
             session.add(banner)
     
     categories = data_defs["faq_categories"]
-    for i in range(data_ranges["faqs_count"]):
+    
+    # 真实的FAQ数据
+    faq_data = [
+        {"category": "회원가입", "question": "회원가입은 어떻게 하나요?", "answer": "홈페이지 상단의 '회원가입' 버튼을 클릭하여 사업자등록번호와 기업 정보를 입력하시면 됩니다. 승인까지 1-2일 소요됩니다."},
+        {"category": "회원가입", "question": "사업자등록증이 없어도 가입할 수 있나요?", "answer": "아니요. 기업회원 가입을 위해서는 유효한 사업자등록증이 필요합니다."},
+        {"category": "회원가입", "question": "개인사업자도 가입 가능한가요?", "answer": "네, 개인사업자도 사업자등록증이 있으시면 가입 가능합니다."},
+        
+        {"category": "성과관리", "question": "성과 제출은 언제까지 해야 하나요?", "answer": "분기별 성과는 해당 분기 종료 후 1개월 이내에 제출하셔야 합니다."},
+        {"category": "성과관리", "question": "성과 데이터를 수정할 수 있나요?", "answer": "제출 전까지는 수정 가능하며, 제출 후에는 관리자 승인을 받아 수정할 수 있습니다."},
+        {"category": "성과관리", "question": "성과 제출 시 필요한 서류는 무엇인가요?", "answer": "매출 증빙서류, 고용 현황 자료, 사업 실적 보고서 등이 필요합니다."},
+        
+        {"category": "프로젝트", "question": "프로젝트 신청은 어떻게 하나요?", "answer": "프로젝트 목록에서 원하는 프로젝트를 선택하고 '신청하기' 버튼을 클릭하여 신청서를 작성하시면 됩니다."},
+        {"category": "프로젝트", "question": "프로젝트 신청 후 결과는 언제 알 수 있나요?", "answer": "신청 후 2주 이내에 심사 결과를 개별 통보해 드립니다."},
+        {"category": "프로젝트", "question": "한 번에 여러 프로젝트에 신청할 수 있나요?", "answer": "네, 자격 요건을 만족하는 프로젝트에는 모두 신청 가능합니다."},
+        
+        {"category": "기업프로필", "question": "기업 정보를 수정하려면 어떻게 해야 하나요?", "answer": "마이페이지 > 기업정보 관리에서 수정할 수 있습니다. 중요 정보 변경 시 관리자 승인이 필요할 수 있습니다."},
+        {"category": "기업프로필", "question": "로고 이미지는 어떤 형식으로 업로드해야 하나요?", "answer": "JPG, PNG 형식의 이미지 파일을 업로드하실 수 있으며, 파일 크기는 5MB 이하로 제한됩니다."},
+        
+        {"category": "문의/지원", "question": "기술적인 문제가 발생했을 때 어디에 문의하나요?", "answer": "고객지원 > 1:1 문의 또는 전화(033-000-0000)로 문의하시면 됩니다."},
+        {"category": "문의/지원", "question": "비밀번호를 잊어버렸어요.", "answer": "로그인 페이지의 '비밀번호 찾기'를 이용하시거나 고객지원에 문의하시기 바랍니다."},
+        
+        {"category": "기타", "question": "서비스 이용료가 있나요?", "answer": "아니요. 모든 서비스는 무료로 제공됩니다."},
+        {"category": "기타", "question": "모바일에서도 이용할 수 있나요?", "answer": "네, 모바일 브라우저에서도 이용 가능하며, 향후 모바일 앱도 출시 예정입니다."},
+    ]
+    
+    for i in range(min(data_ranges["faqs_count"], len(faq_data))):
+        faq_item = faq_data[i]
+        faq = FAQ(
+            id=uuid4(),
+            category=faq_item["category"],
+            question=faq_item["question"],
+            answer=faq_item["answer"],
+            display_order=i,
+            created_at=datetime.now(timezone.utc) - timedelta(days=random.randint(0, data_ranges["created_days_ago_max"])),
+        )
+        session.add(faq)
+    
+    # 如果需要更多FAQ，使用随机生成
+    for i in range(len(faq_data), data_ranges["faqs_count"]):
         faq = FAQ(
             id=uuid4(),
             category=random.choice(categories),
-            question=fake.sentence(nb_words=8),
-            answer=fake.text(max_nb_chars=500),
+            question=f"자주 묻는 질문 {i+1}",
+            answer=f"이것은 {i+1}번째 자주 묻는 질문에 대한 답변입니다.",
             display_order=i,
             created_at=datetime.now(timezone.utc) - timedelta(days=random.randint(0, data_ranges["created_days_ago_max"])),
         )
@@ -1109,13 +1331,45 @@ async def generate_inquiries(session: AsyncSession, members: List['Member'], con
         member = random.choice(members)
         status = random.choice(statuses)
         
+        # 真实的询问主题和内容
+        inquiry_subjects = [
+            "회원가입 승인 문의", "성과 제출 방법 문의", "프로젝트 신청 관련 문의",
+            "기업정보 수정 요청", "비밀번호 재설정 요청", "서류 제출 방법 문의",
+            "지원사업 자격 요건 문의", "시스템 오류 신고", "첨부파일 업로드 문제",
+            "결과 통보 일정 문의", "추가 서류 제출 문의", "사업자등록증 변경 신고"
+        ]
+        
+        inquiry_contents = [
+            f"{member.company_name}입니다. 회원가입 신청 후 승인이 지연되고 있어 문의드립니다.",
+            f"성과 제출 시 필요한 서류와 제출 방법에 대해 자세히 안내 부탁드립니다.",
+            f"현재 진행 중인 프로젝트에 신청하고 싶은데, 자격 요건을 확인해 주세요.",
+            f"기업 정보 중 대표자명이 변경되었습니다. 수정 방법을 안내해 주세요.",
+            f"비밀번호를 분실하여 로그인할 수 없습니다. 재설정 방법을 알려주세요.",
+            f"서류 제출 시 파일 형식과 크기 제한에 대해 문의드립니다.",
+            f"저희 회사가 현재 공고된 지원사업 대상에 해당하는지 확인 부탁드립니다.",
+            f"시스템 이용 중 오류가 발생했습니다. 확인 부탁드립니다.",
+            f"첨부파일 업로드가 되지 않습니다. 해결 방법을 알려주세요.",
+            f"프로젝트 신청 결과는 언제쯤 통보되는지 문의드립니다."
+        ]
+        
+        subject = random.choice(inquiry_subjects)
+        content = random.choice(inquiry_contents)
+        
+        admin_replies = [
+            "문의해 주신 내용을 확인했습니다. 관련 부서에서 검토 후 답변드리겠습니다.",
+            "안내해 주신 정보를 바탕으로 처리해 드렸습니다. 확인 부탁드립니다.",
+            "요청하신 사항이 완료되었습니다. 추가 문의사항이 있으시면 언제든 연락 주세요.",
+            "관련 서류를 이메일로 발송해 드렸습니다. 확인 후 진행 부탁드립니다.",
+            "시스템 오류가 수정되었습니다. 다시 이용해 보시고 문제가 지속되면 연락 주세요."
+        ]
+        
         inquiry = Inquiry(
             id=uuid4(),
             member_id=member.id,
-            subject=fake.sentence(nb_words=5),
-            content=fake.text(max_nb_chars=500),
+            subject=subject,
+            content=content,
             status=status,
-            admin_reply=fake.text(max_nb_chars=300) if status in ["replied", "closed"] else None,
+            admin_reply=random.choice(admin_replies) if status in ["replied", "closed"] else None,
             created_at=datetime.now(timezone.utc) - timedelta(days=random.randint(0, data_ranges["created_days_ago_max"])),
             replied_at=datetime.now(timezone.utc) - timedelta(days=random.randint(0, data_ranges["replied_days_ago_max"])) if status in ["replied", "closed"] else None,
         )
@@ -1160,15 +1414,32 @@ async def generate_messages(
         is_important = random.random() < data_ranges["is_important_probability"]
         
         subject = random.choice(message_subjects)
-        content = fake.text(max_nb_chars=500)
+        
+        # 根据主题生成相应的消息内容
+        content_templates = {
+            "회원가입 승인 완료": f"안녕하세요. {recipient.company_name}의 회원가입이 승인되었습니다. 이제 모든 서비스를 이용하실 수 있습니다.",
+            "성과 제출 안내": f"{recipient.company_name}님, {datetime.now().year}년 {random.randint(1,4)}분기 성과 제출 기한이 다가왔습니다. 기한 내 제출 부탁드립니다.",
+            "프로젝트 신청 결과": f"{recipient.company_name}님이 신청하신 프로젝트의 심사 결과를 안내드립니다.",
+            "시스템 점검 안내": "시스템 정기점검으로 인해 서비스가 일시 중단됩니다. 이용에 불편을 드려 죄송합니다.",
+            "새로운 지원 사업 안내": f"{recipient.company_name}님께 적합한 새로운 지원 사업이 공고되었습니다. 확인해 보시기 바랍니다.",
+            "프로필 정보 업데이트 요청": f"{recipient.company_name}님의 기업 정보 업데이트가 필요합니다. 마이페이지에서 확인 부탁드립니다.",
+            "문의사항 답변": f"{recipient.company_name}님이 문의하신 내용에 대한 답변을 드립니다.",
+            "중요 공지사항": "중요한 공지사항이 있어 안내드립니다. 공지사항 게시판을 확인해 주세요.",
+            "이벤트 안내": f"{recipient.company_name}님을 위한 특별 이벤트가 진행 중입니다.",
+            "정기 보고서 제출 요청": f"{recipient.company_name}님, 정기 보고서 제출 기한이 임박했습니다."
+        }
+        
+        content = content_templates.get(subject, f"{recipient.company_name}님께 안내드릴 사항이 있습니다.")
         
         created_at = datetime.now(timezone.utc) - timedelta(days=random.randint(0, data_ranges["created_days_ago_max"]))
         read_at = None
         if is_read:
-            read_at = created_at + timedelta(days=random.randint(1, min(
-                data_ranges["read_days_ago_max"],
-                (datetime.now(timezone.utc) - created_at).days
-            )))
+            days_since_created = (datetime.now(timezone.utc) - created_at).days
+            max_read_days = min(data_ranges["read_days_ago_max"], days_since_created)
+            if max_read_days > 0:
+                read_at = created_at + timedelta(days=random.randint(1, max_read_days))
+            else:
+                read_at = created_at + timedelta(days=1)
         
         message = Message(
             id=uuid4(),
@@ -1268,7 +1539,7 @@ async def generate_admins(session: AsyncSession, config: Dict[str, Any], count: 
             username=username,
             email=email,
             password_hash=pwd_context.hash("password123"),
-            full_name=fake.name(),
+            full_name=random.choice(korean_names),
             is_active="true" if random.random() > 0.1 else "false",  # 90% active
             created_at=datetime.now(timezone.utc) - timedelta(days=random.randint(0, 365)),
         )
@@ -1379,7 +1650,7 @@ async def generate_all(
             "PIL/Pillow is not installed. Cannot generate images.\n"
             "Please install with: pip install pillow"
         )
-    print("  ✓ PIL/Pillow is available")
+    print("  [OK] PIL/Pillow is available")
     
     # Initialize storage service
     storage_service = None
@@ -1388,7 +1659,7 @@ async def generate_all(
         storage_service = storage_svc
         # Test connection by trying to access the client
         _ = storage_service.client
-        print("  ✓ Supabase Storage service is available")
+        print("  [OK] Supabase Storage service is available")
     except Exception as e:
         raise RuntimeError(
             f"Storage service is not available: {e}\n"
@@ -1536,14 +1807,14 @@ async def main():
             # Commit the transaction atomically
             # If any error occurs before this point, the transaction will be rolled back
             await session.commit()
-            print(f"\n{Fore.GREEN if HAS_COLORAMA else ''}✓ Transaction committed successfully - all data is now in the database{Style.RESET_ALL if HAS_COLORAMA else ''}")
+            print(f"\n{Fore.GREEN if HAS_COLORAMA else ''}[SUCCESS] Transaction committed successfully - all data is now in the database{Style.RESET_ALL if HAS_COLORAMA else ''}")
             
     except Exception as e:
         # Rollback the transaction on any error
         if session:
             try:
                 await session.rollback()
-                print(f"\n{Fore.RED if HAS_COLORAMA else ''}✗ Transaction rolled back due to error{Style.RESET_ALL if HAS_COLORAMA else ''}")
+                print(f"\n{Fore.RED if HAS_COLORAMA else ''}[ERROR] Transaction rolled back due to error{Style.RESET_ALL if HAS_COLORAMA else ''}")
             except Exception as rollback_error:
                 print(f"Error during rollback: {rollback_error}")
         print(f"Error: {e}")
@@ -1605,6 +1876,14 @@ def suppress_ssl_cleanup_errors():
 
 
 if __name__ == "__main__":
+    # Fix Windows console encoding for Unicode characters
+    import sys
+    import io
+    if sys.platform == "win32":
+        # Set UTF-8 encoding for stdout and stderr
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    
     # Suppress SSL transport errors on Windows (they occur during cleanup and don't affect functionality)
     suppress_ssl_cleanup_errors()
     

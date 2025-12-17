@@ -261,16 +261,30 @@ async function searchNiceDnb(req) {
     data: {
       businessNumber,
       companyName: 'Mock Company Name',
+      companyNameEn: 'Mock Company Name (English)',
       representative: 'Mock Representative',
       address: '강원특별자치도 춘천시 중앙로 1',
+      zipCode: '24341',
+      phone: '070-1234-5678',
+      fax: '050-1234-5678',
+      email: 'mock@example.com',
       industry: '제조업',
+      industryCode: '27112',
+      companyScale: '중소기업',
+      companyType: '일반',
+      mainBusiness: '제조업',
       establishedDate: '2018-05-10',
       creditGrade: mockMetrics.creditGrade,
-      riskLevel: mockMetrics.riskLevel,
-      summary: mockMetrics.summary
+      creditDate: '20251215',
+      employeeCount: 50,
+      employeeCountDate: '202503',
+      salesAmount: 1000000,
+      operatingProfit: 120000,
+      shareholderEquity: 500000,
+      debtAmount: 300000,
+      assetAmount: 800000
     },
-    financials: mockMetrics.financials,
-    insights: mockMetrics.insights
+    financials: mockMetrics.financials
   });
 }
 
@@ -350,17 +364,10 @@ function generateCompanyMetrics(seed) {
   
   return {
     creditGrade,
-    riskLevel,
-    summary: '최근 3년 연속 매출 성장을 기록한 안정적인 기업으로 평가되었습니다.',
     financials: [
       { year: 2022, revenue, profit, employees },
       { year: 2023, revenue: Math.round(revenue * 1.08), profit: Math.round(profit * 1.05), employees: employees + 8 },
       { year: 2024, revenue: Math.round(revenue * 1.15), profit: Math.round(profit * 1.12), employees: employees + 15 }
-    ],
-    insights: [
-      { label: '수출 비중', value: `${exportRatio}%`, trend: 'up' },
-      { label: 'R&D 투자', value: '매출 대비 12%', trend: 'steady' },
-      { label: '신규 고용', value: `${Math.round(employees * 0.1)}명`, trend: 'up' }
     ]
   };
 }

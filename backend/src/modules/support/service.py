@@ -4,8 +4,8 @@ Support service.
 Business logic for support management (FAQs and inquiries).
 """
 from typing import Optional, List, Tuple, Dict, Any
-from uuid import UUID
-from datetime import datetime
+from uuid import UUID, uuid4
+from datetime import datetime, timezone
 
 from ...common.modules.exception import NotFoundError, ForbiddenError
 from ...common.modules.supabase.service import supabase_service
@@ -47,7 +47,7 @@ class SupportService:
         Returns:
             List of FAQ dictionaries ordered by display_order
         """
-        query = supabase_service.client.table('faqs').select('*')
+        query = supabase_service.client.table('faqs').select('*').is_('deleted_at', 'null')
         
         if category:
             query = query.eq('category', category)
@@ -68,6 +68,7 @@ class SupportService:
             Created FAQ dictionary
         """
         faq_data = {
+            'id': str(uuid4()),
             'category': data.category,
             'question': data.question,
             'answer': data.answer,
@@ -106,7 +107,7 @@ class SupportService:
         
         if not update_data:
             # No fields to update, just return existing FAQ
-            result = supabase_service.client.table('faqs').select('*').eq('id', str(faq_id)).execute()
+            result = supabase_service.client.table('faqs').select('*').eq('id', str(faq_id)).is_('deleted_at', 'null').execute()
             if not result.data:
                 raise NotFoundError("FAQ")
             return result.data[0]
@@ -120,7 +121,7 @@ class SupportService:
 
     async def delete_faq(self, faq_id: UUID) -> None:
         """
-        Delete an FAQ.
+        Soft delete an FAQ (set deleted_at timestamp).
 
         Args:
             faq_id: FAQ UUID
@@ -128,14 +129,16 @@ class SupportService:
         Raises:
             NotFoundError: If FAQ not found
         """
-        # Check if FAQ exists first
-        check_result = supabase_service.client.table('faqs').select('id').eq('id', str(faq_id)).execute()
+        # Check if FAQ exists first (exclude soft-deleted)
+        check_result = supabase_service.client.table('faqs').select('id').eq('id', str(faq_id)).is_('deleted_at', 'null').execute()
         
         if not check_result.data:
             raise NotFoundError("FAQ")
         
-        # Delete the FAQ
-        supabase_service.client.table('faqs').delete().eq('id', str(faq_id)).execute()
+        # Soft delete the FAQ (set deleted_at)
+        supabase_service.client.table('faqs').update({
+            'deleted_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', str(faq_id)).execute()
 
     # Inquiry Management - Using Supabase Client
 
@@ -153,6 +156,7 @@ class SupportService:
             Created inquiry dictionary
         """
         inquiry_data = {
+            'id': str(uuid4()),
             'member_id': str(member_id),
             'subject': data.subject,
             'content': data.content,

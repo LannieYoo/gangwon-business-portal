@@ -96,6 +96,13 @@ def _encode_database_url(url: str) -> str:
         Encoded database URL string with pgbouncer parameter removed
     """
     parsed = urlparse(url)
+
+    # Ensure we always use the asyncpg driver, even if the URL comes from
+    # official docs using "postgres://" or "postgresql://".
+    # This lets you keep the original Supabase config unchanged.
+    scheme = parsed.scheme
+    if scheme in ("postgres", "postgresql"):
+        scheme = "postgresql+asyncpg"
     if not parsed.password:
         # Still need to remove pgbouncer parameter even if no password
         query_params = []
@@ -108,7 +115,7 @@ def _encode_database_url(url: str) -> str:
                 query_params = urlencode(params, doseq=True)
         
         return urlunparse((
-            parsed.scheme,
+            scheme,
             parsed.netloc,
             parsed.path,
             parsed.params,
@@ -137,7 +144,7 @@ def _encode_database_url(url: str) -> str:
     
     # Reconstruct the full URL
     return urlunparse((
-        parsed.scheme,
+        scheme,
         netloc,
         parsed.path,
         parsed.params,
@@ -147,77 +154,28 @@ def _encode_database_url(url: str) -> str:
 
 
 # ============================================================================
-# Database Connection Pool Configuration
+# Database Connection (Direct, No Pooling, for scripts)
+# ============================================================================
+#
+# 说明：
+# - 这里的 SQLAlchemy 只给测试脚本等遗留代码用；
+# - 优先使用 DIRECT_URL（直连 Postgres，不经过 PgBouncer）；
+# - 如果没配置 DIRECT_URL，才退回 DATABASE_URL。
 # ============================================================================
 
-# 优化连接池配置以解决超时问题
-POOL_SIZE = 5           # 减少基础连接池大小，避免过多连接
-MAX_OVERFLOW = 10       # 减少溢出连接数
-POOL_TIMEOUT = 60       # 增加池超时时间到60秒
-CONNECT_TIMEOUT = 30    # 增加连接超时时间到30秒
-COMMAND_TIMEOUT = 60    # 增加命令超时时间到60秒
-POOL_RECYCLE = 3600     # 连接回收时间（1小时）
-POOL_PRE_PING = True    # 启用连接预检查
+database_url = settings.DIRECT_URL or settings.DATABASE_URL
 
-# Log pool configuration (保留用于监控)
-db_pool_logger.info(
-    "Initializing SQLAlchemy connection pool (DEPRECATED - legacy)",
-    extra={
-        "pool_size": POOL_SIZE,
-        "max_overflow": MAX_OVERFLOW,
-        "pool_timeout": POOL_TIMEOUT,
-        "connect_timeout": CONNECT_TIMEOUT,
-        "command_timeout": COMMAND_TIMEOUT,
-        "pool_recycle": POOL_RECYCLE,
-        "pool_pre_ping": POOL_PRE_PING,
-        "deprecated": True,
-        "migration_note": "This is legacy code. Migrate to Supabase client for better performance and reliability"
-    }
-)
-
-# Create async engine with properly encoded URL and optimized settings
-# 特别针对 Supabase pooler 的配置 - 使用 pgbouncer=true 参数
 engine = create_async_engine(
-    _encode_database_url(settings.DATABASE_URL),
+    _encode_database_url(database_url),
     echo=settings.DEBUG,
-    future=True,  # 使用 SQLAlchemy 2.0 风格
-    pool_pre_ping=POOL_PRE_PING,
-    pool_size=POOL_SIZE,
-    max_overflow=MAX_OVERFLOW,
-    pool_timeout=POOL_TIMEOUT,
-    pool_recycle=POOL_RECYCLE,
-    # 完全禁用编译缓存以避免 prepared statement 问题
-    query_cache_size=0,
-    # 关键：在引擎级别禁用 prepared statements
-    execution_options={
-        "compiled_cache": {},
-        "autocommit": False,
-    },
+    future=True,
+    poolclass=NullPool,
     connect_args={
-        "timeout": CONNECT_TIMEOUT,
-        "command_timeout": COMMAND_TIMEOUT,
-        # 关键：完全禁用 asyncpg 的 prepared statements - 这是最重要的配置
+        # Critical for PgBouncer (transaction/statement mode):
+        # disable asyncpg's statement cache to avoid DuplicatePreparedStatementError.
         "statement_cache_size": 0,
-        "prepared_statement_cache_size": 0,
-        # 添加服务器设置
-        "server_settings": {
-            "application_name": "gangwon_business_portal",
-            "jit": "off",
-        },
     },
 )
-
-# 添加连接事件监听器来确保 prepared statements 被禁用
-@event.listens_for(Pool, "connect")
-def disable_prepared_statements(dbapi_connection, connection_record):
-    """
-    在每个新连接上禁用 prepared statements
-    确保与 Supabase pooler 兼容
-    """
-    # 对于 asyncpg 连接，确保 prepared statement 缓存被禁用
-    if hasattr(dbapi_connection, 'execute'):
-        # 设置连接级别的参数来禁用 prepared statements
-        connection_record.info['statement_cache_disabled'] = True
 
 # ============================================================================
 # SQL Logging Utilities

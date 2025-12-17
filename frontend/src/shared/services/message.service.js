@@ -3,9 +3,9 @@
  * 站内信服务
  */
 
-import apiService from './api.service';
-import { autoLog } from './logger.service';
-import { API_PREFIX } from '@shared/utils/constants';
+import apiService from "./api.service";
+
+import { API_PREFIX } from "@shared/utils/constants";
 
 const BASE_URL = `${API_PREFIX}/admin/messages`;
 const MEMBER_BASE_URL = `${API_PREFIX}/member/messages`;
@@ -13,161 +13,136 @@ const MEMBER_BASE_URL = `${API_PREFIX}/member/messages`;
 /**
  * Get messages list
  */
-const getMessagesInternal = autoLog('get_messages', { 
-  logResultCount: true, 
-  serviceName: 'MessageService', 
-  methodName: 'getMessages' 
-})(async (params = {}) => {
+const getMessagesInternal = async (params = {}) => {
   const { page = 1, pageSize = 20, isRead, isImportant } = params;
   const queryParams = new URLSearchParams({
     page: page.toString(),
     page_size: pageSize.toString(),
   });
-  
+
   if (isRead !== undefined) {
-    queryParams.append('is_read', isRead.toString());
+    queryParams.append("is_read", isRead.toString());
   }
   if (isImportant !== undefined) {
-    queryParams.append('is_important', isImportant.toString());
+    queryParams.append("is_important", isImportant.toString());
   }
-  
-  const response = await apiService.get(`${BASE_URL}?${queryParams.toString()}`);
+
+  const response = await apiService.get(
+    `${BASE_URL}?${queryParams.toString()}`
+  );
   return response;
-});
+};
 
 /**
  * Get member messages list
  */
-const getMemberMessagesInternal = autoLog('get_member_messages', { 
-  logResultCount: true, 
-  serviceName: 'MessageService', 
-  methodName: 'getMemberMessages' 
-})(async (params = {}) => {
+const getMemberMessagesInternal = async (params = {}) => {
   const { page = 1, pageSize = 20, isRead, isImportant } = params;
   const queryParams = new URLSearchParams({
     page: page.toString(),
     page_size: pageSize.toString(),
   });
-  
+
   if (isRead !== undefined) {
-    queryParams.append('is_read', isRead.toString());
+    queryParams.append("is_read", isRead.toString());
   }
   if (isImportant !== undefined) {
-    queryParams.append('is_important', isImportant.toString());
+    queryParams.append("is_important", isImportant.toString());
   }
-  
-  const response = await apiService.get(`${MEMBER_BASE_URL}?${queryParams.toString()}`);
+
+  const response = await apiService.get(
+    `${MEMBER_BASE_URL}?${queryParams.toString()}`
+  );
   return response;
-});
+};
 
 /**
  * Get unread count
  */
-const getUnreadCountInternal = autoLog('get_unread_count', { 
-  serviceName: 'MessageService', 
-  methodName: 'getUnreadCount' 
-})(async () => {
+const getUnreadCountInternal = async () => {
   const response = await apiService.get(`${BASE_URL}/unread-count`);
   return response;
-});
+};
 
 /**
  * Get member unread count
  */
-const getMemberUnreadCountInternal = autoLog('get_member_unread_count', { 
-  serviceName: 'MessageService', 
-  methodName: 'getMemberUnreadCount' 
-})(async () => {
+const getMemberUnreadCountInternal = async () => {
   const response = await apiService.get(`${MEMBER_BASE_URL}/unread-count`);
   return response;
-});
+};
 
 /**
  * Get message by ID
  */
-const getMessageInternal = autoLog('get_message', { 
-  serviceName: 'MessageService', 
-  methodName: 'getMessage' 
-})(async (messageId) => {
+const getMessageInternal = async (messageId) => {
   const response = await apiService.get(`${BASE_URL}/${messageId}`);
   return response;
-});
+};
 
 /**
  * Get member message by ID
  */
-const getMemberMessageInternal = autoLog('get_member_message', { 
-  serviceName: 'MessageService', 
-  methodName: 'getMemberMessage' 
-})(async (messageId) => {
+const getMemberMessageInternal = async (messageId) => {
   const response = await apiService.get(`${MEMBER_BASE_URL}/${messageId}`);
   return response;
-});
+};
 
 /**
  * Create message
  */
-const createMessageInternal = autoLog('create_message', { 
-  serviceName: 'MessageService', 
-  methodName: 'createMessage' 
-})(async (data) => {
+const createMessageInternal = async (data) => {
   const response = await apiService.post(BASE_URL, data);
   return response;
-});
+};
 
 /**
  * Update message
  */
-const updateMessageInternal = autoLog('update_message', { 
-  serviceName: 'MessageService', 
-  methodName: 'updateMessage' 
-})(async (messageId, data) => {
+const updateMessageInternal = async (messageId, data) => {
   const response = await apiService.put(`${BASE_URL}/${messageId}`, data);
   return response;
-});
+};
 
 /**
  * Update member message
  */
-const updateMemberMessageInternal = autoLog('update_member_message', { 
-  serviceName: 'MessageService', 
-  methodName: 'updateMemberMessage' 
-})(async (messageId, data) => {
-  const response = await apiService.put(`${MEMBER_BASE_URL}/${messageId}`, data);
+const updateMemberMessageInternal = async (messageId, data) => {
+  const response = await apiService.put(
+    `${MEMBER_BASE_URL}/${messageId}`,
+    data
+  );
   return response;
-});
+};
 
 /**
  * Delete message
  */
-const deleteMessageInternal = autoLog('delete_message', { 
-  serviceName: 'MessageService', 
-  methodName: 'deleteMessage' 
-})(async (messageId) => {
+const deleteMessageInternal = async (messageId) => {
   await apiService.delete(`${BASE_URL}/${messageId}`);
-});
+};
 
 /**
  * Delete member message
  */
-const deleteMemberMessageInternal = autoLog('delete_member_message', { 
-  serviceName: 'MessageService', 
-  methodName: 'deleteMemberMessage' 
-})(async (messageId) => {
+const deleteMemberMessageInternal = async (messageId) => {
   await apiService.delete(`${MEMBER_BASE_URL}/${messageId}`);
-});
+};
 
 /**
  * Convert snake_case to camelCase
  */
 function toCamelCase(obj) {
-  if (!obj || typeof obj !== 'object') return obj;
+  if (!obj || typeof obj !== "object") return obj;
   if (Array.isArray(obj)) return obj.map(toCamelCase);
-  
+
   const camelObj = {};
   for (const [key, value] of Object.entries(obj)) {
-    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-    camelObj[camelKey] = typeof value === 'object' && value !== null ? toCamelCase(value) : value;
+    const camelKey = key.replace(/_([a-z])/g, (_, letter) =>
+      letter.toUpperCase()
+    );
+    camelObj[camelKey] =
+      typeof value === "object" && value !== null ? toCamelCase(value) : value;
   }
   return camelObj;
 }
@@ -314,7 +289,84 @@ const messageService = {
   async deleteMemberMessage(messageId) {
     await deleteMemberMessageInternal(messageId);
   },
+
+  /**
+   * Get thread with messages
+   * @param {string} threadId - Thread ID
+   * @returns {Promise<Object>} Thread with messages
+   */
+  async getThread(threadId) {
+    const response = await apiService.get(`${BASE_URL}/threads/${threadId}`);
+    return {
+      thread: toCamelCase(response.thread),
+      messages: (response.messages || []).map(toCamelCase)
+    };
+  },
+
+  /**
+   * Update thread
+   * @param {string} threadId - Thread ID
+   * @param {Object} data - Update data
+   * @returns {Promise<Object>} Updated thread
+   */
+  async updateThread(threadId, data) {
+    const payload = {};
+    if (data.status !== undefined) {
+      payload.status = data.status;
+    }
+    const response = await apiService.put(`${BASE_URL}/threads/${threadId}`, payload);
+    return toCamelCase(response);
+  },
+
+  /**
+   * Create message in thread
+   * @param {string} threadId - Thread ID
+   * @param {Object} data - Message data
+   * @returns {Promise<Object>} Created message
+   */
+  async createThreadMessage(threadId, data) {
+    const payload = {
+      content: data.content,
+      is_important: data.isImportant || false,
+      attachments: data.attachments || []
+    };
+    const response = await apiService.post(`${BASE_URL}/threads/${threadId}/messages`, payload);
+    return toCamelCase(response);
+  },
+
+  /**
+   * Create broadcast message
+   * @param {Object} data - Broadcast data
+   * @returns {Promise<Object>} Broadcast result
+   */
+  async createBroadcast(data) {
+    const payload = {
+      subject: data.subject,
+      content: data.content,
+      is_important: data.isImportant || false,
+      category: data.category || 'general',
+      send_to_all: data.sendToAll,
+      recipient_ids: data.recipientIds || [],
+      attachments: data.attachments || []
+    };
+    const response = await apiService.post(`${BASE_URL}/broadcast`, payload);
+    return toCamelCase(response);
+  },
+
+  /**
+   * Get message analytics
+   * @param {Object} params - Analytics parameters
+   * @returns {Promise<Object>} Analytics data
+   */
+  async getAnalytics(params = {}) {
+    const queryParams = new URLSearchParams();
+    if (params.timeRange) {
+      queryParams.append('time_range', params.timeRange);
+    }
+    
+    const response = await apiService.get(`${BASE_URL}/analytics?${queryParams.toString()}`);
+    return toCamelCase(response);
+  },
 };
 
 export default messageService;
-

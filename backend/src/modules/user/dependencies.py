@@ -157,9 +157,18 @@ async def get_current_active_user_compat(
 
     Raises:
         UnauthorizedError: If user is not active
+        ForbiddenError: If user is not a member (e.g., admin trying to access member-only endpoint)
     """
+    role = current_user.get("role", "member")
+    
+    # Check if user is a member (not admin)
+    if role != "member":
+        raise ForbiddenError("Member access required")
+    
+    # Check active status for members
     if current_user.get("status") != "active":
         raise UnauthorizedError("Inactive user")
+    
     return MemberCompat(current_user)
 
 

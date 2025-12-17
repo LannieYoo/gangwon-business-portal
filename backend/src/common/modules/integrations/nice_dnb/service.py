@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 
 from ...config.settings import settings
 from ...logger import logger
-from .schemas import NiceDnBResponse, NiceDnBCompanyData, NiceDnBFinancialData, NiceDnBInsight
+from .schemas import NiceDnBResponse, NiceDnBCompanyData, NiceDnBFinancialData
 
 
 class NiceDnBClient:
@@ -221,7 +221,8 @@ class NiceDnBClient:
                         "business_number": business_number,
                         "api_url": api_url,
                         "method": "POST",
-                        "response_data": str(data)[:500],  # Log first 500 chars of response
+                        "response_data": str(data)[:1000],  # Log first 1000 chars of response
+                        "response_keys": list(data.keys()) if isinstance(data, dict) else None,
                     }
                 )
 
@@ -340,7 +341,8 @@ class NiceDnBClient:
             extra={
                 "query_business_number": business_number,
                 "api_biz_no": api_biz_no,
-                "data_body_keys": list(data_body.keys())[:10] if isinstance(data_body, dict) else None,
+                "data_body_keys": list(data_body.keys()) if isinstance(data_body, dict) else None,
+                "data_body_sample": {k: str(v)[:100] for k, v in list(data_body.items())[:10]} if isinstance(data_body, dict) else None,
             }
         )
 
@@ -365,7 +367,12 @@ class NiceDnBClient:
                 or ""
             ),
             address=(
-                data_body.get("addr")  # Address (주소)
+                # Combine addr1 and addr2 if both exist
+                " ".join(filter(None, [
+                    data_body.get("addr1"),
+                    data_body.get("addr2")
+                ])).strip()
+                or data_body.get("addr")  # Fallback to single addr field
                 or data_body.get("address") 
                 or data_body.get("location") 
                 or ""
@@ -378,58 +385,92 @@ class NiceDnBClient:
                 or ""
             ),
             established_date=self._parse_date(
-                data_body.get("estbDt")  # Establishment date (설립일자)
+                data_body.get("estbDate")  # Establishment date (설립일자) - API returns YYYYMMDD format
+                or data_body.get("estbDt")
                 or data_body.get("established_date") 
                 or data_body.get("founding_date")
             ),
             credit_grade=(
-                data_body.get("crcdGrade")  # Credit grade (신용등급)
+                data_body.get("criGrd")  # Credit grade (신용등급) - API returns this field
+                or data_body.get("crcdGrade")
                 or data_body.get("credit_grade") 
                 or data_body.get("rating") 
                 or ""
             ),
-            risk_level=(
-                data_body.get("risk_level") 
-                or data_body.get("risk") 
-                or ""
-            ),
-            summary=(
-                data_body.get("summary") 
-                or data_body.get("evaluation") 
-                or ""
-            ),
+            # Additional fields
+            legal_number=data_body.get("corpNo"),
+            company_name_en=data_body.get("cmpEnm"),
+            phone=data_body.get("telNo"),
+            fax=data_body.get("faxTelNo"),
+            email=data_body.get("emlAdr"),
+            zip_code=data_body.get("zip"),
+            company_scale=data_body.get("cmpSclNm"),
+            company_type=data_body.get("cmpTypNm"),
+            main_business=data_body.get("bzcndNm"),
+            industry_code=data_body.get("indCd1"),
+            employee_count=data_body.get("empCnt"),
+            employee_count_date=data_body.get("empAccYm"),
+            credit_date=data_body.get("crDate"),
+            sales_amount=data_body.get("salesAmt"),
+            operating_profit=data_body.get("oprIcAmt"),
+            shareholder_equity=data_body.get("shEqAmt"),
+            debt_amount=data_body.get("debtAmt"),
+            asset_amount=data_body.get("assetAmt"),
         )
 
         # Extract financial data
         financials = []
+        # API returns financial data as single record fields, not array
+        # Try to extract from array first (for backward compatibility)
         financial_list = data_body.get("financials") or data_body.get("financial_data") or []
-        for financial in financial_list:
-            financials.append(
-                NiceDnBFinancialData(
-                    year=financial.get("year") or financial.get("fiscal_year"),
-                    revenue=financial.get("revenue") or financial.get("sales") or 0,
-                    profit=financial.get("profit") or financial.get("net_income") or 0,
-                    employees=financial.get("employees") or financial.get("employee_count") or 0,
+        if financial_list:
+            for financial in financial_list:
+                financials.append(
+                    NiceDnBFinancialData(
+                        year=financial.get("year") or financial.get("fiscal_year"),
+                        revenue=financial.get("revenue") or financial.get("sales") or 0,
+                        profit=financial.get("profit") or financial.get("net_income") or 0,
+                        employees=financial.get("employees") or financial.get("employee_count") or 0,
+                    )
                 )
-            )
-
-        # Extract insights
-        insights = []
-        insights_list = data_body.get("insights") or data_body.get("metrics") or []
-        for insight in insights_list:
-            insights.append(
-                NiceDnBInsight(
-                    label=insight.get("label") or insight.get("name"),
-                    value=insight.get("value") or str(insight.get("value", "")),
-                    trend=insight.get("trend") or "steady",
+        else:
+            # Extract from single record fields (actual API response format)
+            # Get year from sttDate (status date) or crDate (credit date) or current year
+            from datetime import datetime
+            year = None
+            if data_body.get("sttDate"):
+                try:
+                    year = int(data_body.get("sttDate")[:4])
+                except (ValueError, TypeError):
+                    pass
+            if not year and data_body.get("crDate"):
+                try:
+                    year = int(data_body.get("crDate")[:4])
+                except (ValueError, TypeError):
+                    pass
+            if not year:
+                year = datetime.now().year
+            
+            # Extract financial values (API returns in thousands of KRW)
+            sales_amt = data_body.get("salesAmt") or 0
+            opr_ic_amt = data_body.get("oprIcAmt") or 0
+            emp_cnt = data_body.get("empCnt") or 0
+            
+            # Only add if we have meaningful financial data
+            if sales_amt or opr_ic_amt or emp_cnt:
+                financials.append(
+                    NiceDnBFinancialData(
+                        year=year,
+                        revenue=sales_amt * 1000 if sales_amt else 0,  # Convert from thousands to actual amount
+                        profit=opr_ic_amt * 1000 if opr_ic_amt else 0,  # Convert from thousands to actual amount
+                        employees=emp_cnt,
+                    )
                 )
-            )
 
         return NiceDnBResponse(
             success=True,
             data=company_data,
             financials=financials,
-            insights=insights,
         )
 
     def _parse_date(self, date_str: Optional[str]) -> Optional[datetime.date]:

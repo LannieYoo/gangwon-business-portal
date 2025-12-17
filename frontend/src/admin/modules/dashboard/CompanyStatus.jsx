@@ -35,34 +35,24 @@ export default function CompanyStatus() {
 
   const loadDashboardStats = async () => {
     setLoading(true);
-    try {
-      const params = {
-        year: selectedYear === 'all' ? 'all' : selectedYear,
-        // 当选择 'all' 时，传递 'all' 明确表示显示该年度的全部季度
-        quarter: selectedQuarter
-      };
-      const response = await apiService.get(`${API_PREFIX}/admin/dashboard/stats`, params);
-      if (response && response.stats) {
-        setStats(response.stats);
-        // 设置图表数据
-        if (response.chartData) {
-          setChartData({
-            members: response.chartData.members || [],
-            salesEmployment: response.chartData.salesEmployment || []
-          });
-        } else {
-          setChartData({ members: [], salesEmployment: [] });
-        }
-      } else {
-        setStats({
-          totalMembers: 0,
-          totalSales: 0,
-          totalEmployment: 0,
-          totalIntellectualProperty: 0
+    const params = {
+      year: selectedYear === 'all' ? 'all' : selectedYear,
+      // 当选择 'all' 时，传递 'all' 明确表示显示该年度的全部季度
+      quarter: selectedQuarter
+    };
+    const response = await apiService.get(`${API_PREFIX}/admin/dashboard/stats`, params);
+    if (response && response.stats) {
+      setStats(response.stats);
+      // 设置图表数据
+      if (response.chartData) {
+        setChartData({
+          members: response.chartData.members || [],
+          salesEmployment: response.chartData.salesEmployment || []
         });
+      } else {
         setChartData({ members: [], salesEmployment: [] });
       }
-    } catch (error) {
+    } else {
       setStats({
         totalMembers: 0,
         totalSales: 0,
@@ -70,9 +60,8 @@ export default function CompanyStatus() {
         totalIntellectualProperty: 0
       });
       setChartData({ members: [], salesEmployment: [] });
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   // 准备会员增长图表数据
@@ -109,22 +98,16 @@ export default function CompanyStatus() {
   ];
 
   const handleExport = async (format = 'excel') => {
-    try {
-      setLoading(true);
-      const params = {
-        format,
-        year: selectedYear === 'all' ? 'all' : selectedYear,
-        quarter: selectedQuarter
-      };
-      
-      // 使用 adminService.exportDashboard，装饰器会自动处理日志记录
-      await adminService.exportDashboard(params);
-    } catch (error) {
-      // 错误日志已由装饰器记录，静默处理错误
-      console.error('Export failed:', error);
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const params = {
+      format,
+      year: selectedYear === 'all' ? 'all' : selectedYear,
+      quarter: selectedQuarter
+    };
+    
+    // 使用 adminService.exportDashboard，装饰器会自动处理日志记录
+    await adminService.exportDashboard(params);
+    setLoading(false);
   };
 
   return (

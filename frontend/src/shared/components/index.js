@@ -29,3 +29,4 @@ export { LoginModal } from "./LoginModal";
 export { PasswordStrength } from "./PasswordStrength";
 export { default as NotificationBell } from "./NotificationBell";
 export { RichTextEditor } from "./RichTextEditor";
+export { default as Checkbox } from "./Checkbox";

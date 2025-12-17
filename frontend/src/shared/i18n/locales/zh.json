@@ -67,7 +67,14 @@
       "dark": "深色",
       "switchToLight": "切换到浅色模式",
       "switchToDark": "切换到深色模式"
-    }
+    },
+    "fileSize": {
+      "bytes": "Bytes",
+      "kb": "KB",
+      "mb": "MB",
+      "gb": "GB"
+    },
+    "attachment": "📎"
   },
   "nav": {
     "home": "首页",
@@ -155,6 +162,151 @@
       "invalidCredentials": "用户名或密码不正确",
       "notAdminUser": "不是管理员用户？",
       "goToMemberLogin": "前往会员登录"
+    },
+    "messages": {
+      "title": "站内信管理",
+      "tabs": {
+        "list": "消息列表",
+        "send": "发送消息",
+        "broadcast": "群发消息",
+        "analytics": "消息统计"
+      },
+      "list": {
+        "title": "消息列表",
+        "description": "查看和管理所有站内信消息。"
+      },
+      "empty": "暂无消息",
+      "unreadCount": "未读",
+      "filters": {
+        "all": "全部",
+        "unread": "未读",
+        "read": "已读"
+      },
+      "recipient": "收件人",
+      "from": "发件人",
+      "to": "收件人",
+      "system": "系统",
+      "date": "时间",
+      "readAt": "已读时间",
+      "markAsRead": "标记为已读",
+      "selectMessage": "请选择一条消息查看详情",
+      "deleted": "删除成功",
+      "confirmDelete": "确定要删除这条消息吗？",
+      "deleteWarning": "此操作不可撤销，确定要继续吗？",
+      "subject": "主题",
+      "content": "内容",
+      "selectRecipient": "选择收件人",
+      "subjectPlaceholder": "请输入消息主题",
+      "contentPlaceholder": "请输入消息内容",
+      "markAsImportant": "标记为重要消息",
+      "send": "发送",
+      "sendTitle": "发送站内信",
+      "sendDescription": "向指定会员发送站内信消息。",
+      "sent": "消息发送成功",
+      "validationError": "请补全必填信息",
+      "important": "重要",
+      "unread": "未读",
+      "analytics": {
+        "title": "消息统计",
+        "description": "查看消息相关的统计数据和趋势分析。",
+        "last7Days": "最近7天",
+        "last30Days": "最近30天",
+        "last90Days": "最近90天",
+        "allTime": "全部时间",
+        "totalMessages": "总消息数",
+        "unreadMessages": "未读消息",
+        "avgResponseTime": "平均响应时间",
+        "responseRate": "响应率",
+        "messagesTrend": "消息趋势",
+        "messagesByCategory": "消息分类统计",
+        "responseTimeTrend": "响应时间趋势",
+        "messageCount": "消息数量",
+        "responseTime": "响应时间",
+        "minutes": "分钟",
+        "hours": "小时",
+        "categoryGeneral": "一般",
+        "categorySupport": "支持",
+        "categoryPerformance": "绩效",
+        "categoryProject": "项目",
+        "loadFailed": "加载统计数据失败"
+      },
+      "broadcast": {
+        "title": "群发消息",
+        "description": "向所有会员或指定会员发送群发消息。",
+        "subject": "主题",
+        "subjectPlaceholder": "请输入消息主题",
+        "category": "分类",
+        "content": "内容",
+        "contentPlaceholder": "请输入群发消息内容...",
+        "attachments": "附件",
+        "maxFiles": "最多5个文件，每个不超过10MB",
+        "uploading": "上传中...",
+        "clickToUpload": "点击上传文件",
+        "markAsImportant": "标记为重要消息",
+        "send": "发送给 {{count}} 人",
+        "sent": "群发消息发送成功",
+        "recipients": "收件人",
+        "sendToAll": "发送给所有会员",
+        "sendToSelected": "发送给指定会员",
+        "selectedCount": "已选择 {{count}} 人",
+        "selectAll": "全选",
+        "deselectAll": "取消全选",
+        "noRecipients": "请选择收件人"
+      },
+      "category": {
+        "general": "一般通知",
+        "announcement": "重要公告",
+        "system": "系统通知",
+        "support": "技术支持",
+        "performance": "绩效咨询"
+      },
+      "thread": {
+        "title": "消息会话",
+        "description": "查看和管理消息会话详情。",
+        "back": "返回",
+        "backToList": "返回消息列表",
+        "notFound": "会话不存在",
+        "member": "会员",
+        "created": "创建时间",
+        "lastMessage": "最后消息",
+        "messageSent": "消息发送成功",
+        "confirmClose": "确定要关闭这个会话吗？",
+        "closed": "会话已关闭",
+        "reopened": "会话已重新打开",
+        "reply": "回复",
+        "close": "关闭会话",
+        "reopen": "重新打开",
+        "messageCount": "共 {{count}} 条消息",
+        "noMessages": "暂无消息",
+        "admin": "管理员",
+        "status": {
+          "open": "进行中",
+          "resolved": "已解决",
+          "closed": "已关闭"
+        }
+      },
+      "composer": {
+        "newMessage": "新建消息",
+        "reply": "回复消息",
+        "recipient": "收件人",
+        "subject": "主题",
+        "subjectPlaceholder": "请输入消息主题",
+        "category": "分类",
+        "content": "内容",
+        "contentPlaceholder": "请输入消息内容...",
+        "attachments": "附件",
+        "maxFiles": "最多3个文件，每个不超过10MB",
+        "uploading": "上传中...",
+        "clickToUpload": "点击上传文件或拖拽到此处",
+        "supportedFormats": "支持 PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, GIF",
+        "markAsImportant": "标记为重要消息",
+        "send": "发送"
+      }
+    },
+    "dashboard": {
+      "charts": {
+        "noData": "暂无数据"
+      }
     }
   },
   "member": {

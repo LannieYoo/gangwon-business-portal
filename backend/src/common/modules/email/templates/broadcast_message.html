@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_important %}중요 공지{% else %}공지사항{% endif %}</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: {% if is_important %}#dc2626{% else %}#7c3aed{% endif %};
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background-color: {% if is_important %}#fef2f2{% else %}#f5f3ff{% endif %};
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .message-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid {% if is_important %}#dc2626{% else %}#7c3aed{% endif %};
+            margin: 20px 0;
+        }
+        .important-badge {
+            background-color: #dc2626;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .button {
+            display: inline-block;
+            background-color: {% if is_important %}#dc2626{% else %}#7c3aed{% endif %};
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{% if is_important %}🚨 중요 공지사항{% else %}📢 공지사항{% endif %}</h1>
+    </div>
+    
+    <div class="content">
+        <p>안녕하세요,</p>
+        
+        <p><strong>{{ sender_name }}</strong>님이 새로운 공지사항을 발송했습니다.</p>
+        
+        <div class="message-box">
+            {% if is_important %}
+            <div class="important-badge">중요</div>
+            {% endif %}
+            <h3>{{ subject }}</h3>
+            <p>자세한 내용을 확인하려면 아래 버튼을 클릭하세요.</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="{{ messages_link }}" class="button">공지사항 확인하기</a>
+        </div>
+        
+        {% if is_important %}
+        <p style="color: #dc2626; font-weight: bold;">⚠️ 이 공지사항은 중요한 내용을 포함하고 있습니다. 반드시 확인해 주세요.</p>
+        {% endif %}
+        
+        <p>감사합니다.<br>
+        강원창업포털 관리팀</p>
+    </div>
+    
+    <div class="footer">
+        <p>이 메일은 자동으로 발송된 메일입니다. 회신하지 마세요.</p>
+        <p>강원특별자치도 창업지원 포털 시스템</p>
+    </div>
+</body>
+</html>

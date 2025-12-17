@@ -219,10 +219,7 @@ export default function ProjectList() {
                   <Card key={project.id} className="p-4 sm:p-5 lg:p-6 transition-shadow duration-200 ease-in-out hover:shadow-md">
                     <div className="flex justify-between items-start gap-4 mb-4 sm:mb-5 lg:mb-6 pb-4 border-b border-gray-200">
                       <div className="flex-1 min-w-0">
-                        <h2 
-                          className="text-xl font-semibold text-gray-900 m-0 cursor-pointer transition-colors duration-200 ease-in-out leading-snug mb-2 sm:mb-3 lg:mb-4 break-words hover:text-primary-600"
-                          onClick={() => handleViewDetail(project)}
-                        >
+                        <h2 className="text-xl font-semibold text-gray-900 m-0 leading-snug mb-2 sm:mb-3 lg:mb-4 break-words">
                           {project.title}
                         </h2>
                         <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-4 items-center">
@@ -248,9 +245,15 @@ export default function ProjectList() {
                     </div>
                     <div className="mb-4 sm:mb-5 lg:mb-6">
                       <p className="text-[0.9375rem] text-gray-700 leading-relaxed m-0 line-clamp-3">{project.description?.substring(0, 200) || ''}...</p>
-                      {project.targetAudience && (
+                      {(project.target_company_name || project.target_business_number) && (
                         <p className="text-[0.9375rem] text-gray-700 leading-relaxed mt-2">
-                          <strong>{t('projects.targetAudience', '目标对象')}:</strong> {project.targetAudience}
+                          <strong>{t('projects.targetCompany', '목표 기업')}:</strong> 
+                          {project.target_company_name && (
+                            <span className="ml-1">{project.target_company_name}</span>
+                          )}
+                          {project.target_business_number && (
+                            <span className="ml-1 text-gray-600">({project.target_business_number})</span>
+                          )}
                         </p>
                       )}
                     </div>

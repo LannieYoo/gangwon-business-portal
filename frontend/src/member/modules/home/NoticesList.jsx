@@ -6,7 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import Card from '@shared/components/Card';
-import { Pagination } from '@shared/components';
+import { Pagination, Badge } from '@shared/components';
 import { PageContainer } from '@member/layouts';
 import { apiService, loggerService, exceptionService } from '@shared/services';
 import { API_PREFIX, DEFAULT_PAGE_SIZE } from '@shared/utils/constants';
@@ -149,7 +149,7 @@ function NoticesList() {
                 <div className="flex flex-col p-5 no-underline text-inherit h-full flex-1">
                   <div className="flex items-center justify-between mb-3 gap-2">
                     {notice.important && (
-                      <span className="inline-block px-2 py-1 text-xs font-medium rounded whitespace-nowrap bg-red-100 text-red-600">{t('home.notices.important', '重要')}</span>
+                      <Badge variant="danger">{t('home.notices.important', '重要')}</Badge>
                     )}
                     <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">{notice.date}</span>
                   </div>

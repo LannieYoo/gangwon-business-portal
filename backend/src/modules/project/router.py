@@ -181,6 +181,26 @@ async def list_projects_admin(
     )
 
 
+@router.get(
+    "/api/admin/projects/{project_id}",
+    response_model=ProjectResponse,
+    tags=["admin-projects"],
+    summary="Get project details (Admin)",
+)
+@auto_log("get_project_admin", log_resource_id=True)
+async def get_project_admin(
+    project_id: UUID,
+    request: Request,
+    current_admin: Annotated[Member, Depends(get_current_admin_user)],
+):
+    """
+    Get detailed information about a specific project (admin only).
+    Admin can see all project details including drafts and inactive ones.
+    """
+    project = await service.get_project_by_id(project_id)
+    return ProjectResponse.model_validate(project)
+
+
 @router.post(
     "/api/admin/projects",
     response_model=ProjectResponse,
@@ -242,6 +262,38 @@ async def delete_project(
     WARNING: This will cascade delete all applications related to this project.
     """
     await service.delete_project(project_id)
+
+
+@router.get(
+    "/api/admin/projects/applications",
+    response_model=ApplicationListResponsePaginated,
+    tags=["admin-projects"],
+    summary="List all applications (Admin)",
+)
+@auto_log("list_all_applications", log_result_count=True)
+async def list_all_applications(
+    query: Annotated[ApplicationListQuery, Depends()],
+    request: Request,
+    current_admin: Annotated[Member, Depends(get_current_admin_user)],
+    project_id: Optional[UUID] = Query(None, description="Filter by project ID"),
+):
+    """
+    List all applications across all projects (admin only).
+
+    - **project_id**: Filter by specific project ID (optional)
+    - **status**: Filter by application status
+    - **page**: Page number
+    - **page_size**: Items per page
+    """
+    applications, total = await service.list_all_applications(query, project_id)
+
+    return ApplicationListResponsePaginated(
+        items=[ProjectApplicationListItem.model_validate(a) for a in applications],
+        total=total,
+        page=query.page,
+        page_size=query.page_size,
+        total_pages=ceil(total / query.page_size) if total > 0 else 0,
+    )
 
 
 @router.get(

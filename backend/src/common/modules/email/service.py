@@ -230,6 +230,129 @@ class EmailService:
             plain_text=plain_text,
         )
 
+    async def send_email(
+        self,
+        *,
+        to_email: str,
+        subject: str,
+        template_name: str,
+        template_data: Dict[str, Any],
+        plain_text: str | None = None,
+    ) -> bool:
+        """
+        Generic method to send email using a template.
+        
+        Args:
+            to_email: Recipient email address
+            subject: Email subject
+            template_name: Template name (should include .html extension or will be added)
+            template_data: Template context data
+            plain_text: Optional plain text version
+            
+        Returns:
+            True if email sent successfully, False otherwise
+        """
+        # Ensure template name has .html extension
+        if not template_name.endswith('.html'):
+            template_name = f"{template_name}.html"
+        
+        # Build context with common fields
+        context = {
+            **template_data,
+            "year": datetime.now(timezone.utc).year,
+        }
+        
+        return await self._send_email(
+            to_email=to_email,
+            subject=subject,
+            template_name=template_name,
+            context=context,
+            plain_text=plain_text,
+        )
+
+    async def send_new_message_notification(
+        self,
+        *,
+        to_email: str,
+        sender_name: str,
+        subject: str,
+        message_link: str,
+    ) -> bool:
+        """Send notification for new message."""
+        return await self.send_email(
+            to_email=to_email,
+            subject=f"새 메시지: {subject}",
+            template_name="new_message",
+            template_data={
+                "sender_name": sender_name,
+                "subject": subject,
+                "message_link": message_link
+            }
+        )
+
+    async def send_thread_reply_notification(
+        self,
+        *,
+        to_email: str,
+        sender_name: str,
+        subject: str,
+        thread_link: str,
+    ) -> bool:
+        """Send notification for thread reply."""
+        return await self.send_email(
+            to_email=to_email,
+            subject=f"새 답글: {subject}",
+            template_name="thread_reply",
+            template_data={
+                "sender_name": sender_name,
+                "subject": subject,
+                "thread_link": thread_link
+            }
+        )
+
+    async def send_broadcast_notification(
+        self,
+        *,
+        to_email: str,
+        sender_name: str,
+        subject: str,
+        is_important: bool = False,
+        messages_link: str,
+    ) -> bool:
+        """Send notification for broadcast message."""
+        email_subject = f"{'[중요] ' if is_important else ''}{subject}"
+        return await self.send_email(
+            to_email=to_email,
+            subject=email_subject,
+            template_name="broadcast_message",
+            template_data={
+                "sender_name": sender_name,
+                "subject": subject,
+                "is_important": is_important,
+                "messages_link": messages_link
+            }
+        )
+
+    async def send_admin_new_thread_notification(
+        self,
+        *,
+        to_email: str,
+        member_name: str,
+        subject: str,
+        thread_link: str,
+    ) -> bool:
+        """Send notification to admin about new thread."""
+        return await self.send_email(
+            to_email=to_email,
+            subject=f"새 문의: {subject}",
+            template_name="admin_new_thread",
+            template_data={
+                "member_name": member_name,
+                "subject": subject,
+                "thread_link": thread_link
+            }
+        )
+
 
 # Shared singleton used across the application
 email_service = EmailService()

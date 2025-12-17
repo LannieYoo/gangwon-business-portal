@@ -14,6 +14,7 @@ from sqlalchemy import (
     ForeignKey,
     CheckConstraint,
     Index,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
@@ -41,6 +42,7 @@ __all__ = [
     "ApplicationException",
     "Admin",
     "Message",
+    "NiceDnbCompanyInfo",
 ]
 
 
@@ -157,7 +159,8 @@ class Project(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String(255), nullable=False)
     description = Column(Text)
-    target_audience = Column(Text)
+    target_company_name = Column(String(255), nullable=True)  # 受理企业名称
+    target_business_number = Column(String(12), nullable=True)  # 受理企业营业执照号
     start_date = Column(Date)
     end_date = Column(Date)
     image_url = Column(String(500))
@@ -513,4 +516,221 @@ class Message(Base):
 
     def __repr__(self):
         return f"<Message(id={self.id}, recipient_id={self.recipient_id}, subject={self.subject})>"
+
+
+class MessageThread(Base):
+    """Message thread table for conversation grouping."""
+
+    __tablename__ = "message_threads"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    subject = Column(String(255), nullable=False)
+    category = Column(String(50), nullable=False, server_default="general", comment="general, support, performance")
+    status = Column(String(20), nullable=False, server_default="open", comment="open, resolved, closed")
+    member_id = Column(UUID(as_uuid=True), ForeignKey("members.id", ondelete="CASCADE"), nullable=False)
+    created_by = Column(UUID(as_uuid=True), nullable=False, comment="User ID who created the thread")
+    assigned_to = Column(UUID(as_uuid=True), nullable=True, comment="Admin ID assigned to handle this thread")
+    last_message_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    message_count = Column(Integer, nullable=False, server_default="0")
+    unread_count = Column(Integer, nullable=False, server_default="0")
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # Relationships
+    member = relationship("Member", foreign_keys=[member_id])
+    messages = relationship("ThreadMessage", back_populates="thread", cascade="all, delete-orphan")
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_message_threads_member", "member_id", "status"),
+        Index("idx_message_threads_status", "status"),
+        Index("idx_message_threads_created_at", "created_at"),
+    )
+
+    def __repr__(self):
+        return f"<MessageThread(id={self.id}, subject={self.subject}, status={self.status})>"
+
+
+class ThreadMessage(Base):
+    """Individual messages within a thread."""
+
+    __tablename__ = "thread_messages"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    thread_id = Column(UUID(as_uuid=True), ForeignKey("message_threads.id", ondelete="CASCADE"), nullable=False)
+    sender_id = Column(UUID(as_uuid=True), nullable=False, comment="User ID who sent the message")
+    sender_type = Column(String(20), nullable=False, comment="admin or member")
+    content = Column(Text, nullable=False)
+    is_read = Column(String(10), nullable=False, server_default="false")
+    is_important = Column(String(10), nullable=False, server_default="false")
+    read_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # Relationships
+    thread = relationship("MessageThread", back_populates="messages")
+    attachments = relationship("MessageAttachment", back_populates="message", cascade="all, delete-orphan")
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_thread_messages_thread", "thread_id", "created_at"),
+        Index("idx_thread_messages_sender", "sender_id"),
+    )
+
+    def __repr__(self):
+        return f"<ThreadMessage(id={self.id}, thread_id={self.thread_id}, sender_type={self.sender_type})>"
+
+
+class MessageAttachment(Base):
+    """File attachments for messages."""
+
+    __tablename__ = "message_attachments"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    message_id = Column(UUID(as_uuid=True), ForeignKey("thread_messages.id", ondelete="CASCADE"), nullable=False)
+    file_name = Column(String(255), nullable=False)
+    file_path = Column(String(500), nullable=False)
+    file_size = Column(Integer, nullable=False)
+    mime_type = Column(String(100), nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    # Relationships
+    message = relationship("ThreadMessage", back_populates="attachments")
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_message_attachments_message", "message_id"),
+    )
+
+    def __repr__(self):
+        return f"<MessageAttachment(id={self.id}, file_name={self.file_name})>"
+
+
+class BroadcastMessage(Base):
+    """Broadcast messages sent to multiple recipients."""
+
+    __tablename__ = "broadcast_messages"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    sender_id = Column(UUID(as_uuid=True), nullable=False, comment="Admin ID who sent the broadcast")
+    subject = Column(String(255), nullable=False)
+    content = Column(Text, nullable=False)
+    category = Column(String(50), nullable=False, server_default="general")
+    is_important = Column(String(10), nullable=False, server_default="false")
+    send_to_all = Column(String(10), nullable=False, server_default="false")
+    recipient_count = Column(Integer, nullable=False, server_default="0")
+    sent_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    # Relationships
+    recipients = relationship("BroadcastRecipient", back_populates="broadcast", cascade="all, delete-orphan")
+    attachments = relationship("BroadcastAttachment", back_populates="broadcast", cascade="all, delete-orphan")
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_broadcast_messages_sender", "sender_id"),
+        Index("idx_broadcast_messages_created_at", "created_at"),
+    )
+
+    def __repr__(self):
+        return f"<BroadcastMessage(id={self.id}, subject={self.subject})>"
+
+
+class BroadcastRecipient(Base):
+    """Recipients of broadcast messages."""
+
+    __tablename__ = "broadcast_recipients"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    broadcast_id = Column(UUID(as_uuid=True), ForeignKey("broadcast_messages.id", ondelete="CASCADE"), nullable=False)
+    member_id = Column(UUID(as_uuid=True), ForeignKey("members.id", ondelete="CASCADE"), nullable=False)
+    is_read = Column(String(10), nullable=False, server_default="false")
+    read_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    # Relationships
+    broadcast = relationship("BroadcastMessage", back_populates="recipients")
+    member = relationship("Member")
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_broadcast_recipients_broadcast", "broadcast_id"),
+        Index("idx_broadcast_recipients_member", "member_id", "is_read"),
+        UniqueConstraint("broadcast_id", "member_id", name="uq_broadcast_recipient"),
+    )
+
+    def __repr__(self):
+        return f"<BroadcastRecipient(broadcast_id={self.broadcast_id}, member_id={self.member_id})>"
+
+
+class BroadcastAttachment(Base):
+    """File attachments for broadcast messages."""
+
+    __tablename__ = "broadcast_attachments"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    broadcast_id = Column(UUID(as_uuid=True), ForeignKey("broadcast_messages.id", ondelete="CASCADE"), nullable=False)
+    file_name = Column(String(255), nullable=False)
+    file_path = Column(String(500), nullable=False)
+    file_size = Column(Integer, nullable=False)
+    mime_type = Column(String(100), nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    # Relationships
+    broadcast = relationship("BroadcastMessage", back_populates="attachments")
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_broadcast_attachments_broadcast", "broadcast_id"),
+    )
+
+    def __repr__(self):
+        return f"<BroadcastAttachment(id={self.id}, file_name={self.file_name})>"
+
+
+class NiceDnbCompanyInfo(Base):
+    """Snapshot of Nice D&B company info responses."""
+
+    __tablename__ = "nice_dnb_company_info"
+
+    biz_no = Column(String(20), primary_key=True)  # business registration number
+    corp_no = Column(String(30), nullable=True)
+    cmp_nm = Column(String(255), nullable=True)
+    cmp_enm = Column(String(255), nullable=True)
+    ceo_nm = Column(String(255), nullable=True)
+    emp_cnt = Column(Integer, nullable=True)
+    emp_acc_ym = Column(String(6), nullable=True)
+    ind_cd1 = Column(String(20), nullable=True)
+    ind_nm = Column(String(255), nullable=True)
+    cmp_scl_nm = Column(String(100), nullable=True)
+    cmp_typ_nm = Column(String(100), nullable=True)
+    bzcnd_nm = Column(Text, nullable=True)
+    estb_date = Column(String(8), nullable=True)
+    eml_adr = Column(String(255), nullable=True)
+    tel_no = Column(String(50), nullable=True)
+    fax_tel_no = Column(String(50), nullable=True)
+    zip = Column(String(20), nullable=True)
+    addr1 = Column(String(255), nullable=True)
+    addr2 = Column(String(255), nullable=True)
+    stt = Column(String(50), nullable=True)
+    stt_ymd = Column(String(8), nullable=True)
+    up_ymd = Column(String(8), nullable=True)
+    cri_grd = Column(String(10), nullable=True)
+    cr_date = Column(String(8), nullable=True)
+    stt_date = Column(String(8), nullable=True)
+    sales_amt = Column(DECIMAL(20, 2), nullable=True)
+    opr_ic_amt = Column(DECIMAL(20, 2), nullable=True)
+    sh_eq_amt = Column(DECIMAL(20, 2), nullable=True)
+    debt_amt = Column(DECIMAL(20, 2), nullable=True)
+    asset_amt = Column(DECIMAL(20, 2), nullable=True)
+    res_cd = Column(String(10), nullable=True)
+    msg_guid = Column(String(64), nullable=True)
+    msg_req_dttm = Column(String(20), nullable=True)
+    msg_res_dttm = Column(String(20), nullable=True)
+    raw_json = Column(JSONB, nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    def __repr__(self):
+        return f"<NiceDnbCompanyInfo(biz_no={self.biz_no}, cmp_nm={self.cmp_nm})>"
 

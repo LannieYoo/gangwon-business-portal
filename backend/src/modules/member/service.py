@@ -10,6 +10,7 @@ from datetime import datetime, date
 from ...common.modules.db.models import Member, MemberProfile  # 保留用于类型提示和文档
 from ...common.modules.exception import NotFoundError, ValidationError, ConflictError
 from ...common.modules.supabase.service import supabase_service
+from ...common.modules.integrations.nice_dnb.schemas import NiceDnBResponse
 from .schemas import MemberProfileUpdate, MemberListQuery, MemberProfileResponse
 
 
@@ -348,4 +349,101 @@ class MemberService:
             })
 
         return export_data
+
+    async def save_nice_dnb_data(
+        self,
+        business_number: str,
+        response: NiceDnBResponse,
+        queried_by: Optional[str] = None,
+    ) -> None:
+        """
+        Save Nice D&B API response to database.
+        
+        Args:
+            business_number: Business registration number (cleaned, without hyphens)
+            response: NiceDnBResponse object from API
+            queried_by: User ID who made the query (optional)
+        
+        Raises:
+            Exception: If database operation fails
+        """
+        # Format established_date to YYYYMMDD if available
+        estb_date_str = None
+        if response.data.established_date:
+            estb_date_str = response.data.established_date.strftime("%Y%m%d")
+        
+        # Get latest financial data (most recent year) for single record storage
+        latest_financial = None
+        if response.financials:
+            latest_financial = max(response.financials, key=lambda f: f.year)
+        
+        # Prepare raw JSON for full response storage
+        raw_json_data = {
+            "data": {
+                "businessNumber": response.data.business_number,
+                "companyName": response.data.company_name,
+                "representative": response.data.representative,
+                "address": response.data.address,
+                "industry": response.data.industry,
+                "establishedDate": (
+                    response.data.established_date.isoformat()
+                    if response.data.established_date
+                    else None
+                ),
+                "creditGrade": response.data.credit_grade,
+            },
+            "financials": [
+                {
+                    "year": f.year,
+                    "revenue": f.revenue,
+                    "profit": f.profit,
+                    "employees": f.employees,
+                }
+                for f in response.financials
+            ],
+            "queried_at": datetime.now().isoformat(),
+            "queried_by": queried_by,
+        }
+        
+        # Prepare data for database
+        db_data = {
+            "biz_no": business_number,
+            "cmp_nm": response.data.company_name,
+            "ceo_nm": response.data.representative,
+            "ind_nm": response.data.industry,
+            "estb_date": estb_date_str,
+            "cri_grd": response.data.credit_grade,
+            "bzcnd_nm": response.data.main_business,
+            "raw_json": raw_json_data,
+        }
+        
+        # Address handling (split if needed)
+        if response.data.address:
+            addr_parts = response.data.address.split(" ", 1)
+            db_data["addr1"] = addr_parts[0] if len(addr_parts) > 0 else response.data.address
+            db_data["addr2"] = addr_parts[1] if len(addr_parts) > 1 else None
+        
+        # Financial data from latest year
+        if latest_financial:
+            db_data["sales_amt"] = float(latest_financial.revenue)
+            db_data["emp_cnt"] = latest_financial.employees
+        
+        # Check if record exists
+        existing = supabase_service.client.table("nice_dnb_company_info")\
+            .select("biz_no")\
+            .eq("biz_no", business_number)\
+            .limit(1)\
+            .execute()
+        
+        if existing.data:
+            # Update existing record
+            supabase_service.client.table("nice_dnb_company_info")\
+                .update(db_data)\
+                .eq("biz_no", business_number)\
+                .execute()
+        else:
+            # Insert new record
+            supabase_service.client.table("nice_dnb_company_info")\
+                .insert(db_data)\
+                .execute()
 

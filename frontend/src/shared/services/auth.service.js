@@ -2,82 +2,94 @@
  * Authentication Service
  */
 
-import apiService from './api.service';
-import loggerService from './logger.service';
-import exceptionService from './exception.service';
-import { API_PREFIX, ACCESS_TOKEN_KEY, USER_ROLES } from '@shared/utils/constants';
-import { setStorage, getStorage, removeStorage } from '@shared/utils/storage';
-import { autoLog } from '@shared/utils/decorators';
+import apiService from "./api.service";
+import {
+  API_PREFIX,
+  ACCESS_TOKEN_KEY,
+  USER_ROLES,
+} from "@shared/utils/constants";
+import { setStorage, getStorage, removeStorage } from "@shared/utils/storage";
 
 class AuthService {
   /**
    * Login
-   * 
+   *
    * @param {Object} credentials - Login credentials
    * @param {string} credentials.businessNumber - Business number (will be converted to business_number for API)
    * @param {string} credentials.password - Password
    */
-  @autoLog('login', { logResourceId: true })
   async login(credentials) {
+    // Enforce single-role session per browser: clear any existing auth before login
+    this.clearAuth();
+
     // Convert businessNumber (camelCase) to business_number (snake_case) for backend API
     const requestData = {
-      business_number: credentials.businessNumber || credentials.business_number,
-      password: credentials.password
+      business_number:
+        credentials.businessNumber || credentials.business_number,
+      password: credentials.password,
     };
-    
-    const response = await apiService.post(`${API_PREFIX}/auth/login`, requestData);
-    
+
+    const response = await apiService.post(
+      `${API_PREFIX}/auth/login`,
+      requestData
+    );
+
     if (response.access_token) {
       setStorage(ACCESS_TOKEN_KEY, response.access_token);
       // Backend doesn't return refresh_token or expires_at yet
       // Store user info with role from response
       const userInfo = {
         ...response.user,
-        role: response.user.role || 'member' // Default to member if not provided
+        role: response.user.role || "member", // Default to member if not provided
       };
-      setStorage('user_info', userInfo);
+      setStorage("user_info", userInfo);
     }
-    
+
     return response;
   }
-  
+
   /**
    * Admin Login
-   * 
+   *
    * @param {Object} credentials - Admin login credentials
    * @param {string} credentials.email - Admin email
    * @param {string} credentials.password - Password
    */
-  @autoLog('admin_login', { logResourceId: true })
   async adminLogin(credentials) {
+    // Enforce single-role session per browser: clear any existing auth before admin login
+    this.clearAuth();
+
     const requestData = {
       email: credentials.email,
-      password: credentials.password
+      password: credentials.password,
     };
-    
-    const response = await apiService.post(`${API_PREFIX}/auth/admin-login`, requestData);
-    
+
+    const response = await apiService.post(
+      `${API_PREFIX}/auth/admin-login`,
+      requestData
+    );
+
     if (response.access_token) {
       setStorage(ACCESS_TOKEN_KEY, response.access_token);
       const userInfo = {
         ...response.user,
-        role: 'admin' // Ensure role is set to admin
+        role: "admin", // Ensure role is set to admin
       };
-      setStorage('user_info', userInfo);
-      
+      setStorage("user_info", userInfo);
+
       // Return response with updated user info that includes role
       return {
         ...response,
-        user: userInfo
+        user: userInfo,
       };
     }
-    
+
     return response;
   }
 
   /**
    * Register
-   * 
+   *
    * @param {FormData|Object} userData - Registration data (FormData or plain object)
    * @returns {Promise<Object>} Registration response
    */
@@ -85,19 +97,19 @@ class AuthService {
     // If userData is FormData, we need to extract and process it
     // Otherwise, assume it's already processed
     let registrationData;
-    
+
     if (userData instanceof FormData) {
       // Extract data from FormData
       const data = {};
       const files = {};
-      
+
       for (const [key, value] of userData.entries()) {
         // Check if value is a File object
         if (value instanceof File) {
           files[key] = value;
-        } else if (key.endsWith('[]')) {
+        } else if (key.endsWith("[]")) {
           // Handle array fields like cooperationFields[]
-          const fieldName = key.replace('[]', '');
+          const fieldName = key.replace("[]", "");
           if (!data[fieldName]) {
             data[fieldName] = [];
           }
@@ -106,7 +118,7 @@ class AuthService {
           data[key] = value;
         }
       }
-      
+
       // Upload files first if they exist
       // Note: Currently, file upload requires authentication, so we skip file uploads during registration
       // Backend needs to support file upload during registration (either by creating
@@ -114,60 +126,64 @@ class AuthService {
       // For now, files can be uploaded later after user logs in and updates their profile
       let logoFileId = null;
       let certificateFileId = null;
-      
+
       // Skip file uploads during registration (requires authentication)
       // Users can upload files after registration when they log in
-      if (files.logo || files.businessLicenseFile) {
-        loggerService.info('File uploads will be skipped during registration. Users can upload files after login.', {
-          module: 'AuthService',
-          function: 'register'
-        });
-      }
-      
+
       // Map frontend fields to backend fields
       registrationData = {
         // Step 1: Account information
-        business_number: data.businessNumber?.replace(/-/g, '') || data.business_number,
+        business_number:
+          data.businessNumber?.replace(/-/g, "") || data.business_number,
         company_name: data.companyName,
         password: data.password,
         email: data.email,
-        
+
         // Step 2: Company information
         region: data.region || null,
         company_type: data.category || null,
-        corporate_number: data.corporationNumber?.replace(/-/g, '') || null,
+        corporate_number: data.corporationNumber?.replace(/-/g, "") || null,
         address: data.address || null,
-        contact_person: data.representativeName || data.contactPersonName || null,
-        
+        contact_person:
+          data.representativeName || data.contactPersonName || null,
+
         // Step 3: Business information
         industry: data.businessField || null,
-        revenue: data.sales ? parseFloat(data.sales.replace(/,/g, '')) : null,
-        employee_count: data.employeeCount ? parseInt(data.employeeCount.replace(/,/g, ''), 10) : null,
+        revenue: data.sales ? parseFloat(data.sales.replace(/,/g, "")) : null,
+        employee_count: data.employeeCount
+          ? parseInt(data.employeeCount.replace(/,/g, ""), 10)
+          : null,
         founding_date: data.establishedDate || null,
         website: data.websiteUrl || null,
         main_business: data.mainBusiness || null,
-        
+
         // Step 4: File uploads (file IDs from upload endpoint)
         logo_file_id: logoFileId,
         certificate_file_id: certificateFileId,
-        
+
         // Step 5: Terms agreement
-        terms_agreed: !!(data.termsOfService && data.privacyPolicy && data.thirdPartySharing)
+        terms_agreed: !!(
+          data.termsOfService &&
+          data.privacyPolicy &&
+          data.thirdPartySharing
+        ),
       };
     } else {
       // Already processed data
       registrationData = userData;
     }
-    
+
     // Send registration request as JSON
     return this._registerInternal(registrationData);
   }
-  
-  @autoLog('register', { logResourceId: true })
+
   async _registerInternal(registrationData) {
-    return await apiService.post(`${API_PREFIX}/auth/register`, registrationData);
+    return await apiService.post(
+      `${API_PREFIX}/auth/register`,
+      registrationData
+    );
   }
-  
+
   /**
    * Logout
    */
@@ -180,81 +196,76 @@ class AuthService {
       this.clearAuth();
     }
   }
-  
-  @autoLog('logout')
+
   async _logoutInternal() {
     await apiService.post(`${API_PREFIX}/auth/logout`);
   }
-  
+
   /**
    * Refresh token
    */
   async refreshToken() {
-    const refreshToken = getStorage('refresh_token');
+    const refreshToken = getStorage("refresh_token");
     if (!refreshToken) {
-      const error = new Error('No refresh token available');
-      loggerService.warn('Token refresh failed: no refresh token', {
-        module: 'AuthService',
-        function: 'refreshToken',
-        error_message: error.message
-      });
-      throw error;
+      throw new Error("No refresh token available");
     }
-    
+
     const response = await this._refreshTokenInternal(refreshToken);
-    
+
     if (response.access_token) {
       setStorage(ACCESS_TOKEN_KEY, response.access_token);
-      setStorage('token_expiry', response.expires_at);
+      setStorage("token_expiry", response.expires_at);
     }
-    
+
     return response;
   }
-  
-  @autoLog('refresh_token')
+
   async _refreshTokenInternal(refreshToken) {
     return await apiService.post(`${API_PREFIX}/auth/refresh`, {
-      refresh_token: refreshToken
+      refresh_token: refreshToken,
     });
   }
-  
+
   /**
    * Get current user
    */
-  @autoLog('get_current_user', { logResourceId: true })
   async getCurrentUser() {
     const response = await apiService.get(`${API_PREFIX}/auth/me`);
     // Preserve existing role if not returned by API (member endpoints don't return role)
     const existingUser = this.getCurrentUserFromStorage();
     const userInfo = {
       ...response,
-      role: response.role || existingUser?.role || 'member'
+      role: response.role || existingUser?.role || "member",
     };
-    setStorage('user_info', userInfo);
+    setStorage("user_info", userInfo);
     return userInfo;
   }
-  
+
   /**
    * Update profile
    */
-  @autoLog('update_profile', { logResourceId: true })
   async updateProfile(userData) {
-    const response = await apiService.put(`${API_PREFIX}/auth/profile`, userData);
-    setStorage('user_info', response);
+    const response = await apiService.put(
+      `${API_PREFIX}/auth/profile`,
+      userData
+    );
+    setStorage("user_info", response);
     return response;
   }
-  
+
   /**
    * Change password
    */
-  @autoLog('change_password')
   async changePassword(passwordData) {
-    return await apiService.post(`${API_PREFIX}/auth/change-password`, passwordData);
+    return await apiService.post(
+      `${API_PREFIX}/auth/change-password`,
+      passwordData
+    );
   }
-  
+
   /**
    * Forgot password (Request password reset)
-   * 
+   *
    * @param {Object} data - Password reset request data
    * @param {string} data.businessNumber - Business number (will be converted to business_number for API)
    * @param {string} data.email - Email address
@@ -262,62 +273,64 @@ class AuthService {
   async forgotPassword(data) {
     // Convert businessNumber (camelCase) to business_number (snake_case) for backend API
     const requestData = {
-      business_number: data.businessNumber?.replace(/-/g, '') || data.business_number,
-      email: data.email
+      business_number:
+        data.businessNumber?.replace(/-/g, "") || data.business_number,
+      email: data.email,
     };
-    
+
     return await this._forgotPasswordInternal(requestData);
   }
-  
-  @autoLog('request_password_reset')
+
   async _forgotPasswordInternal(requestData) {
-    return await apiService.post(`${API_PREFIX}/auth/password-reset-request`, requestData);
+    return await apiService.post(
+      `${API_PREFIX}/auth/password-reset-request`,
+      requestData
+    );
   }
-  
+
   /**
    * Reset password (Complete password reset with token)
-   * 
+   *
    * @param {string} token - Reset token from email
    * @param {string} newPassword - New password
    */
-  @autoLog('reset_password')
   async resetPassword(token, newPassword) {
     return await apiService.post(`${API_PREFIX}/auth/password-reset`, {
       token,
-      new_password: newPassword
+      new_password: newPassword,
     });
   }
-  
+
   /**
    * Check if user is authenticated
    */
   isAuthenticated() {
     const token = getStorage(ACCESS_TOKEN_KEY);
-    const expiry = getStorage('token_expiry');
-    
+    const expiry = getStorage("token_expiry");
+
     if (!token) return false;
     if (!expiry) return true; // If no expiry, assume token is valid
-    
+
     const expiryDate = new Date(expiry);
     return expiryDate > new Date();
   }
-  
+
   /**
    * Get current user from storage
    */
   getCurrentUserFromStorage() {
-    return getStorage('user_info');
+    return getStorage("user_info");
   }
 
   /**
    * Check if business number is available
-   * 
+   *
    * @param {string} businessNumber - Business registration number
    * @returns {Promise<{available: boolean, message: string}>}
    */
   async checkBusinessNumber(businessNumber) {
     // Remove dashes for API call
-    const cleaned = businessNumber.replace(/-/g, '');
+    const cleaned = businessNumber.replace(/-/g, "");
     const response = await apiService.get(
       `${API_PREFIX}/auth/check-business-number/${encodeURIComponent(cleaned)}`
     );
@@ -326,7 +339,7 @@ class AuthService {
 
   /**
    * Check if email is available
-   * 
+   *
    * @param {string} email - Email address
    * @returns {Promise<{available: boolean, message: string}>}
    */
@@ -336,7 +349,7 @@ class AuthService {
     );
     return response;
   }
-  
+
   /**
    * Check if user has role
    */
@@ -344,31 +357,30 @@ class AuthService {
     const user = this.getCurrentUserFromStorage();
     return user?.role === role;
   }
-  
+
   /**
    * Check if user is admin
    */
   isAdmin() {
     return this.hasRole(USER_ROLES.ADMIN);
   }
-  
+
   /**
    * Check if user is member
    */
   isMember() {
     return this.hasRole(USER_ROLES.MEMBER);
   }
-  
+
   /**
    * Clear authentication data
    */
   clearAuth() {
     removeStorage(ACCESS_TOKEN_KEY);
-    removeStorage('refresh_token');
-    removeStorage('user_info');
-    removeStorage('token_expiry');
+    removeStorage("refresh_token");
+    removeStorage("user_info");
+    removeStorage("token_expiry");
   }
 }
 
 export default new AuthService();
-

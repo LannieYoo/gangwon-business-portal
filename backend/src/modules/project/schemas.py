@@ -31,7 +31,8 @@ class ProjectCreate(BaseModel):
     """Schema for creating a new project (admin only)."""
     title: str = Field(..., max_length=255, description="Project title")
     description: Optional[str] = Field(None, description="Project description")
-    target_audience: Optional[str] = Field(None, description="Target audience description")
+    target_company_name: Optional[str] = Field(None, max_length=255, description="Target company name")
+    target_business_number: Optional[str] = Field(None, max_length=12, description="Target company business number")
     start_date: Optional[date] = Field(None, description="Project start date")
     end_date: Optional[date] = Field(None, description="Project end date")
     image_url: Optional[str] = Field(None, max_length=500, description="Project image URL")
@@ -42,7 +43,8 @@ class ProjectUpdate(BaseModel):
     """Schema for updating a project (admin only)."""
     title: Optional[str] = Field(None, max_length=255)
     description: Optional[str] = None
-    target_audience: Optional[str] = None
+    target_company_name: Optional[str] = Field(None, max_length=255)
+    target_business_number: Optional[str] = Field(None, max_length=12)
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     image_url: Optional[str] = Field(None, max_length=500)
@@ -54,7 +56,8 @@ class ProjectResponse(BaseModel):
     id: UUID
     title: str
     description: Optional[str]
-    target_audience: Optional[str]
+    target_company_name: Optional[str]
+    target_business_number: Optional[str]
     start_date: Optional[date]
     end_date: Optional[date]
     image_url: Optional[str]
@@ -72,6 +75,8 @@ class ProjectListItem(BaseModel):
     id: UUID
     title: str
     description: Optional[str]
+    target_company_name: Optional[str]
+    target_business_number: Optional[str]
     start_date: Optional[date]
     end_date: Optional[date]
     image_url: Optional[str]
@@ -80,6 +85,16 @@ class ProjectListItem(BaseModel):
 
     class Config:
         from_attributes = True
+        
+    @classmethod
+    def model_validate(cls, obj):
+        """Custom validation to handle legacy target_audience field."""
+        if isinstance(obj, dict):
+            # Handle legacy target_audience field by removing it
+            obj = obj.copy()
+            if 'target_audience' in obj:
+                obj.pop('target_audience')
+        return super().model_validate(obj)
 
 
 class ProjectListQuery(BaseModel):
@@ -126,7 +141,9 @@ class ProjectApplicationListItem(BaseModel):
     member_id: UUID
     project_id: UUID
     project_title: Optional[str] = Field(None, description="Project title for convenience")
+    company_name: Optional[str] = Field(None, description="Company name for convenience")
     status: str
+    application_reason: Optional[str] = Field(None, description="Application reason")
     submitted_at: datetime
     reviewed_at: Optional[datetime]
 

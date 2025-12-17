@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '@shared/components/Card';
+import { Badge } from '@shared/components';
 import { contentService, loggerService, exceptionService } from '@shared/services';
 import { ROUTES } from '@shared/utils/constants';
 
@@ -74,9 +75,9 @@ function NoticesPreview() {
               <div className="flex flex-col p-4 cursor-default">
                 <div className="flex items-center justify-between mb-1 gap-2">
                   {notice.important && (
-                    <span className="inline-block px-2 py-0.5 text-xs font-medium rounded whitespace-nowrap bg-red-100 text-red-600">
+                    <Badge variant="danger">
                       {t('home.notices.important', '重要')}
-                    </span>
+                    </Badge>
                   )}
                   <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">{notice.date}</span>
                 </div>

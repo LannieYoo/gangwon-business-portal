@@ -7,8 +7,8 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlobeIcon } from './Icons';
 import { setStorage } from '@shared/utils/storage';
-import loggerService from '@shared/services/logger.service';
-import exceptionService from '@shared/services/exception.service';
+import { loggerService } from '@shared/utils/loggerHandler';
+import { exceptionService } from '@shared/utils/errorHandler';
 import { cn } from '@shared/utils/helpers';
 
 /**

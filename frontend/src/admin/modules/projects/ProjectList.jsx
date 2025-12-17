@@ -6,10 +6,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Card, Table, Button, Badge } from '@shared/components';
-import { apiService, adminService, loggerService, exceptionService } from '@shared/services';
+import { Card, Table, Button, Badge, Pagination } from '@shared/components';
+import { apiService, adminService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import './ProjectList.css';
 
 export default function ProjectList() {
   const { t } = useTranslation();
@@ -17,40 +16,42 @@ export default function ProjectList() {
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState([]);
 
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalCount, setTotalCount] = useState(0);
+
   useEffect(() => {
     loadProjects();
-  }, []);
+  }, [currentPage, pageSize]);
+
+  // 搜索防抖
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPage(1); // 搜索时重置到第一页
+      loadProjects();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchKeyword]);
 
   const loadProjects = async () => {
     setLoading(true);
-    try {
-      loggerService.info('Loading projects', {
-        module: 'ProjectList',
-        function: 'loadProjects'
-      });
-      const response = await apiService.get(`${API_PREFIX}/admin/projects`);
-      if (response.projects) {
-        setProjects(response.projects);
-        loggerService.info('Projects loaded successfully', {
-          module: 'ProjectList',
-          function: 'loadProjects',
-          count: response.projects.length
-        });
-      }
-    } catch (error) {
-      loggerService.error('Failed to load projects', {
-        module: 'ProjectList',
-        function: 'loadProjects',
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'LOAD_PROJECTS_ERROR'
-      });
-    } finally {
-      setLoading(false);
+    const params = {
+      page: currentPage,
+      page_size: pageSize,
+      search: searchKeyword.trim() || undefined
+    };
+    const response = await apiService.get(`${API_PREFIX}/admin/projects`, { params });
+    
+    if (response.items) {
+      setProjects(response.items);
+      setTotalCount(response.total || response.items.length);
+    } else {
+      setProjects([]);
+      setTotalCount(0);
     }
+    setLoading(false);
   };
 
   const handleCreate = () => {
@@ -61,74 +62,22 @@ export default function ProjectList() {
     navigate(`/admin/projects/${projectId}/edit`);
   };
 
+  const handleViewDetail = (projectId) => {
+    navigate(`/admin/projects/${projectId}`);
+  };
+
   const handleDelete = async (projectId) => {
-    if (!confirm(t('admin.projects.confirmDelete'))) {
+    if (!confirm('确定要删除这个项目吗？此操作不可撤销。')) {
       return;
     }
-    try {
-      loggerService.info('Deleting project', {
-        module: 'ProjectList',
-        function: 'handleDelete',
-        project_id: projectId
-      });
-      await apiService.delete(`${API_PREFIX}/admin/projects/${projectId}`);
-      loggerService.info('Project deleted successfully', {
-        module: 'ProjectList',
-        function: 'handleDelete',
-        project_id: projectId
-      });
-      loadProjects();
-    } catch (error) {
-      loggerService.error('Failed to delete project', {
-        module: 'ProjectList',
-        function: 'handleDelete',
-        project_id: projectId,
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'DELETE_PROJECT_ERROR'
-      });
-      alert(t('admin.projects.deleteFailed'));
-    }
+    await apiService.delete(`${API_PREFIX}/admin/projects/${projectId}`);
+    loadProjects();
   };
 
   const handleExport = async (format = 'excel') => {
-    try {
-      setLoading(true);
-      const params = {
-        format
-      };
-      loggerService.info('Exporting projects', {
-        module: 'ProjectList',
-        function: 'handleExport',
-        format: format
-      });
-      await adminService.exportProjects(params);
-      loggerService.info('Projects exported successfully', {
-        module: 'ProjectList',
-        function: 'handleExport',
-        format: format
-      });
-      alert(t('admin.projects.exportSuccess', '导出成功') || '导出成功');
-    } catch (error) {
-      loggerService.error('Failed to export projects', {
-        module: 'ProjectList',
-        function: 'handleExport',
-        format: format,
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'EXPORT_PROJECTS_ERROR'
-      });
-      const errorMessage = error.response?.data?.detail || error.message || t('admin.projects.exportFailed', '导出失败');
-      alert(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    await adminService.exportProjects({ format });
+    setLoading(false);
   };
 
   const columns = [
@@ -137,31 +86,69 @@ export default function ProjectList() {
       label: t('admin.projects.table.title')
     },
     {
-      key: 'target',
-      label: t('admin.projects.table.target')
+      key: 'target_company_name',
+      label: t('admin.projects.table.targetCompanyName', '목표 기업명'),
+      render: (value, row) => {
+        if (!value && !row.target_business_number) {
+          return <span className="text-gray-400">공개 모집</span>;
+        }
+        return value || '-';
+      }
     },
     {
-      key: 'startDate',
+      key: 'target_business_number',
+      label: t('admin.projects.table.targetBusinessNumber', '사업자등록번호'),
+      render: (value) => {
+        return value || '-';
+      }
+    },
+    {
+      key: 'start_date',
       label: t('admin.projects.table.startDate')
     },
     {
-      key: 'endDate',
+      key: 'end_date',
       label: t('admin.projects.table.endDate')
     },
     {
       key: 'status',
       label: t('admin.projects.table.status'),
-      render: (value) => (
-        <Badge variant={value === 'active' ? 'success' : 'default'}>
-          {t(`projects.status.${value}`)}
-        </Badge>
-      )
+      render: (value) => {
+        const getStatusVariant = (status) => {
+          switch (status) {
+            case 'active':
+              return 'success';
+            case 'inactive':
+              return 'warning';
+            case 'archived':
+              return 'secondary';
+            default:
+              return 'default';
+          }
+        };
+        
+        return (
+          <Badge variant={getStatusVariant(value)}>
+            {t(`admin.projects.status.${value}`, value)}
+          </Badge>
+        );
+      }
     },
     {
       key: 'actions',
       label: '',
       render: (_, row) => (
         <div className="flex items-center space-x-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewDetail(row.id);
+            }}
+            className="text-blue-600 hover:text-blue-900 font-medium text-sm"
+          >
+            {t('common.view')}
+          </button>
+          <span className="text-gray-300">|</span>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -187,12 +174,15 @@ export default function ProjectList() {
   ];
 
   return (
-    <div className="admin-project-list">
+    <div>
+
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-4">{t('admin.projects.title')}</h1>
+        <h1 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
+          {t('admin.projects.title')}
+        </h1>
         
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex-1 max-w-md">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div className="flex-1 min-w-[200px] max-w-md">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,11 +192,13 @@ export default function ProjectList() {
               <input
                 type="text"
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                placeholder={t('common.search')}
+                placeholder={t('admin.projects.searchPlaceholder', '请输入项目名称、申请对象等关键词')}
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
               />
             </div>
           </div>
-          <div className="flex items-center space-x-2 ml-4">
+          <div className="flex items-center space-x-2 md:ml-4 w-full md:w-auto">
             <Button 
               onClick={() => handleExport('excel')} 
               variant="outline"
@@ -231,15 +223,41 @@ export default function ProjectList() {
       <div className="bg-white shadow-sm rounded-lg border border-gray-200">
         {loading ? (
           <div className="p-12 text-center text-gray-500">{t('common.loading')}</div>
+        ) : projects.length === 0 ? (
+          <div className="p-12 text-center text-gray-500">
+            <p className="text-lg mb-2">{t('admin.projects.noProjects', '暂无项目数据')}</p>
+            <p className="text-sm text-gray-400">
+              {totalCount === 0 
+                ? '请创建第一个项目，或尝试刷新页面'
+                : '当前筛选条件下没有匹配的项目'}
+            </p>
+          </div>
         ) : (
-          <Table 
-            columns={columns} 
-            data={projects}
-            selectable={true}
-            selectedRows={[]}
-            onSelectRow={() => {}}
-            onSelectAll={() => {}}
-          />
+          <>
+            <Table 
+              columns={columns} 
+              data={projects}
+            />
+            {totalCount > pageSize && (
+              <div className="px-6 py-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center text-sm text-gray-700">
+                  <span>
+                    {t('common.showing', { 
+                      start: ((currentPage - 1) * pageSize) + 1, 
+                      end: Math.min(currentPage * pageSize, totalCount), 
+                      total: totalCount 
+                    }) || `显示 ${((currentPage - 1) * pageSize) + 1}-${Math.min(currentPage * pageSize, totalCount)} 共 ${totalCount} 条`}
+                  </span>
+                </div>
+                <Pagination
+                  current={currentPage}
+                  total={totalCount}
+                  pageSize={pageSize}
+                  onChange={setCurrentPage}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

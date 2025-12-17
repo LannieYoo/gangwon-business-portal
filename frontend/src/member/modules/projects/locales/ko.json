@@ -23,6 +23,7 @@
       "ongoing": "진행중",
       "closed": "마감"
     },
+    "targetCompany": "목표 기업",
     "types": {
       "startup": "창업 지원",
       "rd": "R&D 지원",

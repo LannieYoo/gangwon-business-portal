@@ -7,12 +7,13 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, Select, Input } from '@shared/components';
-import { adminService, loggerService, exceptionService } from '@shared/services';
-import './AuditLogList.css';
+import { adminService } from '@shared/services';
+import { formatDateTime } from '@shared/utils/format';
 
 export default function AuditLogList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const currentLanguage = i18n.language === 'zh' ? 'zh' : 'ko';
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -28,42 +29,21 @@ export default function AuditLogList() {
 
   const loadLogs = useCallback(async () => {
     setLoading(true);
-    try {
-      const params = {
-        page: currentPage,
-        pageSize: pageSize,
-        action: actionFilter !== 'all' ? actionFilter : undefined,
-        resourceType: resourceTypeFilter !== 'all' ? resourceTypeFilter : undefined,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
-      };
-      const response = await adminService.listAuditLogs(params);
-      if (response.logs) {
-        setLogs(response.logs);
-        setTotalCount(response.total || 0);
-        setTotalPages(response.totalPages || 0);
-      }
-      loggerService.info('Audit logs loaded successfully', {
-        module: 'AuditLogList',
-        function: 'loadLogs',
-        count: response.logs?.length || 0
-      });
-    } catch (error) {
-      loggerService.error('Failed to load audit logs', {
-        module: 'AuditLogList',
-        function: 'loadLogs',
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'LOAD_AUDIT_LOGS_ERROR'
-      });
-      const errorMessage = error.response?.data?.detail || error.message || t('admin.auditLogs.loadFailed', '加载审计日志失败');
-      alert(errorMessage);
-    } finally {
-      setLoading(false);
+    const params = {
+      page: currentPage,
+      pageSize: pageSize,
+      action: actionFilter !== 'all' ? actionFilter : undefined,
+      resourceType: resourceTypeFilter !== 'all' ? resourceTypeFilter : undefined,
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+    };
+    const response = await adminService.listAuditLogs(params);
+    if (response.logs) {
+      setLogs(response.logs);
+      setTotalCount(response.total || 0);
+      setTotalPages(response.totalPages || 0);
     }
+    setLoading(false);
   }, [currentPage, pageSize, actionFilter, resourceTypeFilter, startDate, endDate, t]);
 
   useEffect(() => {
@@ -86,18 +66,7 @@ export default function AuditLogList() {
     navigate(`/admin/audit-logs/${logId}`);
   }, [navigate]);
 
-  const formatDate = useCallback((dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  }, []);
+
 
   const getActionBadgeVariant = useCallback((action) => {
     if (action?.includes('create') || action?.includes('register')) {
@@ -145,7 +114,7 @@ export default function AuditLogList() {
     {
       key: 'createdAt',
       label: t('admin.auditLogs.table.time', '时间'),
-      render: (log) => formatDate(log.createdAt)
+      render: (log) => formatDateTime(log.createdAt, 'yyyy-MM-dd HH:mm:ss', currentLanguage)
     },
     {
       key: 'userEmail',
@@ -184,12 +153,12 @@ export default function AuditLogList() {
         </Button>
       )
     }
-  ], [t, formatDate, getActionBadgeVariant, handleViewDetail]);
+  ], [t, getActionBadgeVariant, handleViewDetail]);
 
   return (
-    <div className="admin-audit-log-list">
+    <div className="px-6 py-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
           {t('admin.auditLogs.title', '审计日志')}
         </h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -241,11 +210,11 @@ export default function AuditLogList() {
             />
           </div>
         </div>
-        <div className="flex gap-2 mt-4">
-          <Button onClick={handleFilter} variant="primary">
+        <div className="flex flex-col sm:flex-row gap-2 mt-4 w-full sm:w-auto">
+          <Button onClick={handleFilter} variant="primary" className="w-full sm:w-auto">
             {t('admin.auditLogs.filter', '筛选')}
           </Button>
-          <Button onClick={handleResetFilters} variant="outline">
+          <Button onClick={handleResetFilters} variant="outline" className="w-full sm:w-auto">
             {t('admin.auditLogs.reset', '重置')}
           </Button>
         </div>

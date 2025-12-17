@@ -257,9 +257,11 @@ The system follows a three-tier architecture:
   - Latest 1 press release (image card)
   - Rolling banner carousel (right side)
   - Main banner slider (full width)
+  - **Unread message notification badge** 🔄 **需要实现**
 - **Requirements**:
   - Real-time data from content management system
   - Responsive layout for mobile and desktop
+  - **Real-time message notification updates** 🔄 **需要实现**
 
 #### FR2.2: Company Profile Management
 - **Description**: View and update company information
@@ -325,13 +327,26 @@ The system follows a three-tier architecture:
   - Search functionality
   - Category filtering
 
-**FR2.5.2: 1:1 Consultation**
-- **Description**: Submit inquiries and track responses
+**FR2.5.2: Internal Messaging System (站内信系统)**
+- **Description**: Comprehensive internal messaging system for member-admin communication
 - **Requirements**:
-  - Inquiry form: name, email, phone, title, content, attachments (up to 3)
-  - Inquiry history with status tracking
-  - Admin response viewing
-  - Email notification on response
+  - **Message Composition**: Rich text editor for message content with file attachments (up to 3 files)
+  - **Message Threading**: Conversation-style message threads with reply functionality
+  - **Message Status**: Unread/read status indicators, message priority levels
+  - **Message Categories**: Support inquiry, performance consultation, general questions
+  - **Notification System**: 
+    - Real-time in-app notifications with badge counters
+    - Email notifications for new messages (configurable by user)
+    - Push notifications for urgent messages
+  - **Message Management**: 
+    - Message search and filtering (by date, category, status, sender)
+    - Message archiving and deletion
+    - Bulk operations (mark as read, archive, delete)
+  - **Admin Features**:
+    - Broadcast messages to all members or specific groups
+    - Message templates for common responses
+    - Auto-reply configuration for common inquiries
+    - Message analytics and response time tracking
 
 ### FR3: Admin Portal Features
 
@@ -408,15 +423,7 @@ The system follows a three-tier architecture:
   - Active/inactive status
   - Auto-rotation settings for rolling banners
 
-**FR3.4.4: Popup Management**
-- **Description**: Manage popup notifications
-- **Requirements**:
-  - Start/end date selection
-  - Image upload and optional link
-  - Active/inactive status
-  - "Don't show today" functionality for users
-
-**FR3.4.5: System Introduction Management**
+**FR3.4.4: System Introduction Management**
 - **Description**: Manage system introduction page content
 - **Requirements**:
   - WYSIWYG editor for HTML content
@@ -449,13 +456,31 @@ The system follows a three-tier architecture:
   - Category assignment
   - Display order management
 
-**FR3.6.2: Inquiry Management**
-- **Description**: Respond to enterprise inquiries
+**FR3.6.2: Internal Message Management**
+- **Description**: Comprehensive internal messaging system management
 - **Requirements**:
-  - List all inquiries with status
-  - View inquiry details and attachments
-  - Submit responses
-  - Email notification to enterprise
+  - **Message Dashboard**: Overview of all conversations, unread counts, response time metrics
+  - **Conversation Management**: 
+    - List all conversations with filtering (member, category, status, date range)
+    - View conversation threads with full message history
+    - Reply to messages with rich text editor and file attachments
+    - Mark conversations as resolved/pending/urgent
+  - **Broadcast Messaging**:
+    - Send messages to all members or filtered groups
+    - Schedule message delivery
+    - Message templates for common announcements
+  - **Message Analytics**:
+    - Response time tracking and reporting
+    - Message volume statistics
+    - Member engagement metrics
+  - **Auto-Response System**:
+    - Configure auto-replies for common inquiry types
+    - Set up message routing rules
+    - Template management for quick responses
+  - **Notification Management**:
+    - Configure email notification settings
+    - Manage notification templates
+    - Track notification delivery status
 
 #### FR3.7: Reports & Analytics
 - **Description**: Generate reports and export data
@@ -746,14 +771,28 @@ The system follows a three-tier architecture:
 - **Press Releases**: Title, image, publication date
 - **Banners**: Type, image, link URL, active status
 - **FAQs**: Question, answer, category
+- **Messages**: Internal messaging system data
+- **Message Threads**: Conversation grouping and threading
+- **Message Notifications**: Notification delivery tracking
 
 #### DM1.4: Program Data
 - **Projects**: Program announcements with details
 - **Project Applications**: Enterprise applications with attachments
 
 #### DM1.5: Support Data
-- **Inquiries**: 1:1 consultation requests and responses
-- **Attachments**: Polymorphic file storage (notices, programs, performance, inquiries)
+- **Messages**: Internal messaging system with conversation threads
+  - `id`, `thread_id`, `sender_id`, `sender_type` (member/admin), `recipient_id`, `recipient_type`
+  - `subject`, `content`, `message_type` (inquiry/response/broadcast), `priority` (normal/high/urgent)
+  - `status` (draft/sent/read/archived), `created_at`, `read_at`, `replied_at`
+- **Message Threads**: Conversation grouping and reply chains
+  - `id`, `subject`, `category` (support/performance/general), `status` (open/resolved/closed)
+  - `created_by`, `assigned_to`, `last_message_at`, `message_count`, `unread_count`
+- **Message Attachments**: File attachments for messages
+  - `id`, `message_id`, `file_name`, `file_path`, `file_size`, `mime_type`
+- **Message Notifications**: Email and in-app notification records
+  - `id`, `message_id`, `recipient_id`, `notification_type` (email/push/sms)
+  - `status` (pending/sent/delivered/failed), `sent_at`, `delivered_at`
+- **Attachments**: Polymorphic file storage (notices, programs, performance, messages)
 
 ### DM2: Data Validation
 
@@ -848,19 +887,23 @@ The system follows a three-tier architecture:
 - **Authentication**: API key-based
 
 #### INT1.2: Email Service ✅ **已实现**
-- **Purpose**: Notifications and password reset
+- **Purpose**: Notifications, password reset, and internal messaging
 - **Use Cases**: 
   - Registration approval notifications ✅
   - Password reset links ✅
   - Performance correction requests ✅
   - Approval notifications ✅
   - Revision request notifications ✅
+  - **New message notifications** 🔄 **需要实现**
+  - **Message reply notifications** 🔄 **需要实现**
+  - **Broadcast message notifications** 🔄 **需要实现**
 - **Service Options**: SMTP (支持 Gmail/Outlook/SendGrid/AWS SES 等)
 - **Implementation**: 
   - 位置: `backend/src/common/modules/email/`
   - 模板: HTML + 文本格式
   - 异步发送: 使用 `aiosmtplib`
   - 已集成: user, member, performance 模块
+  - **需要集成**: messaging 模块 🔄
 
 #### INT1.3: SMS Service (Optional)
 - **Purpose**: Critical notifications
@@ -916,12 +959,23 @@ The system follows a three-tier architecture:
 - `GET /api/v1/press/latest1`
 - `GET /api/v1/faqs`
 
+**Messages**:
+- `GET /api/v1/messages/threads` - Get message threads
+- `GET /api/v1/messages/threads/{id}` - Get thread details
+- `POST /api/v1/messages/threads` - Create new thread
+- `POST /api/v1/messages/threads/{id}/messages` - Send message in thread
+- `PUT /api/v1/messages/{id}/read` - Mark message as read
+- `GET /api/v1/messages/unread-count` - Get unread message count
+
 **Admin**:
 - `GET /api/v1/admin/dashboard`
 - `GET /api/v1/admin/members`
 - `POST /api/v1/admin/members/{id}/approve`
 - `GET /api/v1/admin/performance`
 - `POST /api/v1/admin/performance/{id}/approve`
+- `GET /api/v1/admin/messages/threads` - Get all message threads
+- `POST /api/v1/admin/messages/broadcast` - Send broadcast message
+- `GET /api/v1/admin/messages/analytics` - Get messaging analytics
 
 ---
 
@@ -1298,18 +1352,21 @@ The system follows a three-tier architecture:
 
 ### APP5: File Upload Limits
 
-| File Type | Max Size | Allowed Extensions |
-|-----------|----------|-------------------|
-| Images | 5 MB | jpg, jpeg, png, gif, webp |
-| Documents | 10 MB | pdf, doc, docx, hwp, xls, xlsx |
-| Company Logo | 2 MB | jpg, jpeg, png |
-| Business License | 10 MB | pdf, jpg, jpeg, png |
+| File Type | Max Size | Allowed Extensions | Max Count |
+|-----------|----------|-------------------|-----------|
+| Images | 5 MB | jpg, jpeg, png, gif, webp | - |
+| Documents | 10 MB | pdf, doc, docx, hwp, xls, xlsx | - |
+| Company Logo | 2 MB | jpg, jpeg, png | 1 |
+| Business License | 10 MB | pdf, jpg, jpeg, png | 1 |
+| **Message Attachments** | **10 MB** | **pdf, doc, docx, hwp, xls, xlsx, jpg, jpeg, png, gif** | **3** |
+| **Broadcast Attachments** | **10 MB** | **pdf, doc, docx, hwp, xls, xlsx, jpg, jpeg, png, gif** | **5** |
 
 ### APP6: Revision History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0.0 | 2025-11-25 | Development Team | Initial PRD document creation |
+| 1.0.4 | 2025-12-16 | Development Team | **Updated messaging system requirements**: <br/>- Removed popup management functionality<br/>- Enhanced internal messaging system with threading<br/>- Added email notification integration<br/>- Updated component architecture for messaging<br/>- Added message analytics and broadcast features |
 
 ---
 

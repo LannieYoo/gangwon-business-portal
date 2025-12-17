@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import loggerService from '@shared/services/logger.service';
+import { loggerService } from '@shared/utils/loggerHandler';
 
 /**
  * useLogLayout Hook

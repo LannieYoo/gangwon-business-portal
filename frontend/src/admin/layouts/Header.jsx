@@ -8,7 +8,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import useAuthStore from '@shared/stores/authStore';
 import LanguageSwitcher from '@shared/components/LanguageSwitcher';
-import { loggerService, exceptionService } from '@shared/services';
 import {
   MenuIcon,
   BellIcon,
@@ -50,22 +49,8 @@ export default function Header({ onToggleSidebar }) {
     try {
       setShowUserMenu(false);
       await logout();
-      loggerService.info('Admin logout succeeded', {
-        module: 'AdminHeader',
-        function: 'handleLogout'
-      });
       navigate('/admin/login', { replace: true });
     } catch (error) {
-      loggerService.error('Admin logout failed', {
-        module: 'AdminHeader',
-        function: 'handleLogout',
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'LOGOUT_ERROR'
-      });
       // Even if logout API fails, clear local auth and redirect
       const { clearAuth } = useAuthStore.getState();
       clearAuth();
@@ -93,7 +78,8 @@ export default function Header({ onToggleSidebar }) {
         </Link>
       </div>
 
-      <div className="hidden lg:flex flex-1 justify-center items-center max-w-[600px] mx-8">
+      {/* 全局搜索暂时隐藏 */}
+      {/* <div className="hidden lg:flex flex-1 justify-center items-center max-w-[600px] mx-8">
         <div className="relative w-full max-w-[500px]">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4 z-[1]" />
           <input
@@ -104,14 +90,14 @@ export default function Header({ onToggleSidebar }) {
             className="w-full py-2.5 pl-10 pr-4 border border-gray-200 rounded-lg text-sm bg-gray-50 transition-all duration-200 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10"
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="flex items-center gap-3">
         {/* 语言切换 */}
         <LanguageSwitcher />
 
-        {/* 日志 */}
-        <Link 
+        {/* 应用日志 / 异常入口暂时隐藏 */}
+        {/* <Link 
           to="/admin/logs"
           className={`relative bg-transparent border-none cursor-pointer p-2 text-gray-500 transition-all duration-200 rounded-md flex items-center justify-center no-underline ${
             location.pathname.startsWith('/admin/logs') 
@@ -123,7 +109,6 @@ export default function Header({ onToggleSidebar }) {
           <DocumentIcon className="w-5 h-5" />
         </Link>
 
-        {/* 异常 */}
         <Link 
           to="/admin/exceptions"
           className={`relative bg-transparent border-none cursor-pointer p-2 text-gray-500 transition-all duration-200 rounded-md flex items-center justify-center no-underline ${
@@ -134,7 +119,7 @@ export default function Header({ onToggleSidebar }) {
           title={t('admin.header.exceptions') || '应用异常'}
         >
           <WarningIcon className="w-5 h-5" />
-        </Link>
+        </Link> */}
 
         {/* 站内信通知 */}
         <NotificationBell userType="admin" />

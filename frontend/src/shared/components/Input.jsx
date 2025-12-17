@@ -2,7 +2,7 @@
  * Input Component
  */
 
-import { forwardRef } from 'react';
+import { forwardRef, useRef, useEffect } from 'react';
 import { cn } from '@shared/utils/helpers';
 
 export const Input = forwardRef(function Input({
@@ -11,8 +11,28 @@ export const Input = forwardRef(function Input({
   help,
   required,
   className,
+  type,
   ...props
 }, ref) {
+  const inputRef = useRef(null);
+  const actualRef = ref || inputRef;
+
+  const handleClick = (e) => {
+    if (type === 'date' && actualRef?.current) {
+      // 确保输入框获得焦点
+      actualRef.current.focus();
+      // 如果浏览器支持 showPicker API，则调用它
+      if (actualRef.current.showPicker && typeof actualRef.current.showPicker === 'function') {
+        try {
+          actualRef.current.showPicker();
+        } catch (err) {
+          // 如果 showPicker 失败（例如某些浏览器限制），则只聚焦
+          // 浏览器会自动显示日期选择器
+        }
+      }
+    }
+  };
+
   return (
     <div className="mb-4">
       {label && (
@@ -24,16 +44,19 @@ export const Input = forwardRef(function Input({
         </label>
       )}
       <input
-        ref={ref}
+        ref={actualRef}
+        type={type}
         className={cn(
           'w-full px-3 py-2 border rounded-md shadow-sm',
           'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
           'transition-colors duration-200',
+          type === 'date' && 'cursor-pointer',
           error 
             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
             : 'border-gray-300',
           className
         )}
+        onClick={handleClick}
         {...props}
       />
       {error && (

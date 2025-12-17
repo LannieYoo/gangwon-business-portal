@@ -3,23 +3,19 @@
  * 会员服务 - 封装会员相关的 API 调用
  */
 
-import apiService from './api.service';
-import loggerService from './logger.service';
-import exceptionService from './exception.service';
-import { API_PREFIX } from '@shared/utils/constants';
-import { autoLog } from '@shared/utils/decorators';
+import apiService from "./api.service";
+import { API_PREFIX } from "@shared/utils/constants";
 
 class MemberService {
   /**
    * Get current member's profile
    * 获取当前会员资料
-   * 
+   *
    * @returns {Promise<Object>} Member profile data
    */
-  @autoLog('get_member_profile', { logResourceId: true })
   async getProfile() {
     const response = await apiService.get(`${API_PREFIX}/member/profile`);
-    
+
     // Map backend fields to frontend fields
     if (response) {
       const mappedResponse = {
@@ -51,19 +47,19 @@ class MemberService {
         description: null, // Not in backend response yet
         businessField: null, // Not in backend response yet
         mainBusiness: null, // Not in backend response yet
-        cooperationFields: [] // Not in backend response yet
+        cooperationFields: [], // Not in backend response yet
       };
-      
+
       return mappedResponse;
     }
-    
+
     return response;
   }
 
   /**
    * Verify company information
    * 验证公司信息
-   * 
+   *
    * @param {Object} data - Company verification data
    * @param {string} data.businessNumber - Business registration number
    * @param {string} [data.companyName] - Company name (optional)
@@ -71,22 +67,25 @@ class MemberService {
    */
   async verifyCompany(data) {
     const requestData = {
-      business_number: data.businessNumber?.replace(/-/g, '') || data.business_number,
-      company_name: data.companyName || null
+      business_number:
+        data.businessNumber?.replace(/-/g, "") || data.business_number,
+      company_name: data.companyName || null,
     };
-    
+
     return await this._verifyCompanyInternal(requestData);
   }
-  
-  @autoLog('verify_company')
+
   async _verifyCompanyInternal(requestData) {
-    return await apiService.post(`${API_PREFIX}/members/verify-company`, requestData);
+    return await apiService.post(
+      `${API_PREFIX}/members/verify-company`,
+      requestData
+    );
   }
 
   /**
    * Update current member's profile
    * 更新当前会员资料
-   * 
+   *
    * @param {Object} data - Profile data to update
    * @param {string} [data.companyName] - Company name
    * @param {string} [data.email] - Email
@@ -102,7 +101,7 @@ class MemberService {
   async updateProfile(data) {
     // Map frontend fields to backend fields
     const requestData = {};
-    
+
     if (data.companyName !== undefined) {
       requestData.company_name = data.companyName;
     }
@@ -130,9 +129,9 @@ class MemberService {
     if (data.website !== undefined || data.websiteUrl !== undefined) {
       requestData.website = data.website || data.websiteUrl;
     }
-    
+
     const response = await this._updateProfileInternal(requestData);
-    
+
     // Map backend response to frontend format
     if (response) {
       const mappedResponse = {
@@ -155,20 +154,18 @@ class MemberService {
         logo: response.logo_url,
         logoUrl: response.logo_url,
         createdAt: response.created_at,
-        updatedAt: response.updated_at
+        updatedAt: response.updated_at,
       };
-      
+
       return mappedResponse;
     }
-    
+
     return response;
   }
-  
-  @autoLog('update_member_profile', { logResourceId: true })
+
   async _updateProfileInternal(requestData) {
     return await apiService.put(`${API_PREFIX}/member/profile`, requestData);
   }
 }
 
 export default new MemberService();
-

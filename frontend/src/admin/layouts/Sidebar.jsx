@@ -12,7 +12,6 @@ import {
   ChartIcon,
   FolderIcon,
   DocumentIcon,
-  SettingsIcon,
   ReportIcon,
   AuditLogIcon,
   EnvelopeIcon,
@@ -69,18 +68,7 @@ export default function Sidebar({ collapsed, mobileOpen = false, onClose }) {
       icon: ReportIcon,
       label: t('admin.menu.reports')
     },
-    {
-      key: 'auditLogs',
-      path: '/admin/audit-logs',
-      icon: AuditLogIcon,
-      label: t('admin.menu.auditLogs')
-    },
-    {
-      key: 'settings',
-      path: '/admin/settings',
-      icon: SettingsIcon,
-      label: t('admin.menu.settings')
-    }
+
   ];
 
   const toggleExpanded = (key) => {

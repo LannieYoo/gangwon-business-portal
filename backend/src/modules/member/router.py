@@ -14,7 +14,6 @@ from fastapi import Request
 from ...common.modules.audit import audit_log
 from ...common.modules.logger import auto_log
 
-
 from ...common.modules.integrations.nice_dnb import nice_dnb_client
 from .schemas import (
     MemberProfileResponse,
@@ -198,8 +197,7 @@ async def reject_member(
                             "address": "강원특별자치도 춘천시 중앙로 1",
                             "industry": "제조업",
                             "establishedDate": "2018-05-10",
-                            "creditGrade": "A+",
-                            "riskLevel": "low"
+                            "creditGrade": "A+"
                         }
                     }
                 }
@@ -274,7 +272,6 @@ async def verify_company(
                             else None
                         ),
                         "creditGrade": response.data.credit_grade,
-                        "riskLevel": response.data.risk_level,
                     },
                 )
             else:
@@ -405,6 +402,9 @@ async def search_nice_dnb(
     """
     Search company information from Nice D&B API (admin only).
     
+    This endpoint queries the Nice D&B API and stores the result in the database
+    for future reference and audit purposes.
+    
     Args:
         business_number: Business registration number (사업자등록번호)
         current_user: Current admin user (from dependency)
@@ -422,8 +422,11 @@ async def search_nice_dnb(
             detail="Nice D&B API is not configured. Please set NICE_DNB_API_KEY and NICE_DNB_API_SECRET_KEY environment variables.",
         )
     
+    # Clean business number (remove hyphens)
+    clean_business_number = business_number.replace("-", "").strip()
+    
     # Call Nice D&B API
-    response = await nice_dnb_client.search_company(business_number)
+    response = await nice_dnb_client.search_company(clean_business_number)
     
     if not response:
         # API request failed (network error, authentication error, etc.)
@@ -432,8 +435,8 @@ async def search_nice_dnb(
             detail="Nice D&B API request failed. Please check the API configuration, network connection, or try again later.",
         )
     
-    # Convert response to dict format expected by frontend
-    return {
+    # Prepare response data for frontend
+    response_data = {
         "success": response.success,
         "data": {
             "businessNumber": response.data.business_number,
@@ -447,8 +450,25 @@ async def search_nice_dnb(
                 else None
             ),
             "creditGrade": response.data.credit_grade,
-            "riskLevel": response.data.risk_level,
-            "summary": response.data.summary,
+            # Additional fields
+            "legalNumber": response.data.legal_number,
+            "companyNameEn": response.data.company_name_en,
+            "phone": response.data.phone,
+            "fax": response.data.fax,
+            "email": response.data.email,
+            "zipCode": response.data.zip_code,
+            "companyScale": response.data.company_scale,
+            "companyType": response.data.company_type,
+            "mainBusiness": response.data.main_business,
+            "industryCode": response.data.industry_code,
+            "employeeCount": response.data.employee_count,
+            "employeeCountDate": response.data.employee_count_date,
+            "creditDate": response.data.credit_date,
+            "salesAmount": response.data.sales_amount,
+            "operatingProfit": response.data.operating_profit,
+            "shareholderEquity": response.data.shareholder_equity,
+            "debtAmount": response.data.debt_amount,
+            "assetAmount": response.data.asset_amount,
         },
         "financials": [
             {
@@ -459,15 +479,29 @@ async def search_nice_dnb(
             }
             for f in response.financials
         ],
-        "insights": [
-            {
-                "label": i.label,
-                "value": i.value,
-                "trend": i.trend,
-            }
-            for i in response.insights
-        ],
     }
+    
+    # Store the result in database (don't fail request if storage fails)
+    try:
+        await member_service.save_nice_dnb_data(
+            business_number=clean_business_number,
+            response=response,
+            queried_by=current_user.get("id"),
+        )
+    except Exception as e:
+        # Log error but don't fail the request
+        from ...common.modules.logger import logger
+        logger.error(
+            f"Failed to save Nice D&B data to database: {str(e)}",
+            extra={
+                "business_number": clean_business_number,
+                "error_type": type(e).__name__,
+            },
+            exc_info=True,
+        )
+        # Continue to return API response even if storage fails
+    
+    return response_data
 
 
 @router.get("/api/admin/members/export")

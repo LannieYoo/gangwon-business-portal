@@ -6,11 +6,34 @@
         "banners": "横幅",
         "popups": "弹窗",
         "notices": "公告",
-        "news": "新闻资料"
+        "news": "新闻资料",
+        "faq": "FAQ",
+        "systemInfo": "系统介绍"
       },
       "banners": {
         "title": "横幅管理",
-        "placeholder": "横幅管理功能开发中"
+        "placeholder": "横幅管理功能开发中",
+        "types": {
+          "mainBanner": "主页横幅",
+          "systemIntro": "系统介绍",
+          "projects": "项目",
+          "performance": "绩效",
+          "support": "支持"
+        },
+        "form": {
+          "fields": {
+            "image": "图片",
+            "url": "链接URL",
+            "urlPlaceholder": "https://example.com"
+          }
+        },
+        "actions": {
+          "upload": "上传图片",
+          "save": "保存"
+        },
+        "messages": {
+          "saved": "保存成功"
+        }
       },
       "popups": {
         "title": "弹窗管理",
@@ -75,11 +98,116 @@
       },
       "notices": {
         "title": "公告管理",
-        "placeholder": "公告管理功能开发中"
+        "placeholder": "公告管理功能开发中",
+        "list": {
+          "title": "公告列表",
+          "description": "管理网站公告",
+          "empty": "暂无公告"
+        },
+        "form": {
+          "editTitle": "编辑公告",
+          "newTitle": "新建公告",
+          "fields": {
+            "title": "标题",
+            "contentHtml": "内容",
+            "contentHtmlPlaceholder": "请输入公告内容..."
+          }
+        },
+        "actions": {
+          "new": "新建",
+          "create": "创建",
+          "update": "更新",
+          "confirmDelete": "确定要删除这个公告吗？"
+        },
+        "messages": {
+          "validationError": "请补全必填信息",
+          "saved": "保存成功",
+          "deleted": "删除成功"
+        },
+        "views": "浏览"
       },
       "news": {
         "title": "新闻资料管理",
-        "placeholder": "新闻资料管理功能开发中"
+        "placeholder": "新闻资料管理功能开发中",
+        "list": {
+          "title": "新闻列表",
+          "description": "管理新闻稿",
+          "empty": "暂无新闻"
+        },
+        "form": {
+          "editTitle": "编辑新闻",
+          "newTitle": "新建新闻",
+          "fields": {
+            "title": "标题",
+            "image": "上传图片",
+            "imageUrl": "图片URL",
+            "imageUrlHelper": "或直接输入图片URL地址",
+            "imageUrlPlaceholder": "https://example.com/image.jpg"
+          }
+        },
+        "actions": {
+          "new": "新建",
+          "create": "创建",
+          "update": "更新",
+          "confirmDelete": "确定要删除这条新闻吗？",
+          "selectImage": "选择图片",
+          "changeImage": "更换图片"
+        },
+        "messages": {
+          "validationError": "请补全必填信息",
+          "saved": "保存成功",
+          "deleted": "删除成功",
+          "invalidImageType": "请选择图片文件",
+          "imageUploaded": "图片上传成功"
+        }
+      },
+      "faq": {
+        "title": "FAQ管理",
+        "allCategories": "全部分类",
+        "categories": {
+          "general": "一般问题",
+          "registration": "注册相关",
+          "performance": "绩效管理",
+          "project": "项目申报",
+          "technical": "技术支持"
+        },
+        "question": "问题",
+        "category": "分类",
+        "displayOrder": "显示顺序",
+        "createdAt": "创建时间",
+        "addFaq": "添加FAQ",
+        "editFaq": "编辑FAQ",
+        "deleteConfirm": "确定要删除这个FAQ吗？",
+        "searchPlaceholder": "搜索问题或答案...",
+        "selectCategory": "选择分类",
+        "questionPlaceholder": "请输入FAQ问题",
+        "answer": "答案",
+        "answerPlaceholder": "请输入FAQ答案",
+        "displayOrderPlaceholder": "输入显示顺序"
+      },
+      "systemInfo": {
+        "title": "系统介绍管理",
+        "description": "管理系统介绍页面的内容，包括标题、描述、详细内容和展示图片。",
+        "titleLabel": "页面标题",
+        "titlePlaceholder": "请输入系统介绍页面标题",
+        "descriptionLabel": "简短描述",
+        "descriptionPlaceholder": "请输入系统的简短描述（可选）",
+        "imageLabel": "展示图片",
+        "imageHint": "支持 JPG、PNG、GIF 格式，建议尺寸 800x600 像素，文件大小不超过 5MB",
+        "contentLabel": "详细内容",
+        "contentPlaceholder": "请输入系统介绍的详细内容...",
+        "previewTitle": "预览提示",
+        "previewDescription": "保存后的内容将在系统介绍页面中显示。建议在保存前预览内容格式和图片效果。",
+        "noImage": "暂无图片",
+        "noContent": "暂无内容可预览",
+        "messages": {
+          "saved": "保存成功",
+          "saveFailed": "保存失败，请重试",
+          "imageUploaded": "图片上传成功",
+          "imageUploadFailed": "图片上传失败，请重试",
+          "imageTooLarge": "图片大小不能超过5MB",
+          "contentRequired": "请输入详细内容"
+        }
       }
     }
   }

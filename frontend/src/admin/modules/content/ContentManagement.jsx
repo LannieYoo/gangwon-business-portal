@@ -9,6 +9,8 @@ import { Card, Tabs } from '@shared/components';
 import BannerManagement from './BannerManagement';
 import NoticeManagement from './NoticeManagement';
 import NewsManagement from './NewsManagement';
+import FAQManagement from './FAQManagement';
+import SystemInfoManagement from './SystemInfoManagement';
 
 export default function ContentManagement() {
   const { t } = useTranslation();
@@ -18,15 +20,17 @@ export default function ContentManagement() {
   const tabs = useMemo(() => [
     { key: 'banners', label: t('admin.content.tabs.banners') },
     { key: 'notices', label: t('admin.content.tabs.notices') },
-    { key: 'news', label: t('admin.content.tabs.news') }
+    { key: 'news', label: t('admin.content.tabs.news') },
+    { key: 'faq', label: t('admin.content.tabs.faq') },
+    { key: 'systemInfo', label: t('admin.content.tabs.systemInfo') }
   ], [t]);
 
 
 
   return (
-    <div className="p-0">
+    <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-semibold text-gray-900 m-0">{t('admin.content.title')}</h1>
+        <h1 className="text-xl md:text-2xl font-semibold text-gray-900 m-0">{t('admin.content.title')}</h1>
       </div>
 
       <Card>
@@ -36,10 +40,12 @@ export default function ContentManagement() {
           onChange={setActiveTab}
         />
 
-        <div className="py-6">
+        <div className="mt-6 p-6">
           {activeTab === 'banners' && <BannerManagement />}
           {activeTab === 'notices' && <NoticeManagement />}
           {activeTab === 'news' && <NewsManagement />}
+          {activeTab === 'faq' && <FAQManagement />}
+          {activeTab === 'systemInfo' && <SystemInfoManagement />}
         </div>
       </Card>
     </div>

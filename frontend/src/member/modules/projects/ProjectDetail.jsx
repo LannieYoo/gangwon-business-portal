@@ -106,10 +106,17 @@ export default function ProjectDetail() {
                   <p className="mb-2 leading-relaxed">{project.description}</p>
                 </div>
               )}
-              {project.targetAudience && (
+              {(project.target_company_name || project.target_business_number) && (
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 mb-2">{t('projects.targetAudience', '目标对象')}</h3>
-                  <p className="leading-relaxed">{project.targetAudience}</p>
+                  <h3 className="text-base font-semibold text-gray-900 mb-2">{t('projects.targetCompany', '목표 기업')}</h3>
+                  <div className="leading-relaxed">
+                    {project.target_company_name && (
+                      <p className="font-medium">{project.target_company_name}</p>
+                    )}
+                    {project.target_business_number && (
+                      <p className="text-gray-600 text-sm">사업자등록번호: {project.target_business_number}</p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

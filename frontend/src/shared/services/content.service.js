@@ -3,22 +3,21 @@
  * 内容管理服务 - 封装公告、新闻稿、横幅、系统信息等 API
  */
 
-import { apiService } from './index';
-import loggerService from './logger.service';
-import exceptionService from './exception.service';
-import { API_PREFIX } from '@shared/utils/constants';
-import { autoLog } from '@shared/utils/decorators';
+import { apiService } from "./index";
+import { API_PREFIX } from "@shared/utils/constants";
 
 /**
  * 转换后端 snake_case 到前端 camelCase
  */
 function toCamelCase(obj) {
-  if (!obj || typeof obj !== 'object') return obj;
+  if (!obj || typeof obj !== "object") return obj;
   if (Array.isArray(obj)) return obj.map(toCamelCase);
-  
+
   const result = {};
   for (const [key, value] of Object.entries(obj)) {
-    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+    const camelKey = key.replace(/_([a-z])/g, (_, letter) =>
+      letter.toUpperCase()
+    );
     result[camelKey] = toCamelCase(value);
   }
   return result;
@@ -28,12 +27,15 @@ function toCamelCase(obj) {
  * 转换前端 camelCase 到后端 snake_case
  */
 function toSnakeCase(obj) {
-  if (!obj || typeof obj !== 'object') return obj;
+  if (!obj || typeof obj !== "object") return obj;
   if (Array.isArray(obj)) return obj.map(toSnakeCase);
-  
+
   const result = {};
   for (const [key, value] of Object.entries(obj)) {
-    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    const snakeKey = key.replace(
+      /[A-Z]/g,
+      (letter) => `_${letter.toLowerCase()}`
+    );
     result[snakeKey] = toSnakeCase(value);
   }
   return result;
@@ -41,7 +43,7 @@ function toSnakeCase(obj) {
 
 const contentService = {
   // ========== 公告 (Notices) ==========
-  
+
   /**
    * 获取公告列表
    * @param {Object} params - 查询参数
@@ -55,23 +57,23 @@ const contentService = {
     const queryParams = {
       page,
       page_size: pageSize,
-      ...(search && { search })
+      ...(search && { search }),
     };
-    
+
     const response = await listNoticesInternal(queryParams);
-    
+
     // 转换响应格式
     const result = {
       items: (response.items || []).map(toCamelCase),
       total: response.total || 0,
       page: response.page || page,
       pageSize: response.page_size || response.pageSize || pageSize,
-      totalPages: response.total_pages || response.totalPages || 0
+      totalPages: response.total_pages || response.totalPages || 0,
     };
-    
+
     return result;
   },
-  
+
   /**
    * 获取最新5条公告（用于首页）
    * @returns {Promise<Array>} 公告列表
@@ -80,7 +82,7 @@ const contentService = {
     const response = await getLatestNoticesInternal();
     return (response || []).map(toCamelCase);
   },
-  
+
   /**
    * 获取公告详情
    * @param {string} noticeId - 公告ID
@@ -90,7 +92,7 @@ const contentService = {
     const response = await getNoticeInternal(noticeId);
     return toCamelCase(response);
   },
-  
+
   /**
    * 创建公告（管理员）
    * @param {Object} data - 公告数据
@@ -103,13 +105,13 @@ const contentService = {
     const payload = toSnakeCase({
       title: data.title,
       contentHtml: data.contentHtml,
-      boardType: data.boardType || 'notice'
+      boardType: data.boardType || "notice",
     });
-    
+
     const response = await createNoticeInternal(payload);
     return toCamelCase(response);
   },
-  
+
   /**
    * 更新公告（管理员）
    * @param {string} noticeId - 公告ID
@@ -121,7 +123,7 @@ const contentService = {
     const response = await updateNoticeInternal(noticeId, payload);
     return toCamelCase(response);
   },
-  
+
   /**
    * 删除公告（管理员）
    * @param {string} noticeId - 公告ID
@@ -130,9 +132,9 @@ const contentService = {
   async deleteNotice(noticeId) {
     await deleteNoticeInternal(noticeId);
   },
-  
+
   // ========== 新闻稿 (Press Releases) ==========
-  
+
   /**
    * 获取新闻稿列表
    * @param {Object} params - 查询参数
@@ -144,23 +146,23 @@ const contentService = {
     const { page = 1, pageSize = 20 } = params;
     const queryParams = {
       page,
-      page_size: pageSize
+      page_size: pageSize,
     };
-    
+
     const response = await listPressReleasesInternal(queryParams);
-    
+
     // 转换响应格式
     const result = {
       items: (response.items || []).map(toCamelCase),
       total: response.total || 0,
       page: response.page || page,
       pageSize: response.page_size || response.pageSize || pageSize,
-      totalPages: response.total_pages || response.totalPages || 0
+      totalPages: response.total_pages || response.totalPages || 0,
     };
-    
+
     return result;
   },
-  
+
   /**
    * 获取最新1条新闻稿（用于首页）
    * @returns {Promise<Object|null>} 新闻稿详情或 null
@@ -169,7 +171,7 @@ const contentService = {
     const response = await getLatestPressReleaseInternal();
     return response ? toCamelCase(response) : null;
   },
-  
+
   /**
    * 获取新闻稿详情
    * @param {string} pressId - 新闻稿ID
@@ -179,7 +181,7 @@ const contentService = {
     const response = await getPressReleaseInternal(pressId);
     return toCamelCase(response);
   },
-  
+
   /**
    * 创建新闻稿（管理员）
    * @param {Object} data - 新闻稿数据
@@ -190,13 +192,13 @@ const contentService = {
   async createPressRelease(data) {
     const payload = toSnakeCase({
       title: data.title,
-      imageUrl: data.imageUrl
+      imageUrl: data.imageUrl,
     });
-    
+
     const response = await createPressReleaseInternal(payload);
     return toCamelCase(response);
   },
-  
+
   /**
    * 更新新闻稿（管理员）
    * @param {string} pressId - 新闻稿ID
@@ -208,7 +210,7 @@ const contentService = {
     const response = await updatePressReleaseInternal(pressId, payload);
     return toCamelCase(response);
   },
-  
+
   /**
    * 删除新闻稿（管理员）
    * @param {string} pressId - 新闻稿ID
@@ -217,9 +219,9 @@ const contentService = {
   async deletePressRelease(pressId) {
     await deletePressReleaseInternal(pressId);
   },
-  
+
   // ========== 横幅 (Banners) ==========
-  
+
   /**
    * 获取活跃横幅（公开）
    * @param {Object} params - 查询参数
@@ -229,11 +231,11 @@ const contentService = {
   async getBanners(params = {}) {
     const { bannerType } = params;
     const queryParams = bannerType ? { banner_type: bannerType } : {};
-    
+
     const response = await getBannersInternal(queryParams);
     return (response.items || []).map(toCamelCase);
   },
-  
+
   /**
    * 获取所有横幅（管理员）
    * @returns {Promise<Array>} 横幅列表
@@ -242,7 +244,7 @@ const contentService = {
     const response = await getAllBannersInternal();
     return (response.items || []).map(toCamelCase);
   },
-  
+
   /**
    * 创建横幅（管理员）
    * @param {Object} data - 横幅数据
@@ -259,13 +261,13 @@ const contentService = {
       imageUrl: data.imageUrl,
       linkUrl: data.linkUrl,
       isActive: data.isActive !== undefined ? data.isActive : true,
-      displayOrder: data.displayOrder || 0
+      displayOrder: data.displayOrder || 0,
     });
-    
+
     const response = await createBannerInternal(payload);
     return toCamelCase(response);
   },
-  
+
   /**
    * 更新横幅（管理员）
    * @param {string} bannerId - 横幅ID
@@ -277,7 +279,7 @@ const contentService = {
     const response = await updateBannerInternal(bannerId, payload);
     return toCamelCase(response);
   },
-  
+
   /**
    * 删除横幅（管理员）
    * @param {string} bannerId - 横幅ID
@@ -286,9 +288,9 @@ const contentService = {
   async deleteBanner(bannerId) {
     await deleteBannerInternal(bannerId);
   },
-  
+
   // ========== 系统信息 (System Info) ==========
-  
+
   /**
    * 获取系统信息（公开）
    * @returns {Promise<Object|null>} 系统信息或 null
@@ -297,7 +299,7 @@ const contentService = {
     const response = await getSystemInfoInternal();
     return response ? toCamelCase(response) : null;
   },
-  
+
   /**
    * 更新系统信息（管理员，upsert 模式）
    * @param {Object} data - 系统信息数据
@@ -308,9 +310,9 @@ const contentService = {
   async updateSystemInfo(data) {
     const payload = toSnakeCase({
       contentHtml: data.contentHtml,
-      imageUrl: data.imageUrl
+      imageUrl: data.imageUrl,
     });
-    
+
     const response = await updateSystemInfoInternal(payload);
     return toCamelCase(response);
   },
@@ -368,12 +370,12 @@ const contentService = {
       linkUrl: data.linkUrl,
       width: data.width || 600,
       height: data.height || 400,
-      position: data.position || 'center',
+      position: data.position || "center",
       isActive: data.isActive !== undefined ? data.isActive : true,
       startDate: data.startDate || null,
-      endDate: data.endDate || null
+      endDate: data.endDate || null,
     });
-    
+
     const response = await createPopupInternal(payload);
     return toCamelCase(response);
   },
@@ -397,159 +399,128 @@ const contentService = {
    */
   async deletePopup(popupId) {
     await deletePopupInternal(popupId);
-  }
+  },
 };
 
 // 内部辅助函数（使用装饰器）
-const listNoticesInternal = autoLog('list_notices', { logResultCount: true, serviceName: 'ContentService', methodName: 'listNotices' })(
-  async (queryParams) => {
-    return await apiService.get(`${API_PREFIX}/notices`, queryParams);
-  }
-);
+const listNoticesInternal = async (queryParams) => {
+  return await apiService.get(`${API_PREFIX}/notices`, queryParams);
+};
 
-const getLatestNoticesInternal = autoLog('get_latest_notices', { logResultCount: true, serviceName: 'ContentService', methodName: 'getLatestNotices' })(
-  async () => {
-    return await apiService.get(`${API_PREFIX}/notices/latest5`);
-  }
-);
+const getLatestNoticesInternal = async () => {
+  return await apiService.get(`${API_PREFIX}/notices/latest5`);
+};
 
-const getNoticeInternal = autoLog('get_notice', { logResourceId: true, serviceName: 'ContentService', methodName: 'getNotice' })(
-  async (noticeId) => {
-    return await apiService.get(`${API_PREFIX}/notices/${noticeId}`);
-  }
-);
+const getNoticeInternal = async (noticeId) => {
+  return await apiService.get(`${API_PREFIX}/notices/${noticeId}`);
+};
 
-const createNoticeInternal = autoLog('create_notice', { logResourceId: true, serviceName: 'ContentService', methodName: 'createNotice' })(
-  async (data) => {
-    return await apiService.post(`${API_PREFIX}/admin/content/notices`, data);
-  }
-);
+const createNoticeInternal = async (data) => {
+  return await apiService.post(`${API_PREFIX}/admin/content/notices`, data);
+};
 
-const updateNoticeInternal = autoLog('update_notice', { logResourceId: true, serviceName: 'ContentService', methodName: 'updateNotice' })(
-  async (noticeId, data) => {
-    return await apiService.put(`${API_PREFIX}/admin/content/notices/${noticeId}`, data);
-  }
-);
+const updateNoticeInternal = async (noticeId, data) => {
+  return await apiService.put(
+    `${API_PREFIX}/admin/content/notices/${noticeId}`,
+    data
+  );
+};
 
-const deleteNoticeInternal = autoLog('delete_notice', { logResourceId: true, serviceName: 'ContentService', methodName: 'deleteNotice' })(
-  async (noticeId) => {
-    return await apiService.delete(`${API_PREFIX}/admin/content/notices/${noticeId}`);
-  }
-);
+const deleteNoticeInternal = async (noticeId) => {
+  return await apiService.delete(
+    `${API_PREFIX}/admin/content/notices/${noticeId}`
+  );
+};
 
-const listPressReleasesInternal = autoLog('list_press_releases', { logResultCount: true, serviceName: 'ContentService', methodName: 'listPressReleases' })(
-  async (queryParams) => {
-    return await apiService.get(`${API_PREFIX}/press`, queryParams);
-  }
-);
+const listPressReleasesInternal = async (queryParams) => {
+  return await apiService.get(`${API_PREFIX}/press`, queryParams);
+};
 
-const getLatestPressReleaseInternal = autoLog('get_latest_press_release', { serviceName: 'ContentService', methodName: 'getLatestPressRelease' })(
-  async () => {
-    return await apiService.get(`${API_PREFIX}/press/latest1`);
-  }
-);
+const getLatestPressReleaseInternal = async () => {
+  return await apiService.get(`${API_PREFIX}/press/latest1`);
+};
 
-const getPressReleaseInternal = autoLog('get_press_release', { logResourceId: true, serviceName: 'ContentService', methodName: 'getPressRelease' })(
-  async (pressId) => {
-    return await apiService.get(`${API_PREFIX}/press/${pressId}`);
-  }
-);
+const getPressReleaseInternal = async (pressId) => {
+  return await apiService.get(`${API_PREFIX}/press/${pressId}`);
+};
 
-const createPressReleaseInternal = autoLog('create_press_release', { logResourceId: true, serviceName: 'ContentService', methodName: 'createPressRelease' })(
-  async (data) => {
-    return await apiService.post(`${API_PREFIX}/admin/content/press`, data);
-  }
-);
+const createPressReleaseInternal = async (data) => {
+  return await apiService.post(`${API_PREFIX}/admin/content/press`, data);
+};
 
-const updatePressReleaseInternal = autoLog('update_press_release', { logResourceId: true, serviceName: 'ContentService', methodName: 'updatePressRelease' })(
-  async (pressId, data) => {
-    return await apiService.put(`${API_PREFIX}/admin/content/press/${pressId}`, data);
-  }
-);
+const updatePressReleaseInternal = async (pressId, data) => {
+  return await apiService.put(
+    `${API_PREFIX}/admin/content/press/${pressId}`,
+    data
+  );
+};
 
-const deletePressReleaseInternal = autoLog('delete_press_release', { logResourceId: true, serviceName: 'ContentService', methodName: 'deletePressRelease' })(
-  async (pressId) => {
-    return await apiService.delete(`${API_PREFIX}/admin/content/press/${pressId}`);
-  }
-);
+const deletePressReleaseInternal = async (pressId) => {
+  return await apiService.delete(
+    `${API_PREFIX}/admin/content/press/${pressId}`
+  );
+};
 
-const getBannersInternal = autoLog('get_banners', { logResultCount: true, serviceName: 'ContentService', methodName: 'getBanners' })(
-  async (queryParams) => {
-    return await apiService.get(`${API_PREFIX}/banners`, queryParams);
-  }
-);
+const getBannersInternal = async (queryParams) => {
+  return await apiService.get(`${API_PREFIX}/banners`, queryParams);
+};
 
-const getAllBannersInternal = autoLog('get_all_banners', { logResultCount: true, serviceName: 'ContentService', methodName: 'getAllBanners' })(
-  async () => {
-    return await apiService.get(`${API_PREFIX}/admin/content/banners`);
-  }
-);
+const getAllBannersInternal = async () => {
+  return await apiService.get(`${API_PREFIX}/admin/content/banners`);
+};
 
-const createBannerInternal = autoLog('create_banner', { logResourceId: true, serviceName: 'ContentService', methodName: 'createBanner' })(
-  async (data) => {
-    return await apiService.post(`${API_PREFIX}/admin/content/banners`, data);
-  }
-);
+const createBannerInternal = async (data) => {
+  return await apiService.post(`${API_PREFIX}/admin/content/banners`, data);
+};
 
-const updateBannerInternal = autoLog('update_banner', { logResourceId: true, serviceName: 'ContentService', methodName: 'updateBanner' })(
-  async (bannerId, data) => {
-    return await apiService.put(`${API_PREFIX}/admin/content/banners/${bannerId}`, data);
-  }
-);
+const updateBannerInternal = async (bannerId, data) => {
+  return await apiService.put(
+    `${API_PREFIX}/admin/content/banners/${bannerId}`,
+    data
+  );
+};
 
-const deleteBannerInternal = autoLog('delete_banner', { logResourceId: true, serviceName: 'ContentService', methodName: 'deleteBanner' })(
-  async (bannerId) => {
-    return await apiService.delete(`${API_PREFIX}/admin/content/banners/${bannerId}`);
-  }
-);
+const deleteBannerInternal = async (bannerId) => {
+  return await apiService.delete(
+    `${API_PREFIX}/admin/content/banners/${bannerId}`
+  );
+};
 
-const getSystemInfoInternal = autoLog('get_system_info', { serviceName: 'ContentService', methodName: 'getSystemInfo' })(
-  async () => {
-    return await apiService.get(`${API_PREFIX}/system-info`);
-  }
-);
+const getSystemInfoInternal = async () => {
+  return await apiService.get(`${API_PREFIX}/system-info`);
+};
 
-const updateSystemInfoInternal = autoLog('update_system_info', { serviceName: 'ContentService', methodName: 'updateSystemInfo' })(
-  async (data) => {
-    return await apiService.put(`${API_PREFIX}/admin/content/system-info`, data);
-  }
-);
+const updateSystemInfoInternal = async (data) => {
+  return await apiService.put(`${API_PREFIX}/admin/content/system-info`, data);
+};
 
-const getActivePopupInternal = autoLog('get_active_popup', { serviceName: 'ContentService', methodName: 'getActivePopup' })(
-  async () => {
-    return await apiService.get(`${API_PREFIX}/popup`);
-  }
-);
+const getActivePopupInternal = async () => {
+  return apiService.get(`${API_PREFIX}/popup`);
+};
 
-const getAllPopupsInternal = autoLog('get_all_popups', { logResultCount: true, serviceName: 'ContentService', methodName: 'getAllPopups' })(
-  async () => {
-    return await apiService.get(`${API_PREFIX}/admin/content/popups`);
-  }
-);
+const getAllPopupsInternal = async () => {
+  return await apiService.get(`${API_PREFIX}/admin/content/popups`);
+};
 
-const getPopupInternal = autoLog('get_popup', { logResourceId: true, serviceName: 'ContentService', methodName: 'getPopup' })(
-  async (popupId) => {
-    return await apiService.get(`${API_PREFIX}/admin/content/popups/${popupId}`);
-  }
-);
+const getPopupInternal = async (popupId) => {
+  return await apiService.get(`${API_PREFIX}/admin/content/popups/${popupId}`);
+};
 
-const createPopupInternal = autoLog('create_popup', { logResourceId: true, serviceName: 'ContentService', methodName: 'createPopup' })(
-  async (data) => {
-    return await apiService.post(`${API_PREFIX}/admin/content/popups`, data);
-  }
-);
+const createPopupInternal = async (data) => {
+  return apiService.post(`${API_PREFIX}/admin/content/popups`, data);
+};
 
-const updatePopupInternal = autoLog('update_popup', { logResourceId: true, serviceName: 'ContentService', methodName: 'updatePopup' })(
-  async (popupId, data) => {
-    return await apiService.put(`${API_PREFIX}/admin/content/popups/${popupId}`, data);
-  }
-);
+const updatePopupInternal = async (popupId, data) => {
+  return await apiService.put(
+    `${API_PREFIX}/admin/content/popups/${popupId}`,
+    data
+  );
+};
 
-const deletePopupInternal = autoLog('delete_popup', { logResourceId: true, serviceName: 'ContentService', methodName: 'deletePopup' })(
-  async (popupId) => {
-    return await apiService.delete(`${API_PREFIX}/admin/content/popups/${popupId}`);
-  }
-);
+const deletePopupInternal = async (popupId) => {
+  return await apiService.delete(
+    `${API_PREFIX}/admin/content/popups/${popupId}`
+  );
+};
 
 export default contentService;
-

@@ -21,6 +21,15 @@ from .schemas import (
     MessageResponse,
     MessageListResponse,
     UnreadCountResponse,
+    ThreadCreate,
+    ThreadMessageCreate,
+    ThreadUpdate,
+    ThreadResponse,
+    ThreadWithMessagesResponse,
+    ThreadMessageResponse,
+    BroadcastCreate,
+    BroadcastResponse,
+    MessageAnalyticsResponse,
 )
 
 router = APIRouter()
@@ -82,6 +91,22 @@ async def get_unread_count(
     """Get unread messages count for admin."""
     count = await service.get_unread_count(current_user["id"])
     return UnreadCountResponse(unread_count=count)
+
+
+@router.get(
+    "/api/admin/messages/analytics",
+    response_model=MessageAnalyticsResponse,
+    tags=["messages", "analytics", "admin"],
+    summary="Get message analytics (admin)",
+)
+@auto_log("get_message_analytics")
+async def get_message_analytics(
+    time_range: str = Query("7d", regex="^(7d|30d|90d|all)$", description="Time range for analytics (7d, 30d, 90d, or all)"),
+    current_user = Depends(get_current_admin_user),
+):
+    """Get message analytics data (admin only)."""
+    analytics = await service.get_analytics(time_range)
+    return MessageAnalyticsResponse(**analytics)
 
 
 @router.get(
@@ -260,4 +285,136 @@ async def delete_member_message(
 ):
     """Delete a message (member only)."""
     await service.delete_message(message_id, current_user.id)
+
+
+# Thread Endpoints
+
+@router.post(
+    "/api/member/messages/threads",
+    response_model=ThreadResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["messages", "threads", "member"],
+    summary="Create message thread (member)",
+)
+@auto_log("create_thread", log_resource_id=True)
+async def create_thread(
+    data: ThreadCreate,
+    current_user: Member = Depends(get_current_member_user),
+):
+    """Create a new message thread (member)."""
+    thread = await service.create_thread(data, current_user.id)
+    return ThreadResponse(**thread)
+
+
+@router.get(
+    "/api/admin/messages/threads/{thread_id}",
+    response_model=ThreadWithMessagesResponse,
+    tags=["messages", "threads", "admin"],
+    summary="Get thread with messages (admin)",
+)
+@auto_log("get_thread", log_resource_id=True)
+async def get_thread(
+    thread_id: UUID,
+    current_user = Depends(get_current_admin_user),
+):
+    """Get thread with all messages (admin)."""
+    result = await service.get_thread_with_messages(thread_id, current_user["id"])
+    return ThreadWithMessagesResponse(
+        thread=ThreadResponse(**result['thread']),
+        messages=[ThreadMessageResponse(**msg) for msg in result['messages']]
+    )
+
+
+@router.get(
+    "/api/member/messages/threads/{thread_id}",
+    response_model=ThreadWithMessagesResponse,
+    tags=["messages", "threads", "member"],
+    summary="Get thread with messages (member)",
+)
+@auto_log("get_member_thread", log_resource_id=True)
+async def get_member_thread(
+    thread_id: UUID,
+    current_user: Member = Depends(get_current_member_user),
+):
+    """Get thread with all messages (member)."""
+    result = await service.get_thread_with_messages(thread_id, current_user.id)
+    return ThreadWithMessagesResponse(
+        thread=ThreadResponse(**result['thread']),
+        messages=[ThreadMessageResponse(**msg) for msg in result['messages']]
+    )
+
+
+@router.post(
+    "/api/admin/messages/threads/{thread_id}/messages",
+    response_model=ThreadMessageResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["messages", "threads", "admin"],
+    summary="Send message in thread (admin)",
+)
+@auto_log("create_thread_message", log_resource_id=True)
+async def create_thread_message(
+    thread_id: UUID,
+    data: ThreadMessageCreate,
+    current_user = Depends(get_current_admin_user),
+):
+    """Send a message in an existing thread (admin)."""
+    message = await service.create_thread_message(thread_id, data, current_user["id"], "admin")
+    return ThreadMessageResponse(**message)
+
+
+@router.post(
+    "/api/member/messages/threads/{thread_id}/messages",
+    response_model=ThreadMessageResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["messages", "threads", "member"],
+    summary="Send message in thread (member)",
+)
+@auto_log("create_member_thread_message", log_resource_id=True)
+async def create_member_thread_message(
+    thread_id: UUID,
+    data: ThreadMessageCreate,
+    current_user: Member = Depends(get_current_member_user),
+):
+    """Send a message in an existing thread (member)."""
+    message = await service.create_thread_message(thread_id, data, current_user.id, "member")
+    return ThreadMessageResponse(**message)
+
+
+@router.put(
+    "/api/admin/messages/threads/{thread_id}",
+    response_model=ThreadResponse,
+    tags=["messages", "threads", "admin"],
+    summary="Update thread (admin)",
+)
+@auto_log("update_thread", log_resource_id=True)
+async def update_thread(
+    thread_id: UUID,
+    data: ThreadUpdate,
+    current_user = Depends(get_current_admin_user),
+):
+    """Update thread status or assignment (admin)."""
+    thread = await service.update_thread(thread_id, data, current_user["id"])
+    return ThreadResponse(**thread)
+
+
+# Broadcast Endpoints
+
+@router.post(
+    "/api/admin/messages/broadcast",
+    response_model=BroadcastResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["messages", "broadcast", "admin"],
+    summary="Send broadcast message (admin)",
+)
+@auto_log("create_broadcast", log_resource_id=True)
+async def create_broadcast(
+    data: BroadcastCreate,
+    current_user = Depends(get_current_admin_user),
+):
+    """Send a broadcast message to multiple members (admin only)."""
+    broadcast = await service.create_broadcast(data, current_user["id"])
+    return BroadcastResponse(**broadcast)
+
+
+# Analytics endpoint moved above to fix route ordering issue
 

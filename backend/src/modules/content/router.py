@@ -524,19 +524,8 @@ async def update_banner_by_key(
         )
         image_url = attachment["file_url"]
     
-    # Find existing banner of this type (统一使用小写)
-    all_banners = await service.get_all_banners()
-    existing_banner = None
-    
-    for banner in all_banners:
-        banner_type_in_db = banner.get('banner_type')
-        # 统一转换为小写后比较
-        if banner_type_in_db:
-            banner_type_in_db = banner_type_in_db.lower()
-        if banner_type_in_db == banner_type:
-            # Prefer active banners, or take the first one
-            if existing_banner is None or banner.get('is_active') == 'true':
-                existing_banner = banner
+    # Find existing banner of this type (optimized: direct query instead of fetching all)
+    existing_banner = await service.get_banner_by_type(banner_type)
     
     # Prepare update data
     if existing_banner:

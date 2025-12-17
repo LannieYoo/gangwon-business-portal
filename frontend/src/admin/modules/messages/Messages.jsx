@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { Card, Tabs } from '@shared/components';
 import MessageList from './MessageList';
 import SendMessage from './SendMessage';
+import BroadcastMessage from './BroadcastMessage';
+import MessageAnalytics from './MessageAnalytics';
 
 export default function Messages() {
   const { t } = useTranslation();
@@ -15,11 +17,19 @@ export default function Messages() {
 
   const tabs = useMemo(() => [
     { key: 'list', label: t('admin.messages.tabs.list', '消息列表') },
-    { key: 'send', label: t('admin.messages.tabs.send', '发送消息') }
+    { key: 'send', label: t('admin.messages.tabs.send', '发送消息') },
+    { key: 'broadcast', label: t('admin.messages.tabs.broadcast', '群发消息') },
+    { key: 'analytics', label: t('admin.messages.tabs.analytics', '消息统计') }
   ], [t]);
 
   return (
     <div className="admin-messages">
+      <div className="mb-6">
+        <h1 className="text-xl md:text-2xl font-semibold text-gray-900 m-0">
+          {t('admin.messages.title', '站内信管理')}
+        </h1>
+      </div>
+
       <Card>
         <Tabs
           tabs={tabs}
@@ -27,9 +37,11 @@ export default function Messages() {
           onChange={setActiveTab}
         />
 
-        <div className="tab-content mt-6">
+        <div className="tab-content mt-6 p-6">
           {activeTab === 'list' && <MessageList />}
           {activeTab === 'send' && <SendMessage />}
+          {activeTab === 'broadcast' && <BroadcastMessage />}
+          {activeTab === 'analytics' && <MessageAnalytics />}
         </div>
       </Card>
     </div>

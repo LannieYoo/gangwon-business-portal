@@ -23,6 +23,7 @@
       "ongoing": "进行中",
       "closed": "已结束"
     },
+    "targetCompany": "目标企业",
     "types": {
       "startup": "创业支持",
       "rd": "R&D支持",

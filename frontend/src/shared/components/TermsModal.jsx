@@ -9,8 +9,8 @@ import { Modal } from './Modal';
 import { Loading } from './Loading';
 import { Alert } from './Alert';
 import contentService from '@shared/services/content.service';
-import loggerService from '@shared/services/logger.service';
-import exceptionService from '@shared/services/exception.service';
+import { loggerService } from '@shared/utils/loggerHandler';
+import { exceptionService } from '@shared/utils/errorHandler';
 import { cn } from '@shared/utils/helpers';
 
 /**

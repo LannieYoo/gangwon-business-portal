@@ -35,6 +35,7 @@ class PerformanceService:
             quarter=query.quarter,
             status=query.status,
             type=query.type,
+            search_keyword=query.search_keyword,
             page=query.page,
             page_size=query.page_size,
             order_by="created_at",
@@ -212,17 +213,20 @@ class PerformanceService:
         Returns:
             Tuple of (performance records list, total count)
         """
+        # 现在 list_performance_records_with_filters 已经包含了 member 信息的批量获取
         records, total = await supabase_service.list_performance_records_with_filters(
             member_id=str(query.member_id) if query.member_id else None,
             year=query.year,
             quarter=query.quarter,
             status=query.status,
             type=query.type,
+            search_keyword=query.search_keyword,
             page=query.page,
             page_size=query.page_size,
-            order_by="submitted_at",
+            order_by="updated_at",  # 按更新时间倒序，最新的在前面
             order_desc=True,
         )
+        
         return records, total
 
     async def get_performance_by_id_admin(
@@ -235,7 +239,7 @@ class PerformanceService:
             performance_id: Performance record UUID
 
         Returns:
-            Performance record dict
+            Performance record dict with attachments and reviews
 
         Raises:
             NotFoundError: If record not found
@@ -244,6 +248,16 @@ class PerformanceService:
 
         if not record:
             raise NotFoundError("Performance record")
+
+        # Get attachments from Attachment table
+        attachments = await supabase_service.get_attachments_by_resource(
+            'performance', str(performance_id)
+        )
+        record['attachments'] = attachments
+
+        # Get reviews
+        reviews = await supabase_service.get_performance_reviews_by_performance_id(str(performance_id))
+        record['reviews'] = reviews
 
         return record
 

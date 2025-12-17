@@ -55,14 +55,39 @@ export default function LineChart({
       ...grid
     };
 
+    // 计算 x 轴标签显示间隔
+    // 当数据点过多时，自动调整间隔以避免标签拥挤
+    const calculateInterval = () => {
+      const maxLabels = 15; // 最多显示 15 个标签
+      if (categories.length <= maxLabels) {
+        return 0; // 显示所有标签
+      }
+      // 计算间隔：每隔 N 个显示一个标签，确保不超过 maxLabels
+      return Math.ceil(categories.length / maxLabels) - 1;
+    };
+
+    // 计算标签旋转角度
+    // 数据点越多，旋转角度越大，以便更好地显示标签
+    const calculateRotate = () => {
+      if (categories.length <= 6) {
+        return 0;
+      } else if (categories.length <= 15) {
+        return 45;
+      } else if (categories.length <= 30) {
+        return 60;
+      } else {
+        return 75;
+      }
+    };
+
     // 默认 X 轴配置
     const defaultXAxis = {
       type: 'category',
       boundaryGap: false,
       data: categories,
       axisLabel: {
-        rotate: categories.length > 6 ? 45 : 0,
-        interval: 0,
+        rotate: calculateRotate(),
+        interval: calculateInterval(),
         ...xAxis.axisLabel
       },
       ...xAxis

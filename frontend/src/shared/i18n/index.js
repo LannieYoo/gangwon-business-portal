@@ -47,8 +47,6 @@ import adminProjectsKo from '@admin/modules/projects/locales/ko.json';
 import adminProjectsZh from '@admin/modules/projects/locales/zh.json';
 import adminContentKo from '@admin/modules/content/locales/ko.json';
 import adminContentZh from '@admin/modules/content/locales/zh.json';
-import adminSettingsKo from '@admin/modules/settings/locales/ko.json';
-import adminSettingsZh from '@admin/modules/settings/locales/zh.json';
 import adminReportsKo from '@admin/modules/reports/locales/ko.json';
 import adminReportsZh from '@admin/modules/reports/locales/zh.json';
 import adminAuthKo from '@admin/modules/auth/locales/ko.json';
@@ -111,7 +109,6 @@ const adminKo = mergeModules(
   adminPerformanceKo,
   adminProjectsKo,
   adminContentKo,
-  adminSettingsKo,
   adminReportsKo,
   adminAuthKo
 );
@@ -123,7 +120,6 @@ const adminZh = mergeModules(
   adminPerformanceZh,
   adminProjectsZh,
   adminContentZh,
-  adminSettingsZh,
   adminReportsZh,
   adminAuthZh
 );

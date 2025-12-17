@@ -7,11 +7,13 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination } from '@shared/components';
-import { adminService, loggerService, exceptionService } from '@shared/services';
+import { adminService } from '@shared/services';
+import { formatDate } from '@shared/utils/format';
 
 export default function MemberList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const currentLanguage = i18n.language === 'zh' ? 'zh' : 'ko';
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('companyName');
@@ -23,57 +25,28 @@ export default function MemberList() {
 
   const loadMembers = useCallback(async () => {
     setLoading(true);
-    try {
-      loggerService.info('Loading members', {
-        module: 'MemberList',
-        function: 'loadMembers',
-        page: currentPage,
-        pageSize: pageSize,
-        statusFilter: statusFilter
-      });
-      const params = {
-        page: currentPage,
-        pageSize: pageSize,
-        approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
-        search: searchTerm || undefined
-      };
-      const response = await adminService.listMembers(params);
-      
-      if (response) {
-        if (response.members && Array.isArray(response.members)) {
-          setMembers(response.members);
-          const total = response.pagination?.total || response.total || 0;
-          setTotalCount(total);
-          loggerService.info('Members loaded successfully', {
-            module: 'MemberList',
-            function: 'loadMembers',
-            count: response.members.length,
-            total: total
-          });
-        } else {
-          setMembers([]);
-          setTotalCount(response.pagination?.total || response.total || 0);
-        }
+    const params = {
+      page: currentPage,
+      pageSize: pageSize,
+      approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
+      search: searchTerm || undefined
+    };
+    const response = await adminService.listMembers(params);
+    
+    if (response) {
+      if (response.members && Array.isArray(response.members)) {
+        setMembers(response.members);
+        const total = response.pagination?.total || response.total || 0;
+        setTotalCount(total);
       } else {
         setMembers([]);
-        setTotalCount(0);
+        setTotalCount(response.pagination?.total || response.total || 0);
       }
-    } catch (error) {
-      loggerService.error('Failed to load members', {
-        module: 'MemberList',
-        function: 'loadMembers',
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'LOAD_MEMBERS_ERROR'
-      });
-      // Error logged, no alert needed
-      console.error('Load members failed:', error);
-    } finally {
-      setLoading(false);
+    } else {
+      setMembers([]);
+      setTotalCount(0);
     }
+    setLoading(false);
   }, [currentPage, pageSize, statusFilter, searchTerm, t]);
 
   useEffect(() => {
@@ -85,74 +58,19 @@ export default function MemberList() {
   }, []);
 
   const handleExport = useCallback(async (format = 'excel') => {
-    try {
-      setLoading(true);
-      loggerService.info('Exporting members', {
-        module: 'MemberList',
-        function: 'handleExport',
-        format: format
-      });
-      const params = {
-        format,
-        approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
-        search: searchTerm || undefined
-      };
-      await adminService.exportMembers(params);
-      loggerService.info('Members exported successfully', {
-        module: 'MemberList',
-        function: 'handleExport',
-        format: format
-      });
-      // Export successful, file will download automatically
-    } catch (error) {
-      loggerService.error('Failed to export members', {
-        module: 'MemberList',
-        function: 'handleExport',
-        format: format,
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'EXPORT_MEMBERS_ERROR'
-      });
-      // Error logged, no alert needed
-      console.error('Export failed:', error);
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const params = {
+      format,
+      approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
+      search: searchTerm || undefined
+    };
+    await adminService.exportMembers(params);
+    setLoading(false);
   }, [statusFilter, searchTerm, t]);
 
   const handleApprove = useCallback(async (memberId) => {
-    try {
-      loggerService.info('Approving member', {
-        module: 'MemberList',
-        function: 'handleApprove',
-        member_id: memberId
-      });
-      await adminService.approveMember(memberId);
-      loggerService.info('Member approved successfully', {
-        module: 'MemberList',
-        function: 'handleApprove',
-        member_id: memberId
-      });
-      loadMembers();
-      // Approval successful
-    } catch (error) {
-      loggerService.error('Failed to approve member', {
-        module: 'MemberList',
-        function: 'handleApprove',
-        member_id: memberId,
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'APPROVE_MEMBER_ERROR'
-      });
-      // Error logged, no alert needed
-      console.error('Approve failed:', error);
-    }
+    await adminService.approveMember(memberId);
+    loadMembers();
   }, [loadMembers, t]);
 
   const handleViewDetail = useCallback((memberId) => {
@@ -199,6 +117,13 @@ export default function MemberList() {
         key: 'industry',
         label: t('admin.members.table.industry'),
         width: '120px'
+      },
+      {
+        key: 'createdAt',
+        label: t('admin.members.table.createdAt'),
+        sortable: true,
+        width: '140px',
+        render: (value) => formatDate(value, 'yyyy-MM-dd', currentLanguage)
       },
       {
         key: 'approvalStatus',
@@ -312,7 +237,6 @@ export default function MemberList() {
                 <Table 
                   columns={columns} 
                   data={members}
-                  onRowClick={(row) => handleViewDetail(row.id)}
                 />
               </div>
               {totalCount > 0 && (

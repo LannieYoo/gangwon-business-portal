@@ -55,6 +55,7 @@ class PerformanceRecordResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     reviews: list[PerformanceReviewResponse] = Field(default_factory=list)
+    attachments: list[dict[str, Any]] = Field(default_factory=list)
 
     class Config:
         from_attributes = True
@@ -89,6 +90,8 @@ class PerformanceListItem(BaseModel):
     submitted_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
+    member_company_name: Optional[str] = None
+    member_business_number: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -104,6 +107,7 @@ class PerformanceListQuery(BaseModel):
     status: Optional[str] = Field(None, description="Filter by status")
     type: Optional[str] = Field(None, description="Filter by type (sales/support/ip)")
     member_id: Optional[UUID] = Field(None, description="Filter by member (admin only)")
+    search_keyword: Optional[str] = Field(None, description="Search keyword for company name, business number, or year")
 
 
 class PerformanceListResponsePaginated(BaseModel):

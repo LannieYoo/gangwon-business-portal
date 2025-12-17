@@ -9,7 +9,6 @@ from .service import NiceDnBClient, nice_dnb_client
 from .schemas import (
     NiceDnBCompanyData,
     NiceDnBFinancialData,
-    NiceDnBInsight,
     NiceDnBResponse,
 )
 
@@ -18,7 +17,6 @@ __all__ = [
     "nice_dnb_client",
     "NiceDnBCompanyData",
     "NiceDnBFinancialData",
-    "NiceDnBInsight",
     "NiceDnBResponse",
 ]
 

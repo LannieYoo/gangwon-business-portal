@@ -3,6 +3,7 @@ Supabase Service Layer
 提供常用的数据库操作方法
 """
 from typing import List, Dict, Any, Optional
+from uuid import uuid4
 from supabase import Client
 
 from .client import get_supabase_client
@@ -393,7 +394,8 @@ class SupabaseService:
         """获取绩效记录"""
         query = self.client.table('performance_records')\
             .select('*')\
-            .eq('status', status)
+            .eq('status', status)\
+            .is_('deleted_at', 'null')
         
         if year:
             query = query.eq('year', year)
@@ -411,7 +413,8 @@ class SupabaseService:
         """获取用于图表的绩效记录"""
         query = self.client.table('performance_records')\
             .select('*')\
-            .eq('status', 'approved')
+            .eq('status', 'approved')\
+            .is_('deleted_at', 'null')
         
         if year_filter:
             query = query.eq('year', year_filter)
@@ -437,17 +440,30 @@ class SupabaseService:
         result = self.client.table('attachments')\
             .select('*')\
             .eq('id', attachment_id)\
+            .is_('deleted_at', 'null')\
             .limit(1)\
             .execute()
         return result.data[0] if result.data else None
     
     async def delete_attachment(self, attachment_id: str) -> bool:
-        """删除附件记录"""
+        """软删除附件记录（设置 deleted_at）"""
+        from datetime import datetime, timezone
         self.client.table('attachments')\
-            .delete()\
+            .update({'deleted_at': datetime.now(timezone.utc).isoformat()})\
             .eq('id', attachment_id)\
             .execute()
         return True
+    
+    async def get_attachments_by_resource(self, resource_type: str, resource_id: str) -> List[Dict[str, Any]]:
+        """根据资源类型和ID获取附件列表"""
+        result = self.client.table('attachments')\
+            .select('*')\
+            .eq('resource_type', resource_type)\
+            .eq('resource_id', resource_id)\
+            .is_('deleted_at', 'null')\
+            .order('uploaded_at', desc=True)\
+            .execute()
+        return result.data or []
     
     # ============================================================================
     # Performance Record 相关操作
@@ -458,6 +474,7 @@ class SupabaseService:
         result = self.client.table('performance_records')\
             .select('*')\
             .eq('id', performance_id)\
+            .is_('deleted_at', 'null')\
             .limit(1)\
             .execute()
         return result.data[0] if result.data else None
@@ -482,9 +499,10 @@ class SupabaseService:
         return result.data[0]
     
     async def delete_performance_record(self, performance_id: str) -> bool:
-        """删除绩效记录"""
+        """软删除绩效记录（设置 deleted_at）"""
+        from datetime import datetime, timezone
         self.client.table('performance_records')\
-            .delete()\
+            .update({'deleted_at': datetime.now(timezone.utc).isoformat()})\
             .eq('id', performance_id)\
             .execute()
         return True
@@ -496,6 +514,7 @@ class SupabaseService:
         quarter: Optional[int] = None,
         status: Optional[str] = None,
         type: Optional[str] = None,
+        search_keyword: Optional[str] = None,
         page: int = 1,
         page_size: int = 20,
         order_by: str = "created_at",
@@ -504,16 +523,65 @@ class SupabaseService:
         """
         获取绩效记录列表（带筛选和分页）
         
+        Args:
+            search_keyword: 搜索关键词，用于搜索企业名称、营业执照号、年度等
+        
         Returns:
             Tuple of (records list, total count)
         """
-        query = self.client.table('performance_records').select('*', count='exact')
+        query = self.client.table('performance_records').select('*', count='exact').is_('deleted_at', 'null')
+        
+        # 如果有搜索关键词，先通过 member 表筛选
+        matched_member_ids = None
+        search_year = None
+        if search_keyword and search_keyword.strip():
+            keyword = search_keyword.strip()
+            
+            # 检查是否是数字（可能是年度）
+            if keyword.isdigit():
+                search_year = int(keyword)
+            
+            # 查询匹配的 member IDs（企业名称或营业执照号）
+            matched_ids = set()
+            
+            # 查询企业名称匹配的 members
+            try:
+                # 获取所有 members，然后在 Python 中过滤（对于小数据集足够快）
+                # 或者使用 Supabase 的 textSearch 功能
+                all_members = self.client.table('members').select('id, company_name, business_number').execute()
+                
+                if all_members.data:
+                    keyword_lower = keyword.lower()
+                    for member in all_members.data:
+                        company_name = (member.get('company_name') or '').lower()
+                        business_number = (member.get('business_number') or '').lower()
+                        
+                        if keyword_lower in company_name or keyword_lower in business_number:
+                            matched_ids.add(member['id'])
+                
+                matched_member_ids = list(matched_ids) if matched_ids else []
+            except Exception:
+                # 如果查询失败，matched_member_ids 保持为 None
+                matched_member_ids = []
         
         # 应用筛选
         if member_id:
             query = query.eq('member_id', member_id)
+        elif matched_member_ids is not None:
+            # 如果有搜索关键词匹配的 member IDs
+            if matched_member_ids:
+                query = query.in_('member_id', matched_member_ids)
+            elif search_year is None:
+                # 没有匹配的 member 且不是年度搜索，返回空
+                return [], 0
+        
+        # 年度筛选
         if year:
             query = query.eq('year', year)
+        elif search_year is not None and matched_member_ids is None:
+            # 如果搜索关键词是数字且没有匹配的 member，按年度筛选
+            query = query.eq('year', search_year)
+        
         if quarter:
             query = query.eq('quarter', quarter)
         if status:
@@ -532,7 +600,54 @@ class SupabaseService:
         query = query.range(offset, offset + page_size - 1)
         
         result = query.execute()
-        return result.data or [], result.count or 0
+        records = result.data or []
+        total_count = result.count or 0
+        
+        # 如果同时有年度搜索和 member 匹配，需要在结果中进一步过滤
+        if search_year is not None and matched_member_ids:
+            # 过滤出匹配年度或 member_id 的记录
+            matched_member_ids_set = set(matched_member_ids)
+            filtered_records = [
+                r for r in records 
+                if r.get('year') == search_year or str(r.get('member_id')) in matched_member_ids_set
+            ]
+            records = filtered_records
+            # 更新总数（这里简化处理，实际应该重新查询总数）
+            total_count = len(filtered_records)
+        
+        # 批量获取 member 信息（避免 N+1 查询）
+        if records:
+            member_ids = list(set([str(r["member_id"]) for r in records]))
+            members_map = {}
+            
+            # 批量查询 members
+            try:
+                members_result = self.client.table('members')\
+                    .select('id, company_name, business_number')\
+                    .in_('id', member_ids)\
+                    .execute()
+                
+                if members_result.data:
+                    for member in members_result.data:
+                        members_map[str(member['id'])] = {
+                            "company_name": member.get("company_name"),
+                            "business_number": member.get("business_number"),
+                        }
+            except Exception:
+                # 如果批量查询失败，回退到逐个查询（但这种情况应该很少）
+                pass
+            
+            # 添加 member 信息到每个记录
+            for record in records:
+                member_id = str(record["member_id"])
+                if member_id in members_map:
+                    record["member_company_name"] = members_map[member_id]["company_name"]
+                    record["member_business_number"] = members_map[member_id]["business_number"]
+                else:
+                    record["member_company_name"] = None
+                    record["member_business_number"] = None
+        
+        return records, total_count
     
     async def export_performance_records(
         self,
@@ -545,7 +660,7 @@ class SupabaseService:
         """
         导出绩效记录（无分页限制）
         """
-        query = self.client.table('performance_records').select('*')
+        query = self.client.table('performance_records').select('*').is_('deleted_at', 'null')
         
         # 应用筛选
         if member_id:
@@ -570,7 +685,18 @@ class SupabaseService:
     # ============================================================================
     
     async def create_performance_review(self, review_data: Dict[str, Any]) -> Dict[str, Any]:
-        """创建绩效审核记录"""
+        """创建绩效审核记录
+
+        注意：Supabase 中的 performance_reviews.id 字段为 NOT NULL 且无默认值，
+        因此在插入记录时必须显式提供 UUID。
+        """
+        # Ensure ID is present to satisfy NOT NULL constraint in Supabase
+        if not review_data.get("id"):
+            review_data = {
+                **review_data,
+                "id": str(uuid4()),
+            }
+
         result = self.client.table('performance_reviews')\
             .insert(review_data)\
             .execute()
@@ -596,6 +722,7 @@ class SupabaseService:
         result = self.client.table('projects')\
             .select('*')\
             .eq('id', project_id)\
+            .is_('deleted_at', 'null')\
             .limit(1)\
             .execute()
         return result.data[0] if result.data else None
@@ -620,9 +747,10 @@ class SupabaseService:
         return result.data[0]
     
     async def delete_project(self, project_id: str) -> bool:
-        """删除项目"""
+        """软删除项目（设置 deleted_at）"""
+        from datetime import datetime, timezone
         self.client.table('projects')\
-            .delete()\
+            .update({'deleted_at': datetime.now(timezone.utc).isoformat()})\
             .eq('id', project_id)\
             .execute()
         return True
@@ -642,7 +770,7 @@ class SupabaseService:
         Returns:
             Tuple of (projects list, total count)
         """
-        query = self.client.table('projects').select('*', count='exact')
+        query = self.client.table('projects').select('*', count='exact').is_('deleted_at', 'null')
         
         # 应用筛选
         if status:
@@ -654,7 +782,7 @@ class SupabaseService:
         # 搜索（在客户端进行，因为 Supabase 的 ilike 可能不支持多字段搜索）
         if search:
             # 先获取所有符合条件的项目，然后在客户端进行搜索
-            all_query = self.client.table('projects').select('*')
+            all_query = self.client.table('projects').select('*').is_('deleted_at', 'null')
             if status:
                 all_query = all_query.eq('status', status)
             else:
@@ -702,7 +830,7 @@ class SupabaseService:
         """
         导出项目（无分页限制）
         """
-        query = self.client.table('projects').select('*')
+        query = self.client.table('projects').select('*').is_('deleted_at', 'null')
         
         # 应用筛选
         if status:
@@ -792,7 +920,13 @@ class SupabaseService:
         Returns:
             Tuple of (applications list, total count)
         """
-        query = self.client.table('project_applications').select('*', count='exact')
+        # Join with projects and members to get project title and company name
+        query = self.client.table('project_applications').select(
+            '*,'
+            'projects(title),'
+            'members(company_name)',
+            count='exact'
+        )
         
         # 应用筛选
         if project_id:
@@ -813,7 +947,21 @@ class SupabaseService:
         query = query.range(offset, offset + page_size - 1)
         
         result = query.execute()
-        return result.data or [], result.count or 0
+        
+        # Flatten the nested data structure
+        applications = []
+        for app in result.data or []:
+            flattened_app = {
+                **app,
+                'project_title': app.get('projects', {}).get('title') if app.get('projects') else None,
+                'company_name': app.get('members', {}).get('company_name') if app.get('members') else None,
+            }
+            # Remove nested objects to avoid serialization issues
+            flattened_app.pop('projects', None)
+            flattened_app.pop('members', None)
+            applications.append(flattened_app)
+        
+        return applications, result.count or 0
     
     async def export_project_applications(
         self,

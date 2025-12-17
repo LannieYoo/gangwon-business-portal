@@ -1,12 +1,17 @@
 /**
  * Rich Text Editor Component
  * 富文本编辑器组件
+ * 
+ * Uses React Quill for rich text editing
+ * 使用 React Quill 富文本编辑器
  */
 
-import { useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { cn } from '@shared/utils/helpers';
+import uploadService from '@shared/services/upload.service';
+import './RichTextEditor.css';
 
 export const RichTextEditor = ({
   label,
@@ -17,31 +22,81 @@ export const RichTextEditor = ({
   onChange,
   className,
   placeholder,
+  height,
   ...props
 }) => {
   const quillRef = useRef(null);
+  const editorHeight = height || 300;
 
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [{ 'font': [] }],
-      [{ 'size': [] }],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'align': [] }],
-      ['link', 'image'],
-      ['clean']
-    ],
+  // 自定义图片上传处理器
+  const imageHandler = () => {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      // 验证文件大小（最大 10MB）
+      if (file.size > 10 * 1024 * 1024) {
+        alert('图片大小不能超过10MB');
+        return;
+      }
+
+      try {
+        // 上传图片
+        const response = await uploadService.uploadPublic(file);
+        
+        if (response && response.file_url) {
+          const quill = quillRef.current?.getEditor();
+          if (quill) {
+            const range = quill.getSelection(true);
+            quill.insertEmbed(range.index, 'image', response.file_url);
+            quill.setSelection(range.index + 1);
+          }
+        } else {
+          alert('图片上传失败，请重试');
+        }
+      } catch (err) {
+        console.error('Image upload error:', err);
+        alert(err.message || '图片上传失败，请重试');
+      }
+    };
   };
 
+  // Quill 模块配置
+  const modules = useMemo(() => ({
+    toolbar: {
+      container: [
+        [{ 'header': [1, 2, 3, 4, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        ['blockquote', 'code-block'],
+        ['link', 'image', 'video'],
+        ['clean']
+      ],
+      handlers: {
+        image: imageHandler,
+      },
+    },
+    clipboard: {
+      matchVisual: false,
+    },
+  }), []);
+
+  // Quill 格式化配置
   const formats = [
-    'header', 'font', 'size',
-    'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'list', 'bullet', 'indent',
+    'header',
+    'bold', 'italic', 'underline', 'strike',
     'color', 'background',
+    'list', 'bullet',
     'align',
-    'link', 'image'
+    'blockquote', 'code-block',
+    'link', 'image', 'video',
   ];
 
   return (
@@ -54,21 +109,13 @@ export const RichTextEditor = ({
           {label}
         </label>
       )}
-      <div className={cn(
-        'bg-white rounded',
-        '[&_.quill]:bg-white',
-        '[&_.ql-container]:rounded-b',
-        '[&_.ql-container]:text-sm',
-        '[&_.ql-container]:min-h-[200px]',
-        '[&_.ql-editor]:min-h-[200px]',
-        '[&_.ql-toolbar]:rounded-t',
-        '[&_.ql-toolbar]:border-b',
-        '[&_.ql-toolbar]:border-gray-200',
-        '[&_.ql-editor.ql-blank::before]:text-gray-400',
-        '[&_.ql-editor.ql-blank::before]:not-italic',
-        error && '[&_.ql-container]:border-red-500 [&_.ql-toolbar]:border-red-500 [&_.ql-container:focus-within]:border-red-500 [&_.ql-toolbar:focus-within]:border-red-500 [&_.ql-container:focus-within]:ring-2 [&_.ql-toolbar:focus-within]:ring-2 [&_.ql-container:focus-within]:ring-red-500/10 [&_.ql-toolbar:focus-within]:ring-red-500/10',
-        className
-      )}>
+      <div 
+        className={cn(
+          'bg-white rounded border border-gray-300 overflow-hidden',
+          error && 'border-red-500 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/10',
+          className
+        )}
+      >
         <ReactQuill
           ref={quillRef}
           theme="snow"
@@ -76,8 +123,9 @@ export const RichTextEditor = ({
           onChange={onChange}
           modules={modules}
           formats={formats}
-          placeholder={placeholder}
-          {...props}
+          placeholder={placeholder || '输入内容...'}
+          style={{ height: `${editorHeight}px` }}
+          className="rich-text-editor-quill"
         />
       </div>
       {error && (
@@ -91,4 +139,3 @@ export const RichTextEditor = ({
 };
 
 export default RichTextEditor;
-

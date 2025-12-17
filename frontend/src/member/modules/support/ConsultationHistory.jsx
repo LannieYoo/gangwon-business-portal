@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Card from '@shared/components/Card';
+import { Badge } from '@shared/components';
 import { supportService, contentService, loggerService, exceptionService } from '@shared/services';
 import { BANNER_TYPES } from '@shared/utils/constants';
 
@@ -118,9 +119,9 @@ export default function ConsultationHistory() {
               <div className="p-6 flex flex-col flex-1 bg-gradient-to-b from-white to-gray-50">
                 <div className="flex justify-between items-start gap-4 mb-4 md:flex-col md:items-start md:gap-3">
                   <h2 className="flex-1 m-0 text-xl font-bold text-gray-900 leading-tight line-clamp-2">{inquiry.subject || inquiry.title}</h2>
-                  <span className={`inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap shadow-sm transition-all duration-200 ${inquiry.status === 'answered' ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-200' : 'bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border border-amber-200'}`}>
+                  <Badge variant={inquiry.status === 'answered' ? 'success' : 'warning'}>
                     {t(`support.status.${inquiry.status}`)}
-                  </span>
+                  </Badge>
                 </div>
                 <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600 md:flex-col md:gap-2">
                   <span className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg">{t('support.createdDate')}: {inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleDateString() : ''}</span>

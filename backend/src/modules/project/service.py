@@ -158,7 +158,8 @@ class ProjectService:
         project_data = {
             "title": data.title,
             "description": data.description,
-            "target_audience": data.target_audience,
+            "target_company_name": data.target_company_name,
+            "target_business_number": data.target_business_number,
             "start_date": data.start_date.isoformat() if data.start_date else None,
             "end_date": data.end_date.isoformat() if data.end_date else None,
             "image_url": data.image_url,
@@ -190,8 +191,10 @@ class ProjectService:
             update_data["title"] = data.title
         if data.description is not None:
             update_data["description"] = data.description
-        if data.target_audience is not None:
-            update_data["target_audience"] = data.target_audience
+        if data.target_company_name is not None:
+            update_data["target_company_name"] = data.target_company_name
+        if data.target_business_number is not None:
+            update_data["target_business_number"] = data.target_business_number
         if data.start_date is not None:
             update_data["start_date"] = data.start_date.isoformat()
         if data.end_date is not None:
@@ -239,6 +242,29 @@ class ProjectService:
 
         applications, total = await supabase_service.list_project_applications_with_filters(
             project_id=str(project_id),
+            status=query.status.value if query.status else None,
+            page=query.page,
+            page_size=query.page_size,
+            order_by="submitted_at",
+            order_desc=True,
+        )
+        return applications, total
+
+    async def list_all_applications(
+        self, query: ApplicationListQuery, project_id: Optional[UUID] = None
+    ) -> tuple[list[dict], int]:
+        """
+        List all applications across all projects (admin only).
+
+        Args:
+            query: Query parameters for filtering and pagination
+            project_id: Optional project ID to filter by
+
+        Returns:
+            Tuple of (applications list, total count)
+        """
+        applications, total = await supabase_service.list_project_applications_with_filters(
+            project_id=str(project_id) if project_id else None,
             status=query.status.value if query.status else None,
             page=query.page,
             page_size=query.page_size,
@@ -303,7 +329,8 @@ class ProjectService:
                 "id": str(project["id"]),
                 "title": project["title"],
                 "description": project["description"],
-                "target_audience": project["target_audience"],
+                "target_company_name": project["target_company_name"],
+                "target_business_number": project["target_business_number"],
                 "start_date": project.get("start_date"),
                 "end_date": project.get("end_date"),
                 "image_url": project.get("image_url"),

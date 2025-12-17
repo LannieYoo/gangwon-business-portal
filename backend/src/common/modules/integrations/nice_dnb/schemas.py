@@ -17,16 +17,6 @@ class NiceDnBFinancialData(BaseModel):
     employees: int = Field(..., description="Number of employees")
 
 
-class NiceDnBInsight(BaseModel):
-    """Business insight or metric."""
-
-    label: str = Field(..., description="Insight label (e.g., '수출 비중')")
-    value: str = Field(..., description="Insight value (e.g., '45%')")
-    trend: str = Field(
-        ..., description="Trend indicator: 'up', 'down', or 'steady'"
-    )
-
-
 class NiceDnBCompanyData(BaseModel):
     """Company basic information from Nice D&B."""
 
@@ -36,11 +26,29 @@ class NiceDnBCompanyData(BaseModel):
     address: Optional[str] = Field(None, description="Company address")
     industry: Optional[str] = Field(None, description="Industry sector")
     established_date: Optional[date] = Field(None, description="Date of establishment")
-    credit_grade: Optional[str] = Field(None, description="Credit grade (e.g., 'A+', 'A', 'B+')")
-    risk_level: Optional[str] = Field(
-        None, description="Risk level: 'low', 'moderate', or 'caution'"
-    )
-    summary: Optional[str] = Field(None, description="Company summary or evaluation")
+    credit_grade: Optional[str] = Field(None, description="Credit grade (e.g., 'A+', 'A', 'B+', 'B3', 'C2')")
+    
+    # Additional fields from API
+    legal_number: Optional[str] = Field(None, description="Legal entity number (corpNo)")
+    company_name_en: Optional[str] = Field(None, description="Company name in English")
+    phone: Optional[str] = Field(None, description="Phone number")
+    fax: Optional[str] = Field(None, description="Fax number")
+    email: Optional[str] = Field(None, description="Email address")
+    zip_code: Optional[str] = Field(None, description="Zip code")
+    company_scale: Optional[str] = Field(None, description="Company scale (e.g., 중소기업)")
+    company_type: Optional[str] = Field(None, description="Company type (e.g., 일반)")
+    main_business: Optional[str] = Field(None, description="Main business activities")
+    industry_code: Optional[str] = Field(None, description="Industry code")
+    employee_count: Optional[int] = Field(None, description="Number of employees")
+    employee_count_date: Optional[str] = Field(None, description="Employee count reference date (YYYYMM)")
+    credit_date: Optional[str] = Field(None, description="Credit evaluation date (YYYYMMDD)")
+    
+    # Financial fields (in thousands of KRW)
+    sales_amount: Optional[int] = Field(None, description="Sales amount (in thousands of KRW)")
+    operating_profit: Optional[int] = Field(None, description="Operating profit (in thousands of KRW)")
+    shareholder_equity: Optional[int] = Field(None, description="Shareholder equity (in thousands of KRW)")
+    debt_amount: Optional[int] = Field(None, description="Debt amount (in thousands of KRW)")
+    asset_amount: Optional[int] = Field(None, description="Asset amount (in thousands of KRW)")
 
 
 class NiceDnBResponse(BaseModel):
@@ -49,10 +57,7 @@ class NiceDnBResponse(BaseModel):
     success: bool = Field(True, description="Whether the request was successful")
     data: NiceDnBCompanyData = Field(..., description="Company basic information")
     financials: List[NiceDnBFinancialData] = Field(
-        default_factory=list, description="Financial data by year"
-    )
-    insights: List[NiceDnBInsight] = Field(
-        default_factory=list, description="Business insights and metrics"
+        default_factory=list, description="Financial data by year (constructed from single record)"
     )
 
 

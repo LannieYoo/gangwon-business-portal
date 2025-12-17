@@ -5,65 +5,36 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, Button, Badge, Alert, Pagination } from '@shared/components';
-import { messageService, loggerService, exceptionService } from '@shared/services';
+import { Card, Button, Badge, Alert, Pagination, Modal, ModalFooter } from '@shared/components';
+import { messageService } from '@shared/services';
 
 export default function MessageList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(20);
-  const [filter, setFilter] = useState('all'); // all, unread, read, important
+  const [filter, setFilter] = useState('all'); // all, unread, read
   const [message, setMessage] = useState(null);
   const [messageVariant, setMessageVariant] = useState('success');
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, messageId: null });
 
   const loadMessages = useCallback(async () => {
     setLoading(true);
-    try {
-      loggerService.info('Loading messages', {
-        module: 'MessageList',
-        function: 'loadMessages',
-        page: currentPage,
-        filter: filter
-      });
-      
-      const params = {
-        page: currentPage,
-        pageSize: pageSize,
-        isRead: filter === 'read' ? true : filter === 'unread' ? false : undefined,
-        isImportant: filter === 'important' ? true : undefined,
-      };
-      
-      const response = await messageService.getMessages(params);
-      setMessages(response.items || []);
-      setTotalCount(response.total || 0);
-      setUnreadCount(response.unreadCount || 0);
-      
-      loggerService.info('Messages loaded successfully', {
-        module: 'MessageList',
-        function: 'loadMessages',
-        count: response.items?.length || 0
-      });
-    } catch (error) {
-      loggerService.error('Failed to load messages', {
-        module: 'MessageList',
-        function: 'loadMessages',
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'LOAD_MESSAGES_ERROR'
-      });
-      setMessageVariant('error');
-      setMessage(error?.response?.data?.detail || error?.message || t('admin.messages.loadFailed', '加载消息失败'));
-    } finally {
-      setLoading(false);
-    }
+    const params = {
+      page: currentPage,
+      pageSize: pageSize,
+      isRead: filter === 'read' ? true : filter === 'unread' ? false : undefined,
+    };
+    
+    const response = await messageService.getMessages(params);
+    setMessages(response.items || []);
+    setTotalCount(response.total || 0);
+    setUnreadCount(response.unreadCount || 0);
+    setLoading(false);
   }, [currentPage, filter, pageSize, t]);
 
   useEffect(() => {
@@ -72,80 +43,85 @@ export default function MessageList() {
 
   const handleMessageClick = (msg) => {
     setSelectedMessage(msg);
-    // Mark as read if unread
+    // Mark as read if unread - update locally without reloading
     if (!msg.isRead) {
-      handleMarkAsRead(msg.id);
+      handleMarkAsRead(msg.id, msg);
     }
   };
 
-  const handleMarkAsRead = async (messageId) => {
-    try {
-      await messageService.updateMessage(messageId, { isRead: true });
-      await loadMessages();
-      setMessageVariant('success');
-      setMessage(t('admin.messages.markedAsRead', '已标记为已读'));
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      loggerService.error('Failed to mark message as read', {
-        module: 'MessageList',
-        function: 'handleMarkAsRead',
-        error_message: error.message
-      });
-    }
-  };
-
-  const handleDelete = async (messageId) => {
-    if (!window.confirm(t('admin.messages.confirmDelete', '确定要删除这条消息吗？'))) {
-      return;
+  const handleMarkAsRead = async (messageId, messageData = null) => {
+    // Update locally first for instant UI feedback
+    if (messageData) {
+      setMessages(prev => prev.map(msg => 
+        msg.id === messageId 
+          ? { ...msg, isRead: true, readAt: new Date().toISOString() }
+          : msg
+      ));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+      if (selectedMessage?.id === messageId) {
+        setSelectedMessage(prev => prev ? { ...prev, isRead: true, readAt: new Date().toISOString() } : null);
+      }
     }
     
-    try {
-      await messageService.deleteMessage(messageId);
-      await loadMessages();
-      if (selectedMessage?.id === messageId) {
-        setSelectedMessage(null);
+    // Update on server in background (don't wait for it)
+    messageService.updateMessage(messageId, { isRead: true }).catch(() => {
+      // Revert on error
+      if (messageData) {
+        setMessages(prev => prev.map(msg => 
+          msg.id === messageId ? messageData : msg
+        ));
+        setUnreadCount(prev => prev + 1);
       }
-      setMessageVariant('success');
-      setMessage(t('admin.messages.deleted', '删除成功'));
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      loggerService.error('Failed to delete message', {
-        module: 'MessageList',
-        function: 'handleDelete',
-        error_message: error.message
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'DELETE_MESSAGE_ERROR'
-      });
-      setMessageVariant('error');
-      setMessage(error?.response?.data?.detail || error?.message || t('admin.messages.deleteFailed', '删除失败'));
+    });
+  };
+
+  const handleDelete = (messageId) => {
+    setDeleteConfirm({ open: true, messageId });
+  };
+
+  const confirmDelete = async () => {
+    const { messageId } = deleteConfirm;
+    await messageService.deleteMessage(messageId);
+    await loadMessages();
+    if (selectedMessage?.id === messageId) {
+      setSelectedMessage(null);
     }
+    setDeleteConfirm({ open: false, messageId: null });
+    setMessageVariant('success');
+    setMessage(t('admin.messages.deleted', '删除成功'));
+    setTimeout(() => setMessage(null), 3000);
   };
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch {
-      return dateStr;
-    }
+    const date = new Date(dateStr);
+    return date.toLocaleString(i18n.language === 'zh' ? 'zh-CN' : 'ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
     <div className="w-full">
+      {message && (
+        <Alert variant={messageVariant} className="mb-4">
+          {message}
+        </Alert>
+      )}
+
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold text-gray-900">
-            {t('admin.messages.title', '站内信')}
-          </h1>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 m-0 mb-1">
+              {t('admin.messages.list.title', '消息列表')}
+            </h2>
+            <p className="text-gray-600 text-sm m-0">
+              {t('admin.messages.list.description', '查看和管理所有站内信消息。')}
+            </p>
+          </div>
           <div className="flex items-center gap-4">
             {unreadCount > 0 && (
               <Badge variant="error" className="text-sm">
@@ -154,12 +130,6 @@ export default function MessageList() {
             )}
           </div>
         </div>
-
-        {message && (
-          <Alert variant={messageVariant} className="mb-4">
-            {message}
-          </Alert>
-        )}
 
         {/* Filter buttons */}
         <div className="flex gap-2 mb-4">
@@ -183,13 +153,6 @@ export default function MessageList() {
             onClick={() => setFilter('read')}
           >
             {t('admin.messages.filters.read', '已读')}
-          </Button>
-          <Button
-            variant={filter === 'important' ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => setFilter('important')}
-          >
-            {t('admin.messages.filters.important', '重要')}
           </Button>
         </div>
       </div>
@@ -222,7 +185,7 @@ export default function MessageList() {
                               {msg.subject}
                             </span>
                             {msg.isImportant && (
-                              <Badge variant="error" size="sm">重要</Badge>
+                              <Badge variant="error" size="sm">{t('admin.messages.important', '重要')}</Badge>
                             )}
                             {!msg.isRead && (
                               <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
@@ -267,10 +230,10 @@ export default function MessageList() {
                           {selectedMessage.subject}
                         </h2>
                         {selectedMessage.isImportant && (
-                          <Badge variant="error">重要</Badge>
+                          <Badge variant="error">{t('admin.messages.important', '重要')}</Badge>
                         )}
                         {!selectedMessage.isRead && (
-                          <Badge variant="info">未读</Badge>
+                          <Badge variant="info">{t('admin.messages.unread', '未读')}</Badge>
                         )}
                       </div>
                       <div className="text-sm text-gray-600 space-y-1">
@@ -305,7 +268,7 @@ export default function MessageList() {
                   {!selectedMessage.isRead && (
                     <Button
                       variant="outline"
-                      onClick={() => handleMarkAsRead(selectedMessage.id)}
+                      onClick={() => handleMarkAsRead(selectedMessage.id, selectedMessage)}
                     >
                       {t('admin.messages.markAsRead', '标记为已读')}
                     </Button>
@@ -326,6 +289,34 @@ export default function MessageList() {
           </Card>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, messageId: null })}
+        title={t('admin.messages.confirmDelete', '确定要删除这条消息吗？')}
+        size="sm"
+      >
+        <div className="py-4">
+          <p className="text-gray-600">
+            {t('admin.messages.deleteWarning', '此操作不可撤销，确定要继续吗？')}
+          </p>
+        </div>
+        <ModalFooter>
+          <Button
+            variant="outline"
+            onClick={() => setDeleteConfirm({ open: false, messageId: null })}
+          >
+            {t('common.cancel', '取消')}
+          </Button>
+          <Button
+            variant="primary"
+            onClick={confirmDelete}
+          >
+            {t('common.delete', '删除')}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 }

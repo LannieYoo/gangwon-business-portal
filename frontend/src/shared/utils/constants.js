@@ -209,7 +209,6 @@ export const ROUTES = {
   ADMIN_PERFORMANCE: '/admin/performance',
   ADMIN_PROJECTS: '/admin/projects',
   ADMIN_CONTENT: '/admin/content',
-  ADMIN_SETTINGS: '/admin/settings',
   ADMIN_REPORTS: '/admin/reports'
 };
 

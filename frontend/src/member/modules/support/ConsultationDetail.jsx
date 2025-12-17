@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Banner, Submenu } from '@shared/components';
+import { Banner, Submenu, Badge } from '@shared/components';
 import { BANNER_TYPES } from '@shared/utils/constants';
 import { PageContainer } from '@member/layouts';
 import Card from '@shared/components/Card';
@@ -153,12 +153,14 @@ export default function ConsultationDetail() {
               <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 sm:pb-6 border-b-2 border-gray-200">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 m-0 leading-tight flex-1">{consultation.subject || consultation.title}</h1>
-                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-md transition-all duration-300 animate-fade-in flex-shrink-0 ${consultation.status === 'answered' || consultation.status === 'replied' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-green-200' : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-200'}`}>
-                  {consultation.status === 'answered' || consultation.status === 'replied' ? '✓' : '⏳'}
-                  <span className="ml-1">
-                    {t(`support.status.${consultation.status}`)}
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">
+                    {consultation.status === 'answered' || consultation.status === 'replied' ? '✓' : '⏳'}
                   </span>
-                </span>
+                  <Badge variant={consultation.status === 'answered' || consultation.status === 'replied' ? 'success' : 'warning'}>
+                    {t(`support.status.${consultation.status}`)}
+                  </Badge>
+                </div>
               </div>
               {/* 咨询基本信息表格 */}
               <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 sm:p-6 space-y-4">

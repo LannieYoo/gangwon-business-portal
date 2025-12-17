@@ -7,13 +7,22 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import '@shared/styles/index.css';
 
-// 禁用 React DevTools 提示
+// 禁用 React DevTools 提示和 react-quill 的 findDOMNode 警告
 if (typeof window !== 'undefined') {
   const originalConsoleWarn = console.warn;
   console.warn = (...args) => {
-    if (args[0] && typeof args[0] === 'string' && args[0].includes('Download the React DevTools')) {
-      return; // 忽略 React DevTools 提示
+    const message = args[0];
+    
+    // 忽略 React DevTools 提示
+    if (message && typeof message === 'string' && message.includes('Download the React DevTools')) {
+      return;
     }
+    
+    // 忽略 react-quill 的 findDOMNode 弃用警告
+    if (message && typeof message === 'string' && message.includes('findDOMNode is deprecated')) {
+      return;
+    }
+    
     originalConsoleWarn.apply(console, args);
   };
 }
@@ -47,9 +56,7 @@ async function enableMocking() {
 
 enableMocking().then(() => {
   ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
+    <App />
   );
 });
 

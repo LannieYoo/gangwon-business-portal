@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Button, Input, Textarea, Select, Alert } from '@shared/components';
-import { messageService, adminService, loggerService, exceptionService } from '@shared/services';
+import { messageService, adminService } from '@shared/services';
 
 export default function SendMessage() {
   const { t } = useTranslation();
@@ -25,18 +25,9 @@ export default function SendMessage() {
 
   const loadMembers = useCallback(async () => {
     setLoading(true);
-    try {
-      const response = await adminService.listMembers({ page: 1, pageSize: 1000 });
-      setMembers(response.members || []);
-    } catch (error) {
-      loggerService.error('Failed to load members', {
-        module: 'SendMessage',
-        function: 'loadMembers',
-        error_message: error.message
-      });
-    } finally {
-      setLoading(false);
-    }
+    const response = await adminService.listMembers({ page: 1, pageSize: 100 });
+    setMembers(response.members || []);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -83,36 +74,20 @@ export default function SendMessage() {
     }
 
     setSaving(true);
-    try {
-      await messageService.createMessage(formData);
-      setMessageVariant('success');
-      setMessage(t('admin.messages.sent', '消息发送成功'));
-      
-      // Reset form
-      setFormData({
-        recipientId: '',
-        subject: '',
-        content: '',
-        isImportant: false
-      });
-      
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      loggerService.error('Failed to send message', {
-        module: 'SendMessage',
-        function: 'handleSubmit',
-        error_message: error.message,
-        error_code: error.code
-      });
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'SEND_MESSAGE_ERROR'
-      });
-      setMessageVariant('error');
-      setMessage(error?.response?.data?.detail || error?.message || t('admin.messages.sendFailed', '发送失败'));
-    } finally {
-      setSaving(false);
-    }
+    await messageService.createMessage(formData);
+    setMessageVariant('success');
+    setMessage(t('admin.messages.sent', '消息发送成功'));
+    
+    // Reset form
+    setFormData({
+      recipientId: '',
+      subject: '',
+      content: '',
+      isImportant: false
+    });
+    
+    setTimeout(() => setMessage(null), 3000);
+    setSaving(false);
   };
 
   const memberOptions = members.map(member => ({
@@ -121,21 +96,25 @@ export default function SendMessage() {
   }));
 
   return (
-    <div className="w-full max-w-3xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-4">
-          {t('admin.messages.sendTitle', '发送站内信')}
-        </h1>
+    <div className="w-full">
+      {message && (
+        <Alert variant={messageVariant} className="mb-4">
+          {message}
+        </Alert>
+      )}
 
-        {message && (
-          <Alert variant={messageVariant} className="mb-4">
-            {message}
-          </Alert>
-        )}
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 m-0 mb-1">
+          {t('admin.messages.sendTitle', '发送站内信')}
+        </h2>
+        <p className="text-gray-600 text-sm m-0">
+          {t('admin.messages.sendDescription', '向指定会员发送站内信消息。')}
+        </p>
       </div>
 
       <Card>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <Select
             label={t('admin.messages.recipient', '收件人')}
             value={formData.recipientId}
@@ -206,6 +185,7 @@ export default function SendMessage() {
             </Button>
           </div>
         </form>
+        </div>
       </Card>
     </div>
   );

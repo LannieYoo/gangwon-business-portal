@@ -2,6 +2,8 @@
   "admin": {
     "reports": {
       "title": "统计报表",
+      "description": "生成自定义报表和数据导出。实时统计请查看仪表板。",
+      "goToMembers": "前往会员管理",
       "quarter": {
         "all": "全部",
         "Q1": "第一季度",
@@ -10,24 +12,18 @@
         "Q4": "第四季度"
       },
       "fields": {
-        "companyName": "企业名称",
-        "businessNumber": "营业执照号",
         "industry": "行业",
         "region": "地区",
         "year": "年份",
         "quarter": "季度"
       },
-      "search": {
-        "title": "企业检索",
-        "description": "输入企业信息或条件，即可快速检索 Nice D&B 数据与内部统计。",
-        "button": "检索"
+      "filter": {
+        "title": "筛选条件",
+        "description": "选择筛选条件查看统计数据"
       },
       "messages": {
-        "searchSuccess": "已找到 {{count}} 条记录。",
-        "searchFailed": "检索失败，请稍后重试。",
-        "dnbFailed": "获取 Nice D&B 数据失败。{{error}}",
-        "dnbSuccess": "成功获取 Nice D&B 数据。",
-        "dnbNoBusinessNumber": "缺少营业执照号，无法获取 Nice D&B 数据。"
+        "loadFailed": "加载统计数据失败",
+        "comingSoon": "统计报表功能开发中，请使用会员管理模块查看企业详情。"
       },
       "table": {
         "companyName": "企业名称",
@@ -46,26 +42,84 @@
       "detail": {
         "niceTitle": "Nice D&B 企业分析",
         "creditGrade": "信用等级",
-        "riskLevel": "风险等级",
-        "summary": "摘要",
+        "creditDate": "信用评价日期",
         "revenue": "营业额",
         "profit": "利润",
         "year": "年",
         "financialHistory": "财务历史",
-        "insights": "企业洞察",
         "loadingDnb": "正在加载 Nice D&B 数据...",
         "selectHint": "请选择企业以查看 Nice D&B 分析数据。"
-      },
-      "riskLevel": {
-        "low": "低",
-        "moderate": "中等",
-        "caution": "注意",
-        "high": "高"
       },
       "table": {
         "count": "共 {{count}} 条"
       },
-      "placeholder": "请先完成检索以查看企业列表。"
+      "placeholder": "请选择筛选条件查看统计数据",
+      "noData": "暂无统计数据",
+      "tip": "提示：如需查看企业详情和 Nice D&B 数据，请前往会员管理模块。",
+      "statisticsPlaceholder": "统计报表功能开发中，敬请期待。",
+      "tabs": {
+        "custom": "自定义报表",
+        "templates": "报表模板",
+        "export": "导出中心"
+      },
+      "custom": {
+        "title": "自定义报表",
+        "description": "选择报表类型和筛选条件，生成自定义报表。",
+        "reportType": "报表类型",
+        "startDate": "开始日期",
+        "endDate": "结束日期",
+        "generate": "生成报表",
+        "comingSoon": "自定义报表功能开发中，敬请期待。",
+        "generateFailed": "生成报表失败",
+        "reportPreview": "报表预览",
+        "types": {
+          "comprehensive": "综合报表",
+          "enterprise": "企业报表",
+          "performance": "业绩报表"
+        }
+      },
+      "templates": {
+        "title": "报表模板",
+        "description": "选择预定义的报表模板，快速生成常用报表。",
+        "generate": "生成报表",
+        "comingSoon": "报表模板功能开发中，敬请期待。",
+        "generateFailed": "生成报表失败",
+        "monthlySummary": "月度汇总报表",
+        "monthlySummaryDesc": "包含企业数量、销售额、雇佣等月度汇总数据",
+        "quarterlyPerformance": "季度业绩报表",
+        "quarterlyPerformanceDesc": "按季度统计企业业绩数据",
+        "annualReport": "年度综合报表",
+        "annualReportDesc": "年度企业综合数据统计报表",
+        "industryAnalysis": "行业分析报表",
+        "industryAnalysisDesc": "按行业分类的企业数据分析"
+      },
+      "export": {
+        "title": "导出中心",
+        "description": "选择要导出的模块，生成汇总数据文件。",
+        "selectModules": "选择导出模块",
+        "format": "导出格式",
+        "export": "导出数据",
+        "noSelection": "请至少选择一个模块",
+        "comingSoon": "汇总导出功能开发中，敬请期待。",
+        "exportFailed": "导出失败",
+        "quickExport": "快速导出",
+        "quickExportDesc": "各模块的单独导出功能：",
+        "exportMembers": "导出企业列表",
+        "exportPerformance": "导出业绩数据",
+        "exportProjects": "导出项目信息",
+        "modules": {
+          "dashboard": "仪表板统计",
+          "dashboardDesc": "企业汇总统计数据",
+          "members": "企业列表",
+          "membersDesc": "企业会员信息",
+          "performance": "业绩数据",
+          "performanceDesc": "企业业绩记录",
+          "projects": "项目信息",
+          "projectsDesc": "项目列表和详情",
+          "applications": "申请记录",
+          "applicationsDesc": "项目申请记录"
+        }
+      }
     }
   }
 }

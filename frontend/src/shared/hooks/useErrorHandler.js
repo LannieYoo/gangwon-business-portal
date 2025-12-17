@@ -6,8 +6,8 @@
  */
 
 import { useCallback } from 'react';
-import loggerService from '@shared/services/logger.service';
-import exceptionService from '@shared/services/exception.service';
+import { loggerService } from '@shared/utils/loggerHandler';
+import { exceptionService } from '@shared/utils/errorHandler';
 
 /**
  * Custom hook for handling errors consistently
