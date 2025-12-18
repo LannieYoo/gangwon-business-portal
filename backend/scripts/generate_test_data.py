@@ -1519,39 +1519,6 @@ async def generate_admins(session: AsyncSession, config: Dict[str, Any], count: 
     return admins
 
 
-async def generate_audit_logs(session: AsyncSession, members: List['Member'], config: Dict[str, Any], count: int = 1000):
-    """Generate audit log test data."""
-    from src.common.modules.db.models import AuditLog
-    
-    data_defs = config["data_definitions"]
-    data_ranges = config["data_ranges"]["audit_log"]
-    probs = config["probabilities"]
-    
-    actions = data_defs["audit_actions"]
-    resource_types = data_defs["audit_resource_types"]
-    user_agents = data_defs["user_agents"]
-    
-    for i in range(count):
-        member = random.choice(members) if random.random() > probs["audit_log_member_null"] else None
-        action = random.choice(actions)
-        resource_type = random.choice(resource_types) if random.random() > probs["audit_log_resource_type_null"] else None
-        resource_id = uuid4() if resource_type else None
-        
-        log = AuditLog(
-            id=uuid4(),
-            user_id=member.id if member else None,
-            action=action,
-            resource_type=resource_type,
-            resource_id=resource_id,
-            ip_address=fake.ipv4(),
-            user_agent=random.choice(user_agents),
-            created_at=datetime.now(timezone.utc) - timedelta(days=random.randint(0, data_ranges["created_days_ago_max"])),
-        )
-        session.add(log)
-    
-    await session.flush()
-
-
 async def clear_test_data(session: AsyncSession):
     """Clear all test data from database using TRUNCATE.
     
@@ -1563,9 +1530,9 @@ async def clear_test_data(session: AsyncSession):
     """
     # List of all tables to truncate
     # Using TRUNCATE CASCADE to automatically handle foreign key dependencies
+    # Note: Log tables (app_logs, audit_logs, error_logs, system_logs) are NOT truncated
+    # to preserve actual application logs during test data generation
     tables = [
-        "app_logs",
-        "audit_logs",
         "inquiries",
         "faqs",
         "banners",
@@ -1600,7 +1567,6 @@ async def generate_all(
     projects_count: int = None,
     applications_count: int = None,
     attachments_count: int = None,
-    audit_logs_count: int = None,
 ):
     """Generate all test data.
     
@@ -1642,7 +1608,6 @@ async def generate_all(
     projects_count = projects_count or counts["projects"]
     applications_count = applications_count or counts["project_applications"]
     attachments_count = attachments_count or counts["attachments"]
-    audit_logs_count = audit_logs_count or counts["audit_logs"]
     
     print("\nGenerating system info...")
     await generate_system_info(session, [])
@@ -1714,10 +1679,6 @@ async def generate_all(
     await generate_attachments(session, performance_records, projects, applications, config, attachments_count)
     print("Generated attachments")
     
-    print("Generating audit logs...")
-    await generate_audit_logs(session, members, config, audit_logs_count)
-    print(f"Generated {audit_logs_count} audit logs")
-    
     print("\nAll test data generated successfully!")
 
 
@@ -1743,7 +1704,6 @@ async def main():
         SystemInfo,
         FAQ,
         Inquiry,
-        AuditLog,
         Admin,
         Message,
     )

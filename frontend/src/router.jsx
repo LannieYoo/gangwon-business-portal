@@ -216,16 +216,6 @@ const MemberSupportInquiryDetail = lazy(() =>
     default: m.default,
   }))
 );
-const MemberNotifications = lazy(() =>
-  import("@member/modules/notifications/NotificationsPage").then((m) => ({
-    default: m.default,
-  }))
-);
-const MemberNotificationDetail = lazy(() =>
-  import("@member/modules/notifications/NotificationDetailPage").then((m) => ({
-    default: m.default,
-  }))
-);
 const NoticesList = lazy(() =>
   import("@member/modules/home/NoticesList").then((m) => ({
     default: m.default,
@@ -486,26 +476,6 @@ export const router = createBrowserRouter(
               ),
             },
             {
-              path: "support/notifications",
-              element: (
-                <ProtectedRoute allowedRoles={["member"]}>
-                  <LazyRoute>
-                    <MemberNotifications />
-                  </LazyRoute>
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: "support/notifications/:id",
-              element: (
-                <ProtectedRoute allowedRoles={["member"]}>
-                  <LazyRoute>
-                    <MemberNotificationDetail />
-                  </LazyRoute>
-                </ProtectedRoute>
-              ),
-            },
-            {
               path: "notices",
               element: (
                 <ProtectedRoute allowedRoles={["member"]}>
@@ -630,7 +600,6 @@ export const router = createBrowserRouter(
                 </LazyRoute>
               ),
             },
-
             {
               path: "reports",
               element: (

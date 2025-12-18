@@ -37,12 +37,6 @@ export default function InquiryHistoryPage() {
             path: '/member/support/inquiry-history',
             exact: true,
             label: t('support.inquiryHistory')
-          },
-          {
-            key: 'support-notifications',
-            path: '/member/support/notifications',
-            exact: true,
-            label: t('support.notifications')
           }
         ]}
         className="support-submenu bg-white/95 shadow-sm border-b border-gray-100 sticky top-0 z-10 backdrop-blur-sm"

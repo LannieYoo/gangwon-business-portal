@@ -1,24 +1,20 @@
 /**
  * Messages Component - Admin Portal
- * 站内信管理主组件
+ * 1对1咨询管理
  */
 
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Tabs } from '@shared/components';
-import MessageList from './MessageList';
-import SendMessage from './SendMessage';
-import BroadcastMessage from './BroadcastMessage';
+import ThreadList from './ThreadList';
 import MessageAnalytics from './MessageAnalytics';
 
 export default function Messages() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('list');
+  const [activeTab, setActiveTab] = useState('threads');
 
   const tabs = useMemo(() => [
-    { key: 'list', label: t('admin.messages.tabs.list') },
-    { key: 'send', label: t('admin.messages.tabs.send') },
-    { key: 'broadcast', label: t('admin.messages.tabs.broadcast') },
+    { key: 'threads', label: t('admin.messages.tabs.threads') },
     { key: 'analytics', label: t('admin.messages.tabs.analytics') }
   ], [t]);
 
@@ -38,13 +34,10 @@ export default function Messages() {
         />
 
         <div className="tab-content mt-6 p-6">
-          {activeTab === 'list' && <MessageList />}
-          {activeTab === 'send' && <SendMessage />}
-          {activeTab === 'broadcast' && <BroadcastMessage />}
+          {activeTab === 'threads' && <ThreadList />}
           {activeTab === 'analytics' && <MessageAnalytics />}
         </div>
       </Card>
     </div>
   );
 }
-

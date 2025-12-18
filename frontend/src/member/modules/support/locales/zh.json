@@ -1,14 +1,12 @@
 {
   "support": {
     "title": "一站式支持",
-    "subtitle": "咨询、FAQ、通知中心",
+    "subtitle": "咨询、FAQ",
     "inquiry": "1:1咨询",
     "faq": "常见问题",
-    "notifications": "通知中心",
     "newInquiry": "新建咨询",
     "inquiryHistory": "咨询历史",
     "noInquiries": "暂无咨询记录",
-    "noNotifications": "暂无通知",
     "category": {
       "general": "一般咨询",
       "support": "技术支持",

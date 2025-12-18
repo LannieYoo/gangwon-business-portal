@@ -121,6 +121,7 @@ class ThreadResponse(BaseModel):
     last_message_at: Optional[datetime]
     message_count: int
     unread_count: int
+    admin_unread_count: Optional[int] = None  # 管理员未读数（会员发送的消息）
     created_at: datetime
     
     class Config:

@@ -111,6 +111,44 @@ async def get_message_analytics(
 
 
 @router.get(
+    "/api/admin/messages/threads",
+    response_model=ThreadListResponse,
+    tags=["messages", "threads", "admin"],
+    summary="List all threads (admin)",
+)
+@auto_log("list_admin_threads", log_result_count=True)
+async def list_admin_threads(
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+    status: Optional[str] = Query(None, description="Filter by status: open, resolved, closed"),
+    has_unread: Optional[bool] = Query(None, description="Filter threads with unread messages"),
+    current_user = Depends(get_current_admin_user),
+):
+    """
+    List all threads for admin with pagination.
+    
+    - **page**: Page number (default: 1)
+    - **page_size**: Items per page (default: 20, max: 100)
+    - **status**: Optional status filter (open, resolved, closed)
+    - **has_unread**: Optional filter for threads with unread messages
+    """
+    threads, total = await service.get_admin_threads(
+        page=page,
+        page_size=page_size,
+        status=status,
+        has_unread=has_unread,
+    )
+    
+    return ThreadListResponse(
+        items=[ThreadResponse(**thread) for thread in threads],
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=ceil(total / page_size) if total > 0 else 0,
+    )
+
+
+@router.get(
     "/api/admin/messages/{message_id}",
     response_model=MessageResponse,
     tags=["messages", "admin"],
@@ -330,6 +368,24 @@ async def create_member_thread_message(
     return ThreadMessageResponse(**message)
 
 
+@router.post(
+    "/api/member/messages",
+    response_model=MessageResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["messages", "member"],
+    summary="Send message to admin (member)",
+)
+@auto_log("create_member_message", log_resource_id=True)
+async def create_member_message(
+    data: MessageCreate,
+    request: Request,
+    current_user: Member = Depends(get_current_member_user),
+):
+    """Send a message to an admin (member only)."""
+    message = await service.create_message(data, current_user.id)
+    return MessageResponse(**message)
+
+
 @router.get(
     "/api/member/messages/{message_id}",
     response_model=MessageResponse,
@@ -380,7 +436,7 @@ async def delete_member_message(
     await service.delete_message(message_id, current_user.id)
 
 
-# Thread Endpoints (Admin)
+# Thread Endpoints (Admin) - threads/{thread_id} routes
 
 @router.get(
     "/api/admin/messages/threads/{thread_id}",

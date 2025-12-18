@@ -156,17 +156,6 @@
       "성과 승인 완료 안내",
       "성과 보완 요청 안내"
     ],
-    "audit_actions": ["login", "logout", "create", "update", "delete", "view", "approve", "reject"],
-    "audit_resource_types": [
-      "member",
-      "performance",
-      "project",
-      "project_application",
-      "notice",
-      "press_release",
-      "faq",
-      "inquiry"
-    ],
     "user_agents": [
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
@@ -282,9 +271,6 @@
       "file_size_max": 2000000,
       "uploaded_days_ago_max": 90
     },
-    "audit_log": {
-      "created_days_ago_max": 180
-    },
     "system_info": {
       "created_days_ago_max": 365,
       "updated_days_ago_max": 30
@@ -297,8 +283,7 @@
     "projects": 20,
     "project_applications": 80,
     "attachments": 0,
-    "audit_logs": 500,
-    "messages": 50,
+    "messages": 0,
     "system_infos": 1
   },
   "probabilities": {
@@ -311,9 +296,7 @@
     "member_profile_website_null": 0.20,
     "performance_review_comments_null": 0.20,
     "banner_link_url_null": 0.20,
-    "banner_is_active": 0.85,
-    "audit_log_member_null": 0.05,
-    "audit_log_resource_type_null": 0.10
+    "banner_is_active": 0.85
   },
   "gangwon_company_names": [
     "강원테크솔루션주식회사",

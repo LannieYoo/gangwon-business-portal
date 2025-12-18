@@ -30,6 +30,7 @@ export { AddressSearch } from "./AddressSearch";
 export { LoginModal } from "./LoginModal";
 export { PasswordStrength } from "./PasswordStrength";
 export { default as NotificationBell } from "./NotificationBell";
+export { default as ThreadDetailModal } from "./ThreadDetailModal";
 export { RichTextEditor } from "./RichTextEditor";
 export { default as Checkbox } from "./Checkbox";
 export { default as SearchInput } from "./SearchInput";

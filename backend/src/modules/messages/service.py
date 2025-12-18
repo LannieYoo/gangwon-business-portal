@@ -3,6 +3,7 @@ Messages service.
 
 Business logic for internal messaging system.
 """
+import asyncio
 from typing import List, Tuple, Optional, Dict, Any
 from uuid import UUID, uuid4
 from datetime import datetime, timezone, timedelta
@@ -102,15 +103,15 @@ class MessageService:
         count_query = supabase_service.client.table('messages').select('*', count='exact')
         count_query = count_query.or_(base_filter).is_('deleted_at', 'null')
         if is_read is not None:
-            count_query = count_query.eq('is_read', 'true' if is_read else 'false')
+            count_query = count_query.eq('is_read', is_read)
         if is_important is not None:
-            count_query = count_query.eq('is_important', 'true' if is_important else 'false')
+            count_query = count_query.eq('is_important', is_important)
         count_result = count_query.execute()
         total = count_result.count or 0
         
         # Get unread count (only for recipient, exclude soft-deleted)
         unread_query = supabase_service.client.table('messages').select('*', count='exact')
-        unread_query = unread_query.eq('recipient_id', str(user_id)).eq('is_read', 'false').is_('deleted_at', 'null')
+        unread_query = unread_query.eq('recipient_id', str(user_id)).eq('is_read', False).is_('deleted_at', 'null')
         unread_result = unread_query.execute()
         unread_count = unread_result.count or 0
         
@@ -118,9 +119,9 @@ class MessageService:
         query = supabase_service.client.table('messages').select('*')
         query = query.or_(base_filter).is_('deleted_at', 'null')
         if is_read is not None:
-            query = query.eq('is_read', 'true' if is_read else 'false')
+            query = query.eq('is_read', is_read)
         if is_important is not None:
-            query = query.eq('is_important', 'true' if is_important else 'false')
+            query = query.eq('is_important', is_important)
         query = query.order('created_at', desc=True).range((page - 1) * page_size, page * page_size - 1)
         
         result = query.execute()
@@ -199,16 +200,16 @@ class MessageService:
             raise NotFoundError("Message")
         
         # Mark as read if user is recipient and message is unread
-        if str(user_id) == str(recipient_id) and message.get('is_read') != 'true':
+        if str(user_id) == str(recipient_id) and not message.get('is_read'):
             update_result = supabase_service.client.table('messages').update({
-                'is_read': 'true',
+                'is_read': True,
                 'read_at': datetime.now(timezone.utc).isoformat()
             }).eq('id', str(message_id)).execute()
             
             if update_result.data:
                 message = update_result.data[0]
             else:
-                message['is_read'] = 'true'
+                message['is_read'] = True
                 message['read_at'] = datetime.now(timezone.utc).isoformat()
         
         # Enrich with names
@@ -230,24 +231,39 @@ class MessageService:
 
         Args:
             data: Message creation data
-            sender_id: Sender UUID (admin)
+            sender_id: Sender UUID (admin or member)
 
         Returns:
             Created message dictionary
         """
-        # Verify recipient exists
-        member_result = supabase_service.client.table('members').select('id').eq('id', str(data.recipient_id)).execute()
-        if not member_result.data:
-            raise NotFoundError("Recipient member")
+        # Check if sender is admin or member
+        is_admin = await self._is_admin(str(sender_id))
+        
+        if is_admin:
+            # Admin sending to member
+            # Verify recipient exists
+            member_result = supabase_service.client.table('members').select('id').eq('id', str(data.recipient_id)).execute()
+            if not member_result.data:
+                raise NotFoundError("Recipient member")
+            
+            recipient_id = str(data.recipient_id)
+        else:
+            # Member sending to admin - recipient_id should be admin ID
+            # Verify recipient admin exists
+            admin_result = supabase_service.client.table('admins').select('id').eq('id', str(data.recipient_id)).execute()
+            if not admin_result.data:
+                raise NotFoundError("Recipient admin")
+            
+            recipient_id = str(data.recipient_id)
         
         message_data = {
             'id': str(uuid4()),
             'sender_id': str(sender_id),
-            'recipient_id': str(data.recipient_id),
+            'recipient_id': recipient_id,
             'subject': data.subject,
             'content': data.content,
-            'is_read': 'false',
-            'is_important': 'true' if data.is_important else 'false',
+            'is_read': False,
+            'is_important': True if data.is_important else False,
         }
         
         result = supabase_service.client.table('messages').insert(message_data).execute()
@@ -255,21 +271,34 @@ class MessageService:
         
         if message:
             # Enrich with names
-            message['sender_name'] = await self._get_admin_name(str(sender_id))
-            message['recipient_name'] = await self._get_member_name(str(data.recipient_id))
+            if is_admin:
+                message['sender_name'] = await self._get_admin_name(str(sender_id))
+                message['recipient_name'] = await self._get_member_name(recipient_id)
+            else:
+                message['sender_name'] = await self._get_member_name(str(sender_id))
+                message['recipient_name'] = await self._get_admin_name(recipient_id)
             
             # Send email notification
-            recipient_email_result = supabase_service.client.table('members').select('email').eq('id', str(data.recipient_id)).execute()
-            recipient_email = recipient_email_result.data[0]['email'] if recipient_email_result.data else None
-            if recipient_email:
-                frontend_url = settings.FRONTEND_URL.rstrip('/')
-                message_link = f"{frontend_url}/member/messages"
-                await self.email_service.send_new_message_notification(
-                    to_email=recipient_email,
+            frontend_url = settings.FRONTEND_URL.rstrip('/')
+            
+            if is_admin:
+                # Admin sending to member - notify member
+                recipient_email_result = supabase_service.client.table('members').select('email').eq('id', recipient_id).execute()
+                recipient_email = recipient_email_result.data[0]['email'] if recipient_email_result.data else None
+                if recipient_email:
+                    message_link = f"{frontend_url}/member/messages"
+                    await self.email_service.send_new_message_notification(
+                        to_email=recipient_email,
+                        sender_name=message['sender_name'],
+                        subject=data.subject,
+                        message_link=message_link
+                    )
+            else:
+                # Member sending to admin - notify all admins (background task, don't wait)
+                asyncio.create_task(self._send_message_notifications_to_admins(
                     sender_name=message['sender_name'],
-                    subject=data.subject,
-                    message_link=message_link
-                )
+                    subject=data.subject
+                ))
         
         return message
 
@@ -310,14 +339,14 @@ class MessageService:
         # Build update data
         update_data = {}
         if data.is_read is not None:
-            update_data['is_read'] = 'true' if data.is_read else 'false'
+            update_data['is_read'] = data.is_read
             if data.is_read:
                 update_data['read_at'] = datetime.now(timezone.utc).isoformat()
             else:
                 update_data['read_at'] = None
         
         if data.is_important is not None:
-            update_data['is_important'] = 'true' if data.is_important else 'false'
+            update_data['is_important'] = data.is_important
         
         if not update_data:
             # No fields to update, just return existing message
@@ -377,7 +406,7 @@ class MessageService:
 
     async def get_unread_count(self, user_id: UUID) -> int:
         """
-        Get unread messages count for a user.
+        Get unread messages count for a user (includes both direct messages and thread messages).
 
         Args:
             user_id: User UUID
@@ -385,11 +414,37 @@ class MessageService:
         Returns:
             Unread messages count
         """
-        query = supabase_service.client.table('messages').select('*', count='exact')
-        query = query.eq('recipient_id', str(user_id)).eq('is_read', 'false').is_('deleted_at', 'null')
+        # Count unread direct messages
+        direct_query = supabase_service.client.table('messages').select('*', count='exact')
+        direct_query = direct_query.eq('recipient_id', str(user_id)).eq('is_read', False).is_('deleted_at', 'null')
+        direct_result = direct_query.execute()
+        direct_count = direct_result.count or 0
         
-        result = query.execute()
-        return result.count or 0
+        # Check if user is admin or member
+        is_admin = await self._is_admin(str(user_id))
+        
+        # Count unread thread messages
+        thread_count = 0
+        if is_admin:
+            # Admin: count unread messages from members in all threads
+            thread_messages_query = supabase_service.client.table('thread_messages').select('*', count='exact')
+            thread_messages_query = thread_messages_query.eq('sender_type', 'member').eq('is_read', False)
+            thread_result = thread_messages_query.execute()
+            thread_count = thread_result.count or 0
+        else:
+            # Member: count unread messages from admins in their threads
+            # First get member's thread IDs
+            threads_result = supabase_service.client.table('message_threads').select('id').eq('member_id', str(user_id)).execute()
+            thread_ids = [t['id'] for t in (threads_result.data or [])]
+            
+            if thread_ids:
+                # Count unread admin messages in member's threads
+                thread_messages_query = supabase_service.client.table('thread_messages').select('*', count='exact')
+                thread_messages_query = thread_messages_query.in_('thread_id', thread_ids).eq('sender_type', 'admin').eq('is_read', False)
+                thread_result = thread_messages_query.execute()
+                thread_count = thread_result.count or 0
+        
+        return direct_count + thread_count
 
     # Thread-related methods
 
@@ -432,16 +487,16 @@ class MessageService:
             'sender_id': str(member_id),
             'sender_type': 'member',
             'content': data.content,
-            'is_read': 'false',
-            'is_important': 'false'
+            'is_read': False,
+            'is_important': False
         }
         
         message_result = supabase_service.client.table('thread_messages').insert(message_data).execute()
         
-        # Handle attachments if any
+        # Handle attachments if any (batch insert for better performance)
         if data.attachments:
-            for attachment in data.attachments:
-                attachment_data = {
+            attachment_records = [
+                {
                     'id': str(uuid4()),
                     'message_id': message_data['id'],
                     'file_name': attachment['fileName'],
@@ -449,26 +504,60 @@ class MessageService:
                     'file_size': attachment['fileSize'],
                     'mime_type': attachment['mimeType']
                 }
-                supabase_service.client.table('message_attachments').insert(attachment_data).execute()
+                for attachment in data.attachments
+            ]
+            if attachment_records:
+                supabase_service.client.table('message_attachments').insert(attachment_records).execute()
         
         # Enrich thread with member name
         thread['member_name'] = await self._get_member_name(str(member_id))
         
-        # Send email notification to admins
-        admins_result = supabase_service.client.table('admins').select('email').execute()
-        admin_emails = [admin['email'] for admin in (admins_result.data or [])]
-        if admin_emails:
-            frontend_url = settings.FRONTEND_URL.rstrip('/')
-            thread_link = f"{frontend_url}/admin/messages/threads/{thread_id}"
-            for admin_email in admin_emails:
-                await self.email_service.send_admin_new_thread_notification(
-                    to_email=admin_email,
-                    member_name=thread['member_name'],
-                    subject=data.subject,
-                    thread_link=thread_link
-                )
+        # Send email notification to admins (background task, don't wait)
+        asyncio.create_task(self._send_thread_notifications_to_admins(
+            thread_id=thread_id,
+            member_name=thread['member_name'],
+            subject=data.subject,
+            is_new_thread=True
+        ))
         
         return thread
+    
+    async def _send_thread_notifications_to_admins(
+        self,
+        thread_id: str,
+        member_name: str,
+        subject: str,
+        is_new_thread: bool = False
+    ) -> None:
+        """Send email notifications to all admins (background task)."""
+        admins_result = supabase_service.client.table('admins').select('email').execute()
+        admin_emails = [admin['email'] for admin in (admins_result.data or [])]
+        if not admin_emails:
+            return
+
+        frontend_url = settings.FRONTEND_URL.rstrip('/')
+        thread_link = f"{frontend_url}/admin/messages/threads/{thread_id}"
+
+        # Send emails in parallel
+        tasks = []
+        for admin_email in admin_emails:
+            if is_new_thread:
+                task = self.email_service.send_admin_new_thread_notification(
+                    to_email=admin_email,
+                    member_name=member_name,
+                    subject=subject,
+                    thread_link=thread_link
+                )
+            else:
+                task = self.email_service.send_admin_thread_reply_notification(
+                    to_email=admin_email,
+                    member_name=member_name,
+                    subject=subject,
+                    thread_link=thread_link
+                )
+            tasks.append(task)
+
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     async def get_thread_with_messages(self, thread_id: UUID, user_id: UUID) -> dict:
         """
@@ -503,6 +592,34 @@ class MessageService:
         # Get messages
         messages_result = supabase_service.client.table('thread_messages').select('*').eq('thread_id', str(thread_id)).order('created_at').execute()
         messages = messages_result.data or []
+        
+        # Mark unread messages as read (messages from the other party)
+        # Admin reads member messages, member reads admin messages
+        other_sender_type = 'member' if is_admin else 'admin'
+        unread_message_ids = [
+            msg['id'] for msg in messages 
+            if msg.get('sender_type') == other_sender_type and not msg.get('is_read')
+        ]
+        
+        if unread_message_ids:
+            # Batch update all unread messages to read
+            supabase_service.client.table('thread_messages').update({
+                'is_read': True,
+                'read_at': datetime.now(timezone.utc).isoformat()
+            }).in_('id', unread_message_ids).execute()
+            
+            # Update the messages in memory as well
+            for msg in messages:
+                if msg['id'] in unread_message_ids:
+                    msg['is_read'] = True
+                    msg['read_at'] = datetime.now(timezone.utc).isoformat()
+            
+            # Update thread unread_count
+            new_unread_count = max(0, thread.get('unread_count', 0) - len(unread_message_ids))
+            supabase_service.client.table('message_threads').update({
+                'unread_count': new_unread_count
+            }).eq('id', str(thread_id)).execute()
+            thread['unread_count'] = new_unread_count
         
         # Enrich messages with attachments and sender names
         for message in messages:
@@ -564,9 +681,126 @@ class MessageService:
         result = query.execute()
         threads = result.data or []
         
+        # Calculate unread count for each thread (only admin messages that member hasn't read)
+        thread_ids = [str(t['id']) for t in threads]
+        if thread_ids:
+            for thread in threads:
+                tid = str(thread['id'])
+                unread_query = supabase_service.client.table('thread_messages').select('*', count='exact')
+                unread_query = unread_query.eq('thread_id', tid).eq('sender_type', 'admin').eq('is_read', False)
+                unread_result = unread_query.execute()
+                thread['unread_count'] = unread_result.count or 0
+        
         # Enrich threads with member names
         for thread in threads:
             thread['member_name'] = await self._get_member_name(thread['member_id'])
+        
+        return threads, total
+
+    async def get_admin_threads(self, page: int = 1, page_size: int = 20, status: Optional[str] = None, has_unread: Optional[bool] = None) -> tuple:
+        """
+        Get paginated list of all threads for admin.
+
+        Args:
+            page: Page number (default: 1)
+            page_size: Items per page (default: 20)
+            status: Optional status filter (open, resolved, closed)
+            has_unread: Optional filter for threads with unread messages
+
+        Returns:
+            Tuple of (threads list, total count)
+        """
+        # When has_unread filter is specified, we need to calculate unread counts first
+        # then filter, then paginate
+        if has_unread is not None:
+            # Get all threads (without pagination first)
+            query = supabase_service.client.table('message_threads').select('*')
+            if status:
+                query = query.eq('status', status)
+            query = query.order('last_message_at', desc=True)
+            result = query.execute()
+            all_threads = result.data or []
+            
+            # Calculate unread count for each thread
+            for thread in all_threads:
+                tid = str(thread['id'])
+                unread_query = supabase_service.client.table('thread_messages').select('*', count='exact')
+                unread_query = unread_query.eq('thread_id', tid).eq('sender_type', 'member').eq('is_read', False)
+                unread_result = unread_query.execute()
+                thread['admin_unread_count'] = unread_result.count or 0
+            
+            # Filter by has_unread
+            if has_unread:
+                filtered_threads = [t for t in all_threads if t['admin_unread_count'] > 0]
+            else:
+                filtered_threads = [t for t in all_threads if t['admin_unread_count'] == 0]
+            
+            total = len(filtered_threads)
+            
+            # Apply pagination
+            start_idx = (page - 1) * page_size
+            end_idx = start_idx + page_size
+            threads = filtered_threads[start_idx:end_idx]
+            
+            # Batch fetch member names
+            member_ids = list(set(t['member_id'] for t in threads if t.get('member_id')))
+            member_names = {}
+            if member_ids:
+                member_result = supabase_service.client.table('members').select('id, company_name').in_('id', member_ids).execute()
+                for member in (member_result.data or []):
+                    member_names[str(member['id'])] = member.get('company_name') or "会员"
+            
+            # Enrich threads with member names
+            for thread in threads:
+                thread['member_name'] = member_names.get(str(thread['member_id']), "会员")
+            
+            return threads, total
+        
+        # Normal flow without has_unread filter
+        # Build base query
+        query = supabase_service.client.table('message_threads').select('*', count='exact')
+        
+        if status:
+            query = query.eq('status', status)
+        
+        # Get total count
+        count_result = query.execute()
+        total = count_result.count or 0
+        
+        # Get paginated threads
+        query = supabase_service.client.table('message_threads').select('*')
+        
+        if status:
+            query = query.eq('status', status)
+        
+        query = query.order('last_message_at', desc=True)
+        query = query.range((page - 1) * page_size, page * page_size - 1)
+        
+        result = query.execute()
+        threads = result.data or []
+        
+        # Batch fetch member names
+        member_ids = list(set(t['member_id'] for t in threads if t.get('member_id')))
+        member_names = {}
+        if member_ids:
+            member_result = supabase_service.client.table('members').select('id, company_name').in_('id', member_ids).execute()
+            for member in (member_result.data or []):
+                member_names[str(member['id'])] = member.get('company_name') or "会员"
+        
+        # Calculate unread count for each thread (messages from members that admin hasn't read)
+        thread_ids = [str(t['id']) for t in threads]
+        thread_unread_counts = {}
+        if thread_ids:
+            for tid in thread_ids:
+                unread_query = supabase_service.client.table('thread_messages').select('*', count='exact')
+                unread_query = unread_query.eq('thread_id', tid).eq('sender_type', 'member').eq('is_read', False)
+                unread_result = unread_query.execute()
+                thread_unread_counts[tid] = unread_result.count or 0
+        
+        # Enrich threads
+        for thread in threads:
+            thread['member_name'] = member_names.get(str(thread['member_id']), "会员")
+            thread['admin_unread_count'] = thread_unread_counts.get(str(thread['id']), 0)
         
         return threads, total
 
@@ -601,8 +835,8 @@ class MessageService:
             'sender_id': str(sender_id),
             'sender_type': sender_type,
             'content': data.content,
-            'is_read': 'false',
-            'is_important': 'true' if data.is_important else 'false'
+            'is_read': False,
+            'is_important': True if data.is_important else False
         }
         
         message_result = supabase_service.client.table('thread_messages').insert(message_data).execute()
@@ -611,10 +845,10 @@ class MessageService:
         if not message:
             raise ValidationError("Failed to create message")
         
-        # Handle attachments
+        # Handle attachments (batch insert for better performance)
         if data.attachments:
-            for attachment in data.attachments:
-                attachment_data = {
+            attachment_records = [
+                {
                     'id': str(uuid4()),
                     'message_id': message['id'],
                     'file_name': attachment['fileName'],
@@ -622,7 +856,10 @@ class MessageService:
                     'file_size': attachment['fileSize'],
                     'mime_type': attachment['mimeType']
                 }
-                supabase_service.client.table('message_attachments').insert(attachment_data).execute()
+                for attachment in data.attachments
+            ]
+            if attachment_records:
+                supabase_service.client.table('message_attachments').insert(attachment_records).execute()
         
         # Update thread counters
         new_message_count = thread['message_count'] + 1
@@ -640,22 +877,74 @@ class MessageService:
         else:
             message['sender_name'] = await self._get_member_name(str(sender_id))
         
-        # Send email notification to the other party
+        # Send email notification to the other party (background task, don't wait)
         if sender_type == 'admin':
-            # Admin replied, notify member
-            member_email_result = supabase_service.client.table('members').select('email').eq('id', str(thread['member_id'])).execute()
-            member_email = member_email_result.data[0]['email'] if member_email_result.data else None
-            if member_email:
-                frontend_url = settings.FRONTEND_URL.rstrip('/')
-                thread_link = f"{frontend_url}/member/messages/threads/{thread_id}"
-                await self.email_service.send_thread_reply_notification(
-                    to_email=member_email,
-                    sender_name=message['sender_name'],
-                    subject=thread['subject'],
-                    thread_link=thread_link
-                )
+            # Admin replied, notify member (background task)
+            asyncio.create_task(self._send_thread_reply_to_member(
+                thread_id=str(thread_id),
+                member_id=str(thread['member_id']),
+                sender_name=message['sender_name'],
+                subject=thread['subject']
+            ))
+        else:
+            # Member replied, notify all admins (background task)
+            asyncio.create_task(self._send_thread_notifications_to_admins(
+                thread_id=str(thread_id),
+                member_name=message['sender_name'],
+                subject=thread['subject'],
+                is_new_thread=False
+            ))
         
         return message
+    
+    async def _send_thread_reply_to_member(
+        self,
+        thread_id: str,
+        member_id: str,
+        sender_name: str,
+        subject: str
+    ) -> None:
+        """Send email notification to member (background task)."""
+        member_email_result = supabase_service.client.table('members').select('email').eq('id', member_id).execute()
+        member_email = member_email_result.data[0]['email'] if member_email_result.data else None
+        if not member_email:
+            return
+
+        frontend_url = settings.FRONTEND_URL.rstrip('/')
+        thread_link = f"{frontend_url}/member/messages/threads/{thread_id}"
+        await self.email_service.send_thread_reply_notification(
+            to_email=member_email,
+            sender_name=sender_name,
+            subject=subject,
+            thread_link=thread_link
+        )
+    
+    async def _send_message_notifications_to_admins(
+        self,
+        sender_name: str,
+        subject: str
+    ) -> None:
+        """Send email notifications to all admins for member messages (background task)."""
+        admins_result = supabase_service.client.table('admins').select('email').execute()
+        admin_emails = [admin['email'] for admin in (admins_result.data or [])]
+        if not admin_emails:
+            return
+
+        frontend_url = settings.FRONTEND_URL.rstrip('/')
+        message_link = f"{frontend_url}/admin/messages"
+
+        # Send emails in parallel
+        tasks = [
+            self.email_service.send_new_message_notification(
+                to_email=admin_email,
+                sender_name=sender_name,
+                subject=subject,
+                message_link=message_link
+            )
+            for admin_email in admin_emails
+        ]
+
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     async def update_thread(self, thread_id: UUID, data: ThreadUpdate, user_id: UUID) -> dict:
         """
@@ -728,8 +1017,8 @@ class MessageService:
             'subject': data.subject,
             'content': data.content,
             'category': data.category,
-            'is_important': 'true' if data.is_important else 'false',
-            'send_to_all': 'true' if data.send_to_all else 'false',
+            'is_important': data.is_important or False,
+            'send_to_all': data.send_to_all or False,
             'recipient_count': len(recipient_ids),
             'sent_at': datetime.now(timezone.utc).isoformat()
         }
@@ -747,7 +1036,7 @@ class MessageService:
                 'id': str(uuid4()),
                 'broadcast_id': broadcast_id,
                 'member_id': recipient_id,
-                'is_read': 'false'
+                'is_read': False
             })
         
         if recipient_records:
@@ -837,21 +1126,21 @@ class MessageService:
         
         # Get unread messages count
         # Regular messages
-        unread_regular_query = supabase_service.client.table('messages').select('*', count='exact').eq('is_read', 'false').is_('deleted_at', 'null')
+        unread_regular_query = supabase_service.client.table('messages').select('*', count='exact').eq('is_read', False).is_('deleted_at', 'null')
         if start_date:
             unread_regular_query = unread_regular_query.gte('created_at', start_date_str)
         unread_regular_result = unread_regular_query.execute()
         unread_regular = unread_regular_result.count or 0
         
         # Thread messages
-        unread_thread_query = supabase_service.client.table('thread_messages').select('*', count='exact').eq('is_read', 'false')
+        unread_thread_query = supabase_service.client.table('thread_messages').select('*', count='exact').eq('is_read', False)
         if start_date:
             unread_thread_query = unread_thread_query.gte('created_at', start_date_str)
         unread_thread_result = unread_thread_query.execute()
         unread_thread = unread_thread_result.count or 0
         
         # Broadcast recipients (count unread broadcast recipients)
-        unread_broadcast_result = supabase_service.client.table('broadcast_recipients').select('*', count='exact').eq('is_read', 'false').execute()
+        unread_broadcast_result = supabase_service.client.table('broadcast_recipients').select('*', count='exact').eq('is_read', False).execute()
         unread_broadcast = unread_broadcast_result.count or 0
         
         unread_messages = unread_regular + unread_thread + unread_broadcast

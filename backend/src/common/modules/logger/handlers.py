@@ -72,7 +72,9 @@ class DatabaseSystemLogHandler(logging.Handler):
         """Initialize database system log handler."""
         super().__init__(level)
         self._enabled = getattr(settings, "LOG_DB_ENABLED", True)
-        self._min_level = getattr(settings, "LOG_DB_MIN_LEVEL", "DEBUG")
+        # System logs should not include DEBUG and INFO levels (too verbose)
+        # Use WARNING as minimum level for system logs
+        self._min_level = getattr(settings, "LOG_DB_SYSTEM_MIN_LEVEL", "WARNING")
         
         # Log level priority (higher = more important)
         self.log_levels = {

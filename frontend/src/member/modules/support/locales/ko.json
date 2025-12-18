@@ -1,14 +1,12 @@
 {
   "support": {
     "title": "원스톱 지원",
-    "subtitle": "문의, FAQ, 알림 센터",
+    "subtitle": "문의, FAQ",
     "inquiry": "1:1 문의",
     "faq": "자주 묻는 질문",
-    "notifications": "알림 센터",
     "newInquiry": "새 문의",
     "inquiryHistory": "문의 내역",
     "noInquiries": "문의 내역이 없습니다",
-    "noNotifications": "알림이 없습니다",
     "category": {
       "general": "일반 문의",
       "support": "기술 지원",

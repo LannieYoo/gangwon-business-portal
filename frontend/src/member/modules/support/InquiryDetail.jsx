@@ -191,12 +191,6 @@ export default function InquiryDetail() {
             exact: true,
             activePaths: ['/member/support/inquiry-history', '/member/support/inquiry'],
             label: t('support.inquiryHistory')
-          },
-          {
-            key: 'support-notifications',
-            path: '/member/support/notifications',
-            exact: true,
-            label: t('support.notifications')
           }
         ]}
         className="support-submenu bg-white/95 shadow-md border-b border-gray-200/50 sticky top-0 z-10 backdrop-blur-md"

@@ -88,7 +88,16 @@
     },
     "attachment": "📎",
     "resultsCount": "共{{count}}条记录",
-    "itemsPerPage": "每页显示"
+    "itemsPerPage": "每页显示",
+    "notifications": "通知"
+  },
+  "notifications": {
+    "unread": "未读",
+    "empty": "暂无通知",
+    "important": "重要",
+    "viewAll": "查看全部通知",
+    "fromMember": "来自 {{name}} 的咨询",
+    "adminReplied": "管理员回复了您的咨询"
   },
   "nav": {
     "home": "首页",
@@ -180,10 +189,16 @@
     "messages": {
       "title": "通知中心",
       "tabs": {
+        "threads": "1对1咨询",
         "list": "消息列表",
         "send": "发送消息",
         "broadcast": "群发消息",
         "analytics": "消息统计"
+      },
+      "threads": {
+        "title": "1对1咨询列表",
+        "description": "查看和回复会员的1对1咨询请求。",
+        "empty": "暂无咨询请求"
       },
       "list": {
         "title": "消息列表",
@@ -280,11 +295,15 @@
         "back": "返回",
         "backToList": "返回消息列表",
         "notFound": "会话不存在",
+        "subject": "主题",
         "member": "会员",
+        "category": "分类",
         "created": "创建时间",
         "lastMessage": "最后消息",
+        "unread": "未读",
         "messageSent": "消息发送成功",
         "confirmClose": "确定要关闭这个会话吗？",
+        "closeWarning": "关闭后将无法继续回复。确定要继续吗？",
         "closed": "会话已关闭",
         "reopened": "会话已重新打开",
         "reply": "回复",
@@ -314,7 +333,8 @@
         "clickToUpload": "点击上传文件或拖拽到此处",
         "supportedFormats": "支持 PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, GIF",
         "markAsImportant": "标记为重要消息",
-        "send": "发送"
+        "send": "发送",
+        "sendHint": "Enter 发送，Shift+Enter 换行"
       }
     },
     "dashboard": {
@@ -486,7 +506,6 @@
     "notice": "公告",
     "news": "新闻",
     "resources": "资料库",
-    "category": "分类",
     "subject": "标题",
     "content": "内容",
     "answer": "回答",
@@ -510,6 +529,28 @@
     "uploadFailed": "文件上传失败，请重试",
     "addAttachment": "添加附件",
     "attachmentHint": "支持 PDF、Word、Excel、图片格式，单个文件最大 10MB",
+    "inquiryDetail": "咨询详情",
+    "inquiryHistory": "咨询历史",
+    "noMessages": "暂无消息",
+    "noInquiries": "暂无咨询记录",
+    "noMatchingInquiries": "没有匹配的咨询记录",
+    "createFirstInquiry": "提交第一个咨询",
+    "searchPlaceholder": "搜索标题...",
+    "statusLabel": "状态",
+    "lastReply": "最后回复",
+    "messageCount": "消息数",
+    "user": "我",
+    "admin": "管理员",
+    "reply": "回复",
+    "replyPlaceholder": "请输入回复内容...",
+    "sendReply": "发送回复",
+    "replyFailed": "回复发送失败，请重试",
+    "attachmentNumber": "附件 {{number}}",
+    "status": {
+      "open": "进行中",
+      "resolved": "已解决",
+      "closed": "已关闭"
+    },
     "category": {
       "general": "一般咨询",
       "support": "技术支持",

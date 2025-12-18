@@ -352,6 +352,26 @@ class EmailService:
                 "thread_link": thread_link
             }
         )
+    
+    async def send_admin_thread_reply_notification(
+        self,
+        *,
+        to_email: str,
+        member_name: str,
+        subject: str,
+        thread_link: str,
+    ) -> bool:
+        """Send notification to admin about member reply in existing thread."""
+        return await self.send_email(
+            to_email=to_email,
+            subject=f"새 답글: {subject}",
+            template_name="admin_new_thread",  # Reuse same template, different subject
+            template_data={
+                "member_name": member_name,
+                "subject": subject,
+                "thread_link": thread_link
+            }
+        )
 
 
 # Shared singleton used across the application

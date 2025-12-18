@@ -50,7 +50,7 @@ class LoggingService:
 
         Writes to:
         - File log (always, for debugging and backup)
-        - Database (async batch write, only for important logs: WARNING/ERROR/CRITICAL by default)
+        - Database (async batch write, INFO and above by default)
 
         Args:
             source: Source of the log (backend/frontend)

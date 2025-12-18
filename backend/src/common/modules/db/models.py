@@ -4,6 +4,7 @@ Database models for the application.
 This module defines all SQLAlchemy models for the database schema.
 """
 from sqlalchemy import (
+    Boolean,
     Column,
     String,
     Integer,
@@ -524,8 +525,8 @@ class Message(Base):
     recipient_id = Column(UUID(as_uuid=True), ForeignKey("members.id", ondelete="CASCADE"), nullable=False, comment="Member ID who receives the message")
     subject = Column(String(255), nullable=False)
     content = Column(Text, nullable=False)
-    is_read = Column(String(10), nullable=False, server_default="false")
-    is_important = Column(String(10), nullable=False, server_default="false")
+    is_read = Column(Boolean, nullable=False, server_default="false")
+    is_important = Column(Boolean, nullable=False, server_default="false")
     read_at = Column(TIMESTAMP(timezone=True), nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -587,8 +588,8 @@ class ThreadMessage(Base):
     sender_id = Column(UUID(as_uuid=True), nullable=False, comment="User ID who sent the message")
     sender_type = Column(String(20), nullable=False, comment="admin or member")
     content = Column(Text, nullable=False)
-    is_read = Column(String(10), nullable=False, server_default="false")
-    is_important = Column(String(10), nullable=False, server_default="false")
+    is_read = Column(Boolean, nullable=False, server_default="false")
+    is_important = Column(Boolean, nullable=False, server_default="false")
     read_at = Column(TIMESTAMP(timezone=True), nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -670,7 +671,7 @@ class BroadcastRecipient(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     broadcast_id = Column(UUID(as_uuid=True), ForeignKey("broadcast_messages.id", ondelete="CASCADE"), nullable=False)
     member_id = Column(UUID(as_uuid=True), ForeignKey("members.id", ondelete="CASCADE"), nullable=False)
-    is_read = Column(String(10), nullable=False, server_default="false")
+    is_read = Column(Boolean, nullable=False, server_default="false")
     read_at = Column(TIMESTAMP(timezone=True), nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 

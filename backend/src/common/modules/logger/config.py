@@ -39,10 +39,12 @@ def setup_logging() -> None:
     - Structured JSON formatting (production) or plain text (debug)
     """
     # Determine log level
+    # System logs should not include DEBUG and INFO levels (too verbose)
+    # Use WARNING as minimum level for system logs
     if settings.DEBUG:
-        level = logging.DEBUG
+        level = logging.WARNING  # Even in DEBUG mode, system logs use WARNING minimum
     else:
-        level = get_log_level(getattr(settings, "LOG_LEVEL", "INFO"))
+        level = get_log_level(getattr(settings, "LOG_LEVEL", "WARNING"))
 
     # Choose formatter based on environment
     if settings.DEBUG:

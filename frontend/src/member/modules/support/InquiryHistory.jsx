@@ -3,34 +3,17 @@
  * 咨询历史记录组件 - 表格布局，与其他模块保持一致
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '@shared/utils/format';
 import { useNavigate } from 'react-router-dom';
 import Card, { CardBody } from '@shared/components/Card';
-import { Badge, Pagination, Modal } from '@shared/components';
+import { Badge, Pagination } from '@shared/components';
 import Button from '@shared/components/Button';
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@shared/components/Table';
 import { messagesService } from '@shared/services';
-import { SearchIcon, DocumentIcon } from '@shared/components/Icons';
-
-// 用户头像组件
-function UserAvatar({ name, isAdmin = false, size = 'md' }) {
-  const sizeClasses = {
-    sm: 'w-8 h-8 text-xs',
-    md: 'w-10 h-10 text-sm',
-    lg: 'w-12 h-12 text-base'
-  };
-  
-  const initials = name ? name.charAt(0).toUpperCase() : '?';
-  const bgColor = isAdmin ? 'bg-primary-500' : 'bg-gray-400';
-  
-  return (
-    <div className={`${sizeClasses[size]} ${bgColor} rounded-full flex items-center justify-center text-white font-medium flex-shrink-0`}>
-      {initials}
-    </div>
-  );
-}
+import { SearchIcon } from '@shared/components/Icons';
+import ThreadDetailModal from '@shared/components/ThreadDetailModal';
 
 export default function InquiryHistory() {
   const { t } = useTranslation();
@@ -38,12 +21,6 @@ export default function InquiryHistory() {
   const [threads, setThreads] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedThreadId, setSelectedThreadId] = useState(null);
-  const [selectedThreadData, setSelectedThreadData] = useState(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
-  const [replyContent, setReplyContent] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const messagesEndRef = useRef(null);
-  const loadingThreadRef = useRef(null); // 防止重复请求
   
   // 搜索和过滤状态
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -138,116 +115,16 @@ export default function InquiryHistory() {
   };
 
   // 打开详情模态框
-  const openDetailModal = async (threadId) => {
-    // 防止重复请求同一个 thread
-    if (loadingThreadRef.current === threadId) {
-      return;
-    }
-    
-    // 如果已经有缓存的数据且是同一个 thread，直接使用
-    if (selectedThreadData?.thread?.id === threadId && selectedThreadId === threadId) {
-      return;
-    }
-    
+  const openDetailModal = (threadId) => {
     setSelectedThreadId(threadId);
-    setLoadingDetail(true);
-    setReplyContent('');
-    loadingThreadRef.current = threadId;
-    
-    try {
-      const response = await messagesService.getMemberThread(threadId);
-      if (response) {
-        setSelectedThreadData(response);
-        // 滚动到底部
-        setTimeout(() => {
-          if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-          }
-        }, 100);
-      }
-    } catch (err) {
-      console.error('Failed to load thread detail:', err);
-    } finally {
-      setLoadingDetail(false);
-      loadingThreadRef.current = null;
-    }
   };
 
   // 关闭详情模态框
   const closeDetailModal = () => {
     setSelectedThreadId(null);
-    setSelectedThreadData(null);
-    setReplyContent('');
-    loadingThreadRef.current = null;
+    // 刷新列表
+    loadThreads(pagination.page);
   };
-
-  // 处理回复
-  const handleReply = async () => {
-    if (!selectedThreadId || !replyContent.trim()) {
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const newMessage = await messagesService.createMemberThreadMessage(selectedThreadId, {
-        content: replyContent,
-        isImportant: false,
-        attachments: []
-      });
-      // 更新模态框中的线程数据
-      if (selectedThreadData) {
-        setSelectedThreadData(prev => ({
-          ...prev,
-          messages: [...(prev.messages || []), newMessage]
-        }));
-      }
-      // 更新列表中的线程信息
-      setThreads(prev => prev.map(thread => {
-        if (thread.id === selectedThreadId) {
-          return {
-            ...thread,
-            messageCount: (thread.messageCount || 0) + 1,
-            lastMessageAt: newMessage.createdAt
-          };
-        }
-        return thread;
-      }));
-      setReplyContent('');
-      // 滚动到底部
-      setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    } catch (err) {
-      console.error('Failed to send reply:', err);
-      alert(t('support.replyFailed'));
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // 下载附件
-  const handleDownload = (attachment) => {
-    const link = document.createElement('a');
-    link.href = attachment.file_path || attachment.fileUrl;
-    link.download = attachment.file_name || attachment.fileName || 'attachment';
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  // 滚动到底部
-  useEffect(() => {
-    if (selectedThreadData && selectedThreadId) {
-      setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    }
-  }, [selectedThreadData, selectedThreadId]);
 
   return (
     <div className="w-full">
@@ -378,126 +255,12 @@ export default function InquiryHistory() {
       </Card>
 
       {/* 详情模态框 */}
-      <Modal
+      <ThreadDetailModal
+        threadId={selectedThreadId}
         isOpen={selectedThreadId !== null}
         onClose={closeDetailModal}
-        title={selectedThreadData?.thread?.subject || t('support.inquiryDetail')}
-        size="xl"
-      >
-        {loadingDetail ? (
-          <div className="p-8 text-center">
-            <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-2"></div>
-            <p className="text-sm text-gray-500">{t('common.loading')}</p>
-          </div>
-        ) : selectedThreadData ? (
-          <div className="max-h-[70vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            <div className="mb-6">
-              {!selectedThreadData.messages || selectedThreadData.messages.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 text-sm">
-                  {t('support.noMessages')}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {selectedThreadData.messages.map((msg) => {
-                  const isMember = msg.senderType === 'member';
-                  const senderName = msg.senderName || (isMember ? t('support.user') : t('support.admin'));
-                  
-                  return (
-                    <div
-                      key={msg.id}
-                      className={`flex gap-3 ${isMember ? 'justify-start' : 'justify-end'}`}
-                    >
-                      {isMember && (
-                        <UserAvatar 
-                          name={senderName} 
-                          isAdmin={false}
-                          size="md"
-                        />
-                      )}
-                      <div className={`flex flex-col ${isMember ? 'max-w-[75%]' : 'max-w-[75%] items-end'}`}>
-                        <div className={`rounded-lg px-4 py-3 ${
-                          isMember 
-                            ? 'bg-gray-100 text-gray-900' 
-                            : 'bg-primary-500 text-white'
-                        }`}>
-                          <div className={`flex items-center gap-2 mb-2 ${isMember ? 'justify-start' : 'justify-end'}`}>
-                            <span className={`text-xs font-medium ${
-                              isMember ? 'text-gray-600' : 'text-primary-50'
-                            }`}>
-                              {senderName}
-                            </span>
-                            <time className={`text-xs ${
-                              isMember ? 'text-gray-500' : 'text-primary-100'
-                            }`}>
-                              {msg.createdAt ? formatDateTime(msg.createdAt) : ''}
-                            </time>
-                          </div>
-                          <div className={`text-sm leading-relaxed whitespace-pre-wrap ${
-                            isMember ? 'text-gray-900' : 'text-white'
-                          }`}>
-                            {msg.content}
-                          </div>
-                          {msg.attachments && msg.attachments.length > 0 && (
-                            <div className={`space-y-1 mt-3 pt-3 border-t ${
-                              isMember ? 'border-gray-300' : 'border-primary-400'
-                            }`}>
-                              {msg.attachments.map((attachment, attIndex) => (
-                                <button
-                                  key={attIndex}
-                                  onClick={() => handleDownload(attachment)}
-                                  className={`flex items-center gap-2 text-xs ${
-                                    isMember 
-                                      ? 'text-primary-600 hover:text-primary-800' 
-                                      : 'text-primary-50 hover:text-white'
-                                  }`}
-                                >
-                                  <DocumentIcon className="w-4 h-4" />
-                                  <span className="truncate">{attachment.file_name || attachment.fileName || t('support.attachmentNumber', { number: attIndex + 1 })}</span>
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      {!isMember && (
-                        <UserAvatar 
-                          name={senderName} 
-                          isAdmin={true}
-                          size="md"
-                        />
-                      )}
-                    </div>
-                  );
-                  })}
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {selectedThreadData.thread.status === 'open' && (
-              <div className="pt-4 border-t border-gray-200">
-                <textarea
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  placeholder={t('support.replyPlaceholder')}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm mb-3"
-                  rows={4}
-                />
-                <div className="flex justify-end">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={handleReply}
-                    disabled={!replyContent.trim() || submitting}
-                  >
-                    {submitting ? t('common.sending') : t('support.sendReply')}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : null}
-      </Modal>
+        onMessageSent={() => loadThreads(pagination.page)}
+      />
     </div>
   );
 }

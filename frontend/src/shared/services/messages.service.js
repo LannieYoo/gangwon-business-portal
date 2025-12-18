@@ -316,6 +316,35 @@ const messagesService = {
   },
 
   /**
+   * Get admin threads list
+   * @param {Object} params - Query parameters
+   * @param {number} params.page - Page number
+   * @param {number} params.pageSize - Page size
+   * @param {string} params.status - Filter by status (open, resolved, closed)
+   * @param {boolean} params.hasUnread - Filter threads with unread messages
+   * @returns {Promise<Object>} Threads list response
+   */
+  async getAdminThreads(params = {}) {
+    const queryParams = new URLSearchParams({
+      page: (params.page || 1).toString(),
+      page_size: (params.pageSize || 20).toString(),
+    });
+
+    if (params.status) {
+      queryParams.append('status', params.status);
+    }
+    if (params.hasUnread !== undefined) {
+      queryParams.append('has_unread', params.hasUnread.toString());
+    }
+
+    const response = await apiService.get(`${BASE_URL}/threads?${queryParams.toString()}`);
+    return {
+      ...response,
+      items: (response.items || []).map(toCamelCase),
+    };
+  },
+
+  /**
    * Create thread (member)
    * @param {Object} data - Thread data
    * @param {string} data.subject - Thread subject

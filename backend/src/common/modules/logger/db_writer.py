@@ -49,7 +49,8 @@ class DatabaseLogWriter:
         # Configuration
         self.batch_size = getattr(settings, "LOG_DB_BATCH_SIZE", 50)  # Batch size
         self.batch_interval = getattr(settings, "LOG_DB_BATCH_INTERVAL", 5.0)  # Seconds
-        self.min_log_level = getattr(settings, "LOG_DB_MIN_LEVEL", "WARNING")  # Only ERROR/WARNING by default
+        self.min_log_level = getattr(settings, "LOG_DB_APP_MIN_LEVEL", "INFO")  # App logs: INFO and above by default
+        self.min_system_log_level = getattr(settings, "LOG_DB_SYSTEM_MIN_LEVEL", "WARNING")  # System logs: WARNING and above by default
         
         # Log level priority (higher = more important)
         self.log_levels = {
@@ -186,12 +187,21 @@ class DatabaseLogWriter:
             # Don't raise - graceful degradation
     
     def _should_write_to_db(self, level: str) -> bool:
-        """Check if log level should be written to database."""
+        """Check if app log level should be written to database."""
         if not self._enabled:
             return False
         
         log_priority = self.log_levels.get(level.upper(), 0)
         min_priority = self.log_levels.get(self.min_log_level.upper(), 0)
+        return log_priority >= min_priority
+    
+    def _should_write_system_log_to_db(self, level: str) -> bool:
+        """Check if system log level should be written to database."""
+        if not self._enabled:
+            return False
+        
+        log_priority = self.log_levels.get(level.upper(), 0)
+        min_priority = self.log_levels.get(self.min_system_log_level.upper(), 0)
         return log_priority >= min_priority
     
     def enqueue_log(
@@ -284,6 +294,7 @@ class DatabaseLogWriter:
             "queue_size": self.log_queue.qsize(),
             "enabled": self._enabled,
             "min_log_level": self.min_log_level,
+            "min_system_log_level": self.min_system_log_level,
             "batch_size": self.batch_size,
             "batch_interval": self.batch_interval,
         }
@@ -438,8 +449,8 @@ class DatabaseLogWriter:
         if not self._enabled:
             return
         
-        # Check if log level should be written to database
-        if not self._should_write_to_db(level):
+        # Check if system log level should be written to database
+        if not self._should_write_system_log_to_db(level):
             return
         
         try:
