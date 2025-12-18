@@ -36,9 +36,9 @@ services:
       - key: LOG_DB_ENABLED
         value: "true"
       - key: LOG_DB_MIN_LEVEL
-        value: "INFO"  # 在云平台上，将更多日志写入数据库以确保持久化
+        value: "DEBUG"  # 所有日志级别都写入数据库，实现永久存储
       - key: LOG_ENABLE_FILE
-        value: "false"  # 禁用文件日志（Render 容器重启会丢失文件）
+        value: "true"  # 启用文件日志（容器运行期间可实时查看，重启后会丢失但数据库有备份）
       - key: DEBUG
         value: "false"
 

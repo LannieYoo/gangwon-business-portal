@@ -1,9 +1,11 @@
 """Custom log handlers."""
 import logging
 import sys
+import threading
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from ..config import settings
 
@@ -59,6 +61,95 @@ def create_file_handler(
     handler.setLevel(level)
     handler.setFormatter(formatter)
     return handler
+
+
+class DatabaseSystemLogHandler(logging.Handler):
+    """Custom logging handler that writes system logs to database.
+    
+    This handler writes logs from Python's standard logging module
+    (system.log) to the system_logs table in Supabase.
+    """
+    
+    def __init__(self, level=logging.NOTSET):
+        """Initialize database system log handler."""
+        super().__init__(level)
+        self._enabled = getattr(settings, "LOG_DB_ENABLED", True)
+        self._min_level = getattr(settings, "LOG_DB_MIN_LEVEL", "DEBUG")
+        
+        # Log level priority (higher = more important)
+        self.log_levels = {
+            "DEBUG": 0,
+            "INFO": 1,
+            "WARNING": 2,
+            "ERROR": 3,
+            "CRITICAL": 4,
+        }
+        
+    def emit(self, record: logging.LogRecord) -> None:
+        """Emit a log record to database.
+        
+        Args:
+            record: Log record to emit
+        """
+        if not self._enabled:
+            return
+        
+        # Check if log level should be written to database
+        log_priority = self.log_levels.get(record.levelname, 0)
+        min_priority = self.log_levels.get(self._min_level.upper(), 0)
+        if log_priority < min_priority:
+            return
+        
+        try:
+            from ..supabase.client import get_supabase_client
+            
+            supabase = get_supabase_client()
+            
+            # Extract information from log record
+            system_log_data = {
+                "id": str(uuid4()),
+                "level": record.levelname,
+                "message": self.format(record),
+                "logger_name": record.name,
+                "module": record.module if hasattr(record, "module") else None,
+                "function": record.funcName if hasattr(record, "funcName") else None,
+                "line_number": record.lineno if hasattr(record, "lineno") else None,
+                "process_id": record.process if hasattr(record, "process") else None,
+                "thread_name": record.threadName if hasattr(record, "threadName") else None,
+            }
+            
+            # Add extra data if available
+            extra_data = {}
+            if hasattr(record, "pathname"):
+                extra_data["pathname"] = record.pathname
+            if record.exc_info:
+                import traceback
+                extra_data["exc_info"] = traceback.format_exception(*record.exc_info)
+            if hasattr(record, "exc_text") and record.exc_text:
+                extra_data["exc_text"] = record.exc_text
+            
+            if extra_data:
+                system_log_data["extra_data"] = extra_data
+            
+            # Remove None values
+            system_log_data = {k: v for k, v in system_log_data.items() if v is not None}
+            
+            # Insert using Supabase API (run in thread to avoid blocking)
+            def _insert_system_log():
+                try:
+                    return supabase.table("system_logs").insert(system_log_data).execute()
+                except Exception:
+                    # Don't log here to avoid infinite recursion
+                    pass
+            
+            # Run in background thread (fire-and-forget)
+            thread = threading.Thread(target=_insert_system_log, daemon=True)
+            thread.start()
+            
+        except Exception:
+            # Don't fail if database write fails (graceful degradation)
+            # Don't log here to avoid infinite recursion
+            pass
 
 
 

@@ -5,7 +5,7 @@ from pathlib import Path
 from ..config import settings
 from .filters import SensitiveDataFilter, ContextFilter
 from .formatter import JSONFormatter
-from .handlers import create_file_handler
+from .handlers import create_file_handler, DatabaseSystemLogHandler
 # from .handlers import create_console_handler  # Uncomment if console logging is needed
 
 
@@ -101,6 +101,13 @@ def setup_logging() -> None:
         file_handler.addFilter(sensitive_filter)
         file_handler.addFilter(context_filter)
         root_logger.addHandler(file_handler)
+    
+    # Database handler for system logs (if enabled)
+    if getattr(settings, "LOG_DB_ENABLED", True):
+        db_handler = DatabaseSystemLogHandler(level=level)
+        db_handler.addFilter(sensitive_filter)
+        db_handler.addFilter(context_filter)
+        root_logger.addHandler(db_handler)
 
     # Suppress noisy third-party loggers in production
     if not settings.DEBUG:

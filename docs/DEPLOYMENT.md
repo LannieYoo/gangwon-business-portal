@@ -226,10 +226,12 @@ NICE_DNB_API_URL=https://gate.nicednb.com
 
 1. **端口配置**: Render 使用 `$PORT` 环境变量，代码中需要读取
 2. **日志持久化**: 
-   - ⚠️ **重要**: Render 容器重启时，本地文件系统会被清空，所有日志文件会丢失
-   - ✅ **解决方案**: 系统已配置将日志写入数据库（`app_logs` 表），确保日志持久化
-   - 📝 **配置**: `LOG_DB_ENABLED=true` 和 `LOG_ENABLE_FILE=false`（已在 render.yaml 中配置）
-   - 💾 **数据库日志**: 所有重要日志（INFO 级别及以上）都会写入 Supabase 数据库，不会丢失
+   - ⚠️ **重要**: Render 容器重启时，本地文件系统会被清空，文件日志会丢失
+   - ✅ **解决方案**: 系统已配置双重日志机制
+     - 📝 **文件日志**: 容器运行期间可实时查看（通过 Render Dashboard Logs），方便排查问题
+     - 💾 **数据库日志**: 永久保存到 Supabase 数据库（`app_logs` 表），即使容器重启也不丢失
+   - 📝 **配置**: `LOG_DB_ENABLED=true` 和 `LOG_ENABLE_FILE=true`（已在 render.yaml 中配置）
+   - 🔄 **互补作用**: 文件日志用于实时排查，数据库日志用于历史查询和备份
 3. **数据库迁移**: 在 Build Command 中自动运行
 
 ---
@@ -857,11 +859,11 @@ Render 会自动使用此端点进行健康检查。
 ```yaml
 envVars:
   - key: LOG_DB_ENABLED
-    value: "true"  # 启用数据库日志
+    value: "true"  # 启用数据库日志（永久存储）
   - key: LOG_DB_MIN_LEVEL
-    value: "INFO"  # 记录 INFO 及以上级别
+    value: "DEBUG"  # 所有日志级别都写入数据库，实现永久存储
   - key: LOG_ENABLE_FILE
-    value: "false"  # 禁用文件日志（避免浪费资源）
+    value: "true"  # 启用文件日志（容器运行期间实时查看）
 ```
 
 #### 本地开发配置（.env.local）
@@ -879,10 +881,15 @@ LOG_ENABLE_FILE=true  # 本地启用文件日志便于调试
 
 | 日志类型 | 文件存储 | 数据库存储 | 持久化状态 |
 |---------|---------|-----------|-----------|
-| **应用日志** (app.log) | ❌ 临时 | ✅ 永久 | ✅ 已持久化 |
-| **错误日志** (error.log) | ❌ 临时 | ✅ 永久 | ✅ 已持久化 |
-| **审计日志** (audit.log) | ❌ 临时 | ✅ 永久 | ✅ 已持久化 |
-| **系统日志** (system.log) | ❌ 临时 | ❌ 不存储 | ⚠️ 仅用于调试 |
+| **应用日志** (app.log) | ⚠️ 临时 | ✅ 永久（`app_logs` 表，所有级别） | ✅ 已持久化 |
+| **错误日志** (error.log) | ⚠️ 临时 | ✅ 永久（`error_logs` 表） | ✅ 已持久化 |
+| **审计日志** (audit.log) | ⚠️ 临时 | ✅ 永久（`audit_logs` 表） | ✅ 已持久化 |
+| **系统日志** (system.log) | ⚠️ 临时 | ✅ 永久（`system_logs` 表，所有级别） | ✅ 已持久化 |
+
+**注意**: 
+- 应用日志写入 `app_logs` 表（所有级别：DEBUG/INFO/WARNING/ERROR/CRITICAL）
+- 异常日志写入 `error_logs` 表（专门的错误日志表，包含完整的堆栈跟踪）
+- 审计日志写入 `audit_logs` 表（合规和安全性追踪）
 
 ### 查看日志
 
@@ -911,22 +918,25 @@ GET /api/v1/logging/logs?trace_id=abc123
 
 ### 最佳实践
 
-1. **生产环境**: 
+1. **生产环境（Render）**: 
    - ✅ 启用数据库日志 (`LOG_DB_ENABLED=true`)
-   - ❌ 禁用文件日志 (`LOG_ENABLE_FILE=false`)
+   - ✅ 所有日志写入数据库 (`LOG_DB_MIN_LEVEL=DEBUG`) - **实现永久存储**
+   - ✅ 启用文件日志 (`LOG_ENABLE_FILE=true`) - 用于实时排查
    - 📊 定期清理旧日志（通过数据库维护任务）
 
 2. **本地开发**: 
    - ✅ 可以同时启用文件和数据库日志
    - 📝 文件日志便于实时查看和调试
+   - 💾 数据库日志可以设置为 `LOG_DB_MIN_LEVEL=WARNING`（减少本地数据库压力）
 
 3. **日志级别**: 
-   - 生产环境: `LOG_DB_MIN_LEVEL=INFO`（记录所有重要日志）
-   - 开发环境: `LOG_DB_MIN_LEVEL=WARNING`（只记录警告和错误）
+   - **生产环境**: `LOG_DB_MIN_LEVEL=DEBUG`（**所有日志永久存储**）
+   - 开发环境: `LOG_DB_MIN_LEVEL=WARNING`（可选，减少本地数据库压力）
 
 4. **日志清理**: 
    - 建议定期清理超过 90 天的旧日志
    - 可以通过 Supabase 的定时任务或数据库维护脚本实现
+   - 注意：清理前确保已备份重要日志
 
 ### 故障排查
 

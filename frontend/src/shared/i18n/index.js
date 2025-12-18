@@ -143,14 +143,15 @@ i18n
   .use(initReactI18next) // 绑定 react-i18next
   .init({
     resources,
-    fallbackLng: 'ko', // 默认语言
+    lng: 'ko', // 强制默认韩语
+    fallbackLng: 'ko', // 回退语言
     supportedLngs: ['ko', 'zh'],
     debug: false, // 关闭调试日志
     interpolation: {
       escapeValue: false // React 已经安全处理
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'], // 只从 localStorage 读取，不检测浏览器语言
       lookupLocalStorage: 'language',
       caches: ['localStorage'],
       excludeCacheFor: ['cimode']

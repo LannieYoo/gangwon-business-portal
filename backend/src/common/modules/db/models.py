@@ -39,6 +39,8 @@ __all__ = [
     "Inquiry",
     "AuditLog",
     "AppLog",
+    "ErrorLog",
+    "SystemLog",
     "Admin",
     "Message",
     "NiceDnbCompanyInfo",
@@ -423,6 +425,75 @@ class AppLog(Base):
 
     def __repr__(self):
         return f"<AppLog(id={self.id}, source={self.source}, level={self.level}, created_at={self.created_at})>"
+
+
+class ErrorLog(Base):
+    """Error logs for exception tracking and debugging."""
+
+    __tablename__ = "error_logs"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    source = Column(String(20), nullable=False)  # backend, frontend
+    error_type = Column(String(255), nullable=False)  # Exception class name
+    error_message = Column(Text, nullable=False)
+    error_code = Column(String(100))  # Application error code
+    status_code = Column(Integer)  # HTTP status code
+    stack_trace = Column(Text)  # Full stack trace
+    module = Column(String(255))  # Module name
+    function = Column(String(255))  # Function name
+    line_number = Column(Integer)  # Line number
+    trace_id = Column(String(100))  # Request trace ID
+    user_id = Column(UUID(as_uuid=True), ForeignKey("members.id"), nullable=True)
+    ip_address = Column(String(45))
+    user_agent = Column(Text)
+    request_method = Column(String(10))  # GET, POST, etc.
+    request_path = Column(String(500))  # Request path
+    request_data = Column(JSONB)  # Request payload (sanitized)
+    error_details = Column(JSONB)  # Additional error details
+    context_data = Column(JSONB)  # Additional context data
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), index=True)
+
+    # Relationships
+    user = relationship("Member", foreign_keys=[user_id])
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_error_logs_source_type", "source", "error_type", "created_at"),
+        Index("idx_error_logs_trace_id", "trace_id"),
+        Index("idx_error_logs_user_id", "user_id", "created_at"),
+        Index("idx_error_logs_created", "created_at"),
+    )
+
+    def __repr__(self):
+        return f"<ErrorLog(id={self.id}, source={self.source}, error_type={self.error_type}, created_at={self.created_at})>"
+
+
+class SystemLog(Base):
+    """System logs for infrastructure and operational monitoring."""
+
+    __tablename__ = "system_logs"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    level = Column(String(20), nullable=False)  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+    message = Column(Text, nullable=False)
+    logger_name = Column(String(255))  # Logger name (e.g., uvicorn, sqlalchemy)
+    module = Column(String(255))  # Module name
+    function = Column(String(255))  # Function name
+    line_number = Column(Integer)  # Line number
+    process_id = Column(Integer)  # Process ID
+    thread_name = Column(String(100))  # Thread name
+    extra_data = Column(JSONB)  # Additional context data
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), index=True)
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_system_logs_level", "level", "created_at"),
+        Index("idx_system_logs_logger", "logger_name", "created_at"),
+        Index("idx_system_logs_created", "created_at"),
+    )
+
+    def __repr__(self):
+        return f"<SystemLog(id={self.id}, level={self.level}, logger_name={self.logger_name}, created_at={self.created_at})>"
 
 
 class Admin(Base):
