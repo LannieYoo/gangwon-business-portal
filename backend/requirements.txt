@@ -9,7 +9,7 @@ asyncpg==0.29.0
 alembic==1.13.0
 
 # Data Validation
-pydantic>=2.11.7,<3.0.0  # Required by supabase 2.25.1 (realtime needs >=2.11.7)
+pydantic[email]>=2.11.7,<3.0.0  # Required by supabase 2.25.1 (realtime needs >=2.11.7)
 pydantic-settings==2.1.0
 
 # Authentication & Security
