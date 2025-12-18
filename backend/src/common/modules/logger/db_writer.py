@@ -1,12 +1,16 @@
-"""Database log writer for application logs using Supabase API.
+"""Unified database log writer for all log types using Supabase API.
 
-This module provides asynchronous batch writing of logs to Supabase database.
-Uses a queue-based approach to batch insert logs, reducing database overhead.
+This module provides unified asynchronous writing of all log types to Supabase database:
+- Application logs (app_logs) - batch processing
+- Error logs (error_logs) - single insert
+- System logs (system_logs) - single insert
+- Audit logs (audit_logs) - single insert
 
 Features:
 - Asynchronous queue-based writing (non-blocking)
-- Batch insertion (configurable batch size and interval)
-- Log level filtering (only important logs go to database)
+- Batch insertion for application logs (configurable batch size and interval)
+- Single insert for error/system/audit logs (immediate write)
+- Log level filtering (configurable)
 - Failure handling with graceful degradation
 """
 import asyncio
@@ -315,6 +319,223 @@ class DatabaseLogWriter:
         
         if remaining:
             await self._flush_batch(remaining)
+    
+    def write_error_log(
+        self,
+        source: str,
+        error_type: str,
+        error_message: str,
+        error_code: Optional[str] = None,
+        status_code: Optional[int] = None,
+        stack_trace: Optional[str] = None,
+        module: Optional[str] = None,
+        function: Optional[str] = None,
+        line_number: Optional[int] = None,
+        trace_id: Optional[str] = None,
+        user_id: Optional[UUID] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        request_method: Optional[str] = None,
+        request_path: Optional[str] = None,
+        request_data: Optional[dict[str, Any]] = None,
+        error_details: Optional[dict[str, Any]] = None,
+        context_data: Optional[dict[str, Any]] = None,
+    ) -> None:
+        """Write an error log entry to error_logs table (async, non-blocking).
+        
+        Args:
+            source: Source of the error (backend/frontend)
+            error_type: Exception class name
+            error_message: Exception message
+            error_code: Application error code
+            status_code: HTTP status code
+            stack_trace: Full stack trace
+            module: Module name
+            function: Function name
+            line_number: Line number
+            trace_id: Request trace ID
+            user_id: User ID
+            ip_address: IP address
+            user_agent: User agent string
+            request_method: HTTP method
+            request_path: Request path
+            request_data: Request payload (sanitized)
+            error_details: Additional error details
+            context_data: Additional context data
+        """
+        if not self._enabled:
+            return
+        
+        try:
+            error_data = {
+                "id": str(uuid4()),
+                "source": source,
+                "error_type": error_type,
+                "error_message": error_message,
+                "error_code": error_code,
+                "status_code": status_code,
+                "stack_trace": stack_trace,
+                "module": module,
+                "function": function,
+                "line_number": line_number,
+                "trace_id": trace_id,
+                "user_id": str(user_id) if user_id else None,
+                "ip_address": ip_address,
+                "user_agent": user_agent,
+                "request_method": request_method,
+                "request_path": request_path,
+                "request_data": request_data,
+                "error_details": error_details,
+                "context_data": context_data,
+            }
+            
+            # Remove None values
+            error_data = {k: v for k, v in error_data.items() if v is not None}
+            
+            # Insert using Supabase API (run in thread to avoid blocking)
+            def _insert_error_log():
+                try:
+                    client = get_supabase_client()
+                    return client.table("error_logs").insert(error_data).execute()
+                except Exception:
+                    # Don't log here to avoid infinite recursion
+                    pass
+            
+            # Run in background thread (fire-and-forget)
+            import threading
+            thread = threading.Thread(target=_insert_error_log, daemon=True)
+            thread.start()
+            
+        except Exception:
+            # Don't fail if database write fails (graceful degradation)
+            pass
+    
+    def write_system_log(
+        self,
+        level: str,
+        message: str,
+        logger_name: Optional[str] = None,
+        module: Optional[str] = None,
+        function: Optional[str] = None,
+        line_number: Optional[int] = None,
+        process_id: Optional[int] = None,
+        thread_name: Optional[str] = None,
+        extra_data: Optional[dict[str, Any]] = None,
+    ) -> None:
+        """Write a system log entry to system_logs table (async, non-blocking).
+        
+        Args:
+            level: Log level (DEBUG/INFO/WARNING/ERROR/CRITICAL)
+            message: Log message
+            logger_name: Logger name (e.g., uvicorn, sqlalchemy)
+            module: Module name
+            function: Function name
+            line_number: Line number
+            process_id: Process ID
+            thread_name: Thread name
+            extra_data: Additional context data
+        """
+        if not self._enabled:
+            return
+        
+        # Check if log level should be written to database
+        if not self._should_write_to_db(level):
+            return
+        
+        try:
+            system_log_data = {
+                "id": str(uuid4()),
+                "level": level.upper(),
+                "message": message,
+                "logger_name": logger_name,
+                "module": module,
+                "function": function,
+                "line_number": line_number,
+                "process_id": process_id,
+                "thread_name": thread_name,
+                "extra_data": extra_data,
+            }
+            
+            # Remove None values
+            system_log_data = {k: v for k, v in system_log_data.items() if v is not None}
+            
+            # Insert using Supabase API (run in thread to avoid blocking)
+            def _insert_system_log():
+                try:
+                    client = get_supabase_client()
+                    return client.table("system_logs").insert(system_log_data).execute()
+                except Exception:
+                    # Don't log here to avoid infinite recursion
+                    pass
+            
+            # Run in background thread (fire-and-forget)
+            import threading
+            thread = threading.Thread(target=_insert_system_log, daemon=True)
+            thread.start()
+            
+        except Exception:
+            # Don't fail if database write fails (graceful degradation)
+            pass
+    
+    async def write_audit_log(
+        self,
+        action: str,
+        user_id: Optional[UUID] = None,
+        resource_type: Optional[str] = None,
+        resource_id: Optional[UUID] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        extra_data: Optional[dict[str, Any]] = None,
+    ) -> Optional[dict[str, Any]]:
+        """Write an audit log entry to audit_logs table (async, non-blocking).
+        
+        Args:
+            action: Action type (e.g., 'login', 'create', 'update', 'delete', 'approve')
+            user_id: User ID who performed the action
+            resource_type: Type of resource (e.g., 'member', 'performance', 'project')
+            resource_id: ID of the affected resource
+            ip_address: IP address of the user
+            user_agent: User agent string
+            extra_data: Additional context data
+            
+        Returns:
+            Created audit log data as dict, or None if failed
+        """
+        if not self._enabled:
+            return None
+        
+        try:
+            audit_data = {
+                "id": str(uuid4()),
+                "user_id": str(user_id) if user_id else None,
+                "action": action,
+                "resource_type": resource_type,
+                "resource_id": str(resource_id) if resource_id else None,
+                "ip_address": ip_address,
+                "user_agent": user_agent,
+            }
+            
+            if extra_data:
+                audit_data.update(extra_data)
+            
+            # Remove None values
+            audit_data = {k: v for k, v in audit_data.items() if v is not None}
+            
+            # Insert using Supabase API (run in thread pool to avoid blocking)
+            def _insert_audit_log():
+                client = get_supabase_client()
+                return client.table("audit_logs").insert(audit_data).execute()
+            
+            result = await asyncio.to_thread(_insert_audit_log)
+            
+            if result.data and len(result.data) > 0:
+                return result.data[0]
+            else:
+                return None
+                
+        except Exception:
+            # Don't fail if database write fails (graceful degradation)
+            return None
 
 
 # Singleton instance

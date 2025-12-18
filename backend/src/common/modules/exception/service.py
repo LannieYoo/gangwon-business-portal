@@ -7,10 +7,9 @@ Writes to both file logs and error_logs table for permanent storage.
 from typing import Optional, Any
 from uuid import UUID
 import traceback
-import asyncio
 
 from ..logger.file_writer import file_log_writer
-from ..supabase.client import get_supabase_client
+from ..logger.db_writer import db_log_writer
 
 
 class ExceptionService:
@@ -87,57 +86,28 @@ class ExceptionService:
             # Don't fail if file write fails
             pass
         
-        # Write to error_logs table (for permanent storage)
+        # Write to error_logs table using unified db_log_writer (for permanent storage)
         try:
-            from uuid import uuid4
-            
-            supabase = get_supabase_client()
-            
-            error_data = {
-                "id": str(uuid4()),
-                "source": source,
-                "error_type": exception_type,
-                "error_message": exception_message,
-                "error_code": error_code,
-                "status_code": status_code,
-                "stack_trace": stack_trace,
-                "module": None,  # Can be extracted from stack_trace if needed
-                "function": None,
-                "line_number": None,
-                "trace_id": trace_id,
-                "user_id": str(user_id) if user_id else None,
-                "ip_address": ip_address,
-                "user_agent": user_agent,
-                "request_method": request_method,
-                "request_path": request_path,
-                "request_data": request_data,
-                "error_details": exception_details,
-                "context_data": context_data,
-            }
-            
-            # Remove None values (Supabase will use defaults)
-            error_data = {k: v for k, v in error_data.items() if v is not None}
-            
-            # Insert using Supabase API (run in thread pool to avoid blocking)
-            # This is a fire-and-forget operation, so we don't wait for the result
-            def _insert_error_log():
-                try:
-                    return supabase.table("error_logs").insert(error_data).execute()
-                except Exception as e:
-                    # Log error but don't raise (already in background thread)
-                    import logging
-                    logging.warning(f"Failed to insert error log to database: {str(e)}")
-            
-            # Run in background thread (fire-and-forget)
-            import threading
-            thread = threading.Thread(target=_insert_error_log, daemon=True)
-            thread.start()
-            
-        except Exception as e:
+            db_log_writer.write_error_log(
+                source=source,
+                error_type=exception_type,
+                error_message=exception_message,
+                error_code=error_code,
+                status_code=status_code,
+                stack_trace=stack_trace,
+                module=None,  # Can be extracted from stack_trace if needed
+                function=None,
+                line_number=None,
+                trace_id=trace_id,
+                user_id=user_id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                request_method=request_method,
+                request_path=request_path,
+                request_data=request_data,
+                error_details=exception_details,
+                context_data=context_data,
+            )
+        except Exception:
             # Don't fail if database write fails (graceful degradation)
-            # Log to file as fallback
-            try:
-                import logging
-                logging.warning(f"Failed to write error log to database: {str(e)}")
-            except Exception:
-                pass
+            pass

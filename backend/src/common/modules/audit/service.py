@@ -11,7 +11,7 @@ from uuid import UUID
 
 from ..db.models import AuditLog, Member
 from ..logger.file_writer import file_log_writer
-from ..supabase.client import get_supabase_client
+from ..logger.db_writer import db_log_writer
 from .schemas import AuditLogListQuery, AuditLogListResponse, AuditLogResponse
 
 
@@ -41,32 +41,18 @@ class AuditLogService:
         Returns:
             Created audit log data as dict
         """
-        from uuid import uuid4
-        
-        supabase = get_supabase_client()
-        
-        audit_data = {
-            "id": str(uuid4()),
-            "user_id": str(user_id) if user_id else None,
-            "action": action,
-            "resource_type": resource_type,
-            "resource_id": str(resource_id) if resource_id else None,
-            "ip_address": ip_address,
-            "user_agent": user_agent,
-        }
-        
         try:
-            # Insert using Supabase API (run in thread pool to avoid blocking)
-            import asyncio
+            # Write to audit_logs table using unified db_log_writer
+            created_log = await db_log_writer.write_audit_log(
+                action=action,
+                user_id=user_id,
+                resource_type=resource_type,
+                resource_id=resource_id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
             
-            def _insert_audit_log():
-                return supabase.table("audit_logs").insert(audit_data).execute()
-            
-            result = await asyncio.to_thread(_insert_audit_log)
-            
-            if result.data and len(result.data) > 0:
-                created_log = result.data[0]
-                
+            if created_log:
                 # Write to audit log file (non-blocking, fire-and-forget)
                 try:
                     file_log_writer.write_audit_log(
@@ -88,7 +74,8 @@ class AuditLogService:
                 
                 return created_log
             else:
-                raise Exception("Failed to create audit log: no data returned")
+                # Return empty dict on failure (graceful degradation)
+                return {}
                 
         except Exception as e:
             # Log error but don't fail the operation

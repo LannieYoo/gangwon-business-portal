@@ -1,11 +1,9 @@
 """Custom log handlers."""
 import logging
 import sys
-import threading
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Any
-from uuid import uuid4
 
 from ..config import settings
 
@@ -101,23 +99,9 @@ class DatabaseSystemLogHandler(logging.Handler):
             return
         
         try:
-            from ..supabase.client import get_supabase_client
-            
-            supabase = get_supabase_client()
+            from ..logger.db_writer import db_log_writer
             
             # Extract information from log record
-            system_log_data = {
-                "id": str(uuid4()),
-                "level": record.levelname,
-                "message": self.format(record),
-                "logger_name": record.name,
-                "module": record.module if hasattr(record, "module") else None,
-                "function": record.funcName if hasattr(record, "funcName") else None,
-                "line_number": record.lineno if hasattr(record, "lineno") else None,
-                "process_id": record.process if hasattr(record, "process") else None,
-                "thread_name": record.threadName if hasattr(record, "threadName") else None,
-            }
-            
             # Add extra data if available
             extra_data = {}
             if hasattr(record, "pathname"):
@@ -128,23 +112,18 @@ class DatabaseSystemLogHandler(logging.Handler):
             if hasattr(record, "exc_text") and record.exc_text:
                 extra_data["exc_text"] = record.exc_text
             
-            if extra_data:
-                system_log_data["extra_data"] = extra_data
-            
-            # Remove None values
-            system_log_data = {k: v for k, v in system_log_data.items() if v is not None}
-            
-            # Insert using Supabase API (run in thread to avoid blocking)
-            def _insert_system_log():
-                try:
-                    return supabase.table("system_logs").insert(system_log_data).execute()
-                except Exception:
-                    # Don't log here to avoid infinite recursion
-                    pass
-            
-            # Run in background thread (fire-and-forget)
-            thread = threading.Thread(target=_insert_system_log, daemon=True)
-            thread.start()
+            # Write to system_logs table using unified db_log_writer
+            db_log_writer.write_system_log(
+                level=record.levelname,
+                message=self.format(record),
+                logger_name=record.name,
+                module=record.module if hasattr(record, "module") else None,
+                function=record.funcName if hasattr(record, "funcName") else None,
+                line_number=record.lineno if hasattr(record, "lineno") else None,
+                process_id=record.process if hasattr(record, "process") else None,
+                thread_name=record.threadName if hasattr(record, "threadName") else None,
+                extra_data=extra_data if extra_data else None,
+            )
             
         except Exception:
             # Don't fail if database write fails (graceful degradation)
