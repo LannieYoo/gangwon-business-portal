@@ -32,11 +32,13 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
     # CORS Configuration
-    # Default allows both Vite dev ports (5173 and 3000)
+    # Default allows both Vite dev ports (5173 and 3000) and production domains
     # Can be set as comma-separated string in .env: "http://localhost:5173,http://localhost:3000"
     ALLOWED_ORIGINS: Union[List[str], str] = [
         "http://localhost:5173",
         "http://localhost:3000",
+        "https://gangwon-portal-frontend.onrender.com",
+        "https://gangwon-business-portal-frontend.onrender.com",
     ]
 
     @field_validator('ALLOWED_ORIGINS', mode='before')
