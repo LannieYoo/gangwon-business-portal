@@ -321,7 +321,7 @@ frontend-architecture-standards ─┘
 
 ## 数据层设计
 
-- **数据库**：PostgreSQL（Supabase）。采用命名空间 `public`，核心表包括 `members`、`member_profiles`、`projects`、`project_applications`、`performance_records`、`performance_reviews`、`message_threads`、`thread_messages`、`message_attachments`、`broadcast_messages`、`broadcast_recipients`、`broadcast_attachments`、`attachments`、`notices`、`faqs`、`inquiries`、`audit_logs`、`application_logs`、`application_exceptions`。
+- **数据库**：PostgreSQL（Supabase）。采用命名空间 `public`，核心表包括 `members`、`member_profiles`、`projects`、`project_applications`、`performance_records`、`performance_reviews`、`message_threads`、`thread_messages`、`message_attachments`、`broadcast_messages`、`broadcast_recipients`、`broadcast_attachments`、`attachments`、`notices`、`faqs`、`inquiries`、`audit_logs`、`app_logs`。
 - **数据库迁移**：使用 Alembic 进行版本化管理，迁移文件位于 `backend/alembic/versions/`，包括初始 schema 和后续的增量迁移。
 - **关系约束**：
   - `members` 与 `performance_records` 为一对多，审批记录存储在 `performance_reviews`。

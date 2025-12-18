@@ -11,27 +11,26 @@ from uuid import UUID
 
 from ..db.models import AuditLog, Member
 from ..logger.file_writer import file_log_writer
+from ..supabase.client import get_supabase_client
 from .schemas import AuditLogListQuery, AuditLogListResponse, AuditLogResponse
 
 
 class AuditLogService:
     """Audit log service class."""
 
-    async def create_audit_log(
+    async def create_audit_log_via_api(
         self,
-        db: AsyncSession,
         action: str,
         user_id: Optional[UUID] = None,
         resource_type: Optional[str] = None,
         resource_id: Optional[UUID] = None,
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None,
-    ) -> AuditLog:
+    ) -> dict:
         """
-        Create an audit log entry.
+        Create an audit log entry using Supabase API (no database session required).
 
         Args:
-            db: Database session
             action: Action type (e.g., 'login', 'create', 'update', 'delete', 'approve')
             user_id: User ID who performed the action
             resource_type: Type of resource (e.g., 'member', 'performance', 'project')
@@ -40,42 +39,63 @@ class AuditLogService:
             user_agent: User agent string
 
         Returns:
-            Created AuditLog instance
+            Created audit log data as dict
         """
-        audit_log = AuditLog(
-            user_id=user_id,
-            action=action,
-            resource_type=resource_type,
-            resource_id=resource_id,
-            ip_address=ip_address,
-            user_agent=user_agent,
-        )
-
-        db.add(audit_log)
-        await db.commit()
-        await db.refresh(audit_log)
-
-        # Write to audit log file (non-blocking, fire-and-forget)
+        from uuid import uuid4
+        
+        supabase = get_supabase_client()
+        
+        audit_data = {
+            "id": str(uuid4()),
+            "user_id": str(user_id) if user_id else None,
+            "action": action,
+            "resource_type": resource_type,
+            "resource_id": str(resource_id) if resource_id else None,
+            "ip_address": ip_address,
+            "user_agent": user_agent,
+        }
+        
         try:
-            file_log_writer.write_audit_log(
-                action=action,
-                user_id=user_id,
-                resource_type=resource_type,
-                resource_id=resource_id,
-                ip_address=ip_address,
-                user_agent=user_agent,
-                extra_data={
-                    "audit_log_id": str(audit_log.id),
-                    "created_at": audit_log.created_at.isoformat() if audit_log.created_at else None,
-                },
-            )
+            # Insert using Supabase API (run in thread pool to avoid blocking)
+            import asyncio
+            
+            def _insert_audit_log():
+                return supabase.table("audit_logs").insert(audit_data).execute()
+            
+            result = await asyncio.to_thread(_insert_audit_log)
+            
+            if result.data and len(result.data) > 0:
+                created_log = result.data[0]
+                
+                # Write to audit log file (non-blocking, fire-and-forget)
+                try:
+                    file_log_writer.write_audit_log(
+                        action=action,
+                        user_id=user_id,
+                        resource_type=resource_type,
+                        resource_id=resource_id,
+                        ip_address=ip_address,
+                        user_agent=user_agent,
+                        extra_data={
+                            "audit_log_id": created_log.get("id"),
+                            "created_at": created_log.get("created_at"),
+                        },
+                    )
+                except Exception as e:
+                    # Log error but don't fail the audit log creation
+                    import logging
+                    logging.warning(f"Failed to write audit log to file: {str(e)}")
+                
+                return created_log
+            else:
+                raise Exception("Failed to create audit log: no data returned")
+                
         except Exception as e:
-            # Log error but don't fail the audit log creation
-            # Use standard logging to avoid circular dependency
+            # Log error but don't fail the operation
             import logging
-            logging.warning(f"Failed to write audit log to file: {str(e)}")
-
-        return audit_log
+            logging.warning(f"Failed to create audit log via API: {str(e)}", exc_info=False)
+            # Return empty dict on failure
+            return {}
 
     async def list_audit_logs(
         self,

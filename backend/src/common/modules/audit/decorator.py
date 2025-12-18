@@ -67,28 +67,13 @@ def audit_log(
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            # Import here to avoid circular dependencies
-            from sqlalchemy.ext.asyncio import AsyncSession
-            from ..db.session import get_db
-
             # Execute the original function
             # Exceptions will be handled by global exception handlers
             result = await func(*args, **kwargs)
 
-            # Try to extract database session and request from kwargs or args
-            db: Optional[AsyncSession] = None
+            # Try to extract request from kwargs or args
             request: Optional[Request] = None
             user_id: Optional[UUID] = None
-
-            # Find db session in kwargs
-            if "db" in kwargs:
-                db = kwargs["db"]
-            else:
-                # Try to find in args (usually after self)
-                for arg in args:
-                    if isinstance(arg, AsyncSession):
-                        db = arg
-                        break
 
             # Find request in kwargs
             if "request" in kwargs:
@@ -157,25 +142,24 @@ def audit_log(
             if request:
                 ip_address, user_agent = get_client_info(request)
 
-            # Create audit log entry (non-blocking, log errors but don't fail)
+            # Create audit log entry using Supabase API (no db session required)
+            # Non-blocking, log errors but don't fail
             # Only log if function succeeded (exceptions are handled by global handlers)
-            if db:
-                try:
-                    audit_service = AuditLogService()
-                    await audit_service.create_audit_log(
-                        db=db,
-                        action=action,
-                        user_id=user_id,
-                        resource_type=resource_type,
-                        resource_id=resource_id,
-                        ip_address=ip_address,
-                        user_agent=user_agent,
-                    )
-                except Exception as e:
-                    # Log error but don't fail the operation
-                    import logging
-                    logger = logging.getLogger(__name__)
-                    logger.warning(f"Failed to create audit log: {str(e)}", exc_info=False)
+            try:
+                audit_service = AuditLogService()
+                await audit_service.create_audit_log_via_api(
+                    action=action,
+                    user_id=user_id,
+                    resource_type=resource_type,
+                    resource_id=resource_id,
+                    ip_address=ip_address,
+                    user_agent=user_agent,
+                )
+            except Exception as e:
+                # Log error but don't fail the operation
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Failed to create audit log: {str(e)}", exc_info=False)
 
             return result
 

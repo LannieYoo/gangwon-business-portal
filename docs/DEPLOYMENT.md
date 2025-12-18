@@ -17,7 +17,8 @@
 7. [环境变量管理](#环境变量管理)
 8. [部署流程](#部署流程)
 9. [本地开发环境设置](#本地开发环境设置)
-10. [故障排查](#故障排查)
+10. [日志持久化策略](#日志持久化策略)
+11. [故障排查](#故障排查)
 
 ---
 
@@ -224,7 +225,11 @@ NICE_DNB_API_URL=https://gate.nicednb.com
 #### 注意事项
 
 1. **端口配置**: Render 使用 `$PORT` 环境变量，代码中需要读取
-2. **日志文件**: Render 容器重启会丢失，建议日志写入数据库
+2. **日志持久化**: 
+   - ⚠️ **重要**: Render 容器重启时，本地文件系统会被清空，所有日志文件会丢失
+   - ✅ **解决方案**: 系统已配置将日志写入数据库（`app_logs` 表），确保日志持久化
+   - 📝 **配置**: `LOG_DB_ENABLED=true` 和 `LOG_ENABLE_FILE=false`（已在 render.yaml 中配置）
+   - 💾 **数据库日志**: 所有重要日志（INFO 级别及以上）都会写入 Supabase 数据库，不会丢失
 3. **数据库迁移**: 在 Build Command 中自动运行
 
 ---
@@ -808,6 +813,129 @@ Render 会自动使用此端点进行健康检查。
 - [ ] 构建成功
 - [ ] 部署成功
 - [ ] 服务健康
+
+---
+
+## 日志持久化策略
+
+### 问题说明
+
+在 Render 等云平台上，容器重启时**本地文件系统会被清空**，所有存储在容器内的日志文件都会丢失。这是一个常见的问题，需要特别处理。
+
+### 解决方案
+
+系统已实现**双重日志存储机制**，确保日志不会丢失：
+
+#### 1. 数据库日志（持久化，推荐）
+
+- **存储位置**: Supabase PostgreSQL 数据库的 `app_logs` 表
+- **持久性**: ✅ **永久保存**，不会因容器重启而丢失
+- **配置**: 
+  - `LOG_DB_ENABLED=true` - 启用数据库日志
+  - `LOG_DB_MIN_LEVEL=INFO` - 记录 INFO 级别及以上的日志（在云平台上）
+- **优势**:
+  - 日志永久保存
+  - 可通过 API 查询和检索
+  - 支持高级过滤和搜索
+  - 与业务数据一起备份
+
+#### 2. 文件日志（临时，仅用于调试）
+
+- **存储位置**: `backend/logs/` 目录
+- **持久性**: ❌ **临时存储**，容器重启会丢失
+- **配置**: 
+  - `LOG_ENABLE_FILE=false` - 在云平台上禁用文件日志（已在 render.yaml 中配置）
+  - 本地开发时可以启用（`LOG_ENABLE_FILE=true`）
+- **用途**: 
+  - 本地开发调试
+  - 实时查看日志（如果启用）
+
+### 配置说明
+
+#### Render 部署配置（render.yaml）
+
+```yaml
+envVars:
+  - key: LOG_DB_ENABLED
+    value: "true"  # 启用数据库日志
+  - key: LOG_DB_MIN_LEVEL
+    value: "INFO"  # 记录 INFO 及以上级别
+  - key: LOG_ENABLE_FILE
+    value: "false"  # 禁用文件日志（避免浪费资源）
+```
+
+#### 本地开发配置（.env.local）
+
+```bash
+# 本地开发可以同时启用文件和数据库日志
+LOG_DB_ENABLED=true
+LOG_DB_MIN_LEVEL=WARNING  # 本地只记录重要日志到数据库
+LOG_ENABLE_FILE=true  # 本地启用文件日志便于调试
+```
+
+### 日志类型说明
+
+系统中有多种日志类型，它们的持久化策略如下：
+
+| 日志类型 | 文件存储 | 数据库存储 | 持久化状态 |
+|---------|---------|-----------|-----------|
+| **应用日志** (app.log) | ❌ 临时 | ✅ 永久 | ✅ 已持久化 |
+| **错误日志** (error.log) | ❌ 临时 | ✅ 永久 | ✅ 已持久化 |
+| **审计日志** (audit.log) | ❌ 临时 | ✅ 永久 | ✅ 已持久化 |
+| **系统日志** (system.log) | ❌ 临时 | ❌ 不存储 | ⚠️ 仅用于调试 |
+
+### 查看日志
+
+#### 通过 API 查看数据库日志
+
+```bash
+# 获取所有日志
+GET /api/v1/logging/logs?page=1&page_size=50
+
+# 按级别过滤
+GET /api/v1/logging/logs?level=ERROR
+
+# 按时间范围过滤
+GET /api/v1/logging/logs?start_date=2025-01-01&end_date=2025-01-31
+
+# 按 trace_id 查询（追踪完整请求链路）
+GET /api/v1/logging/logs?trace_id=abc123
+```
+
+#### 通过 Supabase Dashboard 查看
+
+1. 登录 Supabase Dashboard
+2. 进入 Table Editor
+3. 选择 `app_logs` 表
+4. 可以查看、过滤和导出所有日志
+
+### 最佳实践
+
+1. **生产环境**: 
+   - ✅ 启用数据库日志 (`LOG_DB_ENABLED=true`)
+   - ❌ 禁用文件日志 (`LOG_ENABLE_FILE=false`)
+   - 📊 定期清理旧日志（通过数据库维护任务）
+
+2. **本地开发**: 
+   - ✅ 可以同时启用文件和数据库日志
+   - 📝 文件日志便于实时查看和调试
+
+3. **日志级别**: 
+   - 生产环境: `LOG_DB_MIN_LEVEL=INFO`（记录所有重要日志）
+   - 开发环境: `LOG_DB_MIN_LEVEL=WARNING`（只记录警告和错误）
+
+4. **日志清理**: 
+   - 建议定期清理超过 90 天的旧日志
+   - 可以通过 Supabase 的定时任务或数据库维护脚本实现
+
+### 故障排查
+
+如果发现日志丢失：
+
+1. **检查配置**: 确认 `LOG_DB_ENABLED=true`
+2. **检查数据库连接**: 确认 Supabase 连接正常
+3. **查看数据库**: 直接在 Supabase Dashboard 查看 `app_logs` 表
+4. **检查日志级别**: 确认 `LOG_DB_MIN_LEVEL` 设置合理
 
 ---
 

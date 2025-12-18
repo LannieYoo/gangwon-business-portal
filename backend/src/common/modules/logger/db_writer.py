@@ -165,7 +165,7 @@ class DatabaseLogWriter:
             # Note: Supabase Python client's execute() is synchronous, so we run it in a thread
             # to avoid blocking the event loop
             def _insert_batch():
-                return client.table("application_logs").insert(log_data).execute()
+                return client.table("app_logs").insert(log_data).execute()
             
             result = await asyncio.to_thread(_insert_batch)
             

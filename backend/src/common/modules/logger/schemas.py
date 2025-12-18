@@ -10,7 +10,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field, field_validator
 
 
-class ApplicationLogResponse(BaseModel):
+class AppLogResponse(BaseModel):
     """Application log response schema."""
 
     id: UUID
@@ -56,7 +56,7 @@ class LogListQuery(BaseModel):
 class LogListResponse(BaseModel):
     """Response schema for application log list."""
 
-    items: list[ApplicationLogResponse]
+    items: list[AppLogResponse]
     total: int
     page: int
     page_size: int

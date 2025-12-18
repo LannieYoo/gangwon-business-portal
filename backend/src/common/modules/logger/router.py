@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 from .schemas import (
     LogListResponse,
     LogListQuery,
-    ApplicationLogResponse,
+    AppLogResponse,
     FrontendLogCreate,
 )
 
@@ -185,7 +185,7 @@ async def create_frontend_log(
     return {"status": "ok"}
 
 
-@router.get("/api/v1/logging/logs/{log_id}", response_model=ApplicationLogResponse)
+@router.get("/api/v1/logging/logs/{log_id}", response_model=AppLogResponse)
 async def get_log(
     log_id: UUID,
     current_user = Depends(get_admin_user_dependency),
@@ -207,7 +207,7 @@ async def get_log(
         user_email = log.user.email
         user_company_name = log.user.company_name
     
-    return ApplicationLogResponse(
+    return AppLogResponse(
         id=log.id,
         source=log.source,
         level=log.level,

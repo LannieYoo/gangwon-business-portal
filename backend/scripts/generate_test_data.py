@@ -1564,8 +1564,7 @@ async def clear_test_data(session: AsyncSession):
     # List of all tables to truncate
     # Using TRUNCATE CASCADE to automatically handle foreign key dependencies
     tables = [
-        "application_exceptions",
-        "application_logs",
+        "app_logs",
         "audit_logs",
         "inquiries",
         "faqs",

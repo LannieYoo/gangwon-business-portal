@@ -35,6 +35,10 @@ services:
         value: INFO
       - key: LOG_DB_ENABLED
         value: "true"
+      - key: LOG_DB_MIN_LEVEL
+        value: "INFO"  # 在云平台上，将更多日志写入数据库以确保持久化
+      - key: LOG_ENABLE_FILE
+        value: "false"  # 禁用文件日志（Render 容器重启会丢失文件）
       - key: DEBUG
         value: "false"
 

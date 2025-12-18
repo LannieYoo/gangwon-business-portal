@@ -15,11 +15,11 @@ from .db_writer import db_log_writer
 
 # Use TYPE_CHECKING to avoid circular import
 if TYPE_CHECKING:
-    from ..db.models import ApplicationLog, Member
+    from ..db.models import AppLog, Member
 from .schemas import (
     LogListQuery,
     LogListResponse,
-    ApplicationLogResponse,
+    AppLogResponse,
 )
 
 
@@ -134,37 +134,37 @@ class LoggingService:
             Paginated list of application logs
         """
         # Lazy import to avoid circular dependency
-        from ..db.models import ApplicationLog, Member
+        from ..db.models import AppLog, Member
         
         # Build base query
-        base_query = select(ApplicationLog).options(selectinload(ApplicationLog.user))
+        base_query = select(AppLog).options(selectinload(AppLog.user))
 
         # Apply filters
         conditions = []
 
         if query.source:
-            conditions.append(ApplicationLog.source == query.source)
+            conditions.append(AppLog.source == query.source)
 
         if query.level:
-            conditions.append(ApplicationLog.level == query.level)
+            conditions.append(AppLog.level == query.level)
 
         if query.trace_id:
-            conditions.append(ApplicationLog.trace_id == query.trace_id)
+            conditions.append(AppLog.trace_id == query.trace_id)
 
         if query.user_id:
-            conditions.append(ApplicationLog.user_id == query.user_id)
+            conditions.append(AppLog.user_id == query.user_id)
 
         if query.start_date:
-            conditions.append(ApplicationLog.created_at >= query.start_date)
+            conditions.append(AppLog.created_at >= query.start_date)
 
         if query.end_date:
-            conditions.append(ApplicationLog.created_at <= query.end_date)
+            conditions.append(AppLog.created_at <= query.end_date)
 
         if conditions:
             base_query = base_query.where(and_(*conditions))
 
         # Get total count
-        count_query = select(func.count()).select_from(ApplicationLog)
+        count_query = select(func.count()).select_from(AppLog)
         if conditions:
             count_query = count_query.where(and_(*conditions))
 
@@ -173,7 +173,7 @@ class LoggingService:
 
         # Apply pagination and ordering
         offset = (query.page - 1) * query.page_size
-        base_query = base_query.order_by(ApplicationLog.created_at.desc())
+        base_query = base_query.order_by(AppLog.created_at.desc())
         base_query = base_query.offset(offset).limit(query.page_size)
 
         # Execute query
@@ -191,7 +191,7 @@ class LoggingService:
                 user_company_name = log.user.company_name
 
             items.append(
-                ApplicationLogResponse(
+                AppLogResponse(
                     id=log.id,
                     source=log.source,
                     level=log.level,
@@ -229,7 +229,7 @@ class LoggingService:
         self,
         db: AsyncSession,
         log_id: UUID,
-    ) -> Optional['ApplicationLog']:
+    ) -> Optional['AppLog']:
         """
         Get a single log by ID.
 
@@ -238,15 +238,15 @@ class LoggingService:
             log_id: Log ID
 
         Returns:
-            ApplicationLog instance or None if not found
+            AppLog instance or None if not found
         """
         # Lazy import to avoid circular dependency
-        from ..db.models import ApplicationLog
+        from ..db.models import AppLog
         
         result = await db.execute(
-            select(ApplicationLog)
-            .options(selectinload(ApplicationLog.user))
-            .where(ApplicationLog.id == log_id)
+            select(AppLog)
+            .options(selectinload(AppLog.user))
+            .where(AppLog.id == log_id)
         )
         return result.scalar_one_or_none()
 

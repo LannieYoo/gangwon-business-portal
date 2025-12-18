@@ -6,11 +6,17 @@ It records all critical operations (login, CRUD, approvals, file operations, adm
 for government compliance requirements (7-year retention period).
 
 Usage:
-    from ...common.modules.audit import audit_log_service, create_audit_log
+    from ...common.modules.audit import audit_log
     
-    # Create audit log
-    await audit_log_service.create_audit_log(
-        db=db,
+    # Use decorator (recommended)
+    @audit_log(action="login", resource_type="member")
+    async def login(...):
+        ...
+    
+    # Or manually create audit log via API
+    from ...common.modules.audit import audit_log_service
+    
+    await audit_log_service.create_audit_log_via_api(
         action="login",
         user_id=user.id,
         ip_address=request.client.host,
