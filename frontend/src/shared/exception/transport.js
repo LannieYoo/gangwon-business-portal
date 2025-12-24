@@ -9,11 +9,13 @@
  * Requirements: 12.1, 12.2
  */
 
+import { API_BASE_URL } from '@shared/utils/constants';
+
 /**
  * 默认传输配置
  */
 const DEFAULT_TRANSPORT_CONFIG = {
-  endpoint: '/api/v1/exceptions/frontend',
+  endpoint: `${API_BASE_URL}/api/v1/exceptions/frontend`,
   maxRetries: 3,
   retryDelays: [1000, 2000, 4000],
   requestTimeout: 5000,

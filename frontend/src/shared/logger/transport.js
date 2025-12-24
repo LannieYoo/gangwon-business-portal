@@ -11,6 +11,7 @@
  */
 
 import { LOGGING_CONFIG } from './config';
+import { API_BASE_URL } from '@shared/utils/constants';
 
 /**
  * 过滤敏感信息
@@ -53,7 +54,7 @@ export class LogTransport {
     const defaultConfig = LOGGING_CONFIG.transport;
     
     this.config = {
-      endpoint: config.endpoint || '/api/v1/logging/frontend/logs',
+      endpoint: config.endpoint || `${API_BASE_URL}/api/v1/logging/frontend/logs`,
       maxRetries: config.maxRetries || defaultConfig.maxRetries,
       retryDelays: config.retryDelays || defaultConfig.retryDelays,
       enableSensitiveFiltering: config.enableSensitiveFiltering !== false,
@@ -98,6 +99,12 @@ export class LogTransport {
    * @param {Object} logEntry - 日志条目
    */
   async _sendLog(logEntry) {
+    // 如果重试队列已满，跳过发送避免积压
+    if (this._retryQueue.length >= this.config.maxQueueSize) {
+      this._stats.droppedLogs++;
+      return;
+    }
+    
     try {
       await this._sendBatch([logEntry]);
       this._stats.totalSent++;
@@ -107,7 +114,10 @@ export class LogTransport {
         console.debug(`[LogTransport] Sent log: ${logEntry.layer || 'unknown'} - ${logEntry.message || ''}`);
       }
     } catch (error) {
-      console.warn('[LogTransport] Failed to send log:', error);
+      // 只在开发环境输出警告，避免控制台刷屏
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[LogTransport] Failed to send log:', error.message);
+      }
       
       // 添加到重试队列
       this._retryQueue.push({
@@ -147,7 +157,14 @@ export class LogTransport {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
-    return response.json();
+    // 检查响应是否有内容再解析 JSON
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const text = await response.text();
+      return text ? JSON.parse(text) : { success: true };
+    }
+    
+    return { success: true };
   }
   
   /**
@@ -181,7 +198,10 @@ export class LogTransport {
             console.debug(`[LogTransport] Retry ${item.retryCount + 1} succeeded for batch of ${item.batch.length} logs`);
           }
         } catch (error) {
-          console.warn(`[LogTransport] Retry ${item.retryCount + 1} failed:`, error);
+          // 只在开发环境输出警告
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`[LogTransport] Retry ${item.retryCount + 1} failed:`, error.message);
+          }
           
           // 增加重试次数并重新入队
           item.retryCount++;

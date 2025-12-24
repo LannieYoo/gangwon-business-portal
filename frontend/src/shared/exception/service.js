@@ -14,6 +14,7 @@ import { frontendExceptionHandler } from './handler.js';
 import { ExceptionDeduplicator } from './dedup.js';
 import { ExceptionFilter } from './filter.js';
 import { ExceptionTransport } from './transport.js';
+import { API_BASE_URL } from '@shared/utils/constants';
 
 /**
  * 默认服务配置
@@ -27,7 +28,7 @@ const DEFAULT_CONFIG = {
   maxStackLength: 5000,
   
   // 传输配置
-  endpoint: '/api/v1/exceptions/frontend',
+  endpoint: `${API_BASE_URL}/api/v1/exceptions/frontend`,
   maxRetries: 3,
   retryDelays: [1000, 2000, 4000],
   requestTimeout: 5000,
