@@ -134,8 +134,8 @@ export default function ProjectList() {
   return (
     <>
       <PageContainer className="flex flex-col min-h-[calc(100vh-70px)] max-md:min-h-[calc(100vh-60px)]">
-        <div className="mb-8 p-0 bg-transparent shadow-none">
-          <h1 className="block text-2xl font-bold text-gray-900 mb-0">{t('projects.title', '项目')}</h1>
+        <div className="mb-6 sm:mb-8 lg:mb-10 min-h-[48px] flex items-center">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 m-0">{t('projects.title', '项目')}</h1>
         </div>
 
           {/* 搜索和分页设置 */}

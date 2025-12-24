@@ -7,7 +7,8 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Button, Input, Select, Textarea, Loading, Alert } from '@shared/components';
-import { adminService, uploadService } from '@shared/services';
+import { adminService } from '@shared/services';
+import useUpload from '@shared/hooks/useUpload';
 
 // Helper to format date for form (YYYY-MM-DD)
 const formatDateForInput = (dateString) => {
@@ -23,9 +24,11 @@ export default function ProjectForm() {
 
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState(null);
   const [messageVariant, setMessageVariant] = useState('success');
+
+  // 使用统一的上传 hook
+  const { uploading, uploadFile } = useUpload();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -129,11 +132,10 @@ export default function ProjectForm() {
     if (!file) return;
 
     try {
-      setUploading(true);
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
       formDataUpload.append('type', 'project');
-      const result = await uploadService.uploadFile(formDataUpload);
+      const result = await uploadFile(formDataUpload);
       if (result?.file_url) {
         setFormData(prev => ({ ...prev, image: result.file_url }));
       }
@@ -143,7 +145,6 @@ export default function ProjectForm() {
       setMessage(t('admin.projects.form.uploadError', '图片上传失败，请重试'));
       setTimeout(() => setMessage(null), 5000);
     } finally {
-      setUploading(false);
       e.target.value = '';
     }
   };

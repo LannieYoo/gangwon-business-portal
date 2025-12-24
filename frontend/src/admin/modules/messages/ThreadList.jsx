@@ -7,8 +7,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Card, Button, Badge, Alert, Pagination, Modal, ModalFooter } from '@shared/components';
-import { messagesService, uploadService } from '@shared/services';
+import { messagesService } from '@shared/services';
 import { formatDateTime } from '@shared/utils/format';
+import useUpload from '@shared/hooks/useUpload';
 
 export default function ThreadList() {
   const { t, i18n } = useTranslation();
@@ -31,9 +32,11 @@ export default function ThreadList() {
   
   const [replyContent, setReplyContent] = useState('');
   const [replyAttachments, setReplyAttachments] = useState([]);
-  const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
   const [closeConfirm, setCloseConfirm] = useState({ open: false, threadId: null });
+
+  // 使用统一的上传 hook
+  const { uploading, uploadAttachments } = useUpload();
 
   const scrollToBottom = (smooth = true) => {
     if (messagesEndRef.current) {
@@ -49,14 +52,14 @@ export default function ThreadList() {
     if (remainingSlots <= 0) return;
     
     const filesToUpload = files.slice(0, remainingSlots);
-    setUploading(true);
     try {
-      const uploaded = await uploadService.uploadAttachments(filesToUpload);
-      setReplyAttachments(prev => [...prev, ...uploaded]);
+      const uploaded = await uploadAttachments(filesToUpload);
+      if (uploaded) {
+        setReplyAttachments(prev => [...prev, ...uploaded]);
+      }
     } catch (err) {
       // 上传失败
     } finally {
-      setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };

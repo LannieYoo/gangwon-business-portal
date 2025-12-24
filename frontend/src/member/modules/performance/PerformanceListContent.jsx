@@ -12,7 +12,8 @@ import Select from '@shared/components/Select';
 import { Alert, Modal, ModalFooter, Pagination } from '@shared/components';
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@shared/components/Table';
 import { performanceService, uploadService } from '@shared/services';
-import { DownloadIcon, EditIcon, TrashIcon, InfoIcon } from '@shared/components/Icons';
+import { DownloadIcon } from '@shared/components/Icons';
+import { FileUploadButton } from '@shared/components';
 
 export default function PerformanceListContent() {
   const { t } = useTranslation();
@@ -25,6 +26,10 @@ export default function PerformanceListContent() {
   const [filters, setFilters] = useState({ year: '', quarter: '', status: '' });
   const [commentModal, setCommentModal] = useState({ open: false, comments: [], status: '' });
   const [attachmentModal, setAttachmentModal] = useState({ open: false, attachments: [], canDownload: false });
+  const [uploadModal, setUploadModal] = useState({ open: false, recordId: null, recordInfo: '' });
+  const [uploadFiles, setUploadFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [downloading, setDownloading] = useState(null); // 正在下载的附件ID
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 20,
@@ -73,8 +78,13 @@ export default function PerformanceListContent() {
     loadPerformances(pagination.page);
   };
 
-  const handleDownload = async (fileId, fileName) => {
-    if (fileId) await uploadService.downloadFile(fileId, fileName);
+  const handleDownload = async (attachmentId, fileName) => {
+    setDownloading(attachmentId);
+    try {
+      await uploadService.downloadFile(attachmentId, fileName);
+    } finally {
+      setDownloading(null);
+    }
   };
 
   // 获取最新的审核评论
@@ -94,6 +104,45 @@ export default function PerformanceListContent() {
 
   // 检查是否可以下载（只有已批准的才能下载）
   const canDownload = (status) => status === 'approved';
+
+  // 打开上传弹窗
+  const openUploadModal = (record) => {
+    const recordInfo = `${record.year}${t('common.year', '年')} ${record.quarter ? quarterLabels[record.quarter] : t('performance.annual', '年度')}`;
+    setUploadModal({ open: true, recordId: record.id, recordInfo });
+    setUploadFiles([]);
+  };
+
+  // 处理文件上传
+  const handleUpload = async () => {
+    if (uploadFiles.length === 0) {
+      setMessageVariant('warning');
+      setMessage(t('performance.selectFileFirst', '请先选择文件'));
+      return;
+    }
+
+    setUploading(true);
+    try {
+      // 上传文件并关联到成果记录
+      for (const file of uploadFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('resource_type', 'performance');
+        formData.append('resource_id', uploadModal.recordId);
+        await uploadService.uploadFile(formData);
+      }
+      
+      setMessageVariant('success');
+      setMessage(t('performance.uploadSuccess', '上传成功'));
+      setUploadModal({ open: false, recordId: null, recordInfo: '' });
+      setUploadFiles([]);
+      loadPerformances(pagination.page);
+    } catch (error) {
+      setMessageVariant('error');
+      setMessage(error.message || t('performance.uploadFailed', '上传失败'));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // 显示附件弹窗
   const showAttachments = (record) => {
@@ -127,14 +176,16 @@ export default function PerformanceListContent() {
     );
   };
 
-  // 格式化日期时间 (YYYY-MM-DD)
+  // 格式化日期时间 (YYYY-MM-DD HH:mm)
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '-';
     const date = new Date(dateStr);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
   const yearOptions = [
@@ -290,32 +341,32 @@ export default function PerformanceListContent() {
                                 >
                                   {t('performance.viewComments', '查看意见')}
                                 </button>
-                                {(perf.status === 'draft' || perf.status === 'revision_requested') && (
-                                  <span className="text-gray-300">|</span>
-                                )}
+                                <span className="text-gray-300">|</span>
                               </>
                             )}
-                            {(perf.status === 'draft' || perf.status === 'revision_requested') && (
-                              <>
-                                <button
-                                  onClick={() => navigate(`/member/performance/edit/${perf.id}`)}
-                                  className="text-primary-600 hover:text-primary-900 font-medium text-sm"
-                                >
-                                  {t('common.edit', '编辑')}
-                                </button>
-                                {perf.status === 'draft' && (
-                                  <span className="text-gray-300">|</span>
-                                )}
-                              </>
-                            )}
-                            {perf.status === 'draft' && (
-                              <button
-                                onClick={() => setDeleteConfirm({ open: true, id: perf.id })}
-                                className="text-red-600 hover:text-red-900 font-medium text-sm"
-                              >
-                                {t('common.delete', '删除')}
-                              </button>
-                            )}
+                            {/* 上传按钮 - 所有状态都可以 */}
+                            <button
+                              onClick={() => openUploadModal(perf)}
+                              className="text-green-600 hover:text-green-900 font-medium text-sm"
+                            >
+                              {t('common.upload', '上传')}
+                            </button>
+                            <span className="text-gray-300">|</span>
+                            {/* 编辑按钮 - 所有状态都可以 */}
+                            <button
+                              onClick={() => navigate(`/member/performance/edit/${perf.id}`)}
+                              className="text-primary-600 hover:text-primary-900 font-medium text-sm"
+                            >
+                              {t('common.edit', '编辑')}
+                            </button>
+                            <span className="text-gray-300">|</span>
+                            {/* 删除按钮 - 所有状态都可以 */}
+                            <button
+                              onClick={() => setDeleteConfirm({ open: true, id: perf.id })}
+                              className="text-red-600 hover:text-red-900 font-medium text-sm"
+                            >
+                              {t('common.delete', '删除')}
+                            </button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -428,11 +479,20 @@ export default function PerformanceListContent() {
                     <Button
                       variant={attachmentModal.canDownload ? 'outline' : 'secondary'}
                       size="sm"
-                      disabled={!attachmentModal.canDownload}
-                      onClick={() => attachmentModal.canDownload && handleDownload(att.id || att.file_id, fileName)}
+                      disabled={!attachmentModal.canDownload || downloading === att.id}
+                      onClick={() => attachmentModal.canDownload && handleDownload(att.id, fileName)}
                     >
-                      <DownloadIcon className="w-4 h-4 mr-1" />
-                      {t('common.download', '下载')}
+                      {downloading === att.id ? (
+                        <>
+                          <span className="w-4 h-4 mr-1 border-2 border-gray-300 border-t-primary-600 rounded-full animate-spin inline-block"></span>
+                          {t('common.downloading', '下载中...')}
+                        </>
+                      ) : (
+                        <>
+                          <DownloadIcon className="w-4 h-4 mr-1" />
+                          {t('common.download', '下载')}
+                        </>
+                      )}
                     </Button>
                   </div>
                 );
@@ -445,6 +505,77 @@ export default function PerformanceListContent() {
         <ModalFooter>
           <Button variant="primary" onClick={() => setAttachmentModal({ open: false, attachments: [], canDownload: false })}>
             {t('common.close', '关闭')}
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      {/* 上传附件弹窗 */}
+      <Modal
+        isOpen={uploadModal.open}
+        onClose={() => {
+          setUploadModal({ open: false, recordId: null, recordInfo: '' });
+          setUploadFiles([]);
+        }}
+        title={t('performance.uploadAttachment', '上传附件')}
+        size="md"
+      >
+        <div className="py-4">
+          <p className="text-sm text-gray-600 mb-4">
+            {t('performance.uploadFor', '为 {{period}} 上传附件', { period: uploadModal.recordInfo })}
+          </p>
+          <div className="flex items-center gap-4">
+            <FileUploadButton
+              onFilesSelected={(files) => setUploadFiles(prev => [...prev, ...files])}
+              multiple
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
+              label={t('performance.selectFiles', '选择文件')}
+              variant="outline"
+            />
+            <span className="text-sm text-gray-500">
+              {t('performance.supportedFormats', '支持 PDF、Word、Excel、PPT、图片')}
+            </span>
+          </div>
+          {uploadFiles.length > 0 && (
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                {t('performance.selectedFiles', '已选择 {{count}} 个文件', { count: uploadFiles.length })}
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                {uploadFiles.map((file, idx) => (
+                  <li key={idx} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <span>📄</span>
+                      <span className="truncate">{file.name}</span>
+                      <span className="text-gray-400 flex-shrink-0">({(file.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                    <button
+                      onClick={() => setUploadFiles(prev => prev.filter((_, i) => i !== idx))}
+                      className="text-red-500 hover:text-red-700 ml-2"
+                    >
+                      ✕
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        <ModalFooter>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setUploadModal({ open: false, recordId: null, recordInfo: '' });
+              setUploadFiles([]);
+            }}
+          >
+            {t('common.cancel', '取消')}
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleUpload}
+            disabled={uploading || uploadFiles.length === 0}
+          >
+            {uploading ? t('common.uploading', '上传中...') : t('common.upload', '上传')}
           </Button>
         </ModalFooter>
       </Modal>

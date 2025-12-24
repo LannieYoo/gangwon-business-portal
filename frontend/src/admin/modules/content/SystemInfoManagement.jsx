@@ -12,7 +12,8 @@ import {
   Modal,
   Alert
 } from '@shared/components';
-import { contentService, uploadService } from '@shared/services';
+import { contentService } from '@shared/services';
+import useUpload from '@shared/hooks/useUpload';
 
 export default function SystemInfoManagement() {
   const { t } = useTranslation();
@@ -21,13 +22,15 @@ export default function SystemInfoManagement() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-  const [uploading, setUploading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [message, setMessage] = useState(null);
   const [messageVariant, setMessageVariant] = useState('success');
   const [formData, setFormData] = useState({
     content: ''
   });
+
+  // 使用统一的上传 hook
+  const { uploading, upload } = useUpload();
 
   // 获取系统介绍信息
   const fetchSystemInfo = async () => {
@@ -49,21 +52,23 @@ export default function SystemInfoManagement() {
 
   // 处理图片上传
   const handleImageUpload = async (file) => {
-    setUploading(true);
     setMessage(null);
     
-    const response = await uploadService.uploadPublic(file);
-    if (response && response.file_url) {
-      setImageUrl(response.file_url);
-      setMessageVariant('success');
-      setMessage(t('admin.content.systemInfo.messages.imageUploaded', '图片上传成功'));
-      setTimeout(() => setMessage(null), 3000);
-    } else {
+    try {
+      const response = await upload(file);
+      if (response && response.file_url) {
+        setImageUrl(response.file_url);
+        setMessageVariant('success');
+        setMessage(t('admin.content.systemInfo.messages.imageUploaded', '图片上传成功'));
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessageVariant('error');
+        setMessage(t('admin.content.systemInfo.messages.imageUploadFailed', '图片上传失败，请重试'));
+      }
+    } catch (err) {
       setMessageVariant('error');
       setMessage(t('admin.content.systemInfo.messages.imageUploadFailed', '图片上传失败，请重试'));
     }
-    
-    setUploading(false);
   };
 
   // 处理图片删除

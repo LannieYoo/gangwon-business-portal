@@ -7,8 +7,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '@shared/components';
 import Button from '@shared/components/Button';
-import { messagesService, uploadService } from '@shared/services';
+import { messagesService } from '@shared/services';
 import { formatDateTime } from '@shared/utils/format';
+import useUpload from '@shared/hooks/useUpload';
 
 export default function ThreadDetailModal({ 
   threadId, 
@@ -21,10 +22,12 @@ export default function ThreadDetailModal({
   const [loading, setLoading] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [replyAttachments, setReplyAttachments] = useState([]);
-  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // 使用统一的上传 hook
+  const { uploading, uploadAttachments } = useUpload();
 
   useEffect(() => {
     if (isOpen && threadId) {
@@ -66,14 +69,14 @@ export default function ThreadDetailModal({
     if (remainingSlots <= 0) return;
     
     const filesToUpload = files.slice(0, remainingSlots);
-    setUploading(true);
     try {
-      const uploaded = await uploadService.uploadAttachments(filesToUpload);
-      setReplyAttachments(prev => [...prev, ...uploaded]);
+      const uploaded = await uploadAttachments(filesToUpload);
+      if (uploaded) {
+        setReplyAttachments(prev => [...prev, ...uploaded]);
+      }
     } catch (err) {
       // 上传失败
     } finally {
-      setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };

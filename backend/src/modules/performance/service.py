@@ -30,11 +30,44 @@ class PerformanceService:
         Returns:
             Tuple of (performance records list, total count)
         """
-        # Use existing supabase_service method
-        records, total = await supabase_service.list_performance_records_with_filters(
-            sort_by="created_at",
-            sort_order="desc",
-        )
+        # 先获取 member 信息
+        member = await supabase_service.get_by_id('members', str(member_id))
+        member_company_name = member.get('company_name', '') if member else ''
+        member_business_number = member.get('business_number', '') if member else ''
+        
+        # 查询当前用户的记录
+        db_query = supabase_service.client.table('performance_records')\
+            .select('*', count='exact')\
+            .eq('member_id', str(member_id))\
+            .is_('deleted_at', 'null')\
+            .order('created_at', desc=True)
+        
+        # 应用筛选条件
+        if query.year:
+            db_query = db_query.eq('year', query.year)
+        if query.quarter:
+            db_query = db_query.eq('quarter', query.quarter)
+        if query.status:
+            db_query = db_query.eq('status', query.status)
+        
+        result = db_query.execute()
+        records = result.data or []
+        total = result.count or 0
+        
+        # 添加 member 信息到每条记录
+        for record in records:
+            record['member_company_name'] = member_company_name
+            record['member_business_number'] = member_business_number
+        
+        # Batch get attachments for all records (避免 N+1 查询)
+        if records:
+            record_ids = [str(r['id']) for r in records]
+            attachments_map = await supabase_service.get_attachments_by_resource_ids_batch(
+                'performance', record_ids
+            )
+            for record in records:
+                record['attachments'] = attachments_map.get(str(record['id']), [])
+        
         return records, total
 
     async def get_performance_by_id(
@@ -219,6 +252,15 @@ class PerformanceService:
             sort_by="updated_at",  # 按更新时间倒序，最新的在前面
             sort_order="desc",
         )
+        
+        # Batch get attachments for all records (避免 N+1 查询)
+        if records:
+            record_ids = [str(r['id']) for r in records]
+            attachments_map = await supabase_service.get_attachments_by_resource_ids_batch(
+                'performance', record_ids
+            )
+            for record in records:
+                record['attachments'] = attachments_map.get(str(record['id']), [])
         
         return records, total
 

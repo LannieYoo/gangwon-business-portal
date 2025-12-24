@@ -114,12 +114,19 @@ class StorageService:
 
         Returns:
             str: Signed URL
+        
+        Raises:
+            ValueError: If signed URL creation fails
         """
         try:
             result = self.client.storage.from_(bucket).create_signed_url(path, expires_in)
-            # Supabase may return a dict with 'signedURL' key or a string directly
+            # Supabase Python SDK returns dict with 'signedURL' key
             if isinstance(result, dict):
-                return result.get('signedURL', result.get('url', str(result)))
+                signed_url = result.get('signedURL') or result.get('signedUrl') or result.get('url')
+                if signed_url:
+                    return signed_url
+                # If no URL found in dict, raise error with details
+                raise ValueError(f"Supabase returned unexpected response format: {result}")
             return str(result)
         except Exception as e:
             error_str = str(e)
@@ -130,7 +137,7 @@ class StorageService:
                     "Please ensure SUPABASE_SERVICE_KEY is set in your .env file. "
                     "Service role key is required to bypass Row-Level Security (RLS) policies for server-side operations."
                 ) from e
-            raise
+            raise ValueError(f"Failed to create signed URL for {bucket}/{path}: {error_str}") from e
 
 
 # Global storage service instance

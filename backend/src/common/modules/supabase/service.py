@@ -355,6 +355,29 @@ class SupabaseService:
         
         return result.data or []
 
+    async def get_attachments_by_resource_ids_batch(self, resource_type: str, resource_ids: List[str]) -> Dict[str, List[Dict[str, Any]]]:
+        """批量获取多个资源的附件列表，返回 {resource_id: [attachments]} 格式"""
+        if not resource_ids:
+            return {}
+        
+        result = self.client.table('attachments')\
+            .select('*')\
+            .eq('resource_type', resource_type)\
+            .in_('resource_id', resource_ids)\
+            .is_('deleted_at', 'null')\
+            .order('uploaded_at', desc=False)\
+            .execute()
+        
+        # 按 resource_id 分组
+        attachments_map = {}
+        for att in (result.data or []):
+            rid = att['resource_id']
+            if rid not in attachments_map:
+                attachments_map[rid] = []
+            attachments_map[rid].append(att)
+        
+        return attachments_map
+
     # Complex business methods that are still needed for backward compatibility
     async def list_members_with_filters(self, **kwargs) -> Tuple[List[Dict[str, Any]], int]:
         """List members with advanced filtering and search capabilities."""

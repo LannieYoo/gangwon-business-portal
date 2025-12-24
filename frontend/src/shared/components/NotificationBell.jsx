@@ -216,9 +216,15 @@ export default function NotificationBell({ userType = 'member', variant = 'light
             </div>
 
             <div className="px-4 py-3 border-t border-gray-200">
-              <Link to={viewAllPath} onClick={() => setIsOpen(false)} className="block text-center text-sm text-primary-600 hover:text-primary-800 font-medium">
+              <button 
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate(viewAllPath);
+                }} 
+                className="block w-full text-center text-sm text-primary-600 hover:text-primary-800 font-medium bg-transparent border-none cursor-pointer"
+              >
                 {t('notifications.viewAll')}
-              </Link>
+              </button>
             </div>
           </div>
         )}

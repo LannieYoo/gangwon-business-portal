@@ -390,14 +390,24 @@ class MessageService:
         if attachments and message:
             for att in attachments:
                 # 附件数据来自前端上传后返回的信息
+                original_name = att.get('fileName') or att.get('original_name') or att.get('name')
+                file_url = att.get('filePath') or att.get('file_url') or att.get('url')
+                # stored_name 如果没有，则从 file_url 提取或使用 original_name
+                stored_name = att.get('storedName') or att.get('stored_name')
+                if not stored_name and file_url:
+                    # 从 URL 中提取文件名作为 stored_name
+                    stored_name = file_url.split('/')[-1].split('?')[0]
+                if not stored_name:
+                    stored_name = original_name
+                
                 attachment_data = {
                     "id": str(uuid4()),
                     "resource_type": "thread",
                     "resource_id": message_id,
                     "file_type": att.get('fileType') or att.get('file_type') or 'document',
-                    "file_url": att.get('filePath') or att.get('file_url') or att.get('url'),
-                    "original_name": att.get('fileName') or att.get('original_name') or att.get('name'),
-                    "stored_name": att.get('storedName') or att.get('stored_name'),
+                    "file_url": file_url,
+                    "original_name": original_name,
+                    "stored_name": stored_name,
                     "file_size": att.get('fileSize') or att.get('file_size') or att.get('size'),
                     "mime_type": att.get('mimeType') or att.get('mime_type'),
                 }
@@ -560,10 +570,10 @@ class MessageService:
         return {
             "total_messages": data['total_messages'],
             "unread_messages": data['unread_messages'],
-            "response_time": 0.0,
-            "messages_by_day": [],
-            "messages_by_category": [],
-            "response_time_by_day": [],
+            "response_time": data.get('response_time', 0.0),
+            "messages_by_day": data.get('messages_by_day', []),
+            "messages_by_category": data.get('messages_by_category', []),
+            "response_time_by_day": data.get('response_time_by_day', []),
         }
 
 

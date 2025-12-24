@@ -152,7 +152,6 @@ class ContentService:
             'title': data.title,
             'content_html': data.content_html,
             'board_type': data.board_type or 'general',
-            'is_pinned': data.is_pinned or False,
             'view_count': 0,
         }
         
@@ -186,8 +185,6 @@ class ContentService:
             update_data['content_html'] = data.content_html
         if data.board_type is not None:
             update_data['board_type'] = data.board_type
-        if data.is_pinned is not None:
-            update_data['is_pinned'] = data.is_pinned
 
         if not update_data:
             return existing_notice
@@ -289,7 +286,6 @@ class ContentService:
         press_data = {
             'id': str(uuid4()),
             'title': data.title,
-            'content_html': data.content_html,
             'image_url': data.image_url,
         }
         
@@ -468,8 +464,14 @@ class ContentService:
         update_data = {}
         if data.banner_type is not None:
             update_data['banner_type'] = data.banner_type
-        if data.title is not None:
-            update_data['title'] = data.title
+        if data.title_ko is not None:
+            update_data['title_ko'] = data.title_ko
+        if data.title_zh is not None:
+            update_data['title_zh'] = data.title_zh
+        if data.subtitle_ko is not None:
+            update_data['subtitle_ko'] = data.subtitle_ko
+        if data.subtitle_zh is not None:
+            update_data['subtitle_zh'] = data.subtitle_zh
         if data.image_url is not None:
             update_data['image_url'] = data.image_url
         if data.link_url is not None:

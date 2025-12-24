@@ -141,6 +141,8 @@
           "fields": {
             "title": "标题",
             "image": "上传图片",
+            "imageHint": "支持 JPG、PNG、GIF 格式，建议尺寸 800x600 像素",
+            "noImage": "暂无图片",
             "imageUrl": "图片URL",
             "imageUrlHelper": "或直接输入图片URL地址",
             "imageUrlPlaceholder": "https://example.com/image.jpg"
@@ -159,7 +161,8 @@
           "saved": "保存成功",
           "deleted": "删除成功",
           "invalidImageType": "请选择图片文件",
-          "imageUploaded": "图片上传成功"
+          "imageUploaded": "图片上传成功",
+          "imageTooLarge": "图片大小不能超过5MB"
         }
       },
       "faq": {

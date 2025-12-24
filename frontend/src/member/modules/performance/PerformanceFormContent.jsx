@@ -13,7 +13,8 @@ import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
 import { Tabs, Modal, ModalFooter } from '@shared/components';
-import { performanceService, uploadService } from '@shared/services';
+import { performanceService } from '@shared/services';
+import useUpload from '@shared/hooks/useUpload';
 import { 
   DocumentIcon,
   CheckCircleIcon, 
@@ -31,9 +32,12 @@ export default function PerformanceFormContent() {
   
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('salesEmployment');
   const [submitConfirm, setSubmitConfirm] = useState({ open: false });
+
+  // 使用统一的上传 hook
+  const { uploading, uploadAttachments } = useUpload();
+
   const [formData, setFormData] = useState({
     year: new Date().getFullYear(),
     quarter: '',
@@ -188,13 +192,13 @@ export default function PerformanceFormContent() {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
     
-    setUploading(true);
-    const uploadedFiles = await uploadService.uploadAttachments(files);
-    setFormData(prev => ({
-      ...prev,
-      attachments: [...(prev.attachments || []), ...uploadedFiles]
-    }));
-    setUploading(false);
+    const uploadedFiles = await uploadAttachments(files);
+    if (uploadedFiles) {
+      setFormData(prev => ({
+        ...prev,
+        attachments: [...(prev.attachments || []), ...uploadedFiles]
+      }));
+    }
     e.target.value = '';
   };
 

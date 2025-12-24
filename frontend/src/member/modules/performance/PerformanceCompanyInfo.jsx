@@ -13,7 +13,8 @@ import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
 import { Badge, Modal, ModalFooter } from '@shared/components';
-import { memberService, uploadService } from '@shared/services';
+import { memberService } from '@shared/services';
+import useUpload from '@shared/hooks/useUpload';
 import {
   UserIcon,
   BuildingIcon,
@@ -36,8 +37,11 @@ export default function PerformanceCompanyInfo() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+
+  // 使用统一的上传 hook
+  const { uploading: uploadingLogo, upload: uploadLogo } = useUpload();
+
   const [message, setMessage] = useState(null);
   const [messageVariant, setMessageVariant] = useState('success');
   const [companyData, setCompanyData] = useState({
@@ -166,8 +170,9 @@ export default function PerformanceCompanyInfo() {
     }
     
     if (missingFields.length > 0) {
+      const missingFieldNames = missingFields.map(field => requiredFieldsMap[field]).join(', ');
       setMessageVariant('error');
-      setMessage(t('performance.companyInfo.validation.missingRequiredFields', '请填写所有必填项'));
+      setMessage(t('performance.companyInfo.validation.missingRequiredFields', { fields: missingFieldNames }));
       return;
     }
 
@@ -224,15 +229,18 @@ export default function PerformanceCompanyInfo() {
       return;
     }
     
-    setUploadingLogo(true);
-    const uploadResponse = await uploadService.uploadPublic(file);
-    setCompanyData(prev => ({ ...prev, logo: uploadResponse.file_url || uploadResponse.url }));
-    setMessageVariant('success');
-    setMessage(t('performance.companyInfo.message.logoUploadSuccess', 'Logo上传成功'));
-    setTimeout(() => setMessage(null), 3000);
-    setUploadingLogo(false);
+    try {
+      const uploadResponse = await uploadLogo(file);
+      setCompanyData(prev => ({ ...prev, logo: uploadResponse.file_url || uploadResponse.url }));
+      setMessageVariant('success');
+      setMessage(t('performance.companyInfo.message.logoUploadSuccess', 'Logo上传成功'));
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      setMessageVariant('error');
+      setMessage(t('common.uploadFailed', '上传失败'));
+    }
     e.target.value = '';
-  }, [t]);
+  }, [t, uploadLogo]);
 
 
 
@@ -376,7 +384,7 @@ export default function PerformanceCompanyInfo() {
                       <img 
                         src={companyData.logoPreview || companyData.logo} 
                         alt="Company Logo" 
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover"
                         onError={(e) => {
                           e.target.src = '';
                           e.target.style.display = 'none';
@@ -401,7 +409,7 @@ export default function PerformanceCompanyInfo() {
                       <img 
                         src={companyData.logo} 
                         alt="Company Logo" 
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover"
                         onError={(e) => {
                           e.target.src = '';
                           e.target.style.display = 'none';
@@ -430,7 +438,7 @@ export default function PerformanceCompanyInfo() {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.businessLicense', 'Business License')} <span className="text-red-600">*</span></label>
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.businessLicense', 'Business License')}</label>
             <Input value={companyData.businessNumber} disabled={true} />
             <small className="mt-2 text-xs text-gray-500">{t('performance.companyInfo.profile.businessLicenseHint', '营业执照号不可修改')}</small>
           </div>

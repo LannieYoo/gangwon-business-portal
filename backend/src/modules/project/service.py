@@ -3,7 +3,7 @@ Project service.
 
 Business logic for project and application management operations.
 """
-from uuid import UUID
+from uuid import UUID, uuid4
 from typing import Optional
 from datetime import datetime
 
@@ -173,6 +173,7 @@ class ProjectService:
             Created project dict
         """
         project_data = {
+            "id": str(uuid4()),
             "title": data.title,
             "description": data.description,
             "target_company_name": data.target_company_name,

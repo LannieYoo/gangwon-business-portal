@@ -12,8 +12,9 @@ import { Alert, FileUploadButton } from '@shared/components';
 import Input from '@shared/components/Input';
 import Select from '@shared/components/Select';
 import Textarea from '@shared/components/Textarea';
-import { messagesService, uploadService } from '@shared/services';
+import { messagesService } from '@shared/services';
 import { TrashIcon, DocumentIcon } from '@shared/components/Icons';
+import useUpload from '@shared/hooks/useUpload';
 
 const MAX_ATTACHMENTS = 3;
 
@@ -34,9 +35,13 @@ export default function InquiryForm({ onSubmitSuccess }) {
     attachments: []
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+
+  // 使用统一的上传 hook
+  const { uploading: isUploading, uploadAttachments } = useUpload({
+    onError: (err) => setError(err.message || t('common.uploadFailed'))
+  });
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -58,16 +63,15 @@ export default function InquiryForm({ onSubmitSuccess }) {
     }
 
     const filesToUpload = files.slice(0, remainingSlots);
-    
-    setIsUploading(true);
     setError(null);
 
-    const uploadedFiles = await uploadService.uploadAttachments(filesToUpload);
-    setFormData(prev => ({
-      ...prev,
-      attachments: [...prev.attachments, ...uploadedFiles]
-    }));
-    setIsUploading(false);
+    const uploadedFiles = await uploadAttachments(filesToUpload);
+    if (uploadedFiles) {
+      setFormData(prev => ({
+        ...prev,
+        attachments: [...prev.attachments, ...uploadedFiles]
+      }));
+    }
   };
 
   // 删除附件

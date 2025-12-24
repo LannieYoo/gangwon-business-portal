@@ -93,6 +93,7 @@ class AttachmentListItem(BaseModel):
     id: UUID
     original_name: str
     file_size: int
+    file_url: str
 
 
 class PerformanceListItem(BaseModel):

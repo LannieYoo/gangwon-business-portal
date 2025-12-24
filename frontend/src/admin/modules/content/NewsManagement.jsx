@@ -6,11 +6,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Alert, Card, Modal, ModalFooter } from '@shared/components';
-import { apiService, contentService } from '@shared/services';
+import { contentService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import { validateImageFile } from '@shared/utils/fileValidation';
 import { formatDate } from '@shared/utils/format';
 import { validateNewsForm } from './utils';
+import useUpload from '@shared/hooks/useUpload';
 
 export default function NewsManagement() {
   const { t, i18n } = useTranslation();
@@ -25,8 +26,10 @@ export default function NewsManagement() {
   const [saving, setSaving] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [imageUploading, setImageUploading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, newsId: null });
+
+  // 使用统一的上传 hook
+  const { uploading: imageUploading, upload } = useUpload();
 
   // Load news
   const loadNews = useCallback(async (pageNum = 1) => {
@@ -54,13 +57,11 @@ export default function NewsManagement() {
       return;
     }
 
-    setImageUploading(true);
     setMessage(null);
     
     try {
-      const response = await apiService.upload(`${API_PREFIX}/upload/public`, file);
+      const response = await upload(file);
       
-      // Backend returns FileUploadResponse with file_url directly
       if (response?.file_url) {
         setForm((prev) => ({
           ...prev,
@@ -68,22 +69,16 @@ export default function NewsManagement() {
         }));
         setMessageVariant('success');
         setMessage(t('admin.content.news.messages.imageUploaded', '图片上传成功'));
-        setTimeout(() => {
-          setMessage(null);
-        }, 3000);
+        setTimeout(() => setMessage(null), 3000);
       } else {
-        // Upload response missing file URL
         setMessageVariant('error');
         setMessage(t('admin.content.news.messages.uploadFailed', '图片上传失败'));
       }
     } catch (error) {
       setMessageVariant('error');
       setMessage(error.message || t('admin.content.news.messages.uploadFailed', '图片上传失败'));
-      setTimeout(() => {
-        setMessage(null);
-      }, 3000);
+      setTimeout(() => setMessage(null), 3000);
     } finally {
-      setImageUploading(false);
       event.target.value = '';
     }
   };
@@ -249,77 +244,63 @@ export default function NewsManagement() {
               <label className="text-sm font-medium text-gray-700">
                 {t('admin.content.news.form.fields.image', '上传图片')}
               </label>
-              <div className="flex flex-col gap-3">
-                {form.imageUrl && (
-                  <div className="relative flex flex-col gap-2">
-                    <div className="w-full max-h-[300px] overflow-hidden rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center">
+              <p className="text-sm text-gray-500 m-0">
+                {t('admin.content.news.form.fields.imageHint', '支持 JPG、PNG、GIF 格式，建议尺寸 800x600 像素')}
+              </p>
+              
+              <div className="space-y-4">
+                {form.imageUrl ? (
+                  <div className="relative group">
+                    <div className="w-full aspect-video overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-50">
                       <img
                         src={form.imageUrl}
                         alt="News preview"
-                        className="max-w-full max-h-[300px] object-contain rounded-lg"
+                        className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="flex gap-2">
-                      <input
-                        id="news-image-input"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        disabled={imageUploading}
-                        className="hidden"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          document.getElementById('news-image-input')?.click();
-                        }}
-                        disabled={imageUploading}
-                        loading={imageUploading}
-                      >
-                        {t('admin.content.news.actions.changeImage', '更换图片')}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setForm((prev) => ({ ...prev, imageUrl: '' }));
-                          setMessage(null);
-                        }}
-                      >
-                        {t('common.remove', '移除')}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                {!form.imageUrl && (
-                  <div className="flex flex-col gap-3">
-                    <input
-                      id="news-image-input"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={imageUploading}
-                      className="hidden"
-                    />
-                    <Button
+                    <button
                       type="button"
-                      variant="outline"
                       onClick={() => {
-                        document.getElementById('news-image-input')?.click();
+                        setForm((prev) => ({ ...prev, imageUrl: '' }));
+                        setMessage(null);
                       }}
-                      disabled={imageUploading}
-                      loading={imageUploading}
-                      className="w-full"
+                      className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1.5 text-sm font-medium rounded-md shadow-lg hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
                     >
-                      {imageUploading
-                        ? t('common.uploading', '上传中...')
-                        : t('admin.content.news.actions.selectImage', '选择图片')}
-                    </Button>
+                      {t('common.remove', '移除')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center aspect-video flex flex-col items-center justify-center">
+                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <p className="mt-2 text-sm text-gray-500">
+                      {t('admin.content.news.form.fields.noImage', '暂无图片')}
+                    </p>
                   </div>
                 )}
+                
+                <label className="block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 5 * 1024 * 1024) {
+                          setMessageVariant('error');
+                          setMessage(t('admin.content.news.messages.imageTooLarge', '图片大小不能超过5MB'));
+                          setTimeout(() => setMessage(null), 3000);
+                          e.target.value = '';
+                          return;
+                        }
+                        handleImageUpload(e);
+                      }
+                    }}
+                    disabled={imageUploading}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer disabled:opacity-50"
+                  />
+                </label>
               </div>
             </div>
             

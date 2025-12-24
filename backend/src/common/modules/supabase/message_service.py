@@ -674,8 +674,10 @@ class MessageService(SupabaseService):
         result = self.client.table('members').select('id').eq('status', 'active').execute()
         return [m['id'] for m in (result.data or [])]
     
-    async def get_analytics_data(self, start_date: Optional[str] = None) -> Dict[str, int]:
+    async def get_analytics_data(self, start_date: Optional[str] = None) -> Dict[str, Any]:
         """获取分析数据"""
+        from datetime import datetime as dt
+        
         # 总消息数
         total_query = self.client.table('messages').select('id', count='exact')
         if start_date:
@@ -688,9 +690,107 @@ class MessageService(SupabaseService):
             unread_query = unread_query.gte('created_at', start_date)
         unread_result = unread_query.execute()
         
+        # 按天统计消息数
+        messages_by_day = []
+        messages_by_category = []
+        response_time_by_day = []
+        avg_response_time = 0.0
+        
+        # 获取消息列表用于统计
+        messages_query = self.client.table('messages').select('created_at, category, thread_id, sender_type')
+        if start_date:
+            messages_query = messages_query.gte('created_at', start_date)
+        messages_result = messages_query.execute()
+        
+        if messages_result.data:
+            # 按天分组
+            day_counts = {}
+            category_counts = {}
+            
+            # 用于计算响应时间的数据结构
+            thread_messages = {}  # thread_id -> list of messages
+            
+            for msg in messages_result.data:
+                # 按天统计
+                if msg.get('created_at'):
+                    day = msg['created_at'][:10]  # YYYY-MM-DD
+                    day_counts[day] = day_counts.get(day, 0) + 1
+                
+                # 按分类统计
+                category = msg.get('category') or 'general'
+                category_counts[category] = category_counts.get(category, 0) + 1
+                
+                # 收集线程消息用于计算响应时间
+                thread_id = msg.get('thread_id')
+                if thread_id:
+                    if thread_id not in thread_messages:
+                        thread_messages[thread_id] = []
+                    thread_messages[thread_id].append(msg)
+            
+            # 转换为列表格式
+            messages_by_day = [
+                {'date': day, 'count': count}
+                for day, count in sorted(day_counts.items())
+            ]
+            messages_by_category = [
+                {'category': cat, 'count': count}
+                for cat, count in category_counts.items()
+            ]
+            
+            # 计算响应时间（从会员消息到管理员回复的时间）
+            response_times = []
+            day_response_times = {}
+            
+            for thread_id, msgs in thread_messages.items():
+                # 按时间排序
+                sorted_msgs = sorted(msgs, key=lambda x: x.get('created_at', ''))
+                
+                # 找到第一条会员消息和第一条管理员回复
+                first_member_msg = None
+                first_admin_reply = None
+                
+                for msg in sorted_msgs:
+                    sender_type = msg.get('sender_type')
+                    if sender_type == 'member' and first_member_msg is None:
+                        first_member_msg = msg
+                    elif sender_type == 'admin' and first_member_msg and first_admin_reply is None:
+                        first_admin_reply = msg
+                        break
+                
+                if first_member_msg and first_admin_reply:
+                    try:
+                        created_at = first_member_msg['created_at']
+                        replied_at = first_admin_reply['created_at']
+                        created = dt.fromisoformat(created_at.replace('Z', '+00:00'))
+                        replied = dt.fromisoformat(replied_at.replace('Z', '+00:00'))
+                        response_minutes = (replied - created).total_seconds() / 60
+                        
+                        if response_minutes >= 0:
+                            response_times.append(response_minutes)
+                            day = created_at[:10]
+                            if day not in day_response_times:
+                                day_response_times[day] = []
+                            day_response_times[day].append(response_minutes)
+                    except (ValueError, TypeError):
+                        pass
+            
+            # 计算平均响应时间
+            if response_times:
+                avg_response_time = sum(response_times) / len(response_times)
+            
+            # 按天计算平均响应时间
+            response_time_by_day = [
+                {'date': day, 'responseTime': round(sum(times) / len(times), 1)}
+                for day, times in sorted(day_response_times.items())
+            ]
+        
         return {
             'total_messages': total_result.count or 0,
-            'unread_messages': unread_result.count or 0
+            'unread_messages': unread_result.count or 0,
+            'messages_by_day': messages_by_day,
+            'messages_by_category': messages_by_category,
+            'response_time': round(avg_response_time, 1),
+            'response_time_by_day': response_time_by_day,
         }
 
 

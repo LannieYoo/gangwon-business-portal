@@ -59,6 +59,7 @@ class NoticeListItem(BaseModel):
     id: UUID
     title: str
     board_type: str
+    content_html: Optional[str] = None
     view_count: int
     created_at: datetime
     
@@ -87,6 +88,7 @@ class NoticeListItem(BaseModel):
             "id": data["id"],
             "title": data["title"],
             "board_type": data["board_type"],
+            "content_html": data.get("content_html"),
             "view_count": data["view_count"],
             "created_at": cls._parse_datetime(data["created_at"]),
             

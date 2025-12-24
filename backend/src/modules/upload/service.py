@@ -370,9 +370,11 @@ class UploadService:
             try:
                 signed_url = storage_service.create_signed_url(bucket, path, expires_in=3600)
                 download_url = signed_url
-            except Exception:
-                # Fallback to public URL if signed URL generation fails
-                download_url = file_url
+            except ValueError as e:
+                error_msg = str(e)
+                if "Object not found" in error_msg or "404" in error_msg:
+                    raise NotFoundError(f"文件不存在或已被删除: {attachment.get('original_name', path)}")
+                raise
 
         # Return attachment with modified file_url
         attachment["file_url"] = download_url

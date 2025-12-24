@@ -141,6 +141,8 @@
           "fields": {
             "title": "제목",
             "image": "이미지 업로드",
+            "imageHint": "JPG, PNG, GIF 형식을 지원하며, 권장 크기는 800x600 픽셀입니다",
+            "noImage": "이미지 없음",
             "imageUrl": "이미지 URL",
             "imageUrlHelper": "또는 이미지 URL 주소를 직접 입력하세요",
             "imageUrlPlaceholder": "https://example.com/image.jpg"
@@ -159,7 +161,8 @@
           "saved": "저장되었습니다",
           "deleted": "삭제되었습니다",
           "invalidImageType": "이미지 파일을 선택해주세요",
-          "imageUploaded": "이미지가 업로드되었습니다"
+          "imageUploaded": "이미지가 업로드되었습니다",
+          "imageTooLarge": "이미지 크기는 5MB를 초과할 수 없습니다"
         }
       },
       "faq": {

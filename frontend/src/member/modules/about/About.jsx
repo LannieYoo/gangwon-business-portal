@@ -36,18 +36,20 @@ export default function About() {
   }, [i18n.language, t]);
 
   return (
-    <div className="w-full max-w-full flex flex-col p-0 m-0 overflow-x-hidden">
+    <div className="about w-full flex flex-col">
       <Banner
         bannerType={BANNER_TYPES.ABOUT}
-        sectionClassName="mb-6 md:mb-6"
+        sectionClassName="mb-16"
+        height="400px"
+        fullWidth={true}
       />
-      <PageContainer>
-        <div className="w-full max-w-full flex flex-col gap-0 mt-8 animate-fade-in">
+      <PageContainer className="pb-8" fullWidth={false}>
+        <div className="w-full">
           {loading && <div className="text-center py-12 px-8 text-base text-gray-500">{t('about.loading')}</div>}
           {error && <div className="text-center py-12 px-8 text-base text-red-600">{t('about.errorMessage', { message: error })}</div>}
           {!loading && !error && htmlContent && (
             <div 
-              className="w-full py-8 prose prose-gray max-w-none"
+              className="w-full prose prose-gray max-w-none"
               dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
           )}

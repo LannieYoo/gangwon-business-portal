@@ -98,17 +98,31 @@ class UploadService {
   }
 
   async _downloadFileInternal(fileUrl, filename) {
-    // If the URL is absolute (e.g. Supabase storage URL), use browser download directly
-    // to avoid CORS issues that can cause Axios "Network Error".
+    // If the URL is absolute (e.g. Supabase storage URL), fetch and force download
+    // to avoid browser preview behavior
     if (typeof fileUrl === "string" && /^https?:\/\//i.test(fileUrl)) {
-      const link = document.createElement("a");
-      link.href = fileUrl;
-      if (filename) {
-        link.download = filename;
+      try {
+        const response = await fetch(fileUrl);
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = filename || "download";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      } catch (error) {
+        // Fallback to direct link if fetch fails (e.g., CORS)
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        if (filename) {
+          link.download = filename;
+        }
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
       return;
     }
 
@@ -124,16 +138,30 @@ class UploadService {
    * @returns {Promise<void>}
    */
   async downloadFileByUrl(fileUrl, filename = null) {
-    // Same handling as _downloadFileInternal: prefer direct download for absolute URLs
+    // Fetch and force download to avoid browser preview
     if (typeof fileUrl === "string" && /^https?:\/\//i.test(fileUrl)) {
-      const link = document.createElement("a");
-      link.href = fileUrl;
-      if (filename) {
-        link.download = filename;
+      try {
+        const response = await fetch(fileUrl);
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = filename || "download";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      } catch (error) {
+        // Fallback to direct link if fetch fails (e.g., CORS)
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        if (filename) {
+          link.download = filename;
+        }
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
       return;
     }
 
