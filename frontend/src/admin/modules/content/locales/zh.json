@@ -8,7 +8,8 @@
         "notices": "公告",
         "news": "新闻资料",
         "faq": "FAQ",
-        "systemInfo": "系统介绍"
+        "systemInfo": "系统介绍",
+        "legal": "使用条款/隐私政策"
       },
       "banners": {
         "title": "横幅管理",
@@ -208,8 +209,22 @@
           "imageTooLarge": "图片大小不能超过5MB",
           "contentRequired": "请输入详细内容"
         }
+      },
+      "legal": {
+        "title": "使用条款/隐私政策管理",
+        "description": "管理使用条款和隐私政策内容。",
+        "termsOfService": "使用条款",
+        "privacyPolicy": "隐私政策",
+        "contentPlaceholder": "请输入内容...",
+        "helpTitle": "说明",
+        "helpText": "此处输入的内容将在会员注册时的使用条款和隐私政策弹窗中显示。",
+        "noContent": "暂无内容可预览",
+        "messages": {
+          "saved": "保存成功",
+          "saveFailed": "保存失败",
+          "contentRequired": "请输入内容"
+        }
       }
     }
   }
 }
-

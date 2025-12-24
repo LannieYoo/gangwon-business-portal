@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@shared/hooks';
 import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
-import { Alert, Loading } from '@shared/components';
+import { Alert, Loading, AddressSearch } from '@shared/components';
 import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
@@ -44,7 +44,9 @@ export default function PerformanceCompanyInfo() {
     companyName: '', businessNumber: '', corporationNumber: '', establishedDate: '',
     representative: '', phone: '', address: '', region: '', category: '', industry: '',
     description: '', website: '', logo: null, logoPreview: null, businessField: '', sales: '', employeeCount: '',
-    mainBusiness: '', cooperationFields: [], approvalStatus: null
+    mainBusiness: '', cooperationFields: [], approvalStatus: null,
+    // Contact person fields
+    contactPersonName: '', contactPersonDepartment: '', contactPersonPosition: ''
   });
 
   // 使用 ref 存储 logoPreview URL，便于清理
@@ -84,7 +86,11 @@ export default function PerformanceCompanyInfo() {
       employeeCount: profile.employeeCount ? formatNumber(profile.employeeCount) : '',
       mainBusiness: profile.mainBusiness || '', 
       cooperationFields: profile.cooperationFields || [],
-      approvalStatus: profile.approvalStatus || null
+      approvalStatus: profile.approvalStatus || null,
+      // Contact person fields
+      contactPersonName: profile.contactPersonName || '',
+      contactPersonDepartment: profile.contactPersonDepartment || '',
+      contactPersonPosition: profile.contactPersonPosition || ''
     });
     setLoading(false);
   }, [isAuthenticated, cleanupLogoPreview]);
@@ -179,7 +185,15 @@ export default function PerformanceCompanyInfo() {
       corporationNumber: companyData.corporationNumber,
       representative: companyData.representative,
       phone: companyData.phone,
-      logoUrl: companyData.logo
+      logoUrl: companyData.logo,
+      // Contact person fields
+      contactPersonName: companyData.contactPersonName,
+      contactPersonDepartment: companyData.contactPersonDepartment,
+      contactPersonPosition: companyData.contactPersonPosition,
+      // Business info fields
+      mainBusiness: companyData.mainBusiness,
+      description: companyData.description,
+      cooperationFields: companyData.cooperationFields
     };
 
     await memberService.updateProfile(saveData);
@@ -456,6 +470,36 @@ export default function PerformanceCompanyInfo() {
           </div>
           <div className="flex flex-col">
             <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">
+              {t('member.contactPersonName', '담당자명')}
+            </label>
+            <Input 
+              value={companyData.contactPersonName} 
+              onChange={(e) => handleChange('contactPersonName', e.target.value)} 
+              disabled={!isEditing}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">
+              {t('member.contactPersonDepartment', '담당자 부서')}
+            </label>
+            <Input 
+              value={companyData.contactPersonDepartment} 
+              onChange={(e) => handleChange('contactPersonDepartment', e.target.value)} 
+              disabled={!isEditing}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">
+              {t('member.contactPersonPosition', '담당자 직책')}
+            </label>
+            <Input 
+              value={companyData.contactPersonPosition} 
+              onChange={(e) => handleChange('contactPersonPosition', e.target.value)} 
+              disabled={!isEditing}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">
               {t('member.phone', 'Phone')} <span className="text-red-600">*</span>
             </label>
             <Input 
@@ -481,9 +525,9 @@ export default function PerformanceCompanyInfo() {
             <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">
               {t('member.address', 'Address')} <span className="text-red-600">*</span>
             </label>
-            <Input 
+            <AddressSearch 
               value={companyData.address} 
-              onChange={(e) => handleChange('address', e.target.value)} 
+              onChange={(address) => handleChange('address', address)} 
               disabled={!isEditing} 
               required
               error={fieldErrors.address}

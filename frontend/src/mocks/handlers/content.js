@@ -355,9 +355,9 @@ export const contentHandlers = [
   http.get(`${BASE_URL}/faqs`, getFAQs),
   http.get(`${API_BASE_URL}${API_PREFIX}/member/faqs`, getFAQs),
   
-  // Member: Get terms by type (terms_of_service or privacy_policy)
+  // Legal content: Get terms by type (terms_of_service or privacy_policy)
   http.get(`${BASE_URL}/terms`, getTermByType),
-  http.get(`${API_BASE_URL}${API_PREFIX}/member/terms`, getTermByType),
+  http.get(`${API_BASE_URL}${API_PREFIX}/legal-content/:contentType`, getTermByType),
   
   // Admin: Get all banners
   http.get(`${ADMIN_BASE_URL}/banners`, getAllBanners),

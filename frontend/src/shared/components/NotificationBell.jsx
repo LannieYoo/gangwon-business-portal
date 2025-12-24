@@ -34,49 +34,77 @@ export default function NotificationBell({ userType = 'member', variant = 'light
     : 'text-gray-600 hover:text-gray-900';
 
   const loadUnreadCount = async () => {
-    const count = userType === 'admin' 
-      ? await messagesService.getUnreadCount()
-      : await messagesService.getMemberUnreadCount();
-    setUnreadCount(count);
+    try {
+      const count = userType === 'admin' 
+        ? await messagesService.getUnreadCount()
+        : await messagesService.getMemberUnreadCount();
+      setUnreadCount(count);
+    } catch (error) {
+      // 401 错误表示用户未登录，静默处理
+      const status = error?.status || error?.response?.status;
+      if (status === 401) {
+        setUnreadCount(0);
+        return;
+      }
+      console.error('Failed to load unread count:', error);
+    }
   };
 
   const loadNotifications = async () => {
     setLoading(true);
     
-    if (userType === 'admin') {
-      const threadsResponse = await messagesService.getAdminThreads({ page: 1, pageSize: 10, hasUnread: true });
-      const threadNotifications = (threadsResponse.items || [])
-        .filter(thread => thread.adminUnreadCount > 0)
-        .map(thread => ({
-          id: thread.id,
-          subject: thread.subject,
-          content: t('notifications.fromMember', { name: thread.memberName || t('admin.messages.thread.member') }),
-          isRead: false,
-          isImportant: false,
-          createdAt: thread.lastMessageAt || thread.createdAt,
-          isThread: true
-        }));
-      setNotifications(threadNotifications);
-    } else {
-      const threadsResponse = await messagesService.getMemberThreads({ page: 1, pageSize: 10 });
-      const threadNotifications = (threadsResponse.items || [])
-        .filter(thread => thread.unreadCount > 0)
-        .map(thread => ({
-          id: thread.id,
-          subject: thread.subject,
-          content: t('notifications.adminReplied'),
-          isRead: false,
-          isImportant: false,
-          createdAt: thread.lastMessageAt || thread.createdAt,
-          isThread: true
-        }));
-      setNotifications(threadNotifications);
+    try {
+      if (userType === 'admin') {
+        const threadsResponse = await messagesService.getAdminThreads({ page: 1, pageSize: 10, hasUnread: true });
+        const threadNotifications = (threadsResponse.items || [])
+          .filter(thread => thread.adminUnreadCount > 0)
+          .map(thread => ({
+            id: thread.id,
+            subject: thread.subject,
+            content: t('notifications.fromMember', { name: thread.memberName || t('admin.messages.thread.member') }),
+            isRead: false,
+            isImportant: false,
+            createdAt: thread.lastMessageAt || thread.createdAt,
+            isThread: true
+          }));
+        setNotifications(threadNotifications);
+      } else {
+        const threadsResponse = await messagesService.getMemberThreads({ page: 1, pageSize: 10 });
+        const threadNotifications = (threadsResponse.items || [])
+          .filter(thread => thread.unreadCount > 0)
+          .map(thread => ({
+            id: thread.id,
+            subject: thread.subject,
+            content: t('notifications.adminReplied'),
+            isRead: false,
+            isImportant: false,
+            createdAt: thread.lastMessageAt || thread.createdAt,
+            isThread: true
+          }));
+        setNotifications(threadNotifications);
+      }
+    } catch (error) {
+      // 401 错误表示用户未登录，静默处理
+      const status = error?.status || error?.response?.status;
+      if (status === 401) {
+        setNotifications([]);
+        setLoading(false);
+        return;
+      }
+      console.error('Failed to load notifications:', error);
     }
     
     setLoading(false);
   };
 
   useEffect(() => {
+    // 检查是否有有效的 token，避免无效请求
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setUnreadCount(0);
+      return;
+    }
+    
     loadUnreadCount();
     intervalRef.current = setInterval(loadUnreadCount, 30000);
     return () => clearInterval(intervalRef.current);

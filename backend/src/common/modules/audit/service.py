@@ -26,6 +26,10 @@ class AuditLogService:
         resource_id: Optional[UUID] = None,
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None,
+        trace_id: Optional[str] = None,
+        request_id: Optional[str] = None,
+        request_method: Optional[str] = None,
+        request_path: Optional[str] = None,
     ) -> dict:
         """
         Create an audit log entry using Supabase API (no database session required).
@@ -44,6 +48,10 @@ class AuditLogService:
             resource_id: ID of the affected resource
             ip_address: IP address of the user
             user_agent: User agent string
+            trace_id: Request trace ID for correlation
+            request_id: Request ID for correlation
+            request_method: HTTP method (GET, POST, etc.)
+            request_path: Request path
 
         Returns:
             Created audit log data as dict (from database), or empty dict if both writes failed
@@ -62,6 +70,10 @@ class AuditLogService:
                 resource_id=resource_id,
                 ip_address=ip_address,
                 user_agent=user_agent,
+                trace_id=trace_id,
+                request_id=request_id,
+                request_method=request_method,
+                request_path=request_path,
             )
             if created_log:
                 db_write_success = True
@@ -86,6 +98,10 @@ class AuditLogService:
                 resource_id=resource_id,
                 ip_address=ip_address,
                 user_agent=user_agent,
+                trace_id=trace_id,
+                request_id=request_id,
+                request_method=request_method,
+                request_path=request_path,
                 extra_data=extra_data,
             )
             file_write_success = True

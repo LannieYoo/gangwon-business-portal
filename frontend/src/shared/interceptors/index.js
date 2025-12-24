@@ -2,6 +2,8 @@
  * Interceptors Module - 拦截器模块入口
  * 
  * 统一导出所有拦截器相关功能。
+ * 
+ * 注意：Store 层使用 Zustand 中间件模式（storeLogger.js），不使用拦截器。
  */
 
 // API 拦截器
@@ -9,8 +11,15 @@ export {
   createRequestInterceptor,
   createResponseInterceptor,
   createErrorInterceptor,
-  createApiInterceptors
+  createApiInterceptors,
+  installApiInterceptors
 } from './api.interceptor.js';
+
+// API 错误处理
+export { ApiErrorClassifier } from './api.error.classifier.js';
+export { apiErrorRecovery, ApiErrorRecovery } from './api.error.recovery.js';
+export { apiCache, ApiCache } from './api.cache.js';
+export { apiOfflineQueue, ApiOfflineQueue } from './api.offline.js';
 
 // 认证拦截器 (原有的认证装饰器)
 export {
@@ -43,19 +52,14 @@ export {
   installHookInterceptor,
   uninstallHookInterceptor,
   isHookInterceptorInstalled,
-  getHookInterceptorStats,
-  resetHookInterceptorStats
 } from './hook.interceptor.js';
 
-// Store拦截器
+// 路由拦截器
 export {
-  installStoreInterceptor,
-  uninstallStoreInterceptor,
-  isStoreInterceptorInstalled,
-  interceptStore,
-  getStoreInterceptorStats,
-  resetStoreInterceptorStats
-} from './store.interceptor.js';
+  installRouterInterceptor,
+  uninstallRouterInterceptor,
+  isRouterInterceptorInstalled,
+} from './router.interceptor.js';
 
 // 性能拦截器
 export {

@@ -1,38 +1,21 @@
 """
 Support service.
 
-Business logic for support management (FAQs and inquiries).
+Business logic for support management (FAQs).
 """
-from typing import Optional, List, Tuple, Dict, Any
+from typing import Optional, List, Dict, Any
 from uuid import UUID, uuid4
-from datetime import datetime, timezone
 
-from ...common.modules.exception import NotFoundError, AuthorizationError
+from ...common.modules.exception import NotFoundError
 from ...common.modules.supabase.service import supabase_service
-from .schemas import FAQCreate, FAQUpdate, InquiryCreate, InquiryReplyRequest
+from .schemas import FAQCreate, FAQUpdate
 
 
 class SupportService:
     """Support service class."""
 
-    async def _get_member_name(self, member_id: str) -> Optional[str]:
-        """
-        Get member company name by ID.
-        
-        Args:
-            member_id: Member UUID string
-            
-        Returns:
-            Company name or None if not found
-        """
-        if not member_id:
-            return None
-        
-        member_result = supabase_service.client.table('members').select('company_name').eq('id', member_id).execute()
-        return member_result.data[0]['company_name'] if member_result.data else None
-
     # ============================================================================
-    # FAQ Management - Using Supabase Client
+    # FAQ Management - Using Supabase Service Helper Methods
     # ============================================================================
 
     async def get_faqs(
@@ -47,7 +30,8 @@ class SupportService:
         Returns:
             List of FAQ dictionaries ordered by display_order
         """
-        query = supabase_service.client.table('faqs').select('*').is_('deleted_at', 'null')
+        # Use direct client for complex ordering (display_order + created_at)
+        query = supabase_service.client.table('faqs').select('*')
         
         if category:
             query = query.eq('category', category)
@@ -55,7 +39,7 @@ class SupportService:
         query = query.order('display_order', desc=False).order('created_at', desc=False)
         
         result = query.execute()
-        return result.data
+        return result.data or []
 
     async def create_faq(self, data: FAQCreate) -> Dict[str, Any]:
         """
@@ -75,8 +59,8 @@ class SupportService:
             'display_order': data.display_order,
         }
         
-        result = supabase_service.client.table('faqs').insert(faq_data).execute()
-        return result.data[0] if result.data else None
+        # Use generic helper method
+        return await supabase_service.create_record('faqs', faq_data)
 
     async def update_faq(
         self, faq_id: UUID, data: FAQUpdate
@@ -94,6 +78,11 @@ class SupportService:
         Raises:
             NotFoundError: If FAQ not found
         """
+        # Check if FAQ exists using generic helper
+        existing_faq = await supabase_service.get_by_id('faqs', str(faq_id))
+        if not existing_faq:
+            raise NotFoundError("FAQ")
+
         # Build update data (only include non-None fields)
         update_data = {}
         if data.category is not None:
@@ -106,22 +95,15 @@ class SupportService:
             update_data['display_order'] = data.display_order
         
         if not update_data:
-            # No fields to update, just return existing FAQ
-            result = supabase_service.client.table('faqs').select('*').eq('id', str(faq_id)).is_('deleted_at', 'null').execute()
-            if not result.data:
-                raise NotFoundError("FAQ")
-            return result.data[0]
+            # No fields to update, return existing FAQ
+            return existing_faq
         
-        result = supabase_service.client.table('faqs').update(update_data).eq('id', str(faq_id)).execute()
-        
-        if not result.data:
-            raise NotFoundError("FAQ")
-        
-        return result.data[0]
+        # Use generic helper method
+        return await supabase_service.update_record('faqs', str(faq_id), update_data)
 
     async def delete_faq(self, faq_id: UUID) -> None:
         """
-        Soft delete an FAQ (set deleted_at timestamp).
+        Delete an FAQ (hard delete).
 
         Args:
             faq_id: FAQ UUID
@@ -129,238 +111,79 @@ class SupportService:
         Raises:
             NotFoundError: If FAQ not found
         """
-        # Check if FAQ exists first (exclude soft-deleted)
-        check_result = supabase_service.client.table('faqs').select('id').eq('id', str(faq_id)).is_('deleted_at', 'null').execute()
-        
-        if not check_result.data:
+        # Check if FAQ exists using generic helper
+        existing_faq = await supabase_service.get_by_id('faqs', str(faq_id))
+        if not existing_faq:
             raise NotFoundError("FAQ")
         
-        # Soft delete the FAQ (set deleted_at)
-        supabase_service.client.table('faqs').update({
-            'deleted_at': datetime.now(timezone.utc).isoformat()
-        }).eq('id', str(faq_id)).execute()
+        # Use generic hard delete method
+        await supabase_service.hard_delete_record('faqs', str(faq_id))
 
-    # Inquiry Management - Using Supabase Client
-
-    async def create_inquiry(
-        self, data: InquiryCreate, member_id: UUID
-    ) -> Dict[str, Any]:
+    async def get_faq_by_id(self, faq_id: UUID) -> Dict[str, Any]:
         """
-        Create a new inquiry.
+        Get FAQ by ID.
 
         Args:
-            data: Inquiry creation data
-            member_id: Member UUID
+            faq_id: FAQ UUID
 
         Returns:
-            Created inquiry dictionary
+            FAQ dictionary
+
+        Raises:
+            NotFoundError: If FAQ not found
         """
-        inquiry_id = str(uuid4())
-        
-        inquiry_data = {
-            'id': inquiry_id,
-            'member_id': str(member_id),
-            'category': data.category or 'general',
-            'subject': data.subject,
-            'content': data.content,
-            'status': 'pending',
-            'admin_reply': None,
-            'replied_at': None
-        }
-        
-        result = supabase_service.client.table('inquiries').insert(inquiry_data).execute()
-        inquiry = result.data[0] if result.data else None
-        
-        # Save attachments if provided
-        if inquiry and data.attachments:
-            attachments_data = []
-            for att in data.attachments[:3]:  # Max 3 attachments
-                # Use stored_name if provided, otherwise derive from file_url or use original_name
-                stored_name = att.stored_name
-                if not stored_name and att.file_url:
-                    # Extract filename from URL
-                    stored_name = att.file_url.split('/')[-1] if '/' in att.file_url else att.original_name
-                if not stored_name:
-                    stored_name = att.original_name
-                    
-                attachments_data.append({
-                    'id': str(uuid4()),
-                    'resource_type': 'inquiry',
-                    'resource_id': inquiry_id,
-                    'file_id': att.file_id,
-                    'file_url': att.file_url,
-                    'original_name': att.original_name,
-                    'stored_name': stored_name,
-                    'file_size': att.file_size
-                })
+        # Use generic helper method
+        faq = await supabase_service.get_by_id('faqs', str(faq_id))
+        if not faq:
+            raise NotFoundError("FAQ")
+        return faq
+
+    async def list_faqs_with_pagination(
+        self,
+        page: int = 1,
+        page_size: int = 20,
+        category: Optional[str] = None
+    ) -> tuple[List[Dict[str, Any]], int]:
+        """
+        List FAQs with pagination.
+
+        Args:
+            page: Page number
+            page_size: Items per page
+            category: Optional category filter
+
+        Returns:
+            Tuple of (FAQs list, total count)
+        """
+        filters = {}
+        if category:
+            filters['category'] = category
+
+        # Use generic pagination helper, but with custom ordering
+        # For simple cases, we can use the helper method
+        if not category:
+            # Simple case - use helper method
+            return await supabase_service.list_with_pagination(
+                table='faqs',
+                page=page,
+                page_size=page_size,
+                order_by='display_order',
+                order_desc=False,
+                exclude_deleted=False  # FAQs don't use soft delete
+            )
+        else:
+            # Complex case with category filter - use direct client
+            # Get total count first
+            total = await supabase_service.count_records('faqs', filters)
             
-            if attachments_data:
-                supabase_service.client.table('attachments').insert(attachments_data).execute()
-                inquiry['attachments'] = [
-                    {
-                        'file_id': a['file_id'],
-                        'file_url': a['file_url'],
-                        'original_name': a['original_name'],
-                        'file_size': a['file_size']
-                    } for a in attachments_data
-                ]
-        
-        return inquiry
-
-    async def get_member_inquiries(
-        self,
-        member_id: UUID,
-        page: int = 1,
-        page_size: int = 20,
-    ) -> Tuple[List[Dict[str, Any]], int]:
-        """
-        Get member's own inquiries with pagination.
-
-        Args:
-            member_id: Member UUID
-            page: Page number (1-indexed)
-            page_size: Items per page
-
-        Returns:
-            Tuple of (inquiries list, total count)
-        """
-        # Get total count first
-        count_query = supabase_service.client.table('inquiries').select('*', count='exact').eq('member_id', str(member_id))
-        count_result = count_query.execute()
-        total = count_result.count or 0
-        
-        # Get paginated results
-        query = supabase_service.client.table('inquiries').select('*').eq('member_id', str(member_id))
-        query = query.order('created_at', desc=True).range((page - 1) * page_size, page * page_size - 1)
-        
-        result = query.execute()
-        inquiries = result.data or []
-
-        return inquiries, total
-
-    async def get_inquiry_by_id(
-        self, inquiry_id: UUID, member_id: Optional[UUID] = None
-    ) -> Dict[str, Any]:
-        """
-        Get inquiry by ID with ownership verification.
-
-        Args:
-            inquiry_id: Inquiry UUID
-            member_id: Optional member ID for ownership check (if None, admin access)
-
-        Returns:
-            Inquiry dictionary with attachments
-
-        Raises:
-            NotFoundError: If inquiry not found
-            AuthorizationError: If member tries to access another member's inquiry
-        """
-        query = supabase_service.client.table('inquiries').select('*').eq('id', str(inquiry_id))
-        result = query.execute()
-        
-        if not result.data:
-            raise NotFoundError("Inquiry")
-        
-        inquiry = result.data[0]
-
-        # If member_id is provided, verify ownership
-        if member_id is not None and inquiry['member_id'] != str(member_id):
-            raise AuthorizationError("You can only access your own inquiries")
-
-        # Get attachments for this inquiry
-        attachments_result = supabase_service.client.table('attachments').select('*').eq('resource_type', 'inquiry').eq('resource_id', str(inquiry_id)).execute()
-        
-        inquiry['attachments'] = [
-            {
-                'file_id': att.get('file_id') or str(att.get('id')),
-                'file_url': att.get('file_url'),
-                'original_name': att.get('original_name'),
-                'stored_name': att.get('stored_name'),
-                'file_size': att.get('file_size')
-            } for att in (attachments_result.data or [])
-        ]
-
-        return inquiry
-
-    async def get_all_inquiries_admin(
-        self,
-        page: int = 1,
-        page_size: int = 20,
-        status: Optional[str] = None,
-    ) -> Tuple[List[Dict[str, Any]], int]:
-        """
-        Get all inquiries for admin with pagination and filtering.
-
-        Args:
-            page: Page number (1-indexed)
-            page_size: Items per page
-            status: Optional status filter (pending, replied, closed)
-
-        Returns:
-            Tuple of (inquiries list with member_name, total count)
-        """
-        # Build query with optional status filter
-        count_query = supabase_service.client.table('inquiries').select('*', count='exact')
-        query = supabase_service.client.table('inquiries').select('*')
-        
-        if status:
-            count_query = count_query.eq('status', status)
-            query = query.eq('status', status)
-        
-        # Get total count
-        count_result = count_query.execute()
-        total = count_result.count or 0
-        
-        # Get paginated results
-        query = query.order('created_at', desc=True).range((page - 1) * page_size, page * page_size - 1)
-        
-        result = query.execute()
-        inquiries = result.data or []
-        
-        # Add member names
-        for inquiry in inquiries:
-            inquiry['member_name'] = await self._get_member_name(inquiry.get('member_id'))
-
-        return inquiries, total
-
-    async def reply_to_inquiry(
-        self, inquiry_id: UUID, reply_data: InquiryReplyRequest
-    ) -> Dict[str, Any]:
-        """
-        Reply to an inquiry (admin only).
-
-        Args:
-            inquiry_id: Inquiry UUID
-            reply_data: Reply content
-
-        Returns:
-            Updated inquiry dictionary
-
-        Raises:
-            NotFoundError: If inquiry not found
-        """
-        from datetime import datetime, timezone
-        
-        # Check if inquiry exists first
-        check_result = supabase_service.client.table('inquiries').select('id').eq('id', str(inquiry_id)).execute()
-        
-        if not check_result.data:
-            raise NotFoundError("Inquiry")
-        
-        # Update inquiry with reply
-        update_data = {
-            'admin_reply': reply_data.admin_reply,
-            'status': 'replied',
-            'replied_at': datetime.now(timezone.utc).isoformat()
-        }
-        
-        result = supabase_service.client.table('inquiries').update(update_data).eq('id', str(inquiry_id)).execute()
-        
-        if not result.data:
-            raise NotFoundError("Inquiry")
-        
-        inquiry = result.data[0]
-        inquiry['member_name'] = await self._get_member_name(inquiry.get('member_id'))
-        
-        return inquiry
+            # Get paginated results
+            query = supabase_service.client.table('faqs').select('*')
+            query = query.eq('category', category)
+            query = query.order('display_order', desc=False).order('created_at', desc=False)
+            
+            offset = (page - 1) * page_size
+            query = query.range(offset, offset + page_size - 1)
+            
+            result = query.execute()
+            return result.data or [], total
 

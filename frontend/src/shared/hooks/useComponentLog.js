@@ -13,7 +13,12 @@
  */
 
 import React, { useEffect, useRef, useCallback } from "react";
-import { info, debug, warn, LOG_LAYERS } from "@shared/utils/logger";
+import { info, debug, warn, LOG_LAYERS } from "@shared/logger";
+import { getLayerLogLevel } from "@shared/logger/config";
+
+// 从配置文件获取组件层日志级别
+const componentLogLevel = getLayerLogLevel('component');
+const logFn = componentLogLevel === 'DEBUG' ? debug : info;
 
 /**
  * 组件日志记录 Hook
@@ -24,7 +29,6 @@ import { info, debug, warn, LOG_LAYERS } from "@shared/utils/logger";
 export function useComponentLog(componentName, options = {}) {
   const {
     enableLogging = true,
-    logLevel = "info",
     trackProps = false,
     trackRenders = false,
     slowRenderThreshold = 16, // ms (60fps = 16.67ms per frame)
@@ -42,19 +46,16 @@ export function useComponentLog(componentName, options = {}) {
     try {
       mountTimeRef.current = performance.now();
 
-      const logMessage = `Component Mount: ${componentName}`;
+      // 按规范格式: Component: {name} {lifecycle}
+      const logMessage = `Component: ${componentName} mounted`;
       const logData = {
         component_name: componentName,
-        lifecycle_event: "mount",
-        mount_timestamp: new Date().toISOString(),
-        component_stack: getComponentStack(),
+        lifecycle: "mount",
+        props: {},  // 脱敏后的 props
       };
 
-      if (logLevel === "debug") {
-        debug(LOG_LAYERS.COMPONENT, logMessage, logData);
-      } else {
-        info(LOG_LAYERS.COMPONENT, logMessage, logData);
-      }
+      // 使用配置的日志级别
+      logFn(LOG_LAYERS.COMPONENT, logMessage, logData);
     } catch (error) {
       console.warn("Failed to log component mount:", error);
     }
@@ -68,26 +69,22 @@ export function useComponentLog(componentName, options = {}) {
           ? Math.round(performance.now() - mountTimeRef.current)
           : null;
 
-        const logMessage = `Component Unmount: ${componentName}`;
+        // 按规范格式: Component: {name} {lifecycle}
+        const logMessage = `Component: ${componentName} unmounted`;
         const logData = {
           component_name: componentName,
-          lifecycle_event: "unmount",
-          mount_duration_ms: mountDuration,
-          render_count: renderCountRef.current,
-          total_renders: renderCountRef.current,
-          unmount_timestamp: new Date().toISOString(),
+          lifecycle: "unmount",
+          props: {},
+          duration_ms: mountDuration,
         };
 
-        if (logLevel === "debug") {
-          debug(LOG_LAYERS.COMPONENT, logMessage, logData);
-        } else {
-          info(LOG_LAYERS.COMPONENT, logMessage, logData);
-        }
+        // 使用配置的日志级别
+        logFn(LOG_LAYERS.COMPONENT, logMessage, logData);
       } catch (error) {
         console.warn("Failed to log component unmount:", error);
       }
     };
-  }, [componentName, enableLogging, logLevel]);
+  }, [componentName, enableLogging]);
 
   // 记录组件渲染的工具函数
   const logRender = useCallback(
@@ -105,29 +102,25 @@ export function useComponentLog(componentName, options = {}) {
 
           const logData = {
             component_name: componentName,
-            lifecycle_event: "render",
-            render_time_ms: renderTime,
-            render_count: renderCountRef.current,
-            render_number: renderCountRef.current,
-            render_info: sanitizeRenderInfo(renderInfo),
+            lifecycle: "update",
+            props: sanitizeRenderInfo(renderInfo),
+            duration_ms: renderTime,
           };
 
           // 慢渲染警告
           if (renderTime > slowRenderThreshold) {
             warn(
               LOG_LAYERS.COMPONENT,
-              `Slow Component Render: ${componentName}`,
+              `Component: ${componentName} slow render`,
               {
                 ...logData,
-                performance_issue: "SLOW_COMPONENT_RENDER",
                 threshold_ms: slowRenderThreshold,
-                exceeded_by_ms: renderTime - slowRenderThreshold,
               }
             );
           } else {
             debug(
               LOG_LAYERS.COMPONENT,
-              `Component Render: ${componentName}`,
+              `Component: ${componentName} update`,
               logData
             );
           }
@@ -148,12 +141,11 @@ export function useComponentLog(componentName, options = {}) {
       try {
         info(
           LOG_LAYERS.COMPONENT,
-          `Component Event: ${componentName}.${eventName}`,
+          `Component: ${componentName} ${eventName}`,
           {
             component_name: componentName,
-            event_name: eventName,
-            event_data: sanitizeRenderInfo(eventData),
-            render_count: renderCountRef.current,
+            lifecycle: eventName,
+            props: sanitizeRenderInfo(eventData),
           }
         );
       } catch (error) {
@@ -169,13 +161,12 @@ export function useComponentLog(componentName, options = {}) {
       if (!enableLogging) return;
 
       try {
-        warn(LOG_LAYERS.COMPONENT, `Component Error: ${componentName}`, {
+        warn(LOG_LAYERS.COMPONENT, `Component: ${componentName} error`, {
           component_name: componentName,
+          lifecycle: "error",
+          props: sanitizeRenderInfo(errorInfo),
           error_message: error.message,
           error_stack: error.stack,
-          error_name: error.name,
-          error_info: sanitizeRenderInfo(errorInfo),
-          render_count: renderCountRef.current,
         });
       } catch (logError) {
         console.warn("Failed to log component error:", logError);
@@ -196,12 +187,11 @@ export function useComponentLog(componentName, options = {}) {
         if (changedProps.length > 0) {
           debug(
             LOG_LAYERS.COMPONENT,
-            `Component Props Change: ${componentName}`,
+            `Component: ${componentName} props changed`,
             {
               component_name: componentName,
-              lifecycle_event: "props_change",
-              changed_props: changedProps,
-              render_count: renderCountRef.current,
+              lifecycle: "update",
+              props: { changed_fields: changedProps },
             }
           );
         }
@@ -226,29 +216,6 @@ export function useComponentLog(componentName, options = {}) {
         ? Math.round(performance.now() - mountTimeRef.current)
         : null,
   };
-}
-
-/**
- * 获取组件调用栈信息
- * @returns {string} 组件栈信息
- */
-function getComponentStack() {
-  try {
-    const error = new Error();
-    const stack = error.stack || "";
-
-    // 提取 React 组件相关的栈信息
-    const lines = stack
-      .split("\n")
-      .filter(
-        (line) => line.includes("at ") && !line.includes("useComponentLog")
-      )
-      .slice(0, 3);
-
-    return lines.map((line) => line.trim()).join(" -> ");
-  } catch (error) {
-    return "unknown";
-  }
 }
 
 /**

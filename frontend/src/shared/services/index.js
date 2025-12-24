@@ -12,10 +12,8 @@ export { default as contentService } from './content.service';
 export { default as supportService } from './support.service';
 export { default as uploadService } from './upload.service';
 export { default as messagesService } from './messages.service';
-// logger is now exported from utils/logger.js
-export { logger, LOG_LAYERS } from '@shared/utils/logger';
-// loggerService alias for backward compatibility
-export { loggerService } from '@shared/utils/loggerHandler';
+// logger is now exported from @shared/logger
+export { logger, LOG_LAYERS } from '@shared/logger';
 // exceptionService is now exported from exception.service.js
-export { frontendExceptionService as exceptionService } from '@shared/utils/exception.service';
+export { frontendExceptionService as exceptionService } from '@shared/exception';
 

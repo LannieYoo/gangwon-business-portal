@@ -6,6 +6,7 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     react({
+      // 使用 automatic runtime（React 17+ 默认）
       jsxRuntime: 'automatic',
       babel: {
         plugins: [

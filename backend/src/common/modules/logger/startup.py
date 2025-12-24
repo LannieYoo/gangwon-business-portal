@@ -5,9 +5,6 @@ This module handles log cleanup and initialization tasks when the application st
 """
 import logging
 from ..config import settings
-from .file_writer import file_log_writer
-from .service import LoggingService
-from .schemas import AppLogCreate
 
 logger = logging.getLogger(__name__)
 
@@ -21,18 +18,22 @@ async def clear_logs_on_startup() -> tuple[list[str], int, int]:
         Note: logs_count and exceptions_count are always 0 now (no database clearing)
     """
     from pathlib import Path
+    from .file_writer import file_log_writer
+    
+    # Clear any pending log entries in the queue to prevent them from being written after clearing
+    file_log_writer.clear_queue()
     
     # Determine backend directory path
     backend_dir = Path(__file__).resolve().parent.parent.parent.parent.parent
     logs_dir = backend_dir / "logs"
     
-    # Clear all log files (using actual file paths from file_log_writer)
+    # Clear all log files
     log_files = [
-        ("system.log", logs_dir / "system.log"),  # Python standard logging
-        ("app.log", file_log_writer.application_logs_file),  # Application business logs
-        ("error.log", file_log_writer.application_exceptions_file),  # Application exceptions
-        ("audit.log", file_log_writer.audit_logs_file),  # Audit logs
-        ("performance.log", file_log_writer.performance_logs_file),  # Performance logs - 添加性能日志清理
+        ("system.log", logs_dir / "system.log"),
+        ("app.log", logs_dir / "app.log"),
+        ("error.log", logs_dir / "error.log"),
+        ("audit.log", logs_dir / "audit.log"),
+        ("performance.log", logs_dir / "performance.log"),
     ]
     
     cleared_files = []
@@ -55,7 +56,10 @@ async def write_startup_logs(
     db_clear_message: str | None = None,
 ) -> None:
     """
-    Write startup logs to file.
+    Write startup logs to system.log via Python standard logging.
+    
+    System layer logs should use Python standard logging which writes to system.log,
+    not logging_service.log() which writes to app.log.
     
     Args:
         startup_message: Application startup message
@@ -63,45 +67,15 @@ async def write_startup_logs(
         log_clear_message: Optional log cleanup message
         db_clear_message: Optional database cleanup message
     """
-    logging_service = LoggingService()
+    # Use Python standard logging for System layer logs
+    # These will be written to system.log via the root logger
+    logger.info(startup_message)
+    logger.info(debug_mode_message)
     
-    # Write startup messages (from main.py lifespan)
-    await logging_service.log(AppLogCreate(
-        source="backend",
-        level="INFO",
-        message=startup_message,
-        module="src.main",
-        function="lifespan",
-        line_number=30,
-    ))
-    await logging_service.log(AppLogCreate(
-        source="backend",
-        level="INFO",
-        message=debug_mode_message,
-        module="src.main",
-        function="lifespan",
-        line_number=31,
-    ))
-    
-    # Write cleanup messages (from logger.startup module)
     if log_clear_message:
-        await logging_service.log(AppLogCreate(
-            source="backend",
-            level="INFO",
-            message=log_clear_message,
-            module=__name__,
-            function="write_startup_logs",
-            line_number=96,
-        ))
+        logger.info(log_clear_message)
     if db_clear_message:
-        await logging_service.log(AppLogCreate(
-            source="backend",
-            level="INFO",
-            message=db_clear_message,
-            module=__name__,
-            function="write_startup_logs",
-            line_number=107,
-        ))
+        logger.info(db_clear_message)
 
 
 async def handle_startup_logging() -> None:

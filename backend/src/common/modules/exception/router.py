@@ -56,7 +56,10 @@ async def _handle_frontend_exception_batch(request: Request, batch_data: Fronten
     failed = 0
     errors = []
     
-    for exception_item in batch_data.exceptions:
+    # 使用兼容方法获取异常列表
+    exceptions = batch_data.get_exceptions()
+    
+    for exception_item in exceptions:
         try:
             # Convert frontend exception format to backend format
             converted_exception = _convert_frontend_exception(exception_item)
@@ -99,24 +102,36 @@ def _convert_frontend_exception(frontend_exception: dict) -> FrontendExceptionCr
     
     # Extract context information
     user_agent = context.get('userAgent')
-    request_path = context.get('url')
+    
+    # For API errors, extract API request info from context.api
+    # Otherwise fall back to page URL
+    api_info = context.get('api', {})
+    request_method = api_info.get('method')
+    request_path = api_info.get('url') or context.get('url')
     
     # Build exception details from context
     exception_details = {
         'frontend_id': frontend_exception.get('id'),
         'timestamp': frontend_exception.get('timestamp'),
         'classification': frontend_exception.get('classification'),
-        'source': frontend_exception.get('source', 'frontend')
+        'source': frontend_exception.get('source', 'frontend'),
+        'page_url': context.get('url'),  # Keep page URL separately
     }
     
+    # Add API response info if available
+    response_info = context.get('response', {})
+    if response_info:
+        exception_details['api_response'] = response_info
+    
     # Build context data (remove redundant fields)
-    context_data = {k: v for k, v in context.items() if k not in ['userAgent', 'url']}
+    context_data = {k: v for k, v in context.items() if k not in ['userAgent', 'url', 'api', 'response']}
     
     return FrontendExceptionCreate(
         exception_type=exception_type,
         exception_message=exception_message,
         stack_trace=stack_trace,
         user_agent=user_agent,
+        request_method=request_method,
         request_path=request_path,
         exception_details=exception_details,
         context_data=context_data

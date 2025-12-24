@@ -206,6 +206,18 @@ class ExceptionRecorder:
     def _determine_level(self, exception: Exception) -> str:
         """Determine the severity level of an exception."""
         if isinstance(exception, BaseCustomException):
+            # 根据 HTTP 状态码判断级别
+            status_code = getattr(exception, 'http_status_code', 500)
+            
+            # 4xx 是业务异常，不是真正的错误
+            if 400 <= status_code < 500:
+                if status_code in (401, 403):
+                    return "INFO"  # 认证/授权失败
+                elif status_code == 404:
+                    return "INFO"  # 资源不存在
+                else:
+                    return "WARNING"  # 其他客户端错误 (400, 422 等)
+            
             # Critical exceptions that require immediate attention
             critical_types = {"DatabaseError", "ExternalServiceError", "InternalError"}
             if exception.exception_type.value in critical_types:
@@ -273,24 +285,59 @@ class ExceptionRecorder:
     async def _log_exception(self, record: ExceptionRecord) -> None:
         """Log the exception using the unified logging service."""
         try:
-            # Use unified error logging API
-            await logging_service.error(ErrorLogCreate(
-                source=record.source,
-                error_type=record.exception_type,
-                error_message=record.message,
-                status_code=record.http_status,
-                stack_trace=record.stack_trace,
-                layer=record.layer,
-                function=record.function,
-                line_number=record.line_number,
-                trace_id=str(record.trace_id) if record.trace_id else None,
-                user_id=record.user_id,
-                error_details={
-                    "file": record.file,
-                    "level": record.level,
-                },
-                context_data=record.context
-            ))
+            # Extract request info from context for proper logging
+            request_method = record.context.get('request_method')
+            request_path = record.context.get('request_path')
+            ip_address = record.context.get('ip_address')
+            
+            # INFO/WARNING 级别的业务异常记录到 app.log，不污染 error.log
+            if record.level in ("INFO", "WARNING"):
+                from ..logger.schemas import AppLogCreate
+                await logging_service.app(AppLogCreate(
+                    source=record.source,
+                    level=record.level,
+                    message=f"[{record.exception_type}] {record.message}",
+                    layer=record.layer,
+                    module=record.file or "backend/src/common/modules/exception/recorder.py",
+                    function=record.function,
+                    line_number=record.line_number,
+                    trace_id=str(record.trace_id) if record.trace_id else None,
+                    request_id=record.request_id,
+                    user_id=record.user_id,
+                    request_method=request_method,
+                    request_path=request_path,
+                    ip_address=ip_address,
+                    response_status=record.http_status,
+                    extra_data={
+                        "exception_type": record.exception_type,
+                        "context": {k: v for k, v in record.context.items() 
+                                   if k not in ('request_method', 'request_path', 'ip_address')},
+                    }
+                ))
+            else:
+                # ERROR/CRITICAL 级别记录到 error.log
+                await logging_service.error(ErrorLogCreate(
+                    source=record.source,
+                    error_type=record.exception_type,
+                    error_message=record.message,
+                    status_code=record.http_status,
+                    stack_trace=record.stack_trace,
+                    layer=record.layer,
+                    module=record.file or "backend/src/common/modules/exception/recorder.py",
+                    function=record.function,
+                    line_number=record.line_number,
+                    trace_id=str(record.trace_id) if record.trace_id else None,
+                    request_id=record.request_id,
+                    user_id=record.user_id,
+                    request_method=request_method,
+                    request_path=request_path,
+                    ip_address=ip_address,
+                    error_details={
+                        "level": record.level,
+                    },
+                    context_data={k: v for k, v in record.context.items() 
+                                 if k not in ('request_method', 'request_path', 'ip_address')}
+                ))
             
         except Exception as e:
             # Fallback logging - don't let logging failures break exception handling

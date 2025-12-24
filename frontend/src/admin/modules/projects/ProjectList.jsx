@@ -5,8 +5,8 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Card, Table, Button, Badge, Pagination, SearchInput } from '@shared/components';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Card, Table, Button, Badge, Pagination, SearchInput, Alert } from '@shared/components';
 import { apiService, adminService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import { formatBusinessLicense } from '@shared/utils/format';
@@ -14,13 +14,28 @@ import { formatBusinessLicense } from '@shared/utils/format';
 export default function ProjectList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [allProjects, setAllProjects] = useState([]); // 存储所有数据
+  const [message, setMessage] = useState(null);
+  const [messageVariant, setMessageVariant] = useState('success');
 
   const [searchKeyword, setSearchKeyword] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
+
+  // 处理从其他页面传递过来的消息
+  useEffect(() => {
+    if (location.state?.message) {
+      setMessage(location.state.message);
+      setMessageVariant(location.state.messageVariant || 'success');
+      // 清除 location state，防止刷新后重复显示
+      window.history.replaceState({}, document.title);
+      // 3秒后自动清除消息
+      setTimeout(() => setMessage(null), 3000);
+    }
+  }, [location.state]);
 
   // 一次性加载所有项目数据
   const loadAllProjects = useCallback(async () => {
@@ -201,6 +216,11 @@ export default function ProjectList() {
 
   return (
     <div>
+      {message && (
+        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+          {message}
+        </Alert>
+      )}
 
       <div className="mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">

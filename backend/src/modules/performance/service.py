@@ -15,7 +15,7 @@ from .schemas import PerformanceRecordCreate, PerformanceRecordUpdate, Performan
 
 
 class PerformanceService:
-    """Performance service class."""
+    """Performance service class - using supabase_service helper methods and direct client."""
 
     async def list_performance_records(
         self, member_id: UUID, query: PerformanceListQuery
@@ -30,6 +30,7 @@ class PerformanceService:
         Returns:
             Tuple of (performance records list, total count)
         """
+        # Use existing supabase_service method
         records, total = await supabase_service.list_performance_records_with_filters(
             sort_by="created_at",
             sort_order="desc",
@@ -53,7 +54,8 @@ class PerformanceService:
             NotFoundError: If record not found
             AuthorizationError: If member doesn't own the record
         """
-        record = await supabase_service.get_performance_record_by_id(str(performance_id))
+        # Use helper method to get record
+        record = await supabase_service.get_by_id('performance_records', str(performance_id))
 
         if not record:
             raise NotFoundError("Performance record")
@@ -89,7 +91,8 @@ class PerformanceService:
             "status": "draft",
             "data_json": data.data_json,
         }
-        return await supabase_service.create_performance_record(record_data)
+        # Use helper method
+        return await supabase_service.create_record('performance_records', record_data)
 
     async def update_performance(
         self,
@@ -133,7 +136,8 @@ class PerformanceService:
         if data.data_json is not None:
             update_data["data_json"] = data.data_json
 
-        return await supabase_service.update_performance_record(str(performance_id), update_data)
+        # Use helper method
+        return await supabase_service.update_record('performance_records', str(performance_id), update_data)
 
     async def delete_performance(
         self, performance_id: UUID, member_id: UUID
@@ -159,7 +163,8 @@ class PerformanceService:
                 "Only 'draft' records can be deleted."
             )
 
-        await supabase_service.delete_performance_record(str(performance_id))
+        # Use helper method for soft delete
+        await supabase_service.delete_record('performance_records', str(performance_id))
 
     async def submit_performance(
         self, performance_id: UUID, member_id: UUID
@@ -192,7 +197,8 @@ class PerformanceService:
             "status": "submitted",
             "submitted_at": datetime.utcnow().isoformat(),
         }
-        return await supabase_service.update_performance_record(str(performance_id), update_data)
+        # Use helper method
+        return await supabase_service.update_record('performance_records', str(performance_id), update_data)
 
     # Admin operations
 
@@ -231,12 +237,13 @@ class PerformanceService:
         Raises:
             NotFoundError: If record not found
         """
-        record = await supabase_service.get_performance_record_by_id(str(performance_id))
+        # Use helper method to get record
+        record = await supabase_service.get_by_id('performance_records', str(performance_id))
 
         if not record:
             raise NotFoundError("Performance record")
 
-        # Get attachments from Attachment table
+        # Get attachments using existing method
         attachments = await supabase_service.get_attachments_by_resource(
             'performance', str(performance_id)
         )
@@ -288,7 +295,7 @@ class PerformanceService:
                 "Only 'submitted' records can be approved."
             )
 
-        # Update record status and review fields in one operation
+        # Update record status and review fields in one operation - use helper method
         update_data = {
             "status": "approved",
             "reviewer_id": None,  # Admin is not a member, so set to None
@@ -296,27 +303,26 @@ class PerformanceService:
             "review_comments": comments,
             "reviewed_at": datetime.utcnow().isoformat(),
         }
-        await supabase_service.update_performance_record(str(performance_id), update_data)
+        await supabase_service.update_record('performance_records', str(performance_id), update_data)
 
         # Get updated record
-        updated_record = await supabase_service.get_performance_record_by_id(str(performance_id))
+        updated_record = await supabase_service.get_by_id('performance_records', str(performance_id))
 
-        # Send approval notification email
-        try:
-            from ...common.modules.email import email_service
-            # Get member email
-            member = await supabase_service.get_member_by_id(str(record["member_id"]))
-            if member:
-                await email_service.send_approval_notification_email(
+        # Send approval notification email in background (non-blocking)
+        from ...common.modules.email import email_service
+        from ...common.modules.email.background import send_email_background
+        # Get member email
+        member = await supabase_service.get_by_id('members', str(record["member_id"]))
+        if member:
+            send_email_background(
+                email_service.send_approval_notification_email(
                     to_email=member["email"],
                     company_name=member["company_name"],
                     approval_type="성과 데이터",
                     status="approved",
                     comments=comments,
                 )
-        except Exception:
-            # Ignore errors - don't fail approval if email fails
-            pass
+            )
 
         return updated_record
 
@@ -350,7 +356,7 @@ class PerformanceService:
                 "Only 'submitted' records can be sent back for revision."
             )
 
-        # Update record status and review fields in one operation
+        # Update record status and review fields in one operation - use helper method
         update_data = {
             "status": "revision_requested",
             "reviewer_id": None,  # Admin is not a member, so set to None
@@ -358,29 +364,28 @@ class PerformanceService:
             "review_comments": comments,
             "reviewed_at": datetime.utcnow().isoformat(),
         }
-        await supabase_service.update_performance_record(str(performance_id), update_data)
+        await supabase_service.update_record('performance_records', str(performance_id), update_data)
 
         # Get updated record
-        updated_record = await supabase_service.get_performance_record_by_id(str(performance_id))
+        updated_record = await supabase_service.get_by_id('performance_records', str(performance_id))
 
-        # Send revision request email
-        try:
-            from ...common.modules.email import email_service
-            # Get member email
-            member = await supabase_service.get_member_by_id(str(record["member_id"]))
-            if member and comments:
-                from ...common.modules.config.settings import settings
-                revision_url = f"{settings.FRONTEND_URL}/member/performance/{performance_id}"
-                await email_service.send_revision_request_email(
+        # Send revision request email in background (non-blocking)
+        from ...common.modules.email import email_service
+        from ...common.modules.email.background import send_email_background
+        # Get member email
+        member = await supabase_service.get_by_id('members', str(record["member_id"]))
+        if member and comments:
+            from ...common.modules.config.settings import settings
+            revision_url = f"{settings.FRONTEND_URL}/member/performance/{performance_id}"
+            send_email_background(
+                email_service.send_revision_request_email(
                     to_email=member["email"],
                     company_name=member["company_name"],
                     request_type="성과 데이터",
                     comments=comments,
                     revision_url=revision_url,
                 )
-        except Exception:
-            # Ignore errors - don't fail if email fails
-            pass
+            )
 
         return updated_record
 
@@ -414,7 +419,7 @@ class PerformanceService:
                 "Only 'submitted' records can be rejected."
             )
 
-        # Update record status and review fields in one operation
+        # Update record status and review fields in one operation - use helper method
         update_data = {
             "status": "rejected",
             "reviewer_id": None,  # Admin is not a member, so set to None
@@ -422,10 +427,10 @@ class PerformanceService:
             "review_comments": comments,
             "reviewed_at": datetime.utcnow().isoformat(),
         }
-        await supabase_service.update_performance_record(str(performance_id), update_data)
+        await supabase_service.update_record('performance_records', str(performance_id), update_data)
 
         # Get updated record
-        return await supabase_service.get_performance_record_by_id(str(performance_id))
+        return await supabase_service.get_by_id('performance_records', str(performance_id))
 
     async def export_performance_data(
         self, query: PerformanceListQuery

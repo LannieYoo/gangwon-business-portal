@@ -89,12 +89,15 @@ from .handlers import (
     should_log_stack_trace,
 )
 
-from .middleware import (
-    # Middleware
+from ..interceptor.error import (
+    # Middleware - 从 interceptor 模块导入
     ExceptionMiddleware,
-    create_exception_middleware,
     add_exception_middleware,
 )
+
+def create_exception_middleware(debug: bool = False):
+    """创建异常中间件"""
+    return ExceptionMiddleware(None, debug=debug)
 
 __all__ = [
     # Base

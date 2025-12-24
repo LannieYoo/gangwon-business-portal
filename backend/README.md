@@ -20,7 +20,7 @@ backend/
 │   │   ├── performance/    # Performance module
 │   │   ├── project/        # Project module
 │   │   ├── content/        # Content management module
-│   │   └── support/        # Support module (FAQ, inquiries)
+│   │   └── support/        # Support module (FAQ)
 │   └── main.py             # FastAPI application entry point
 ├── tests/                  # Test files
 ├── alembic/                # Database migrations

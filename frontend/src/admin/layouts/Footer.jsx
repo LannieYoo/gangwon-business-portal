@@ -6,8 +6,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '@shared/components';
-import apiService from '@shared/services/api.service';
-import { API_PREFIX } from '@shared/utils/constants';
+import { contentService } from '@shared/services';
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -27,17 +26,22 @@ export default function Footer() {
     setModalContent('');
 
     try {
-      const response = await apiService.get(`${API_PREFIX}/member/terms`, { type });
-      const term = response.term;
+      const response = await contentService.getLegalContent(type);
       
-      if (term) {
-        setModalTitle(term.title);
-        setModalContent(term.content);
+      if (response && response.contentHtml) {
+        setModalTitle(type === 'terms_of_service' 
+          ? t('footer.termsOfService', '이용약관') 
+          : t('footer.privacyPolicy', '개인정보처리방침'));
+        setModalContent(response.contentHtml);
       } else {
-        setError(t('footer.error'));
+        // 如果没有内容，显示默认消息
+        setModalTitle(type === 'terms_of_service' 
+          ? t('footer.termsOfService', '이용약관') 
+          : t('footer.privacyPolicy', '개인정보처리방침'));
+        setModalContent(t('footer.noContent', '내용이 등록되지 않았습니다.'));
       }
     } catch (err) {
-      setError(t('footer.error'));
+      setError(t('footer.error', '내용을 불러오는데 실패했습니다.'));
     } finally {
       setIsLoading(false);
     }
@@ -113,11 +117,10 @@ export default function Footer() {
           </div>
         ) : (
           <div className="max-h-[70vh] overflow-y-auto">
-            <div className="leading-[1.8] text-gray-700">
-              {modalContent.split('\n').map((line, index) => (
-                <p key={index} className="mb-4 last:mb-0">{line}</p>
-              ))}
-            </div>
+            <div 
+              className="leading-[1.8] text-gray-700 prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: modalContent }}
+            />
           </div>
         )}
       </Modal>

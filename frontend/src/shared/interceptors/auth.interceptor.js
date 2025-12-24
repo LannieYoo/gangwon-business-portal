@@ -16,8 +16,12 @@
  * Requirements: 3.5, 4.3, 4.4
  */
 
-import { info, warn, error, debug, LOG_LAYERS } from "@shared/utils/logger";
-import { generateRequestId } from '@shared/utils/logger.context';
+import { info, warn, error, debug, LOG_LAYERS, generateRequestId } from "@shared/logger";
+import { getLayerLogLevel } from '@shared/logger/config';
+
+// 从配置文件获取 Auth 层日志级别
+const authLogLevel = getLayerLogLevel('auth');
+const logFn = authLogLevel === 'DEBUG' ? debug : info;
 
 // ============================================================================
 // 原有的认证装饰器功能 (Requirements 3.5)
@@ -45,7 +49,6 @@ export const AUTH_METHODS = {
 export function createAuthInterceptor(authMethod, options = {}) {
   const {
     enableLogging = true,
-    logLevel = 'info',
     methodName = 'unknown'
   } = options;
 
@@ -53,18 +56,11 @@ export function createAuthInterceptor(authMethod, options = {}) {
     const startTime = performance.now();
     
     if (enableLogging) {
-      const logMessage = `Auth Method Start: ${methodName}`;
-      const logData = {
+      logFn(LOG_LAYERS.AUTH, `Auth: ${methodName} PENDING`, {
         method_name: methodName,
         args_count: args.length,
-        timestamp: new Date().toISOString()
-      };
-      
-      if (logLevel === 'info') {
-        info(LOG_LAYERS.AUTH, logMessage, logData);
-      } else {
-        warn(LOG_LAYERS.AUTH, logMessage, logData);
-      }
+        result: 'PENDING'
+      });
     }
 
     try {
@@ -72,10 +68,11 @@ export function createAuthInterceptor(authMethod, options = {}) {
       
       if (enableLogging) {
         const executionTime = Math.round(performance.now() - startTime);
-        info(LOG_LAYERS.AUTH, `Auth Method Success: ${methodName}`, {
+        logFn(LOG_LAYERS.AUTH, `Auth: ${methodName} OK`, {
           method_name: methodName,
-          execution_time_ms: executionTime,
-          timestamp: new Date().toISOString()
+          args_count: args.length,
+          result: 'SUCCESS',
+          duration_ms: executionTime
         });
       }
       
@@ -83,11 +80,13 @@ export function createAuthInterceptor(authMethod, options = {}) {
     } catch (authError) {
       if (enableLogging) {
         const executionTime = Math.round(performance.now() - startTime);
-        error(LOG_LAYERS.AUTH, `Auth Method Error: ${methodName}`, {
+        error(LOG_LAYERS.AUTH, `Auth: ${methodName} FAILED`, {
           method_name: methodName,
-          execution_time_ms: executionTime,
+          args_count: args.length,
+          result: 'FAILED',
+          error_type: authError.name || 'AuthError',
           error_message: authError.message,
-          timestamp: new Date().toISOString()
+          duration_ms: executionTime
         });
       }
       
@@ -143,8 +142,7 @@ export function applyAuthInterceptor(authService, options = {}) {
 
   if (enableLogging) {
     info(LOG_LAYERS.AUTH, 'Auth Service Interceptor Applied', {
-      service_methods: [...new Set(allMethods)],
-      timestamp: new Date().toISOString()
+      service_methods: [...new Set(allMethods)]
     });
   }
 
@@ -255,13 +253,13 @@ function createAuthMethodInterceptor(serviceName, methodName, originalMethod) {
       const sanitizedArgs = args.map(arg => sanitizeAuthData(arg));
       
       // 记录操作开始
-      debug(LOG_LAYERS.AUTH, `Auth Operation Start: ${serviceName}.${methodName}`, {
+      debug(LOG_LAYERS.AUTH, `Auth: ${serviceName}.${methodName} PENDING`, {
         service_name: serviceName,
         method_name: methodName,
         operation_id: operationId,
         args_count: args.length,
         sanitized_args: sanitizedArgs,
-        timestamp: new Date().toISOString()
+        result: 'PENDING'
       });
       
       // 执行原始方法
@@ -279,17 +277,20 @@ function createAuthMethodInterceptor(serviceName, methodName, originalMethod) {
               service_name: serviceName,
               method_name: methodName,
               operation_id: operationId,
-              execution_time_ms: executionTime,
-              sanitized_result: sanitizedResult,
-              timestamp: new Date().toISOString()
+              sanitized_result: sanitizedResult
             };
             
             // 检查慢操作
             if (executionTime > 2000) { // 2秒阈值
-              warn(LOG_LAYERS.AUTH, `Slow Auth Operation: ${serviceName}.${methodName}`, {
-                ...logData,
+              warn(LOG_LAYERS.AUTH, `Auth: ${serviceName}.${methodName} SLOW`, {
+                service_name: serviceName,
+                method_name: methodName,
+                operation_id: operationId,
+                sanitized_result: sanitizedResult,
+                result: 'SUCCESS',
                 performance_issue: 'SLOW_AUTH_OPERATION',
-                threshold_ms: 2000
+                threshold_ms: 2000,
+                duration_ms: executionTime
               });
               
               authStats.slowOperations.push({
@@ -299,16 +300,25 @@ function createAuthMethodInterceptor(serviceName, methodName, originalMethod) {
                 timestamp: new Date().toISOString()
               });
             } else {
-              debug(LOG_LAYERS.AUTH, `Auth Operation Complete: ${serviceName}.${methodName}`, logData);
+              debug(LOG_LAYERS.AUTH, `Auth: ${serviceName}.${methodName} OK`, {
+                service_name: serviceName,
+                method_name: methodName,
+                operation_id: operationId,
+                sanitized_result: sanitizedResult,
+                result: 'SUCCESS',
+                duration_ms: executionTime
+              });
             }
             
             // 特殊处理登录成功
             if (methodName.toLowerCase().includes('login') && asyncResult) {
-              info(LOG_LAYERS.AUTH, `User Login Success: ${serviceName}`, {
+              info(LOG_LAYERS.AUTH, `Audit: User login successful`, {
                 service_name: serviceName,
                 method_name: methodName,
+                action: 'LOGIN',
+                result: 'SUCCESS',
                 user_info: sanitizeAuthData(asyncResult.user || asyncResult),
-                session_start: new Date().toISOString()
+                duration_ms: executionTime
               });
               
               authStats.sessions.push({
@@ -320,10 +330,12 @@ function createAuthMethodInterceptor(serviceName, methodName, originalMethod) {
             
             // 特殊处理登出
             if (methodName.toLowerCase().includes('logout')) {
-              info(LOG_LAYERS.AUTH, `User Logout: ${serviceName}`, {
+              info(LOG_LAYERS.AUTH, `Audit: User logout`, {
                 service_name: serviceName,
                 method_name: methodName,
-                session_end: new Date().toISOString()
+                action: 'LOGOUT',
+                result: 'SUCCESS',
+                duration_ms: executionTime
               });
               
               authStats.sessions.push({
@@ -339,15 +351,15 @@ function createAuthMethodInterceptor(serviceName, methodName, originalMethod) {
             const executionTime = Math.round(performance.now() - startTime);
             
             // 记录认证错误
-            warn(LOG_LAYERS.AUTH, `Auth Operation Error: ${serviceName}.${methodName}`, {
+            warn(LOG_LAYERS.AUTH, `Auth: ${serviceName}.${methodName} FAILED`, {
               service_name: serviceName,
               method_name: methodName,
               operation_id: operationId,
-              execution_time_ms: executionTime,
-              error_message: asyncError.message,
+              result: 'FAILED',
               error_type: asyncError.name || 'AuthError',
+              error_message: asyncError.message,
               error_code: asyncError.code,
-              timestamp: new Date().toISOString()
+              duration_ms: executionTime
             });
             
             authStats.errors.push({
@@ -360,12 +372,15 @@ function createAuthMethodInterceptor(serviceName, methodName, originalMethod) {
             
             // 特殊处理登录失败
             if (methodName.toLowerCase().includes('login')) {
-              warn(LOG_LAYERS.AUTH, `User Login Failed: ${serviceName}`, {
+              warn(LOG_LAYERS.AUTH, `Audit: User login failed`, {
                 service_name: serviceName,
                 method_name: methodName,
+                action: 'LOGIN',
+                result: 'FAILED',
+                error_type: asyncError.name || 'AuthError',
                 error_message: asyncError.message,
                 error_code: asyncError.code,
-                timestamp: new Date().toISOString()
+                duration_ms: executionTime
               });
             }
             
@@ -376,40 +391,40 @@ function createAuthMethodInterceptor(serviceName, methodName, originalMethod) {
         const executionTime = Math.round(performance.now() - startTime);
         const sanitizedResult = sanitizeAuthData(result);
         
-        debug(LOG_LAYERS.AUTH, `Auth Operation Complete: ${serviceName}.${methodName}`, {
+        debug(LOG_LAYERS.AUTH, `Auth: ${serviceName}.${methodName} OK`, {
           service_name: serviceName,
           method_name: methodName,
           operation_id: operationId,
-          execution_time_ms: executionTime,
           sanitized_result: sanitizedResult,
-          timestamp: new Date().toISOString()
+          result: 'SUCCESS',
+          duration_ms: executionTime
         });
         
         return result;
       }
       
-    } catch (error) {
+    } catch (err) {
       const executionTime = Math.round(performance.now() - startTime);
       
       // 记录同步错误
-      warn(LOG_LAYERS.AUTH, `Auth Operation Error: ${serviceName}.${methodName}`, {
+      warn(LOG_LAYERS.AUTH, `Auth: ${serviceName}.${methodName} FAILED`, {
         service_name: serviceName,
         method_name: methodName,
         operation_id: operationId,
-        execution_time_ms: executionTime,
-        error_message: error.message,
-        error_type: error.name || 'AuthError',
-        timestamp: new Date().toISOString()
+        result: 'FAILED',
+        error_type: err.name || 'AuthError',
+        error_message: err.message,
+        duration_ms: executionTime
       });
       
       authStats.errors.push({
         serviceName,
         methodName,
-        error: error.message,
+        error: err.message,
         timestamp: new Date().toISOString()
       });
       
-      throw error;
+      throw err;
     }
   };
 }
@@ -451,8 +466,7 @@ export function interceptAuthService(authService, serviceName) {
     
     info(LOG_LAYERS.AUTH, `Auth Service Intercepted: ${serviceName}`, {
       service_name: serviceName,
-      methods_count: Object.keys(authService).filter(k => typeof authService[k] === 'function').length,
-      timestamp: new Date().toISOString()
+      methods_count: Object.keys(authService).filter(k => typeof authService[k] === 'function').length
     });
     
     return interceptedService;

@@ -148,6 +148,10 @@ class AdminService {
         logoUrl: response.logo_url,
         createdAt: response.created_at,
         updatedAt: response.updated_at,
+        // Contact person fields
+        contactPersonName: response.contact_person_name ?? null,
+        contactPersonDepartment: response.contact_person_department ?? null,
+        contactPersonPosition: response.contact_person_position ?? null,
         // Additional fields for compatibility
         // Use nullish coalescing to preserve null values
         representative: response.representative ?? null,
@@ -193,6 +197,22 @@ class AdminService {
   async _rejectMemberInternal(memberId, queryParams) {
     const url = `${API_PREFIX}/admin/members/${memberId}/reject`;
     return await apiService.put(url, {}, { params: queryParams });
+  }
+
+  /**
+   * Reset member approval status back to pending (Admin, for testing)
+   * 重置会员审批状态为待审核（管理员，用于测试）
+   *
+   * @param {string} memberId - Member UUID
+   * @returns {Promise<Object>} Reset result
+   */
+  async resetMemberToPending(memberId) {
+    return await this._resetMemberToPendingInternal(memberId);
+  }
+
+  async _resetMemberToPendingInternal(memberId) {
+    const url = `${API_PREFIX}/admin/members/${memberId}/reset-pending`;
+    return await apiService.put(url);
   }
 
   /**

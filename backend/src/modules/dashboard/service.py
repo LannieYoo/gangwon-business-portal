@@ -10,7 +10,7 @@ from ...common.modules.supabase.service import supabase_service
 
 
 class DashboardService:
-    """Dashboard service class."""
+    """Dashboard service class - using supabase_service helper methods and direct client."""
 
     async def get_dashboard_stats(
         self,

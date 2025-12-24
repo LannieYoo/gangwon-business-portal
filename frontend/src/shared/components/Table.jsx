@@ -239,3 +239,4 @@ export function TableCell({ children, className, ...props }) {
   );
 }
 
+export default Table;

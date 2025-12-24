@@ -27,7 +27,7 @@ export default function AdminLayout() {
 
   return (
     <div className={`flex flex-col min-h-screen bg-gray-50 ${mobileMenuOpen ? 'overflow-hidden' : ''}`}>
-      <Header onToggleSidebar={toggleMobileMenu} />
+      <Header onToggleSidebar={toggleMobileMenu} onToggleDesktopSidebar={toggleSidebar} />
       
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (

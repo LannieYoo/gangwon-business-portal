@@ -39,8 +39,22 @@ class FrontendExceptionCreate(BaseModel):
 class FrontendExceptionBatch(BaseModel):
     """Schema for batch frontend exception reporting."""
     
-    exceptions: List[dict] = Field(..., description="Array of exception objects from frontend")
+    # 支持两种格式：
+    # 1. { exceptions: [...] } - 批量格式
+    # 2. { exception: {...} } - 单条格式（前端实际发送的格式）
+    exceptions: Optional[List[dict]] = Field(None, description="Array of exception objects from frontend")
+    exception: Optional[dict] = Field(None, description="Single exception object from frontend")
     metadata: Optional[dict] = Field(None, description="Batch metadata (size, timestamp, etc.)")
+    timestamp: Optional[str] = Field(None, description="Timestamp from frontend")
+    userAgent: Optional[str] = Field(None, description="User agent from frontend")
+    
+    def get_exceptions(self) -> List[dict]:
+        """获取异常列表，兼容单条和批量格式"""
+        if self.exceptions:
+            return self.exceptions
+        if self.exception:
+            return [self.exception]
+        return []
 
 
 class FrontendExceptionBatchResponse(BaseModel):

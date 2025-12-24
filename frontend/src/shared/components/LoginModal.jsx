@@ -10,6 +10,7 @@ import { useAuth } from "@shared/hooks";
 import { Modal } from "./Modal";
 import { EyeIcon, EyeOffIcon } from "./Icons";
 import { formatBusinessLicense } from "@shared/utils/format";
+import { cn } from "@shared/utils/helpers";
 // Exception reporting handled by service layer / AOP; components should not call reporting directly.
 import { API_PREFIX } from "@shared/utils/constants";
 // Auth styles converted to Tailwind classes
@@ -226,9 +227,14 @@ export function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegister }) {
 
           <button
             type="submit"
-            className={`w-full px-6 py-3.5 text-base font-medium leading-relaxed text-center text-white bg-[#0052a4] border-none rounded-md cursor-pointer transition-all duration-200 inline-flex items-center justify-center gap-2 box-border hover:bg-[#003d7a] active:bg-[#003d7a] disabled:opacity-50 disabled:cursor-not-allowed ${
-              isLoading ? "relative text-transparent" : ""
-            }`}
+            className={cn(
+              'w-full px-6 py-3.5 text-base font-medium leading-relaxed text-center text-white',
+              'bg-[#0052a4] border-none rounded-md cursor-pointer transition-all duration-200',
+              'inline-flex items-center justify-center gap-2 box-border',
+              'hover:bg-[#003d7a] active:bg-[#003d7a]',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              isLoading && 'relative text-transparent'
+            )}
             disabled={isLoading}
           >
             {isLoading && (

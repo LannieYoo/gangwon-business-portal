@@ -132,6 +132,22 @@ async def reject_member(
     }
 
 
+@router.put("/api/admin/members/{member_id:uuid}/reset-pending", response_model=dict)
+@audit_log(action="reset_pending", resource_type="member")
+async def reset_member_to_pending(
+    member_id: UUID,
+    request: Request,
+    current_user: dict = Depends(get_current_admin_user),
+):
+    """Reset a member's approval status back to pending (admin only, for testing)."""
+    member = await member_service.reset_member_to_pending(member_id)
+    
+    return {
+        "message": "Member reset to pending",
+        "member_id": str(member["id"]),
+    }
+
+
 @router.post(
     "/api/members/verify-company",
     response_model=CompanyVerifyResponse,

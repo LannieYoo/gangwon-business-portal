@@ -38,6 +38,14 @@ class MemberProfileResponse(BaseModel):
     phone: Optional[str] = None
     website: Optional[str] = None
     logo_url: Optional[str] = None
+    # Contact person fields (担当者信息)
+    contact_person_name: Optional[str] = None
+    contact_person_department: Optional[str] = None
+    contact_person_position: Optional[str] = None
+    # Business info fields
+    main_business: Optional[str] = None
+    description: Optional[str] = None
+    cooperation_fields: Optional[str] = None  # JSON array as string
     created_at: datetime
     updated_at: datetime
 
@@ -61,6 +69,14 @@ class MemberProfileUpdate(BaseModel):
     phone: Optional[str] = Field(None, max_length=50)
     website: Optional[str] = Field(None, max_length=255)
     logo_url: Optional[str] = Field(None, max_length=500)
+    # Contact person fields (担当者信息)
+    contact_person_name: Optional[str] = Field(None, max_length=100)
+    contact_person_department: Optional[str] = Field(None, max_length=100)
+    contact_person_position: Optional[str] = Field(None, max_length=100)
+    # Business info fields
+    main_business: Optional[str] = None
+    description: Optional[str] = None
+    cooperation_fields: Optional[str] = None  # JSON array as string
 
     class Config:
         extra = 'forbid'  # 禁止额外字段，接收到未定义字段时抛出异常

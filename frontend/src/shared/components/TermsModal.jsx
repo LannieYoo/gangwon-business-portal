@@ -9,7 +9,7 @@ import { Modal } from './Modal';
 import { Loading } from './Loading';
 import { Alert } from './Alert';
 import contentService from '@shared/services/content.service';
-import { exceptionService } from '@shared/utils/errorHandler';
+import { exceptionService } from '@shared/exception';
 import { cn } from '@shared/utils/helpers';
 
 /**
@@ -71,19 +71,23 @@ export function TermsModal({ isOpen, termType, onClose }) {
 
   /**
    * 加载条款内容
-   * TODO: 待后端条款 API 实现后，切换到此方法
-   * 目前使用临时内容，后续可以从后端获取
+   * 从后端 API 获取，如果没有则使用占位内容
    */
   const loadTermsContent = async (type) => {
     setLoading(true);
     setError(null);
 
     try {
-      // TODO: 待后端条款 API 实现后，切换到此调用
-      // const response = await contentService.getTerms(type);
-      // setContent(response.content);
-
-      // 临时内容（待后端 API 实现后移除）
+      // 只有 terms_of_service 和 privacy_policy 从 API 获取
+      if (type === TERM_TYPES.TERMS_OF_SERVICE || type === TERM_TYPES.PRIVACY_POLICY) {
+        const response = await contentService.getLegalContent(type);
+        if (response && response.contentHtml) {
+          setContent(response.contentHtml);
+          return;
+        }
+      }
+      
+      // 如果 API 没有返回内容，或者是其他类型，使用占位内容
       const placeholderContent = getPlaceholderContent(type, language);
       setContent(placeholderContent);
     } catch (err) {
@@ -93,7 +97,9 @@ export function TermsModal({ isOpen, termType, onClose }) {
         error_code: err.code || 'LOAD_TERMS_CONTENT_FAILED',
         context_data: { term_type: type }
       });
-      setError(t('auth.termsLoadError', '条款加载失败，请稍后重试'));
+      // 如果 API 失败，使用占位内容
+      const placeholderContent = getPlaceholderContent(type, language);
+      setContent(placeholderContent);
     } finally {
       setLoading(false);
     }

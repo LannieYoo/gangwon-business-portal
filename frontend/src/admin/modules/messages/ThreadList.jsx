@@ -7,13 +7,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Card, Button, Badge, Alert, Pagination, Modal, ModalFooter } from '@shared/components';
-import { messagesService } from '@shared/services';
+import { messagesService, uploadService } from '@shared/services';
 import { formatDateTime } from '@shared/utils/format';
 
 export default function ThreadList() {
   const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
   
   const [loading, setLoading] = useState(false);
   const [threads, setThreads] = useState([]);
@@ -29,6 +30,8 @@ export default function ThreadList() {
   const [loadingThread, setLoadingThread] = useState(false);
   
   const [replyContent, setReplyContent] = useState('');
+  const [replyAttachments, setReplyAttachments] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
   const [closeConfirm, setCloseConfirm] = useState({ open: false, threadId: null });
 
@@ -36,6 +39,30 @@ export default function ThreadList() {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'end' });
     }
+  };
+
+  const handleFileSelect = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    
+    const remainingSlots = 3 - replyAttachments.length;
+    if (remainingSlots <= 0) return;
+    
+    const filesToUpload = files.slice(0, remainingSlots);
+    setUploading(true);
+    try {
+      const uploaded = await uploadService.uploadAttachments(filesToUpload);
+      setReplyAttachments(prev => [...prev, ...uploaded]);
+    } catch (err) {
+      // 上传失败
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAttachment = (index) => {
+    setReplyAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
   const loadThreads = useCallback(async () => {
@@ -92,10 +119,22 @@ export default function ThreadList() {
     if (!replyContent.trim() || !selectedThread) return;
     setSending(true);
     try {
-      const newMessage = await messagesService.createThreadMessage(selectedThread.id, { content: replyContent.trim() });
+      // 转换附件格式
+      const attachments = replyAttachments.map(att => ({
+        fileName: att.original_name || att.name,
+        filePath: att.file_url || att.url,
+        fileSize: att.file_size || att.size || 0,
+        mimeType: att.mime_type || att.mimeType || 'application/octet-stream'
+      }));
+
+      const newMessage = await messagesService.createThreadMessage(selectedThread.id, { 
+        content: replyContent.trim(),
+        attachments 
+      });
       shouldScrollRef.current = true; // 标记需要滚动
       setThreadMessages(prev => [...prev, newMessage]);
       setReplyContent('');
+      setReplyAttachments([]);
     } catch {
       setMessageVariant('error');
       setMessage(t('common.error'));
@@ -306,10 +345,46 @@ export default function ThreadList() {
                               {formatDate(msg.createdAt)}
                             </div>
                             {msg.attachments?.length > 0 && (
-                              <div className={`mt-2 pt-2 border-t ${msg.senderType === 'admin' ? 'border-blue-400/50' : 'border-gray-100'}`}>
-                                {msg.attachments.map((att, idx) => (
-                                  <div key={idx} className="text-xs">📎 {att.fileName}</div>
-                                ))}
+                              <div className={`mt-2 pt-2 border-t ${msg.senderType === 'admin' ? 'border-blue-400/50' : 'border-gray-100'} space-y-2`}>
+                                {msg.attachments.map((att, idx) => {
+                                  const isImage = att.mimeType?.startsWith('image/') || 
+                                    /\.(jpg|jpeg|png|gif|webp)$/i.test(att.fileName || '');
+                                  
+                                  if (isImage) {
+                                    return (
+                                      <a 
+                                        key={idx} 
+                                        href={att.fileUrl} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="block"
+                                      >
+                                        <img 
+                                          src={att.fileUrl} 
+                                          alt={att.fileName}
+                                          className="max-w-[200px] max-h-[150px] rounded border border-gray-200 object-cover hover:opacity-90 transition-opacity"
+                                        />
+                                      </a>
+                                    );
+                                  }
+                                  
+                                  return (
+                                    <a 
+                                      key={idx} 
+                                      href={att.fileUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      download={att.fileName}
+                                      className={`flex items-center gap-1 text-xs hover:underline ${
+                                        msg.senderType === 'admin' ? 'text-blue-100 hover:text-white' : 'text-blue-600 hover:text-blue-800'
+                                      }`}
+                                    >
+                                      <span>📎</span>
+                                      <span className="truncate max-w-[200px]">{att.fileName}</span>
+                                      {att.fileSize && <span className="text-[10px] opacity-70">({(att.fileSize / 1024).toFixed(0)}KB)</span>}
+                                    </a>
+                                  );
+                                })}
                               </div>
                             )}
                           </div>
@@ -323,20 +398,57 @@ export default function ThreadList() {
                 {/* Reply input */}
                 {selectedThread.status === 'open' ? (
                   <div className="p-3 border-t border-gray-100 bg-white">
-                    <div className="flex gap-2 items-end">
-                      <textarea
-                        value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
-                        placeholder={t('admin.messages.composer.contentPlaceholder')}
-                        className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-sm"
-                        rows={2}
-                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendReply(); } }}
-                      />
-                      <Button variant="primary" onClick={handleSendReply} disabled={!replyContent.trim() || sending} className="px-4 py-2.5 rounded-xl">
+                    <textarea
+                      value={replyContent}
+                      onChange={(e) => setReplyContent(e.target.value)}
+                      placeholder={t('admin.messages.composer.contentPlaceholder')}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-sm"
+                      rows={2}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendReply(); } }}
+                    />
+                    
+                    {/* 已上传的附件 */}
+                    {replyAttachments.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {replyAttachments.map((att, idx) => (
+                          <div key={idx} className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs">
+                            <span className="truncate max-w-[120px]">{att.original_name || att.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveAttachment(idx)}
+                              className="text-gray-400 hover:text-red-500 ml-1"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          multiple
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploading || replyAttachments.length >= 3}
+                          className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1 disabled:opacity-50"
+                        >
+                          📎 {uploading ? '上传中...' : '添加附件'}
+                        </button>
+                        <span className="text-xs text-gray-400">({replyAttachments.length}/3)</span>
+                      </div>
+                      <Button variant="primary" onClick={handleSendReply} disabled={!replyContent.trim() || sending} className="px-4 py-2 rounded-lg">
                         {sending ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : '发送'}
                       </Button>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1.5 px-1">{t('admin.messages.composer.sendHint')}</p>
                   </div>
                 ) : (
                   <div className="p-4 border-t border-gray-100 bg-gray-50 text-center text-sm text-gray-500">

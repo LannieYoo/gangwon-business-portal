@@ -15,7 +15,7 @@ from .schemas import MemberProfileUpdate, MemberListQuery, MemberProfileResponse
 
 
 class MemberService:
-    """Member service class."""
+    """Member service class - using supabase_service helper methods and direct client."""
 
     async def get_member_profile(
         self, member_id: UUID
@@ -32,6 +32,7 @@ class MemberService:
         Raises:
             NotFoundError: If member not found
         """
+        # Use existing supabase_service method
         member, profile = await supabase_service.get_member_profile(str(member_id))
         if not member:
             raise NotFoundError("Member")
@@ -72,6 +73,14 @@ class MemberService:
             phone=profile.get("phone") if profile else None,
             website=profile.get("website") if profile else None,
             logo_url=profile.get("logo_url") if profile else None,
+            # Contact person fields
+            contact_person_name=profile.get("contact_person_name") if profile else None,
+            contact_person_department=profile.get("contact_person_department") if profile else None,
+            contact_person_position=profile.get("contact_person_position") if profile else None,
+            # Business info fields
+            main_business=profile.get("main_business") if profile else None,
+            description=profile.get("description") if profile else None,
+            cooperation_fields=profile.get("cooperation_fields") if profile else None,
             created_at=member.get("created_at"),
             updated_at=profile.get("updated_at") if profile and profile.get("updated_at") else member.get("updated_at"),
         )
@@ -112,6 +121,14 @@ class MemberService:
             phone=profile.get("phone") if profile else None,
             website=profile.get("website") if profile else None,
             logo_url=profile.get("logo_url") if profile else None,
+            # Contact person fields
+            contact_person_name=profile.get("contact_person_name") if profile else None,
+            contact_person_department=profile.get("contact_person_department") if profile else None,
+            contact_person_position=profile.get("contact_person_position") if profile else None,
+            # Business info fields
+            main_business=profile.get("main_business") if profile else None,
+            description=profile.get("description") if profile else None,
+            cooperation_fields=profile.get("cooperation_fields") if profile else None,
             created_at=member.get("created_at"),
             updated_at=profile.get("updated_at") if profile and profile.get("updated_at") else member.get("updated_at"),
         )
@@ -140,7 +157,7 @@ class MemberService:
         if data.company_name is not None:
             member_update['company_name'] = data.company_name
         if data.email is not None:
-            # Check email uniqueness
+            # Check email uniqueness using existing method
             is_unique = await supabase_service.check_email_uniqueness(
                 data.email, exclude_member_id=str(member_id)
             )
@@ -148,11 +165,9 @@ class MemberService:
                 raise ValidationError("Email already in use")
             member_update['email'] = data.email
 
-        # Update member if needed
+        # Update member if needed - use helper method
         if member_update:
-            updated_member = await supabase_service.update_member(
-                str(member_id), member_update
-            )
+            updated_member = await supabase_service.update_record('members', str(member_id), member_update)
             if updated_member:
                 member = updated_member
 
@@ -186,8 +201,22 @@ class MemberService:
             profile_update['website'] = data.website
         if data.logo_url is not None:
             profile_update['logo_url'] = data.logo_url
+        # Contact person fields
+        if data.contact_person_name is not None:
+            profile_update['contact_person_name'] = data.contact_person_name
+        if data.contact_person_department is not None:
+            profile_update['contact_person_department'] = data.contact_person_department
+        if data.contact_person_position is not None:
+            profile_update['contact_person_position'] = data.contact_person_position
+        # Business info fields
+        if data.main_business is not None:
+            profile_update['main_business'] = data.main_business
+        if data.description is not None:
+            profile_update['description'] = data.description
+        if data.cooperation_fields is not None:
+            profile_update['cooperation_fields'] = data.cooperation_fields
 
-        # Update or create profile
+        # Update or create profile using existing method
         if profile_update:
             updated_profile = await supabase_service.update_member_profile(
                 str(member_id), profile_update
@@ -209,6 +238,7 @@ class MemberService:
         Returns:
             Tuple of (members list, total count)
         """
+        # Use existing supabase_service method
         members, total = await supabase_service.list_members_with_filters(
             search=query.search,
             approval_status=query.approval_status,
@@ -232,32 +262,32 @@ class MemberService:
         Raises:
             NotFoundError: If member not found
         """
-        member = await supabase_service.get_member_by_id(str(member_id))
+        # Use helper method to get member
+        member = await supabase_service.get_by_id('members', str(member_id))
         if not member:
             raise NotFoundError("Member")
 
-        updated_member = await supabase_service.update_member(
+        # Use helper method to update
+        updated_member = await supabase_service.update_record(
+            'members',
             str(member_id),
             {
                 'approval_status': 'approved',
                 'status': 'active'
             }
         )
-        if not updated_member:
-            raise NotFoundError("Member")
 
-        # Send approval notification email
-        try:
-            from ...common.modules.email import email_service
-            await email_service.send_approval_notification_email(
+        # Send approval notification email in background (non-blocking)
+        from ...common.modules.email import email_service
+        from ...common.modules.email.background import send_email_background
+        send_email_background(
+            email_service.send_approval_notification_email(
                 to_email=updated_member['email'],
                 company_name=updated_member['company_name'],
                 approval_type="회원가입",
                 status="approved",
             )
-        except Exception:
-            # Ignore errors - don't fail approval if email fails
-            pass
+        )
 
         return updated_member
 
@@ -277,33 +307,61 @@ class MemberService:
         Raises:
             NotFoundError: If member not found
         """
-        member = await supabase_service.get_member_by_id(str(member_id))
+        # Use helper method to get member
+        member = await supabase_service.get_by_id('members', str(member_id))
         if not member:
             raise NotFoundError("Member")
 
-        updated_member = await supabase_service.update_member(
+        # Use helper method to update
+        updated_member = await supabase_service.update_record(
+            'members',
             str(member_id),
             {
                 'approval_status': 'rejected',
                 'status': 'suspended'
             }
         )
-        if not updated_member:
-            raise NotFoundError("Member")
 
-        # Send rejection notification email
-        try:
-            from ...common.modules.email import email_service
-            await email_service.send_approval_notification_email(
+        # Send rejection notification email in background (non-blocking)
+        from ...common.modules.email import email_service
+        from ...common.modules.email.background import send_email_background
+        send_email_background(
+            email_service.send_approval_notification_email(
                 to_email=updated_member['email'],
                 company_name=updated_member['company_name'],
                 approval_type="회원가입",
                 status="rejected",
                 comments=reason,
             )
-        except Exception:
-            # Ignore errors - don't fail rejection if email fails
-            pass
+        )
+
+        return updated_member
+
+    async def reset_member_to_pending(self, member_id: UUID) -> dict:
+        """
+        Reset a member's approval status back to pending (for testing).
+
+        Args:
+            member_id: Member UUID
+
+        Returns:
+            Updated member dict
+
+        Raises:
+            NotFoundError: If member not found
+        """
+        member = await supabase_service.get_by_id('members', str(member_id))
+        if not member:
+            raise NotFoundError("Member")
+
+        updated_member = await supabase_service.update_record(
+            'members',
+            str(member_id),
+            {
+                'approval_status': 'pending',
+                'status': 'pending'
+            }
+        )
 
         return updated_member
 
@@ -428,7 +486,7 @@ class MemberService:
             db_data["sales_amt"] = float(latest_financial.revenue)
             db_data["emp_cnt"] = latest_financial.employees
         
-        # Check if record exists
+        # Check if record exists - use direct client for complex query
         existing = supabase_service.client.table("nice_dnb_company_info")\
             .select("biz_no")\
             .eq("biz_no", business_number)\
@@ -436,13 +494,13 @@ class MemberService:
             .execute()
         
         if existing.data:
-            # Update existing record
+            # Update existing record - use direct client
             supabase_service.client.table("nice_dnb_company_info")\
                 .update(db_data)\
                 .eq("biz_no", business_number)\
                 .execute()
         else:
-            # Insert new record
+            # Insert new record - use direct client
             supabase_service.client.table("nice_dnb_company_info")\
                 .insert(db_data)\
                 .execute()

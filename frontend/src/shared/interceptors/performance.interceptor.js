@@ -14,9 +14,8 @@
  * Requirements: 4.3, 4.4
  */
 
-import { info, debug, warn, LOG_LAYERS } from '@shared/utils/logger';
-import { generateRequestId } from '@shared/utils/logger.context';
-import { LOGGING_CONFIG, shouldExcludeFromPerformanceMonitoring } from '@shared/config/logging.config';
+import { info, debug, warn, LOG_LAYERS, generateRequestId } from '@shared/logger';
+import { LOGGING_CONFIG, shouldExcludeFromPerformanceMonitoring } from '@shared/logger/config';
 
 // 拦截器状态
 let isInstalled = false;
@@ -65,61 +64,43 @@ function monitorNetworkPerformance() {
       // 使用统一的排除检查函数
       const isLoggingRequest = shouldExcludeFromPerformanceMonitoring(url);
       
-      if (!isLoggingRequest) {
-        debug(LOG_LAYERS.PERFORMANCE, `Network Request Start: ${method} ${url}`, {
-          request_id: requestId,
-          method,
-          url,
-          has_body: !!options.body,
-          timestamp: new Date().toISOString()
-        });
-      }
+      // 不记录请求开始日志，只关注慢查询
       
       try {
         const response = await originalFetch(resource, options);
         const endTime = performance.now();
         const duration = Math.round(endTime - startTime);
         
-        // 记录请求完成
-        const logData = {
-          request_id: requestId,
-          method,
-          url,
-          status: response.status,
-          duration_ms: duration,
-          response_size: response.headers.get('content-length') || 'unknown',
-          timestamp: new Date().toISOString()
-        };
-        
-        // 忽略日志上传请求的性能监控，避免循环
-        if (!isLoggingRequest) {
-          if (duration > performanceConfig.slowRequestThreshold) {
-            warn(LOG_LAYERS.PERFORMANCE, `Slow Network Request: ${method} ${url}`, {
-              ...logData,
-              performance_issue: 'SLOW_NETWORK_REQUEST',
-              threshold_ms: performanceConfig.slowRequestThreshold
-            });
-            
-            performanceStats.slowOperations.push({
-              type: 'network',
-              method,
-              url,
-              duration,
-              timestamp: new Date().toISOString()
-            });
-          } else {
-            debug(LOG_LAYERS.PERFORMANCE, `Network Request Complete: ${method} ${url}`, logData);
-          }
+        // 只记录慢查询，忽略日志上传请求
+        if (!isLoggingRequest && duration > performanceConfig.slowRequestThreshold) {
+          warn(LOG_LAYERS.PERFORMANCE, `Slow network_request: ${method} ${url} (${duration}ms > ${performanceConfig.slowRequestThreshold}ms)`, {
+            request_id: requestId,
+            metric_name: 'network_request',
+            metric_value: duration,
+            metric_unit: 'ms',
+            method,
+            url,
+            status: response.status,
+            duration_ms: duration,
+            threshold_ms: performanceConfig.slowRequestThreshold,
+            is_slow: true
+          });
+          
+          performanceStats.slowOperations.push({
+            type: 'fetch',
+            method,
+            url,
+            duration
+          });
         }
         
-        // 保存请求统计（但不包括日志请求，避免统计污染）
+        // 保存请求统计（但不包括日志请求）
         if (!isLoggingRequest) {
           performanceStats.networkRequests.push({
             method,
             url,
             status: response.status,
-            duration,
-            timestamp: new Date().toISOString()
+            duration
           });
           
           // 限制统计数据大小
@@ -133,23 +114,13 @@ function monitorNetworkPerformance() {
         const endTime = performance.now();
         const duration = Math.round(endTime - startTime);
         
-        // 忽略日志上传请求的错误监控，避免循环
+        // 网络错误记录到error日志，不在performance日志
         if (!isLoggingRequest) {
-          warn(LOG_LAYERS.PERFORMANCE, `Network Request Error: ${method} ${url}`, {
-            request_id: requestId,
-            method,
-            url,
-            duration_ms: duration,
-            error_message: error.message,
-            timestamp: new Date().toISOString()
-          });
-          
           performanceStats.errors.push({
-            type: 'network',
+            type: 'fetch',
             method,
             url,
-            error: error.message,
-            timestamp: new Date().toISOString()
+            error: error.message
           });
         }
         
@@ -170,15 +141,7 @@ function monitorNetworkPerformance() {
       // 使用统一的排除检查函数
       this._isLoggingRequest = shouldExcludeFromPerformanceMonitoring(url);
       
-      if (!this._isLoggingRequest) {
-        debug(LOG_LAYERS.PERFORMANCE, `XHR Request Start: ${method} ${url}`, {
-          request_id: this._requestId,
-          method,
-          url,
-          async: async !== false,
-          timestamp: new Date().toISOString()
-        });
-      }
+      // 不记录请求开始日志，只关注慢查询
       
       return originalXHROpen.call(this, method, url, async, user, password);
     };
@@ -191,33 +154,36 @@ function monitorNetworkPerformance() {
         if (xhr.readyState === 4) {
           const duration = Math.round(performance.now() - xhr._startTime);
           
-          const logData = {
-            request_id: xhr._requestId,
-            method: xhr._method,
-            url: xhr._url,
-            status: xhr.status,
-            duration_ms: duration,
-            timestamp: new Date().toISOString()
-          };
-          
-          // 忽略日志上传请求的性能监控，避免循环
-          if (!xhr._isLoggingRequest) {
-            if (duration > performanceConfig.slowRequestThreshold) {
-              warn(LOG_LAYERS.PERFORMANCE, `Slow XHR Request: ${xhr._method} ${xhr._url}`, {
-                ...logData,
-                performance_issue: 'SLOW_XHR_REQUEST',
-                threshold_ms: performanceConfig.slowRequestThreshold
-              });
-            } else {
-              debug(LOG_LAYERS.PERFORMANCE, `XHR Request Complete: ${xhr._method} ${xhr._url}`, logData);
-            }
+          // 只记录慢查询
+          if (!xhr._isLoggingRequest && duration > performanceConfig.slowRequestThreshold) {
+            warn(LOG_LAYERS.PERFORMANCE, `Slow network_request: ${xhr._method} ${xhr._url} (${duration}ms > ${performanceConfig.slowRequestThreshold}ms)`, {
+              request_id: xhr._requestId,
+              metric_name: 'network_request',
+              metric_value: duration,
+              metric_unit: 'ms',
+              method: xhr._method,
+              url: xhr._url,
+              status: xhr.status,
+              duration_ms: duration,
+              threshold_ms: performanceConfig.slowRequestThreshold,
+              is_slow: true
+            });
             
+            performanceStats.slowOperations.push({
+              type: 'xhr',
+              method: xhr._method,
+              url: xhr._url,
+              duration
+            });
+          }
+          
+          // 保存统计（不包括日志请求）
+          if (!xhr._isLoggingRequest) {
             performanceStats.networkRequests.push({
               method: xhr._method,
               url: xhr._url,
               status: xhr.status,
-              duration,
-              timestamp: new Date().toISOString()
+              duration
             });
           }
         }
@@ -296,16 +262,22 @@ function monitorMemoryUsage() {
       timestamp: new Date().toISOString()
     };
     
-    // 检查内存警告
-    if (memory.usedJSHeapSize > performanceConfig.memoryWarningThreshold) {
-      warn(LOG_LAYERS.PERFORMANCE, 'High Memory Usage Detected', {
-        ...memoryUsage,
-        performance_issue: 'HIGH_MEMORY_USAGE',
-        threshold_bytes: performanceConfig.memoryWarningThreshold
-      });
-    } else {
-      debug(LOG_LAYERS.PERFORMANCE, 'Memory Usage Report', memoryUsage);
-    }
+    const isHighMemory = memory.usedJSHeapSize > performanceConfig.memoryWarningThreshold;
+    
+    // 按照日志规范格式发送性能日志
+    const logFn = isHighMemory ? warn : info;
+    const message = isHighMemory 
+      ? `Slow memory_usage: App (${Math.round(memory.usedJSHeapSize / 1024 / 1024)}MB > ${Math.round(performanceConfig.memoryWarningThreshold / 1024 / 1024)}MB)`
+      : `Perf: memory_usage = ${Math.round(memory.usedJSHeapSize / 1024 / 1024)}MB`;
+    
+    logFn(LOG_LAYERS.PERFORMANCE, message, {
+      metric_name: 'memory_usage',
+      metric_value: memory.usedJSHeapSize,
+      metric_unit: 'bytes',
+      threshold_ms: performanceConfig.memoryWarningThreshold,
+      is_slow: isHighMemory,
+      ...memoryUsage
+    });
     
     performanceStats.memoryUsage.push(memoryUsage);
     
@@ -321,37 +293,11 @@ function monitorMemoryUsage() {
 
 /**
  * 生成性能报告
+ * 注意：定期报告已禁用，只记录慢查询
  */
 function generatePerformanceReport() {
-  try {
-    const report = {
-      timestamp: new Date().toISOString(),
-      network: {
-        total_requests: performanceStats.networkRequests.length,
-        average_duration: performanceStats.networkRequests.length > 0 
-          ? Math.round(performanceStats.networkRequests.reduce((sum, req) => sum + req.duration, 0) / performanceStats.networkRequests.length)
-          : 0,
-        slow_requests: performanceStats.slowOperations.filter(op => op.type === 'network').length
-      },
-      memory: {
-        current_usage: performanceStats.memoryUsage.length > 0 
-          ? performanceStats.memoryUsage[performanceStats.memoryUsage.length - 1]
-          : null,
-        peak_usage: performanceStats.memoryUsage.length > 0
-          ? Math.max(...performanceStats.memoryUsage.map(m => m.used))
-          : 0
-      },
-      errors: {
-        total_errors: performanceStats.errors.length,
-        network_errors: performanceStats.errors.filter(e => e.type === 'network').length
-      }
-    };
-    
-    info(LOG_LAYERS.PERFORMANCE, 'Performance Report', report);
-    
-  } catch (error) {
-    console.error('[PerformanceInterceptor] Failed to generate performance report:', error);
-  }
+  // 禁用定期报告，只关注慢查询
+  // 慢查询已在网络监控中实时记录
 }
 
 /**
@@ -369,17 +315,14 @@ export function installPerformanceInterceptor(config = {}) {
     // 更新配置
     Object.assign(performanceConfig, config);
     
-    // 安装各种监控
+    // 安装网络监控（慢查询检测）
     monitorNetworkPerformance();
-    monitorNavigationPerformance();
     
-    // 启动定期监控
-    if (performanceConfig.enableMemoryMonitoring) {
-      memoryMonitoringInterval = setInterval(monitorMemoryUsage, 5000); // 每5秒检查内存
+    // 开发环境启用完整监控
+    if (import.meta.env.DEV) {
+      monitorNavigationPerformance();
+      memoryMonitoringInterval = setInterval(monitorMemoryUsage, 30000); // 30秒检查一次内存
     }
-    
-    // 启动定期报告
-    monitoringInterval = setInterval(generatePerformanceReport, performanceConfig.reportInterval);
     
     isInstalled = true;
     

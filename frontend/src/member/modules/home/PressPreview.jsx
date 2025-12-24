@@ -7,6 +7,18 @@ import { contentService } from '@shared/services';
 import { formatDate } from '@shared/utils/format';
 import { ROUTES } from '@shared/utils/constants';
 
+// 新闻卡片颜色配置（与后端 generate_news_images.py 保持一致）
+const NEWS_COLORS = [
+  'bg-blue-700',      // 0: 数字化转型
+  'bg-emerald-600',   // 1: 生物产业
+  'bg-violet-600',    // 2: IT海外进出
+  'bg-red-600',       // 3: 支援实绩
+  'bg-orange-600',    // 4: 投资诱致
+  'bg-green-600',     // 5: 环保能源
+  'bg-cyan-600',      // 6: 医疗器械
+  'bg-pink-700',      // 7: 观光数字化
+];
+
 // 生成占位符图片
 const generatePlaceholderImage = (width = 400, height = 250) => {
   const svg = `
@@ -64,13 +76,21 @@ function PressPreview() {
       ) : news ? (
         <Card className="overflow-hidden flex-1 flex flex-col">
           <Link to={ROUTES.MEMBER_PRESS} className="flex flex-col p-0 text-inherit no-underline h-full transition-transform hover:-translate-y-0.5">
-            <div className="w-full h-[200px] overflow-hidden rounded-t-lg bg-gray-100 relative flex-shrink-0">
+            <div className={`w-full h-[200px] overflow-hidden rounded-t-lg relative flex-shrink-0 ${NEWS_COLORS[0]}`}>
               <LazyImage 
                 src={news.thumbnailUrl || generatePlaceholderImage()} 
                 alt={news.title}
                 placeholder={generatePlaceholderImage()}
                 className="!block !w-full !h-full flex-shrink-0 object-cover object-center"
               />
+              {/* 文字叠加层 */}
+              <div className="absolute inset-0 flex items-center justify-center p-4"
+                style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5))' }}>
+                <h3 className="text-lg font-bold text-white text-center m-0 leading-snug line-clamp-3"
+                  style={{ textShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
+                  {news.title}
+                </h3>
+              </div>
             </div>
             <div className="flex flex-col p-4 gap-2">
               <h3 className="text-base font-semibold text-gray-900 m-0 leading-snug line-clamp-2">{news.title}</h3>

@@ -120,7 +120,10 @@ class ProjectListItem(BaseModel):
             data = data.copy()
             data.pop('target_audience')
         
-        # Basic fields - let it fail if required fields are missing
+        # Basic fields - use .get() for optional fields with safe defaults
+        # application_count may come as 'application_count' or 'applications_count'
+        app_count = data.get("application_count", data.get("applications_count", 0))
+        
         item_data = {
             "id": data["id"],
             "title": data["title"],
@@ -131,7 +134,7 @@ class ProjectListItem(BaseModel):
             "end_date": cls._parse_date(data["end_date"]),
             "image_url": data.get("image_url", ""),
             "status": data["status"],
-            "applications_count": data["application_count"],
+            "applications_count": app_count,
             
             # Formatted display fields
             "status_display": cls._format_status_display(data["status"]),
@@ -144,14 +147,14 @@ class ProjectListItem(BaseModel):
         # Add admin-specific fields if requested
         if include_admin_fields:
             item_data.update({
-                "applications_count_display": format_count_display(data['application_count']),
+                "applications_count_display": format_count_display(app_count),
                 "created_at_display": format_datetime_display(data["created_at"]),
                 "updated_at_display": format_datetime_display(data["updated_at"]),
             })
         else:
             # For non-admin, provide default values for required fields
             item_data.update({
-                "applications_count_display": format_count_display(data['application_count']),
+                "applications_count_display": format_count_display(app_count),
                 "created_at_display": format_datetime_display(data["created_at"]),
                 "updated_at_display": format_datetime_display(data.get("updated_at", data["created_at"])),
             })

@@ -7,10 +7,10 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import Card from '@shared/components/Card';
 import { formatDateTime } from '@shared/utils/format';
-import { Pagination, Badge } from '@shared/components';
+import { Pagination, Badge, Banner } from '@shared/components';
 import { PageContainer } from '@member/layouts';
 import { apiService } from '@shared/services';
-import { API_PREFIX, DEFAULT_PAGE_SIZE } from '@shared/utils/constants';
+import { API_PREFIX, DEFAULT_PAGE_SIZE, BANNER_TYPES } from '@shared/utils/constants';
 
 function NoticesList() {
   const { t, i18n } = useTranslation();
@@ -62,7 +62,9 @@ function NoticesList() {
 
 
   return (
-    <PageContainer className="flex flex-col min-h-[calc(100vh-70px)] max-md:min-h-[calc(100vh-60px)]">
+    <>
+      <Banner bannerType={BANNER_TYPES.NOTICES} />
+      <PageContainer className="flex flex-col min-h-[calc(100vh-70px)] max-md:min-h-[calc(100vh-60px)]">
       <div className="mb-8 p-0 bg-transparent shadow-none">
         <h1 className="block text-2xl font-bold text-gray-900 mb-1 m-0">{t('home.notices.title', '最新公告')}</h1>
         <p className="text-gray-600 text-sm m-0">{t('home.notices.description', '查看最新公告和重要通知')}</p>
@@ -149,6 +151,7 @@ function NoticesList() {
         </Card>
       )}
     </PageContainer>
+    </>
   );
 }
 

@@ -50,7 +50,7 @@ class LoggingService:
     # Unified Log Methods - 统一日志入口
     # =========================================================================
 
-    async def app(self, schema: AppLogCreate) -> "AppLog":
+    async def app(self, schema: AppLogCreate) -> dict:
         """
         Create an application log entry.
         
@@ -58,34 +58,23 @@ class LoggingService:
             schema: AppLogCreate schema instance
             
         Returns:
-            AppLog: The created log entry object
-            
-        Example:
-            >>> await logging_service.app(AppLogCreate(
-            ...     level="INFO",
-            ...     message="User logged in",
-            ...     layer="Auth",
-            ...     user_id=user_id
-            ... ))
+            dict: The log entry data
         """
-        # Convert schema to model
-        model = schema.to_model()
-        
         # Write to file (always, for debugging and backup)
         try:
-            file_log_writer.write_app_log(model)
+            file_log_writer.write_app_log_from_schema(schema)
         except Exception:
             pass
         
         # Enqueue for database write (async, non-blocking)
         try:
-            db_log_writer.enqueue_app_log(model)
+            db_log_writer.enqueue_app_log_from_schema(schema)
         except Exception:
             pass
         
-        return model
+        return schema.to_db_dict()
 
-    async def error(self, schema: ErrorLogCreate) -> "ErrorLog":
+    async def error(self, schema: ErrorLogCreate) -> dict:
         """
         Create an error log entry.
         
@@ -93,33 +82,23 @@ class LoggingService:
             schema: ErrorLogCreate schema instance
             
         Returns:
-            ErrorLog: The created log entry object
-            
-        Example:
-            >>> await logging_service.error(ErrorLogCreate(
-            ...     error_type="ValidationError",
-            ...     error_message="Invalid input",
-            ...     stack_trace=traceback_str
-            ... ))
+            dict: The log entry data
         """
-        # Convert schema to model
-        model = schema.to_model()
-        
         # Write to file
         try:
-            file_log_writer.write_error_log(model)
+            file_log_writer.write_error_log_from_schema(schema)
         except Exception:
             pass
         
         # Enqueue for database write
         try:
-            db_log_writer.enqueue_error_log(model)
+            db_log_writer.enqueue_error_log_from_schema(schema)
         except Exception:
             pass
         
-        return model
+        return schema.to_db_dict()
 
-    async def audit(self, schema: AuditLogCreate) -> "AuditLog":
+    async def audit(self, schema: AuditLogCreate) -> dict:
         """
         Create an audit log entry.
         
@@ -127,33 +106,23 @@ class LoggingService:
             schema: AuditLogCreate schema instance
             
         Returns:
-            AuditLog: The created log entry object
-            
-        Example:
-            >>> await logging_service.audit(AuditLogCreate(
-            ...     action="login",
-            ...     user_id=user_id,
-            ...     ip_address="127.0.0.1"
-            ... ))
+            dict: The log entry data
         """
-        # Convert schema to model
-        model = schema.to_model()
-        
         # Write to file
         try:
-            file_log_writer.write_audit_log(model)
+            file_log_writer.write_audit_log_from_schema(schema)
         except Exception:
             pass
         
         # Enqueue for database write
         try:
-            db_log_writer.enqueue_audit_log(model)
+            db_log_writer.enqueue_audit_log_from_schema(schema)
         except Exception:
             pass
         
-        return model
+        return schema.to_db_dict()
 
-    async def performance(self, schema: PerformanceLogCreate) -> "PerformanceLog":
+    async def performance(self, schema: PerformanceLogCreate) -> dict:
         """
         Create a performance log entry.
         
@@ -161,37 +130,27 @@ class LoggingService:
             schema: PerformanceLogCreate schema instance
             
         Returns:
-            PerformanceLog: The created log entry object
-            
-        Example:
-            >>> await logging_service.performance(PerformanceLogCreate(
-            ...     metric_name="api_response_time",
-            ...     metric_value=150.5,
-            ...     metric_unit="ms"
-            ... ))
+            dict: The log entry data
         """
-        # Convert schema to model
-        model = schema.to_model()
-        
         # Write to file
         try:
-            file_log_writer.write_performance_log(model)
+            file_log_writer.write_performance_log_from_schema(schema)
         except Exception:
             pass
         
         # Enqueue for database write
         try:
-            db_log_writer.enqueue_performance_log(model)
+            db_log_writer.enqueue_performance_log_from_schema(schema)
         except Exception:
             pass
         
-        return model
+        return schema.to_db_dict()
 
     # =========================================================================
     # Backward Compatibility - 向后兼容
     # =========================================================================
 
-    async def log(self, schema: AppLogCreate) -> "AppLog":
+    async def log(self, schema: AppLogCreate) -> dict:
         """
         Alias for app() method for backward compatibility.
         

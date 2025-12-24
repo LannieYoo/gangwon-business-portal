@@ -6,42 +6,70 @@ import {
   createBrowserRouter,
   Navigate,
   useLocation,
+  useNavigate,
   Outlet,
 } from "react-router-dom";
 import { lazy, Suspense, useState, useEffect } from "react";
 import { useAuth } from "@shared/hooks";
 import { Button, Loading, LoginModal, ErrorBoundary } from "@shared/components";
-import { RouteLogger } from "@shared/components/RouteLogger";
 import "@shared/styles/ErrorPages.css";
 
-// Root Layout to include Logger
+// Root Layout
 function RootLayout() {
-  return (
-    <>
-      <RouteLogger />
-      <Outlet />
-    </>
-  );
+  return <Outlet />;
 }
 
 // Protected Route Component with Login Modal
 function ProtectedRoute({ children, allowedRoles = [] }) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading, getCurrentUser } = useAuth();
   const location = useLocation();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    // Show login modal if not authenticated
-    if (!isAuthenticated) {
+    // 页面刷新时，如果有 token 但没有 user 数据，需要获取用户信息
+    const initAuth = async () => {
+      if (isAuthenticated && !user) {
+        try {
+          await getCurrentUser();
+        } catch {
+          // getCurrentUser 内部会处理错误并清除认证状态
+        }
+      }
+      setIsInitializing(false);
+    };
+    
+    initAuth();
+  }, []);
+
+  useEffect(() => {
+    // Show login modal if not authenticated (after initialization)
+    if (!isInitializing && !isAuthenticated) {
       setShowLoginModal(true);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isInitializing]);
 
   // Handle login success
   const handleLoginSuccess = () => {
     setShowLoginModal(false);
     // The route will automatically re-render after authentication state updates
   };
+
+  // 初始化中或正在加载用户数据时显示 Loading
+  if (isInitializing || (isAuthenticated && !user && isLoading)) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "50vh",
+        }}
+      >
+        <Loading />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     // Show login modal instead of redirecting
@@ -80,7 +108,8 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    const redirectUrl = `/unauthorized?from=${encodeURIComponent(location.pathname)}`;
+    return <Navigate to={redirectUrl} replace />;
   }
 
   return children;
@@ -103,50 +132,29 @@ function PublicRoute({ children }) {
 // Simple Error Page Components (inline, no separate pages directory)
 function Unauthorized() {
   const location = useLocation();
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   
-  // 현재 경로를 기반으로 적절한 홈 페이지 결정
+  // 从 URL 参数或 state 中获取来源路径
+  const searchParams = new URLSearchParams(location.search);
+  const fromParam = searchParams.get('from') || location.state?.from || '';
+  
+  // 判断是否来自管理员路径
+  const isFromAdmin = fromParam.startsWith('/admin');
+  const isFromMember = fromParam.startsWith('/member');
+  
   const getHomePath = () => {
-    const currentPath = location.pathname;
-    
-    // Debug: 打印当前路径和用户信息
-    console.log('[Unauthorized] Current path:', currentPath);
-    console.log('[Unauthorized] User role:', user?.role);
-    console.log('[Unauthorized] Location state:', location.state);
-    
-    // 首先检查用户角色
-    if (user?.role === 'admin') {
-      console.log('[Unauthorized] User is admin, redirecting to /admin');
-      return '/admin';
-    }
-    
-    // 관리자 경로인 경우 관리자 홈으로
-    if (currentPath.startsWith('/admin')) {
-      console.log('[Unauthorized] Admin path detected, redirecting to /admin');
-      return '/admin';
-    }
-    
-    // 회원 경로인 경우 회원 홈으로
-    if (currentPath.startsWith('/member')) {
-      console.log('[Unauthorized] Member path detected, redirecting to /member');
-      return '/member';
-    }
-    
-    // 检查是否从 admin 路径跳转过来的
-    if (location.state?.from?.startsWith('/admin')) {
-      console.log('[Unauthorized] Came from admin path, redirecting to /admin');
-      return '/admin';
-    }
-    
-    // 기본적으로 회원 홈으로 (일반 사용자)
-    console.log('[Unauthorized] Default case, redirecting to /member');
+    if (user?.role === 'admin') return '/admin';
+    if (isFromAdmin) return '/admin';
     return '/member';
   };
 
   const homePath = getHomePath();
-  const isAdminPath = homePath === '/admin';
+  const isAdminPath = isFromAdmin || user?.role === 'admin';
 
-  console.log('[Unauthorized] Final homePath:', homePath, 'isAdminPath:', isAdminPath);
+  const handleNavigate = (path) => {
+    navigate(path, { replace: true });
+  };
 
   return (
     <div className="error-page">
@@ -156,9 +164,34 @@ function Unauthorized() {
         <p className="error-message">
           이 페이지에 접근할 수 있는 권한이 없습니다.
         </p>
-        <Button onClick={() => (window.location.href = homePath)}>
-          {isAdminPath ? '관리자 홈으로 돌아가기' : '홈으로 돌아가기'}
-        </Button>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          {isAuthenticated ? (
+            // 已登录：返回对应首页
+            <Button onClick={() => handleNavigate(homePath)}>
+              {isAdminPath ? '관리자 홈으로 돌아가기' : '홈으로 돌아가기'}
+            </Button>
+          ) : isFromAdmin ? (
+            // 未登录 + 来自管理员路径：跳转管理员登录
+            <Button onClick={() => handleNavigate('/admin/login')}>
+              관리자 로그인
+            </Button>
+          ) : isFromMember ? (
+            // 未登录 + 来自会员路径：跳转会员首页（会弹出登录模态框）
+            <Button onClick={() => handleNavigate('/member/home')}>
+              로그인
+            </Button>
+          ) : (
+            // 来源不明确：显示两个选项
+            <>
+              <Button onClick={() => handleNavigate('/member/home')}>
+                회원 로그인
+              </Button>
+              <Button onClick={() => handleNavigate('/admin/login')} style={{ backgroundColor: '#6b7280' }}>
+                관리자 로그인
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -283,11 +316,6 @@ const MemberSupportInquiryHistory = lazy(() =>
     default: m.default,
   }))
 );
-const MemberSupportInquiryDetail = lazy(() =>
-  import("@member/modules/support/InquiryDetail").then((m) => ({
-    default: m.default,
-  }))
-);
 const NoticesList = lazy(() =>
   import("@member/modules/home/NoticesList").then((m) => ({
     default: m.default,
@@ -351,9 +379,13 @@ const AdminReports = lazy(() =>
   import("@admin/modules/reports").then((m) => ({ default: m.default }))
 );
 
-// Lazy route wrapper
+// Lazy route wrapper - 使用最小化的 fallback 避免闪烁
 function LazyRoute({ children }) {
-  return <Suspense fallback={<Loading />}>{children}</Suspense>;
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      {children}
+    </Suspense>
+  );
 }
 
 export const router = createBrowserRouter(
@@ -526,16 +558,6 @@ export const router = createBrowserRouter(
                 <ProtectedRoute allowedRoles={["member"]}>
                   <LazyRoute>
                     <MemberSupportInquiryHistory />
-                  </LazyRoute>
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: "support/inquiry/:id",
-              element: (
-                <ProtectedRoute allowedRoles={["member"]}>
-                  <LazyRoute>
-                    <MemberSupportInquiryDetail />
                   </LazyRoute>
                 </ProtectedRoute>
               ),

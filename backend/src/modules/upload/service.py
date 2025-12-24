@@ -198,7 +198,7 @@ class UploadService:
             make_public=True,
         )
 
-        # Create attachment record
+        # Create attachment record - use helper method
         attachment_id = str(uuid4())
         attachment_data = {
             "id": attachment_id,
@@ -213,7 +213,7 @@ class UploadService:
             # Note: uploaded_at is automatically set by database default
         }
 
-        attachment = await supabase_service.create_attachment(attachment_data)
+        attachment = await supabase_service.create_record('attachments', attachment_data)
         if not attachment:
             raise ValidationError("Failed to create attachment record")
 
@@ -274,7 +274,7 @@ class UploadService:
         # Note: Supabase signed URLs are temporary, so we store the path
         file_url = f"private-files/{upload_result['path']}"
 
-        # Create attachment record
+        # Create attachment record - use helper method
         attachment_id = str(uuid4())
         attachment_data = {
             "id": attachment_id,
@@ -289,7 +289,7 @@ class UploadService:
             # Note: uploaded_at is automatically set by database default
         }
 
-        attachment = await supabase_service.create_attachment(attachment_data)
+        attachment = await supabase_service.create_record('attachments', attachment_data)
         if not attachment:
             raise ValidationError("Failed to create attachment record")
 
@@ -314,8 +314,8 @@ class UploadService:
             NotFoundError: If file not found
             AuthenticationError: If user doesn't have permission
         """
-        # Get attachment
-        attachment = await supabase_service.get_attachment_by_id(str(file_id))
+        # Get attachment - use helper method
+        attachment = await supabase_service.get_by_id('attachments', str(file_id))
 
         if not attachment:
             raise NotFoundError("File not found")
@@ -343,11 +343,6 @@ class UploadService:
                 # Check if user owns the performance record
                 perf_result = supabase_service.client.table('performance_records').select('member_id').eq('id', resource_id).execute()
                 if perf_result.data and perf_result.data[0].get('member_id') == user["id"]:
-                    has_permission = True
-            elif resource_type == "inquiry":
-                # Check if user owns the inquiry
-                inquiry_result = supabase_service.client.table('inquiries').select('member_id').eq('id', resource_id).execute()
-                if inquiry_result.data and inquiry_result.data[0].get('member_id') == user["id"]:
                     has_permission = True
             elif resource_id == user["id"]:
                 # Direct ownership (e.g., profile files)
@@ -402,8 +397,8 @@ class UploadService:
             NotFoundError: If file not found
             AuthenticationError: If user doesn't have permission
         """
-        # Get attachment
-        attachment = await supabase_service.get_attachment_by_id(str(file_id))
+        # Get attachment - use helper method
+        attachment = await supabase_service.get_by_id('attachments', str(file_id))
 
         if not attachment:
             raise NotFoundError("File not found")
@@ -463,8 +458,8 @@ class UploadService:
             # Continue with database deletion even if storage deletion fails
             pass
 
-        # Delete from database
-        success = await supabase_service.delete_attachment(str(file_id))
+        # Delete from database - use helper method
+        success = await supabase_service.delete_record('attachments', str(file_id))
         if not success:
             raise ValidationError("Failed to delete attachment record")
 

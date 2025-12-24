@@ -13,7 +13,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { info, debug, LOG_LAYERS } from '@shared/utils/logger';
+import { info, debug, LOG_LAYERS } from '@shared/logger';
 
 /**
  * Store 日志记录 Hook

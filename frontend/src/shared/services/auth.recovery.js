@@ -13,7 +13,7 @@
  * Requirements: 10.3
  */
 
-import { frontendExceptionService } from '@shared/utils/exception.service.js';
+import { frontendExceptionService } from '@shared/exception';
 
 /**
  * Authentication Recovery Service
@@ -47,6 +47,13 @@ class AuthRecoveryService {
     if (error?.response?.status === 401 && config?.url?.includes('/api/auth/me')) {
       this.clearAuthState();
       return Promise.resolve(); // 不要reject，让组件处理
+    }
+    
+    // 检查是否有 refresh token，没有的话直接处理为未登录状态
+    const hasRefreshToken = !!(localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token'));
+    if (!hasRefreshToken) {
+      // 没有 refresh token，用户未登录，静默处理
+      return this.redirectToLogin();
     }
     
     // 检查冷却时间
@@ -131,11 +138,17 @@ class AuthRecoveryService {
       }
 
       if (!refreshMethod) {
-        throw new Error('No token refresh method available');
+        console.log('[AuthRecoveryService] No token refresh method available');
+        return null;
       }
 
       // 执行刷新
       const result = await refreshMethod();
+      
+      // 如果刷新返回 null（没有 refresh token），直接返回
+      if (result === null) {
+        return null;
+      }
       
       // AOP 系统会自动记录服务调用成功
       
@@ -158,7 +171,9 @@ class AuthRecoveryService {
                         sessionStorage.getItem('refresh_token');
     
     if (!refreshToken) {
-      throw new Error('No refresh token available');
+      // 没有 refresh token，返回 null 而不是抛出异常
+      console.log('[AuthRecoveryService] No refresh token available, user not logged in');
+      return null;
     }
 
     // 发送刷新请求

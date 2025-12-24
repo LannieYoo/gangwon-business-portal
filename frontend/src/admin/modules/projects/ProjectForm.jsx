@@ -6,9 +6,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, Button, Input, Select, Textarea, Loading } from '@shared/components';
-import { adminService } from '@shared/services';
-
+import { Card, Button, Input, Select, Textarea, Loading, Alert } from '@shared/components';
+import { adminService, uploadService } from '@shared/services';
 
 // Helper to format date for form (YYYY-MM-DD)
 const formatDateForInput = (dateString) => {
@@ -24,6 +23,9 @@ export default function ProjectForm() {
 
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [messageVariant, setMessageVariant] = useState('success');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -31,9 +33,8 @@ export default function ProjectForm() {
     target_business_number: '',
     startDate: '',
     endDate: '',
-    status: 'active', // active, inactive
+    status: 'active',
     content: '',
-    // Files will be handled separately
     image: null,
     attachments: []
   });
@@ -50,15 +51,15 @@ export default function ProjectForm() {
     const data = await adminService.getProject(id);
     if (data) {
       setFormData({
-          title: data.title || '',
-          target_company_name: data.target_company_name || '',
-          target_business_number: data.target_business_number || '',
-          startDate: formatDateForInput(data.start_date || data.startDate),
-          endDate: formatDateForInput(data.end_date || data.endDate),
-          status: data.status || 'active',
-          content: data.description || data.content || '',
-          image: data.image_url || data.image || null,
-          attachments: data.attachments || []
+        title: data.title || '',
+        target_company_name: data.target_company_name || '',
+        target_business_number: data.target_business_number || '',
+        startDate: formatDateForInput(data.start_date || data.startDate),
+        endDate: formatDateForInput(data.end_date || data.endDate),
+        status: data.status || 'active',
+        content: data.description || data.content || '',
+        image: data.image_url || data.image || null,
+        attachments: data.attachments || []
       });
     }
     setLoading(false);
@@ -72,156 +73,254 @@ export default function ProjectForm() {
     }));
   };
 
-  const handleFileChange = (field, files) => {
-      setFormData(prev => ({
-          ...prev,
-          [field]: files
-      }));
-  };
-
   const handleSubmit = async () => {
     if (!formData.title || !formData.startDate || !formData.endDate) {
-        alert('请填写必填项：项目标题、开始日期、结束日期');
-        return;
+      setMessageVariant('error');
+      setMessage(t('admin.projects.form.requiredFields', '请填写必填项：项目标题、开始日期、结束日期'));
+      setTimeout(() => setMessage(null), 5000);
+      return;
     }
 
     if (new Date(formData.endDate) < new Date(formData.startDate)) {
-      alert('结束日期不能早于开始日期');
+      setMessageVariant('error');
+      setMessage(t('admin.projects.form.dateError', '结束日期不能早于开始日期'));
+      setTimeout(() => setMessage(null), 5000);
       return;
     }
 
     setSubmitting(true);
-    
-    const payload = {
-      title: formData.title,
-      description: formData.content,
-      target_company_name: formData.target_company_name || null,
-      target_business_number: formData.target_business_number || null,
-      start_date: formData.startDate,
-      end_date: formData.endDate,
-      status: formData.status,
-      image_url: null,
-    };
 
-    if (isEditMode) {
-      await adminService.updateProject(id, payload);
-    } else {
-      await adminService.createProject(payload);
+    try {
+      const payload = {
+        title: formData.title,
+        description: formData.content,
+        target_company_name: formData.target_company_name || null,
+        target_business_number: formData.target_business_number || null,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        status: formData.status,
+        image_url: formData.image || null,
+      };
+
+      let successMessage;
+      if (isEditMode) {
+        await adminService.updateProject(id, payload);
+        successMessage = t('admin.projects.form.updateSuccess', '项目更新成功');
+      } else {
+        await adminService.createProject(payload);
+        successMessage = t('admin.projects.form.createSuccess', '项目创建成功');
+      }
+
+      navigate('/admin/projects', {
+        state: { message: successMessage, messageVariant: 'success' }
+      });
+    } catch (err) {
+      console.error('Submit failed:', err);
+      setMessageVariant('error');
+      setMessage(t('admin.projects.form.submitError', '保存失败，请重试'));
+      setTimeout(() => setMessage(null), 5000);
+    } finally {
+      setSubmitting(false);
     }
+  };
 
-    setSubmitting(false);
-    navigate('/admin/projects');
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      formDataUpload.append('type', 'project');
+      const result = await uploadService.uploadFile(formDataUpload);
+      if (result?.file_url) {
+        setFormData(prev => ({ ...prev, image: result.file_url }));
+      }
+    } catch (err) {
+      console.error('Upload failed:', err);
+      setMessageVariant('error');
+      setMessage(t('admin.projects.form.uploadError', '图片上传失败，请重试'));
+      setTimeout(() => setMessage(null), 5000);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
   };
 
   if (loading) return <Loading />;
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full">
+      {message && (
+        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+          {message}
+        </Alert>
+      )}
 
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          {isEditMode ? '编辑项目' : '新建项目'}
-        </h1>
-        <Button variant="outline" onClick={() => navigate('/admin/projects')}>
-          {t('common.cancel')}
-        </Button>
+      {/* 顶部操作栏 */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => navigate('/admin/projects')}>
+            {t('common.back', '返回')}
+          </Button>
+          {!isEditMode && (
+            <h3 className="text-lg font-semibold text-gray-900">
+              {t('admin.projects.form.createTitle', '新建项目')}
+            </h3>
+          )}
+        </div>
+        <div className="flex gap-4">
+          <Button onClick={handleSubmit} loading={submitting}>
+            {isEditMode ? t('common.save', '保存') : t('common.create', '创建')}
+          </Button>
+        </div>
       </div>
 
-      <Card className="p-6">
-        <div className="space-y-6">
-          <Input
-            label="项目标题"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            placeholder="请输入项目标题"
-          />
+      {/* 左右布局：左边内容，右边图片 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 左侧：表单内容 */}
+        <div className="lg:col-span-2">
+          <Card>
+            <div className="p-6">
+              <div className="flex flex-col gap-4">
+                <Input
+                  label={t('admin.projects.form.title', '项目标题')}
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                  placeholder={t('admin.projects.form.titlePlaceholder', '请输入项目标题')}
+                />
 
-          <Input
-            label="目标企业名称（可选）"
-            name="target_company_name"
-            value={formData.target_company_name}
-            onChange={handleChange}
-            placeholder="例：三星电子株式会社（留空表示公开招募）"
-          />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      {t('admin.projects.form.startDate', '开始日期')} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
 
-          <Input
-            label="营业执照号（可选）"
-            name="target_business_number"
-            value={formData.target_business_number}
-            onChange={handleChange}
-            placeholder="例：123-45-67890"
-            maxLength={12}
-          />
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      {t('admin.projects.form.endDate', '结束日期')} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">
-                开始日期 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-                required
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
+                <Select
+                  label={t('admin.projects.form.status', '项目状态')}
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  options={[
+                    { value: 'active', label: t('admin.projects.status.active', '进行中') },
+                    { value: 'inactive', label: t('admin.projects.status.inactive', '已结束') },
+                    { value: 'archived', label: t('admin.projects.status.archived', '已归档') }
+                  ]}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label={t('admin.projects.form.targetCompany', '目标企业名称')}
+                    name="target_company_name"
+                    value={formData.target_company_name}
+                    onChange={handleChange}
+                    placeholder={t('admin.projects.form.targetCompanyPlaceholder', '留空表示公开招募')}
+                  />
+
+                  <Input
+                    label={t('admin.projects.form.businessNumber', '营业执照号')}
+                    name="target_business_number"
+                    value={formData.target_business_number}
+                    onChange={handleChange}
+                    placeholder={t('admin.projects.form.businessNumberPlaceholder', '例：123-45-67890')}
+                    maxLength={12}
+                  />
+                </div>
+
+                <Textarea
+                  label={t('admin.projects.form.description', '项目详情')}
+                  name="content"
+                  value={formData.content}
+                  onChange={handleChange}
+                  rows={8}
+                  placeholder={t('admin.projects.form.descriptionPlaceholder', '请输入项目详细说明...')}
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">
-                结束日期 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
-                required
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-           <Select
-              label="项目状态"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              options={[
-                { value: 'active', label: '进行中' },
-                { value: 'inactive', label: '已结束' },
-                { value: 'archived', label: '已归档' }
-              ]}
-            />
-            
-            <Textarea
-                label="项目详情"
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                rows={6}
-                placeholder="请输入项目详细说明..."
-            />
-
-            {/* 文件上传功能暂时禁用 */}
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-sm text-gray-600">
-                    <strong>注意：</strong> 图片和附件上传功能正在开发中，暂时不可用。
-                </p>
-            </div>
-
-          <div className="flex justify-end gap-4">
-             <Button variant="outline" type="button" onClick={() => navigate('/admin/projects')}>
-                取消
-            </Button>
-            <Button onClick={handleSubmit} loading={submitting}>
-                {isEditMode ? '保存' : '创建'}
-            </Button>
-          </div>
+          </Card>
         </div>
-      </Card>
+
+        {/* 右侧：封面图片 */}
+        <div className="lg:col-span-1">
+          <Card>
+            <div className="p-6">
+              <div className="mb-4">
+                <h3 className="text-base font-semibold text-gray-900 mb-1">
+                  {t('admin.projects.form.coverImage', '封面图片')}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {t('admin.projects.form.imageHint', '支持 JPG、PNG 格式，建议尺寸 800x400')}
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                {formData.image ? (
+                  <div className="relative group">
+                    <div className="w-full overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-50">
+                      <img
+                        src={formData.image}
+                        alt={t('admin.projects.form.coverImageAlt', '项目封面')}
+                        className="w-full h-auto object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, image: null }))}
+                      className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1.5 text-sm font-medium rounded-md shadow-lg hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                    >
+                      {t('common.remove', '移除')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-full h-48 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center">
+                    <span className="text-gray-400 text-sm">{t('admin.projects.form.noImage', '暂无图片')}</span>
+                  </div>
+                )}
+                
+                <label className="block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer disabled:opacity-50"
+                  />
+                </label>
+                {uploading && (
+                  <p className="text-sm text-blue-600">{t('common.uploading', '上传中...')}</p>
+                )}
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

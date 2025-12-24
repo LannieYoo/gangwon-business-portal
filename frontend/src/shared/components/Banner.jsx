@@ -108,7 +108,7 @@ export default function Banner({
   const [displayBanners, setDisplayBanners] = useState([]);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [textKey, setTextKey] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // 初始为 true，避免闪烁
   const loadedImagesRef = useRef(new Set());
 
   const getBannerType = useCallback(() => {
@@ -266,8 +266,27 @@ export default function Banner({
     return bannersToDisplay[currentBanner] || bannersToDisplay[0];
   }, [bannersToDisplay, currentBanner]);
 
-  if (!bannerType || bannersToDisplay.length === 0) {
+  if (!bannerType) {
     return null;
+  }
+
+  // 加载中或没有数据时显示骨架屏占位
+  if (isLoading || bannersToDisplay.length === 0) {
+    const fullWidthClasses = fullWidth 
+      ? "w-screen max-w-[100vw] -mt-[70px] max-md:-mt-[60px] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]" 
+      : "w-full h-full";
+    const heightClasses = fullWidth 
+      ? "min-h-[400px] max-md:min-h-[300px] max-sm:min-h-[250px]" 
+      : "h-full";
+
+    return (
+      <section className={`relative overflow-hidden ${fullWidthClasses} ${sectionClassName} ${className}`}>
+        <div 
+          className={`relative flex items-center justify-center w-full ${heightClasses} bg-gray-200 animate-pulse`}
+          style={{ height: fullWidth ? height : '100%' }}
+        />
+      </section>
+    );
   }
 
   const bgColorClass = BANNER_BG_COLORS[bannerType] || 'bg-blue-800';

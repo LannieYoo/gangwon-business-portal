@@ -7,7 +7,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { frontendExceptionService } from '@shared/utils/exception.service.js';
+import { frontendExceptionService } from '@shared/exception';
 
 /**
  * 状态管理异常类型枚举

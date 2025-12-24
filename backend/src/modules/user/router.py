@@ -19,7 +19,7 @@ from .schemas import (
     CheckAvailabilityResponse,
 )
 from .service import AuthService
-from .dependencies import get_current_active_user
+from .dependencies import get_current_active_user, get_current_user_optional
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
@@ -96,6 +96,7 @@ async def admin_login(
 
 
 @router.post("/password-reset-request", response_model=dict)
+@audit_log(action="password_reset_request", resource_type="member")
 async def password_reset_request(
     data: PasswordResetRequest,
     request: Request,
@@ -105,11 +106,15 @@ async def password_reset_request(
         data.business_number, data.email
     )
 
+    # Send password reset email in background (non-blocking)
     from ...common.modules.email import email_service
-    await email_service.send_password_reset_email(
-        to_email=data.email,
-        reset_token=reset_token,
-        business_number=data.business_number,
+    from ...common.modules.email.background import send_email_background
+    send_email_background(
+        email_service.send_password_reset_email(
+            to_email=data.email,
+            reset_token=reset_token,
+            business_number=data.business_number,
+        )
     )
 
     return {
@@ -118,6 +123,7 @@ async def password_reset_request(
 
 
 @router.post("/password-reset", response_model=dict)
+@audit_log(action="password_reset", resource_type="member")
 async def password_reset(
     data: PasswordReset,
     request: Request,
@@ -166,9 +172,15 @@ async def get_current_user_info(
 @audit_log(action="logout", resource_type="member")
 async def logout(
     request: Request,
-    current_user = Depends(get_current_active_user),
+    current_user = Depends(get_current_user_optional),
 ):
-    """Logout current user."""
+    """Logout current user.
+    
+    This endpoint accepts both valid and expired tokens.
+    If the token is valid, it logs the user out.
+    If the token is expired or missing, it still returns success
+    (the user is effectively already logged out).
+    """
     return {"message": "Logged out successfully"}
 
 

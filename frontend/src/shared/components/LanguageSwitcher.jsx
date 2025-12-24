@@ -1,21 +1,24 @@
 /**
  * Language Switcher Component
- * 语言切换组件
+ * Only visible in development environment
  */
 
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlobeIcon } from './Icons';
 import { setStorage } from '@shared/utils/storage';
-import { exceptionService } from '@shared/utils/errorHandler';
+import { exceptionService } from '@shared/exception';
 import { cn } from '@shared/utils/helpers';
 
 /**
  * @param {Object} props
- * @param {'light'|'dark'} props.variant - 样式变体：'light' 用于深色背景，'dark' 用于浅色背景
+ * @param {'light'|'dark'} props.variant - Style variant: 'light' for dark backgrounds, 'dark' for light backgrounds
  */
 export default function LanguageSwitcher({ variant = 'dark' }) {
   const { i18n } = useTranslation();
+  
+  // Only show in development environment
+  const isDevelopment = import.meta.env.DEV;
 
   const languages = [
     { code: 'ko', label: '한국어' },
@@ -38,7 +41,6 @@ export default function LanguageSwitcher({ variant = 'dark' }) {
     try {
       localStorage.setItem('i18nextLng', code);
     } catch (error) {
-      // AOP 系统会自动处理异常日志
       exceptionService.recordException(error, {
         request_path: window.location.pathname,
         error_code: 'PERSIST_LANGUAGE_FAILED',
@@ -51,7 +53,6 @@ export default function LanguageSwitcher({ variant = 'dark' }) {
     const targetCode = nextLanguage.code;
     persistLanguagePreference(targetCode);
     i18n.changeLanguage(targetCode).catch(error => {
-      // AOP 系统会自动处理异常日志
       exceptionService.recordException(error, {
         request_path: window.location.pathname,
         error_code: error.code || 'CHANGE_LANGUAGE_FAILED',
@@ -59,6 +60,11 @@ export default function LanguageSwitcher({ variant = 'dark' }) {
       });
     });
   };
+
+  // Hide in production environment
+  if (!isDevelopment) {
+    return null;
+  }
 
   return (
     <button
@@ -70,7 +76,7 @@ export default function LanguageSwitcher({ variant = 'dark' }) {
           : 'focus:ring-primary-500 text-gray-700 dark:text-gray-300 hover:opacity-80'
       )}
       onClick={toggleLanguage}
-      title={`切换到 ${nextLanguage.label} / Switch to ${nextLanguage.label}`}
+      title={`Switch to ${nextLanguage.label}`}
     >
       <GlobeIcon className="w-5 h-5" />
     </button>

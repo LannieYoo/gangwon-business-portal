@@ -103,53 +103,131 @@ def audit_log(
                 return hasattr(user_obj, "username") and not hasattr(user_obj, "business_number")
 
             # Find user_id from current_user, current_admin, or similar
+            # Now we can store both member ID and admin ID (no FK constraint)
             if "current_user" in kwargs:
                 user = kwargs["current_user"]
-                if hasattr(user, "id"):
-                    # Check if it's actually an Admin object (even though param name is current_user)
-                    if is_admin_user(user):
-                        # Admin operations should have user_id = None
-                        # because audit_logs.user_id FK only references members.id
-                        user_id = None
-                    else:
-                        # It's a Member, use member id
+                if user is not None:
+                    # Handle dict (from get_current_user_optional) or object
+                    if isinstance(user, dict) and "id" in user:
+                        uid = user["id"]
+                        user_id = UUID(uid) if isinstance(uid, str) else uid
+                    elif hasattr(user, "id"):
                         user_id = user.id
             elif "current_admin" in kwargs:
                 admin = kwargs["current_admin"]
-                if hasattr(admin, "id"):
-                    # For admin operations, we can't set user_id to admin.id
-                    # because audit_logs.user_id FK only references members.id
-                    # So we set it to None for admin operations
-                    user_id = None
+                if admin is not None:
+                    if isinstance(admin, dict) and "id" in admin:
+                        uid = admin["id"]
+                        user_id = UUID(uid) if isinstance(uid, str) else uid
+                    elif hasattr(admin, "id"):
+                        user_id = admin.id
             else:
                 # Try to find user in args
                 for arg in args:
                     if hasattr(arg, "id") and hasattr(arg, "email"):
-                        # Check if it's an admin (has username) or member (has business_number)
-                        if is_admin_user(arg):
-                            # Admin - set user_id to None
-                            user_id = None
-                        elif hasattr(arg, "business_number"):
-                            # Member - use member id
-                            user_id = arg.id
-                        else:
-                            # Default to member id (safer assumption)
-                            user_id = arg.id
+                        user_id = arg.id
                         break
+            
+            # For login actions, extract user_id from result (TokenResponse.user.id)
+            if user_id is None and action in ("login", "admin_login") and result:
+                try:
+                    # Handle Pydantic model TokenResponse
+                    if hasattr(result, "user"):
+                        user_data = result.user
+                        if isinstance(user_data, dict) and "id" in user_data:
+                            user_id = UUID(user_data["id"]) if isinstance(user_data["id"], str) else user_data["id"]
+                        elif hasattr(user_data, "id"):
+                            user_id = UUID(user_data.id) if isinstance(user_data.id, str) else user_data.id
+                except (ValueError, TypeError):
+                    pass
 
-            # Extract resource_id if function provided
+            # Extract resource_id
             resource_id: Optional[UUID] = None
+            
+            # 1. Try get_resource_id callback if provided
             if get_resource_id and result:
                 try:
                     resource_id = get_resource_id(result)
                 except Exception:
                     pass
+            
+            # 2. Auto-extract from path parameters (e.g., message_id, thread_id, member_id)
+            if resource_id is None:
+                # Common path parameter names for resource IDs
+                id_param_names = [
+                    f"{resource_type}_id" if resource_type else None,  # e.g., message_id, thread_id
+                    "id",
+                    "message_id",
+                    "thread_id",
+                    "member_id",
+                    "project_id",
+                    "performance_id",
+                    "notice_id",
+                    "inquiry_id",
+                    "application_id",
+                ]
+                for param_name in id_param_names:
+                    if param_name and param_name in kwargs:
+                        try:
+                            value = kwargs[param_name]
+                            if isinstance(value, UUID):
+                                resource_id = value
+                                break
+                            elif isinstance(value, str):
+                                resource_id = UUID(value)
+                                break
+                        except (ValueError, TypeError):
+                            pass
+            
+            # 3. Try to extract from result object (for create operations)
+            # Skip for login/logout actions (they don't have resource_id)
+            if resource_id is None and result and action not in ("login", "admin_login", "logout"):
+                try:
+                    # Handle dict result with direct id
+                    if isinstance(result, dict):
+                        rid = None
+                        # Check for direct id field
+                        if "id" in result:
+                            rid = result["id"]
+                        # Check for member_id field (e.g., register response)
+                        elif "member_id" in result:
+                            rid = result["member_id"]
+                        
+                        if rid:
+                            if isinstance(rid, UUID):
+                                resource_id = rid
+                            elif isinstance(rid, str):
+                                resource_id = UUID(rid)
+                    
+                    # Handle object with direct id attribute
+                    elif hasattr(result, "id"):
+                        rid = result.id
+                        if isinstance(rid, UUID):
+                            resource_id = rid
+                        elif isinstance(rid, str):
+                            resource_id = UUID(rid)
+                except (ValueError, TypeError):
+                    pass
 
             # Get IP and user agent from request
             ip_address: Optional[str] = None
             user_agent: Optional[str] = None
+            trace_id: Optional[str] = None
+            request_id: Optional[str] = None
+            request_method: Optional[str] = None
+            request_path: Optional[str] = None
             if request:
                 ip_address, user_agent = get_client_info(request)
+                # Extract trace_id from request headers (X-Trace-ID) or state
+                trace_id = request.headers.get("X-Trace-ID")
+                if not trace_id and hasattr(request.state, "trace_id"):
+                    trace_id = request.state.trace_id
+                # Extract request_id from request state if available
+                if hasattr(request.state, "request_id"):
+                    request_id = request.state.request_id
+                # Extract request method and path
+                request_method = request.method
+                request_path = str(request.url.path)
 
             # Create audit log entry using dual-write service (database + file)
             # Implements Requirement 8.3: write to both audit_logs table and audit.log file
@@ -164,6 +242,10 @@ def audit_log(
                     resource_id=resource_id,
                     ip_address=ip_address,
                     user_agent=user_agent,
+                    trace_id=trace_id,
+                    request_id=request_id,
+                    request_method=request_method,
+                    request_path=request_path,
                 )
             except Exception as e:
                 # Log error but don't fail the operation

@@ -13,7 +13,6 @@ from .models import (
     Notice,
     PressRelease,
     FAQ,
-    Inquiry,
     AuditLog,
 )
 
@@ -30,6 +29,5 @@ __all__ = [
     "Notice",
     "PressRelease",
     "FAQ",
-    "Inquiry",
     "AuditLog",
 ]

@@ -26,7 +26,7 @@ export { default as FileUploadButton } from "./FileUploadButton";
 export { default as ErrorBoundary } from "./ErrorBoundary";
 export * from "./Charts";
 export { TermsModal, TERM_TYPES } from "./TermsModal";
-export { AddressSearch } from "./AddressSearch";
+export { default as AddressSearch } from "./AddressSearch";
 export { LoginModal } from "./LoginModal";
 export { PasswordStrength } from "./PasswordStrength";
 export { default as NotificationBell } from "./NotificationBell";

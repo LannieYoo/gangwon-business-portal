@@ -400,6 +400,34 @@ const contentService = {
   async deletePopup(popupId) {
     await deletePopupInternal(popupId);
   },
+
+  // ========== 法律内容 (Legal Content) ==========
+
+  /**
+   * 获取法律内容（公开）
+   * @param {string} contentType - 内容类型（'terms_of_service' 或 'privacy_policy'）
+   * @returns {Promise<Object|null>} 法律内容或 null
+   */
+  async getLegalContent(contentType) {
+    const response = await getLegalContentInternal(contentType);
+    return response ? toCamelCase(response) : null;
+  },
+
+  /**
+   * 更新法律内容（管理员，upsert 模式）
+   * @param {string} contentType - 内容类型（'terms_of_service' 或 'privacy_policy'）
+   * @param {Object} data - 法律内容数据
+   * @param {string} data.contentHtml - HTML 内容
+   * @returns {Promise<Object>} 更新后的法律内容
+   */
+  async updateLegalContent(contentType, data) {
+    const payload = toSnakeCase({
+      contentHtml: data.contentHtml,
+    });
+
+    const response = await updateLegalContentInternal(contentType, payload);
+    return toCamelCase(response);
+  },
 };
 
 // 内部辅助函数（使用装饰器）
@@ -520,6 +548,17 @@ const updatePopupInternal = async (popupId, data) => {
 const deletePopupInternal = async (popupId) => {
   return await apiService.delete(
     `${API_PREFIX}/admin/content/popups/${popupId}`
+  );
+};
+
+const getLegalContentInternal = async (contentType) => {
+  return await apiService.get(`${API_PREFIX}/legal-content/${contentType}`);
+};
+
+const updateLegalContentInternal = async (contentType, data) => {
+  return await apiService.put(
+    `${API_PREFIX}/admin/content/legal/${contentType}`,
+    data
   );
 };
 

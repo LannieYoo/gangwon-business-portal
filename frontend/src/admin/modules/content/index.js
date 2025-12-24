@@ -8,4 +8,4 @@ export { default as NoticeManagement } from './NoticeManagement';
 export { default as NewsManagement } from './NewsManagement';
 export { default as FAQManagement } from './FAQManagement';
 export { default as SystemInfoManagement } from './SystemInfoManagement';
-
+export { default as LegalContentManagement } from './LegalContentManagement';

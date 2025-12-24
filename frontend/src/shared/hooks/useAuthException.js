@@ -7,7 +7,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { frontendExceptionService } from '@shared/utils/exception.service.js';
+import { frontendExceptionService } from '@shared/exception';
 import { useAuth } from '@shared/hooks/useAuth';
 
 /**

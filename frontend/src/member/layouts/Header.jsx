@@ -137,7 +137,7 @@ function Header() {
   const handleLogout = async () => {
     setShowUserMenu(false);
     await logout();
-    navigate("/login", { replace: true });
+    navigate("/member/home", { replace: true });
   };
 
   return (

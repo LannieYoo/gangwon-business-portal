@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Badge, Pagination, SearchInput } from '@shared/components';
+import { Table, Button, Badge, Pagination, SearchInput, Alert } from '@shared/components';
 import { adminService } from '@shared/services';
 import { formatDate, formatBusinessLicense } from '@shared/utils/format';
 
@@ -21,6 +21,8 @@ export default function MemberList() {
   const [pageSize, setPageSize] = useState(20);
   const [allMembers, setAllMembers] = useState([]); // 存储所有数据
   const [totalCount, setTotalCount] = useState(0);
+  const [message, setMessage] = useState(null);
+  const [messageVariant, setMessageVariant] = useState('success');
 
   // 一次性加载所有会员数据
   const loadAllMembers = useCallback(async () => {
@@ -110,6 +112,27 @@ export default function MemberList() {
 
   const handleApprove = useCallback(async (memberId) => {
     await adminService.approveMember(memberId);
+    setMessageVariant('success');
+    setMessage(t('admin.members.approveSuccess', '批准成功'));
+    setTimeout(() => setMessage(null), 3000);
+    loadAllMembers();
+  }, [loadAllMembers, t]);
+
+  const handleReject = useCallback(async (memberId) => {
+    const reason = prompt(t('admin.members.rejectReason', '请输入拒绝原因（可选）') || '请输入拒绝原因（可选）');
+    if (reason === null) return; // 用户点击了取消
+    await adminService.rejectMember(memberId, reason || null);
+    setMessageVariant('success');
+    setMessage(t('admin.members.rejectSuccess', '拒绝成功'));
+    setTimeout(() => setMessage(null), 3000);
+    loadAllMembers();
+  }, [loadAllMembers, t]);
+
+  const handleResetToPending = useCallback(async (memberId) => {
+    await adminService.resetMemberToPending(memberId);
+    setMessageVariant('success');
+    setMessage(t('admin.members.resetSuccess', '已重置为待审核'));
+    setTimeout(() => setMessage(null), 3000);
     loadAllMembers();
   }, [loadAllMembers, t]);
 
@@ -205,16 +228,45 @@ export default function MemberList() {
                 >
                   {t('admin.members.approve')}
                 </button>
+                <span className="text-gray-300">|</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReject(row.id);
+                  }}
+                  className="text-red-600 hover:text-red-900 font-medium text-sm"
+                >
+                  {t('admin.members.reject', '拒绝')}
+                </button>
+              </>
+            )}
+            {(row.approvalStatus === 'approved' || row.approvalStatus === 'rejected') && (
+              <>
+                <span className="text-gray-300">|</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleResetToPending(row.id);
+                  }}
+                  className="text-orange-600 hover:text-orange-900 font-medium text-sm"
+                >
+                  {t('admin.members.resetPending', '取消')}
+                </button>
               </>
             )}
           </div>
         )
       }
     ];
-  }, [t, handleViewDetail, handleApprove]);
+  }, [t, handleViewDetail, handleApprove, handleReject, handleResetToPending]);
 
   return (
     <div className="w-full">
+      {message && (
+        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+          {message}
+        </Alert>
+      )}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900 mb-4">{t('admin.members.title')}</h1>
         

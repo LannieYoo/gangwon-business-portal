@@ -6,7 +6,7 @@ import uuid
 from typing import Optional
 
 from ..config import settings
-from ..supabase.client import get_supabase_client
+from ..supabase.client import get_supabase_service_client
 
 
 class StorageService:
@@ -18,8 +18,8 @@ class StorageService:
 
     @property
     def client(self):
-        """Get Supabase client for storage operations."""
-        return get_supabase_client()
+        """Get Supabase service client for storage operations (bypasses RLS)."""
+        return get_supabase_service_client()
 
     async def upload_file(
         self,

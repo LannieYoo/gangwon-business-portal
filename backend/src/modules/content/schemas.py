@@ -350,3 +350,25 @@ class PopupListResponse(BaseModel):
     """Popup list response schema."""
     
     popups: List[PopupResponse]
+
+
+# LegalContent Schemas (Terms of Service, Privacy Policy)
+
+class LegalContentUpdate(BaseModel):
+    """Legal content update schema."""
+    
+    content_html: str = Field(..., description="HTML content (WYSIWYG editor)")
+
+
+class LegalContentResponse(BaseModel):
+    """Legal content response schema."""
+    
+    id: UUID
+    content_type: str  # 'terms_of_service' or 'privacy_policy'
+    content_html: str
+    updated_by: Optional[UUID]
+    updated_at: datetime
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True

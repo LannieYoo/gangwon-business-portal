@@ -11,6 +11,7 @@ import NoticeManagement from './NoticeManagement';
 import NewsManagement from './NewsManagement';
 import FAQManagement from './FAQManagement';
 import SystemInfoManagement from './SystemInfoManagement';
+import LegalContentManagement from './LegalContentManagement';
 
 export default function ContentManagement() {
   const { t } = useTranslation();
@@ -22,7 +23,8 @@ export default function ContentManagement() {
     { key: 'notices', label: t('admin.content.tabs.notices') },
     { key: 'news', label: t('admin.content.tabs.news') },
     { key: 'faq', label: t('admin.content.tabs.faq') },
-    { key: 'systemInfo', label: t('admin.content.tabs.systemInfo') }
+    { key: 'systemInfo', label: t('admin.content.tabs.systemInfo') },
+    { key: 'legal', label: t('admin.content.tabs.legal', '이용약관/개인정보') }
   ], [t]);
 
 
@@ -46,9 +48,9 @@ export default function ContentManagement() {
           {activeTab === 'news' && <NewsManagement />}
           {activeTab === 'faq' && <FAQManagement />}
           {activeTab === 'systemInfo' && <SystemInfoManagement />}
+          {activeTab === 'legal' && <LegalContentManagement />}
         </div>
       </Card>
     </div>
   );
 }
-

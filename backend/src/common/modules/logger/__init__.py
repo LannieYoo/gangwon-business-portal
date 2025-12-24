@@ -43,15 +43,23 @@ from .service import LoggingService
 # NOTE: router is imported lazily to avoid circular import with db.session
 # Use get_logging_router() instead of logging_router directly
 from .request import get_trace_id, set_request_context, get_request_context
-from .middleware import (
+
+# HTTP Logging Middleware - 从 interceptor 模块导入
+from ..interceptor.router import (
     HTTPLoggingMiddleware,
     get_client_ip,
-    extract_or_generate_trace_id,
-    extract_or_generate_request_id,
     determine_log_level,
     should_skip_logging,
     SLOW_REQUEST_THRESHOLD_MS,
 )
+
+# 兼容旧 API
+def extract_or_generate_trace_id(request):
+    return get_trace_id(request)
+
+def extract_or_generate_request_id(request, trace_id):
+    from .request import get_request_id
+    return get_request_id(request, trace_id)
 
 # Initialize logging on import
 setup_logging()

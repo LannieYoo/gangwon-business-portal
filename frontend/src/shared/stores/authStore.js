@@ -5,35 +5,35 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import authService from '@shared/services/auth.service';
+import { storeLogger } from './storeLogger';
 
 export const useAuthStore = create(
   devtools(
-    (set) => ({
-      user: authService.getCurrentUserFromStorage(),
-      isAuthenticated: authService.isAuthenticated(),
-      isLoading: false,
-      
-      setUser: (user) => set({ user, isAuthenticated: true }),
-      
-      setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
-      
-      setLoading: (isLoading) => set({ isLoading }),
-      
-      clearAuth: () => {
-        // AOP 系统会自动记录 Store 操作
-        authService.clearAuth();
-        set({ user: null, isAuthenticated: false });
-      },
-      
-      logout: async () => {
-        // AOP 系统会自动记录 Store 操作
-        await authService.logout();
-        set({ user: null, isAuthenticated: false });
-      }
-    }),
+    storeLogger('AuthStore')(
+      (set) => ({
+        user: authService.getCurrentUserFromStorage(),
+        isAuthenticated: authService.isAuthenticated(),
+        isLoading: false,
+        
+        setUser: (user) => set({ user, isAuthenticated: true }, false, 'setUser'),
+        
+        setAuthenticated: (isAuthenticated) => set({ isAuthenticated }, false, 'setAuthenticated'),
+        
+        setLoading: (isLoading) => set({ isLoading }, false, 'setLoading'),
+        
+        clearAuth: () => {
+          authService.clearAuth();
+          set({ user: null, isAuthenticated: false }, false, 'clearAuth');
+        },
+        
+        logout: async () => {
+          await authService.logout();
+          set({ user: null, isAuthenticated: false }, false, 'logout');
+        }
+      })
+    ),
     { name: 'AuthStore' }
   )
 );
 
 export default useAuthStore;
-

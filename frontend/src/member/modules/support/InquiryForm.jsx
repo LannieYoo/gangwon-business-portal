@@ -148,8 +148,8 @@ export default function InquiryForm({ onSubmitSuccess }) {
       });
       
       if (onSubmitSuccess) {
-        // 跳转到新创建的线程详情页
-        navigate(`/member/support/inquiry/${thread.id}`);
+        // 跳转到咨询历史页面
+        onSubmitSuccess();
       }
     } catch (err) {
       // AOP 系统会自动记录错误

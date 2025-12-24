@@ -8,20 +8,28 @@ from supabase import create_client, Client
 from supabase.client import ClientOptions
 
 from ..config import settings
-from .unified_client import UnifiedSupabaseClient, create_unified_supabase_client
+from ..interceptor.database import UnifiedSupabaseClient, create_unified_supabase_client
 
 
 class SupabaseClient:
     """Supabase 客户端单例"""
     
     _instance: Optional[Client] = None
+    _service_instance: Optional[Client] = None
     
     @classmethod
     def get_client(cls) -> Client:
-        """获取 Supabase 客户端实例"""
+        """获取 Supabase 客户端实例（使用 anon key）"""
         if cls._instance is None:
             cls._instance = cls._create_client()
         return cls._instance
+    
+    @classmethod
+    def get_service_client(cls) -> Client:
+        """获取 Supabase 服务端客户端实例（使用 service role key，绕过 RLS）"""
+        if cls._service_instance is None:
+            cls._service_instance = cls._create_service_client()
+        return cls._service_instance
     
     @classmethod
     def _create_client(cls) -> Client:
@@ -43,12 +51,37 @@ class SupabaseClient:
         
         client = create_client(url, key, options=options)
         return client
+    
+    @classmethod
+    def _create_service_client(cls) -> Client:
+        """创建使用 service role key 的 Supabase 客户端（绕过 RLS）"""
+        url = settings.SUPABASE_URL
+        key = settings.SUPABASE_SERVICE_KEY
+        
+        if not url or not key:
+            raise ValueError("SUPABASE_URL and SUPABASE_SERVICE_KEY must be set for service client")
+        
+        options = ClientOptions(
+            postgrest_client_timeout=30,
+            storage_client_timeout=60,  # Storage 操作可能需要更长时间
+            schema="public",
+            auto_refresh_token=False,
+            persist_session=False,
+        )
+        
+        client = create_client(url, key, options=options)
+        return client
 
 
 # 便捷函数
 def get_supabase_client() -> Client:
     """获取原始 Supabase 客户端实例"""
     return SupabaseClient.get_client()
+
+
+def get_supabase_service_client() -> Client:
+    """获取使用 service role key 的 Supabase 客户端实例（用于 Storage 等需要绕过 RLS 的操作）"""
+    return SupabaseClient.get_service_client()
 
 
 def get_unified_supabase_client() -> UnifiedSupabaseClient:

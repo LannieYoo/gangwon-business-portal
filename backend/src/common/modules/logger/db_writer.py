@@ -17,13 +17,16 @@ Features:
 import asyncio
 import logging
 from datetime import datetime
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional, Union, TYPE_CHECKING
 from uuid import UUID, uuid4
 from collections import deque
 
 from ..config import settings
 # Import database models for consistent data structure
 from ..db.models import AppLog, ErrorLog, SystemLog, AuditLog, PerformanceLog
+
+if TYPE_CHECKING:
+    from .schemas import AppLogCreate, ErrorLogCreate, AuditLogCreate, PerformanceLogCreate
 
 
 def _get_raw_supabase_client():
@@ -50,7 +53,12 @@ async def _async_insert(table_name: str, data: dict) -> Optional[dict]:
         return None
 
 
-from .utils import format_timestamp
+from ...utils.formatters import now_kst
+
+
+def format_timestamp() -> str:
+    """Format timestamp in unified format: YYYY-MM-DD HH:MM:SS.mmm (KST)."""
+    return now_kst().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
 
 class DatabaseLogWriter:
@@ -79,7 +87,7 @@ class DatabaseLogWriter:
         self.batch_size = getattr(settings, "LOG_DB_BATCH_SIZE", 50)  # Batch size
         self.batch_interval = getattr(settings, "LOG_DB_BATCH_INTERVAL", 5.0)  # Seconds
         self.min_log_level = getattr(settings, "LOG_DB_APP_MIN_LEVEL", "INFO")  # App logs: INFO and above by default
-        self.min_system_log_level = getattr(settings, "LOG_DB_SYSTEM_MIN_LEVEL", "WARNING")  # System logs: WARNING and above by default
+        self.min_system_log_level = getattr(settings, "LOG_DB_SYSTEM_MIN_LEVEL", "INFO")  # System logs: INFO and above (consistent with file)
         
         # Log level priority (higher = more important)
         self.log_levels = {
@@ -180,22 +188,38 @@ class DatabaseLogWriter:
         trace_id: Optional[str] = None,
         request_id: Optional[str] = None,
         user_id: Optional[Union[str, UUID]] = None,
+        duration_ms: Optional[int] = None,
+        extra_data: Optional[Dict[str, Any]] = None,
+        log_id: Optional[UUID] = None,
+        # Legacy fields - will be merged into extra_data
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None,
         request_method: Optional[str] = None,
         request_path: Optional[str] = None,
-        request_data: Optional[Dict[str, Any]] = None,
         response_status: Optional[int] = None,
-        duration_ms: Optional[int] = None,
-        extra_data: Optional[Dict[str, Any]] = None,
-        log_id: Optional[UUID] = None,
     ) -> Dict[str, Any]:
         """
-        Create app log data dictionary using AppLog model structure.
+        Create app log data dictionary using new AppLog model structure.
         
-        This ensures database inserts match exactly with the AppLog model definition.
+        按日志规范：
+        - 通用字段：source, level, message, layer, module, function, line_number
+        - 追踪字段：trace_id, request_id, user_id, duration_ms
+        - 扩展字段：extra_data (包含 ip_address, user_agent, request_method, request_path, response_status)
         """
-        # Create data dictionary matching AppLog model fields
+        # Build extra_data from legacy fields
+        merged_extra = dict(extra_data) if extra_data else {}
+        if ip_address:
+            merged_extra["ip_address"] = ip_address
+        if user_agent:
+            merged_extra["user_agent"] = user_agent[:200] if len(user_agent) > 200 else user_agent
+        if request_method:
+            merged_extra["request_method"] = request_method
+        if request_path:
+            merged_extra["request_path"] = request_path
+        if response_status:
+            merged_extra["response_status"] = response_status
+        
+        # Create data dictionary matching new AppLog model fields
         log_data = {
             "id": str(log_id or uuid4()),
             "source": source,
@@ -204,7 +228,7 @@ class DatabaseLogWriter:
             "created_at": format_timestamp(),
         }
         
-        # Add optional fields (only if not None, matching model nullable fields)
+        # Add optional fields (only if not None)
         optional_fields = {
             "layer": layer,
             "module": module,
@@ -213,17 +237,11 @@ class DatabaseLogWriter:
             "trace_id": trace_id,
             "request_id": request_id,
             "user_id": str(user_id) if user_id else None,
-            "ip_address": ip_address,
-            "user_agent": user_agent,
-            "request_method": request_method,
-            "request_path": request_path,
-            "request_data": request_data,
-            "response_status": response_status,
             "duration_ms": duration_ms,
-            "extra_data": extra_data,
+            "extra_data": merged_extra if merged_extra else None,
         }
         
-        # Only add non-None values (Supabase will use defaults for None values)
+        # Only add non-None values
         for key, value in optional_fields.items():
             if value is not None:
                 log_data[key] = value
@@ -235,56 +253,80 @@ class DatabaseLogWriter:
         source: str,
         error_type: str,
         error_message: str,
-        error_code: Optional[str] = None,
-        status_code: Optional[int] = None,
-        stack_trace: Optional[str] = None,
+        level: str = "ERROR",
         layer: Optional[str] = None,
         module: Optional[str] = None,
         function: Optional[str] = None,
         line_number: Optional[int] = None,
         trace_id: Optional[str] = None,
+        request_id: Optional[str] = None,
         user_id: Optional[Union[str, UUID]] = None,
+        log_id: Optional[UUID] = None,
+        # Legacy fields - will be merged into extra_data
+        error_code: Optional[str] = None,
+        status_code: Optional[int] = None,
+        stack_trace: Optional[str] = None,
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None,
         request_method: Optional[str] = None,
         request_path: Optional[str] = None,
-        request_data: Optional[Dict[str, Any]] = None,
         error_details: Optional[Dict[str, Any]] = None,
         context_data: Optional[Dict[str, Any]] = None,
-        log_id: Optional[UUID] = None,
     ) -> Dict[str, Any]:
         """
-        Create error log data dictionary using ErrorLog model structure.
+        Create error log data dictionary using new ErrorLog model structure.
         
-        This ensures database inserts match exactly with the ErrorLog model definition.
+        按日志规范：
+        - 通用字段：source, level, message, layer, module, function, line_number
+        - 追踪字段：trace_id, request_id, user_id
+        - 扩展字段：extra_data (包含 error_type, error_message, stack_trace, error_code, status_code, ip_address, request_method, request_path)
         """
-        # Create data dictionary matching ErrorLog model fields
+        # Build extra_data from error and legacy fields
+        extra: Dict[str, Any] = {
+            "error_type": error_type,
+            "error_message": error_message,
+        }
+        if stack_trace:
+            extra["stack_trace"] = stack_trace
+        if error_code:
+            extra["error_code"] = error_code
+        if status_code:
+            extra["status_code"] = status_code
+        if ip_address:
+            extra["ip_address"] = ip_address
+        if user_agent:
+            extra["user_agent"] = user_agent[:200] if len(user_agent) > 200 else user_agent
+        if request_method:
+            extra["request_method"] = request_method
+        if request_path:
+            extra["request_path"] = request_path
+        if error_details:
+            extra.update(error_details)
+        if context_data:
+            extra.update(context_data)
+        
+        # Generate message per spec: "{error_type}: {error_message}"
+        message = f"{error_type}: {error_message}"
+        
+        # Create data dictionary matching new ErrorLog model fields
         error_data = {
             "id": str(log_id or uuid4()),
             "source": source,
-            "error_type": error_type,
-            "error_message": error_message,
+            "level": level,
+            "message": message,
             "created_at": format_timestamp(),
+            "extra_data": extra,
         }
         
-        # Add optional fields (only if not None, matching model nullable fields)
+        # Add optional fields (only if not None)
         optional_fields = {
-            "error_code": error_code,
-            "status_code": status_code,
-            "stack_trace": stack_trace,
             "layer": layer,
             "module": module,
             "function": function,
             "line_number": line_number,
             "trace_id": trace_id,
+            "request_id": request_id,
             "user_id": str(user_id) if user_id else None,
-            "ip_address": ip_address,
-            "user_agent": user_agent,
-            "request_method": request_method,
-            "request_path": request_path,
-            "request_data": request_data,
-            "error_details": error_details,
-            "context_data": context_data,
         }
         
         # Only add non-None values
@@ -300,45 +342,78 @@ class DatabaseLogWriter:
         metric_name: str,
         metric_value: float,
         metric_unit: str = "ms",
+        level: str = "INFO",
         layer: Optional[str] = None,
         module: Optional[str] = None,
-        component_name: Optional[str] = None,
+        function: Optional[str] = None,
+        line_number: Optional[int] = None,
         trace_id: Optional[str] = None,
         request_id: Optional[str] = None,
         user_id: Optional[Union[str, UUID]] = None,
+        duration_ms: Optional[int] = None,
+        log_id: Optional[UUID] = None,
+        # Legacy fields - will be merged into extra_data
+        component_name: Optional[str] = None,
         threshold: Optional[float] = None,
         performance_issue: Optional[str] = None,
         web_vitals: Optional[Dict[str, Any]] = None,
         extra_data: Optional[Dict[str, Any]] = None,
-        log_id: Optional[UUID] = None,
     ) -> Dict[str, Any]:
         """
-        Create performance log data dictionary using PerformanceLog model structure.
+        Create performance log data dictionary using new PerformanceLog model structure.
         
-        This ensures database inserts match exactly with the PerformanceLog model definition.
+        按日志规范：
+        - 通用字段：source, level, message, layer, module, function, line_number
+        - 追踪字段：trace_id, request_id, user_id, duration_ms
+        - 扩展字段：extra_data (包含 metric_name, metric_value, metric_unit, threshold_ms, is_slow, component_name, web_vitals)
         """
-        # Create data dictionary matching PerformanceLog model fields
-        perf_data = {
-            "id": str(log_id or uuid4()),
-            "source": source,
+        # Determine if slow
+        is_slow = performance_issue == "SLOW" if performance_issue else (threshold and metric_value > threshold)
+        
+        # Build extra_data from performance fields
+        merged_extra: Dict[str, Any] = {
             "metric_name": metric_name,
             "metric_value": metric_value,
             "metric_unit": metric_unit,
+            "is_slow": bool(is_slow),
+        }
+        if component_name:
+            merged_extra["component_name"] = component_name
+        if threshold is not None:
+            merged_extra["threshold_ms"] = threshold
+        if web_vitals:
+            merged_extra["web_vitals"] = web_vitals
+        if extra_data:
+            merged_extra.update(extra_data)
+        
+        # Generate message per spec
+        target = component_name or metric_name
+        duration = duration_ms if duration_ms is not None else metric_value
+        if is_slow and threshold:
+            message = f"Slow {metric_name}: {target} ({duration:.0f}ms > {threshold:.0f}ms)"
+        else:
+            message = f"Perf: {metric_name} = {metric_value}{metric_unit}"
+        
+        # Create data dictionary matching new PerformanceLog model fields
+        perf_data = {
+            "id": str(log_id or uuid4()),
+            "source": source,
+            "level": level,
+            "message": message,
             "created_at": format_timestamp(),
+            "extra_data": merged_extra,
         }
         
-        # Add optional fields (only if not None, matching model nullable fields)
+        # Add optional fields (only if not None)
         optional_fields = {
-            "layer": layer,
+            "layer": layer or "Performance",
             "module": module,
-            "component_name": component_name,
+            "function": function,
+            "line_number": line_number,
             "trace_id": trace_id,
             "request_id": request_id,
             "user_id": str(user_id) if user_id else None,
-            "threshold": threshold,
-            "performance_issue": performance_issue,
-            "web_vitals": web_vitals,
-            "extra_data": extra_data,
+            "duration_ms": duration_ms,
         }
         
         # Only add non-None values
@@ -407,15 +482,15 @@ class DatabaseLogWriter:
                     trace_id=entry.get("trace_id"),
                     request_id=entry.get("request_id"),
                     user_id=entry.get("user_id"),
+                    duration_ms=entry.get("duration_ms"),
+                    extra_data=entry.get("extra_data"),
+                    log_id=UUID(entry["id"]) if entry.get("id") else None,
+                    # Legacy fields -> merged into extra_data
                     ip_address=entry.get("ip_address"),
                     user_agent=entry.get("user_agent"),
                     request_method=entry.get("request_method"),
                     request_path=entry.get("request_path"),
-                    request_data=entry.get("request_data"),
                     response_status=entry.get("response_status"),
-                    duration_ms=entry.get("duration_ms"),
-                    extra_data=entry.get("extra_data"),
-                    log_id=UUID(entry["id"]) if entry.get("id") else None,
                 )
                 log_data.append(log_entry)
             
@@ -452,17 +527,22 @@ class DatabaseLogWriter:
                     metric_name=entry.get("metric_name", "unknown"),
                     metric_value=entry.get("metric_value", 0.0),
                     metric_unit=entry.get("metric_unit", "ms"),
+                    level=entry.get("level", "INFO"),
                     layer=entry.get("layer"),
                     module=entry.get("module"),
-                    component_name=entry.get("component_name"),
+                    function=entry.get("function"),
+                    line_number=entry.get("line_number"),
                     trace_id=entry.get("trace_id"),
                     request_id=entry.get("request_id"),
                     user_id=entry.get("user_id"),
+                    duration_ms=entry.get("duration_ms"),
+                    log_id=UUID(entry["id"]) if entry.get("id") else None,
+                    # Legacy fields -> merged into extra_data
+                    component_name=entry.get("component_name"),
                     threshold=entry.get("threshold"),
                     performance_issue=entry.get("performance_issue"),
                     web_vitals=entry.get("web_vitals"),
                     extra_data=entry.get("extra_data"),
-                    log_id=UUID(entry["id"]) if entry.get("id") else None,
                 )
                 performance_data.append(perf_entry)
             
@@ -503,6 +583,8 @@ class DatabaseLogWriter:
         """
         Enqueue an application log entry using AppLog model object.
         
+        Uses AppLogCreate schema for consistent data conversion.
+        
         Args:
             app_log: AppLog model instance
         """
@@ -513,33 +595,34 @@ class DatabaseLogWriter:
         # Ensure worker is started (lazy initialization)
         self._ensure_worker_started()
         
-        # Convert model to dictionary for database insertion
-        # Use the model's attributes directly
-        log_entry = {
-            "id": str(app_log.id),
-            "source": app_log.source,
-            "level": app_log.level,
-            "message": app_log.message,
-            "layer": app_log.layer,
-            "module": app_log.module,
-            "function": app_log.function,
-            "line_number": app_log.line_number,
-            "trace_id": app_log.trace_id,
-            "request_id": app_log.request_id,
-            "user_id": str(app_log.user_id) if app_log.user_id else None,
-            "ip_address": app_log.ip_address,
-            "user_agent": app_log.user_agent,
-            "request_method": app_log.request_method,
-            "request_path": app_log.request_path,
-            "request_data": app_log.request_data,
-            "response_status": app_log.response_status,
-            "duration_ms": app_log.duration_ms,
-            "extra_data": app_log.extra_data,
-            "created_at": format_timestamp(),
-        }
+        from .schemas import AppLogCreate
         
-        # Remove None values (Supabase will use defaults)
-        log_entry = {k: v for k, v in log_entry.items() if v is not None}
+        # Use schema for data conversion
+        app_create = AppLogCreate(
+            source=app_log.source,
+            level=app_log.level,
+            message=app_log.message,
+            layer=app_log.layer,
+            module=app_log.module,
+            function=app_log.function,
+            line_number=app_log.line_number,
+            trace_id=app_log.trace_id,
+            request_id=app_log.request_id,
+            user_id=app_log.user_id,
+            ip_address=app_log.ip_address,
+            user_agent=app_log.user_agent,
+            request_method=app_log.request_method,
+            request_path=app_log.request_path,
+            request_data=app_log.request_data,
+            response_status=app_log.response_status,
+            duration_ms=app_log.duration_ms,
+            extra_data=app_log.extra_data,
+        )
+        
+        # Get db dict and add id/created_at
+        log_entry = app_create.to_db_dict()
+        log_entry["id"] = str(app_log.id)
+        log_entry["created_at"] = format_timestamp()
         
         # Enqueue (non-blocking)
         try:
@@ -645,6 +728,8 @@ class DatabaseLogWriter:
         """
         Enqueue an error log entry using ErrorLog model object.
         
+        Uses ErrorLogCreate schema for consistent data conversion.
+        
         Args:
             error_log: ErrorLog model instance
         """
@@ -652,39 +737,41 @@ class DatabaseLogWriter:
             return
         
         try:
-            # Convert model to dictionary for database insertion
-            error_data = {
-                "id": str(error_log.id),
-                "source": error_log.source,
-                "error_type": error_log.error_type,
-                "error_message": error_log.error_message,
-                "error_code": error_log.error_code,
-                "status_code": error_log.status_code,
-                "stack_trace": error_log.stack_trace,
-                "layer": error_log.layer,
-                "module": error_log.module,
-                "function": error_log.function,
-                "line_number": error_log.line_number,
-                "trace_id": error_log.trace_id,
-                "user_id": str(error_log.user_id) if error_log.user_id else None,
-                "ip_address": error_log.ip_address,
-                "user_agent": error_log.user_agent,
-                "request_method": error_log.request_method,
-                "request_path": error_log.request_path,
-                "request_data": error_log.request_data,
-                "error_details": error_log.error_details,
-                "context_data": error_log.context_data,
-                "created_at": format_timestamp(),
-            }
+            from .schemas import ErrorLogCreate
             
-            # Remove None values
-            error_data = {k: v for k, v in error_data.items() if v is not None}
+            # Use schema for data conversion
+            error_create = ErrorLogCreate(
+                source=error_log.source,
+                error_type=error_log.error_type,
+                error_message=error_log.error_message,
+                error_code=error_log.error_code,
+                status_code=error_log.status_code,
+                stack_trace=error_log.stack_trace,
+                layer=error_log.layer,
+                module=error_log.module,
+                function=error_log.function,
+                line_number=error_log.line_number,
+                trace_id=error_log.trace_id,
+                user_id=error_log.user_id,
+                ip_address=error_log.ip_address,
+                user_agent=error_log.user_agent,
+                request_method=error_log.request_method,
+                request_path=error_log.request_path,
+                request_data=error_log.request_data,
+                error_details=error_log.error_details,
+                context_data=error_log.context_data,
+            )
+            
+            # Get db dict and add id/created_at
+            error_data = error_create.to_db_dict()
+            error_data["id"] = str(error_log.id)
+            error_data["created_at"] = format_timestamp()
             
             # Insert using Supabase API (async, fire-and-forget)
             async def _insert_error_log():
                 try:
-                    client = _get_logged_supabase_client()
-                    return await client.table("error_logs").insert(error_data).execute()
+                    client = _get_raw_supabase_client()
+                    return client.table("error_logs").insert(error_data).execute()
                 except Exception:
                     pass
             
@@ -697,6 +784,9 @@ class DatabaseLogWriter:
         """
         Enqueue an audit log entry using AuditLog model object.
         
+        Uses AuditLogCreate schema for consistent data conversion.
+        Note: New AuditLog model stores action/result/ip_address etc in extra_data.
+        
         Args:
             audit_log: AuditLog model instance
         """
@@ -704,25 +794,40 @@ class DatabaseLogWriter:
             return
         
         try:
-            # Convert model to dictionary for database insertion
-            audit_data = {
-                "id": str(audit_log.id),
-                "action": audit_log.action,
-                "user_id": str(audit_log.user_id) if audit_log.user_id else None,
-                "resource_type": audit_log.resource_type,
-                "resource_id": str(audit_log.resource_id) if audit_log.resource_id else None,
-                "ip_address": audit_log.ip_address,
-                "user_agent": audit_log.user_agent,
-            }
+            # New model stores audit fields in extra_data
+            extra_data = audit_log.extra_data or {}
             
-            # Remove None values
-            audit_data = {k: v for k, v in audit_data.items() if v is not None}
+            from .schemas import AuditLogCreate
+            
+            # Use schema for data conversion
+            audit_create = AuditLogCreate(
+                action=extra_data.get("action", "UNKNOWN"),
+                source=audit_log.source or "backend",
+                level=audit_log.level or "INFO",
+                layer=audit_log.layer or "Auth",
+                module=audit_log.module or "",
+                function=audit_log.function or "",
+                line_number=audit_log.line_number or 0,
+                user_id=audit_log.user_id,
+                trace_id=audit_log.trace_id,
+                result=extra_data.get("result", "SUCCESS"),
+                resource_type=extra_data.get("resource_type"),
+                resource_id=UUID(extra_data["resource_id"]) if extra_data.get("resource_id") else None,
+                ip_address=extra_data.get("ip_address"),
+                user_agent=extra_data.get("user_agent"),
+                request_method=extra_data.get("request_method"),
+                request_path=extra_data.get("request_path"),
+            )
+            
+            # Get db dict and add id
+            audit_data = audit_create.to_db_dict()
+            audit_data["id"] = str(audit_log.id)
             
             # Insert using Supabase API (async, fire-and-forget)
             async def _insert_audit_log():
                 try:
-                    client = _get_logged_supabase_client()
-                    return await client.table("audit_logs").insert(audit_data).execute()
+                    client = _get_raw_supabase_client()
+                    return client.table("audit_logs").insert(audit_data).execute()
                 except Exception:
                     pass
             
@@ -735,6 +840,8 @@ class DatabaseLogWriter:
         """
         Enqueue a performance log entry using PerformanceLog model object.
         
+        Uses PerformanceLogCreate schema for consistent data conversion.
+        
         Args:
             performance_log: PerformanceLog model instance
         """
@@ -744,28 +851,30 @@ class DatabaseLogWriter:
         # Ensure worker is started (lazy initialization)
         self._ensure_worker_started()
         
-        # Convert model to dictionary for database insertion
-        perf_entry = {
-            "id": str(performance_log.id),
-            "source": performance_log.source,
-            "metric_name": performance_log.metric_name,
-            "metric_value": performance_log.metric_value,
-            "metric_unit": performance_log.metric_unit,
-            "layer": performance_log.layer,
-            "module": performance_log.module,
-            "component_name": performance_log.component_name,
-            "trace_id": performance_log.trace_id,
-            "request_id": performance_log.request_id,
-            "user_id": str(performance_log.user_id) if performance_log.user_id else None,
-            "threshold": performance_log.threshold,
-            "performance_issue": performance_log.performance_issue,
-            "web_vitals": performance_log.web_vitals,
-            "extra_data": performance_log.extra_data,
-            "created_at": format_timestamp(),
-        }
+        from .schemas import PerformanceLogCreate
         
-        # Remove None values
-        perf_entry = {k: v for k, v in perf_entry.items() if v is not None}
+        # Use schema for data conversion
+        perf_create = PerformanceLogCreate(
+            source=performance_log.source,
+            metric_name=performance_log.metric_name,
+            metric_value=performance_log.metric_value,
+            metric_unit=performance_log.metric_unit,
+            layer=performance_log.layer,
+            module=performance_log.module,
+            component_name=performance_log.component_name,
+            trace_id=performance_log.trace_id,
+            request_id=performance_log.request_id,
+            user_id=performance_log.user_id,
+            threshold=performance_log.threshold,
+            performance_issue=performance_log.performance_issue,
+            web_vitals=performance_log.web_vitals,
+            extra_data=performance_log.extra_data,
+        )
+        
+        # Get db dict and add id/created_at
+        perf_entry = perf_create.to_db_dict()
+        perf_entry["id"] = str(performance_log.id)
+        perf_entry["created_at"] = format_timestamp()
         
         # Enqueue (non-blocking)
         try:
@@ -934,6 +1043,8 @@ class DatabaseLogWriter:
     ) -> None:
         """Write an error log entry to error_logs table (async, non-blocking).
         
+        Uses ErrorLogCreate schema for consistent data conversion.
+        
         Args:
             source: Source of the error (backend/frontend)
             error_type: Exception class name
@@ -959,8 +1070,10 @@ class DatabaseLogWriter:
             return
         
         try:
-            # Use model-based data creation for consistency
-            error_data = self._create_error_log_data(
+            from .schemas import ErrorLogCreate
+            
+            # Use schema for data conversion
+            error_create = ErrorLogCreate(
                 source=source,
                 error_type=error_type,
                 error_message=error_message,
@@ -982,11 +1095,15 @@ class DatabaseLogWriter:
                 context_data=context_data,
             )
             
+            # Get db dict and add created_at
+            error_data = error_create.to_db_dict()
+            error_data["created_at"] = format_timestamp()
+            
             # Insert using Supabase API (async)
             async def _insert_error_log():
                 try:
-                    client = _get_logged_supabase_client()
-                    return await client.table("error_logs").insert(error_data).execute()
+                    client = _get_raw_supabase_client()
+                    return client.table("error_logs").insert(error_data).execute()
                 except Exception:
                     # Don't log here to avoid infinite recursion
                     pass
@@ -1006,11 +1123,10 @@ class DatabaseLogWriter:
         module: Optional[str] = None,
         function: Optional[str] = None,
         line_number: Optional[int] = None,
-        process_id: Optional[int] = None,
-        thread_name: Optional[str] = None,
-        extra_data: Optional[dict[str, Any]] = None,
     ) -> None:
         """Write a system log entry to system_logs table (async, non-blocking).
+        
+        Uses SystemLogCreate schema for consistent data conversion.
         
         Args:
             level: Log level (DEBUG/INFO/WARNING/ERROR/CRITICAL)
@@ -1019,9 +1135,6 @@ class DatabaseLogWriter:
             module: Module name
             function: Function name
             line_number: Line number
-            process_id: Process ID
-            thread_name: Thread name
-            extra_data: Additional context data
         """
         if not self._enabled:
             return
@@ -1031,27 +1144,27 @@ class DatabaseLogWriter:
             return
         
         try:
-            system_log_data = {
-                "id": str(uuid4()),
-                "level": level.upper(),
-                "message": message,
-                "logger_name": logger_name,
-                "module": module,
-                "function": function,
-                "line_number": line_number,
-                "process_id": process_id,
-                "thread_name": thread_name,
-                "extra_data": extra_data,
-            }
+            from .schemas import SystemLogCreate
             
-            # Remove None values
-            system_log_data = {k: v for k, v in system_log_data.items() if v is not None}
+            # Use schema for data conversion
+            system_create = SystemLogCreate(
+                level=level,
+                message=message,
+                logger_name=logger_name,
+                module=module,
+                function=function,
+                line_number=line_number,
+            )
+            
+            # Get db dict and add created_at
+            system_log_data = system_create.to_db_dict()
+            system_log_data["created_at"] = format_timestamp()
             
             # Insert using Supabase API (async)
             async def _insert_system_log():
                 try:
-                    client = _get_logged_supabase_client()
-                    return await client.table("system_logs").insert(system_log_data).execute()
+                    client = _get_raw_supabase_client()
+                    return client.table("system_logs").insert(system_log_data).execute()
                 except Exception:
                     # Don't log here to avoid infinite recursion
                     pass
@@ -1071,7 +1184,14 @@ class DatabaseLogWriter:
         resource_id: Optional[UUID] = None,
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None,
-        extra_data: Optional[dict[str, Any]] = None,
+        trace_id: Optional[str] = None,
+        request_id: Optional[str] = None,
+        request_method: Optional[str] = None,
+        request_path: Optional[str] = None,
+        module: Optional[str] = None,
+        function: Optional[str] = None,
+        line_number: Optional[int] = None,
+        result: str = "SUCCESS",
     ) -> Optional[dict[str, Any]]:
         """Write an audit log entry to audit_logs table (async, non-blocking).
         
@@ -1082,7 +1202,14 @@ class DatabaseLogWriter:
             resource_id: ID of the affected resource
             ip_address: IP address of the user
             user_agent: User agent string
-            extra_data: Additional context data
+            trace_id: Request trace ID for correlation
+            request_id: Request ID for correlation
+            request_method: HTTP method (GET, POST, etc.)
+            request_path: Request path
+            module: Module path relative to project root
+            function: Function name
+            line_number: Line number
+            result: Action result (SUCCESS/FAILED)
             
         Returns:
             Created audit log data as dict, or None if failed
@@ -1091,31 +1218,108 @@ class DatabaseLogWriter:
             return None
         
         try:
-            audit_data = {
-                "id": str(uuid4()),
-                "user_id": str(user_id) if user_id else None,
-                "action": action,
-                "resource_type": resource_type,
-                "resource_id": str(resource_id) if resource_id else None,
-                "ip_address": ip_address,
-                "user_agent": user_agent,
-            }
+            from .schemas import AuditLogCreate
             
-            if extra_data:
-                audit_data.update(extra_data)
-            
-            # Remove None values
-            audit_data = {k: v for k, v in audit_data.items() if v is not None}
+            # Use schema for data conversion
+            audit_log = AuditLogCreate(
+                action=action,
+                source="backend",
+                level="INFO",
+                layer="Auth",
+                module=module or "",
+                function=function or "",
+                line_number=line_number or 0,
+                user_id=user_id,
+                resource_type=resource_type,
+                resource_id=resource_id,
+                result=result,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                trace_id=trace_id,
+                request_id=request_id,
+                request_method=request_method,
+                request_path=request_path,
+            )
             
             # Insert using raw Supabase API (async) - avoid circular logging
-            result = await _async_insert("audit_logs", audit_data)
-            return result
+            result_data = await _async_insert("audit_logs", audit_log.to_db_dict())
+            return result_data
                 
         except Exception as e:
             # Log the specific error for debugging, but don't fail (graceful degradation)
             import logging
             logging.warning(f"Failed to write audit log to database: {str(e)}", exc_info=False)
             return None
+
+    # =========================================================================
+    # Schema-based enqueue methods - 直接使用 schema 入队
+    # =========================================================================
+
+    def enqueue_app_log_from_schema(self, schema: "AppLogCreate") -> None:
+        """Enqueue an application log entry directly from schema."""
+        if not self._should_write_to_db(schema.level):
+            return
+        self._ensure_worker_started()
+        
+        log_entry = schema.to_db_dict()
+        log_entry["created_at"] = format_timestamp()
+        
+        try:
+            self.log_queue.put_nowait(log_entry)
+            self._stats["total_enqueued"] += 1
+        except asyncio.QueueFull:
+            logging.warning("Log database queue is full, dropping log entry")
+            self._stats["total_failed"] += 1
+
+    def enqueue_error_log_from_schema(self, schema: "ErrorLogCreate") -> None:
+        """Enqueue an error log entry directly from schema."""
+        if not self._enabled:
+            return
+        
+        error_data = schema.to_db_dict()
+        error_data["created_at"] = format_timestamp()
+        
+        async def _insert_error_log():
+            try:
+                client = _get_raw_supabase_client()
+                return client.table("error_logs").insert(error_data).execute()
+            except Exception:
+                pass
+        
+        asyncio.create_task(_insert_error_log())
+
+    def enqueue_audit_log_from_schema(self, schema: "AuditLogCreate") -> None:
+        """Enqueue an audit log entry directly from schema."""
+        if not self._enabled:
+            return
+        
+        audit_data = schema.to_db_dict()
+        audit_data["created_at"] = format_timestamp()
+        
+        async def _insert_audit_log():
+            try:
+                client = _get_raw_supabase_client()
+                return client.table("audit_logs").insert(audit_data).execute()
+            except Exception:
+                pass
+        
+        asyncio.create_task(_insert_audit_log())
+
+    def enqueue_performance_log_from_schema(self, schema: "PerformanceLogCreate") -> None:
+        """Enqueue a performance log entry directly from schema."""
+        if not self._enabled:
+            return
+        self._ensure_worker_started()
+        
+        perf_entry = schema.to_db_dict()
+        perf_entry["created_at"] = format_timestamp()
+        
+        try:
+            self.performance_queue.put_nowait(perf_entry)
+            self._stats["performance_total_enqueued"] += 1
+        except asyncio.QueueFull:
+            logging.warning("Performance log database queue is full, dropping performance log entry")
+            self._stats["performance_total_failed"] += 1
 
 
 # Singleton instance

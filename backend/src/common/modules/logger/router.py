@@ -185,70 +185,86 @@ async def create_frontend_log(
                                 log_entry.layer == 'Performance')
             
             if is_performance_log:
-                # Simplified performance log processing
+                # 统一性能日志处理 - 按照日志规范格式
                 from .schemas import PerformanceLogCreate
                 
                 extra_data = log_entry.extra_data or {}
                 
-                # Quick metric extraction with defaults
-                metric_name = "performance_metric"
-                metric_value = 0.0
-                metric_unit = "ms"
+                # 标准化指标名称和值
+                metric_name = extra_data.get("metric_name", "frontend_performance")
+                metric_value = float(extra_data.get("metric_value", extra_data.get("duration_ms", 0.0)))
+                metric_unit = extra_data.get("metric_unit", "ms")
                 
-                # Fast pattern matching for common metrics
-                message = log_entry.message
-                if "memory" in message.lower():
-                    metric_name = "memory_usage"
-                    metric_value = float(extra_data.get("used", 0))
-                    metric_unit = "bytes"
-                elif "network" in message.lower() or "request" in message.lower():
-                    metric_name = "network_request"
-                    metric_value = float(extra_data.get("duration_ms", 0))
-                elif "report" in message.lower():
-                    metric_name = "performance_report"
-                    metric_value = 1.0
-                    metric_unit = "report"
+                # 跳过无意义的 performance_report 类型（定期汇报）
+                if metric_name == "performance_report":
+                    return True  # 跳过，不记录
                 
-                # Convert request_id to string if needed
-                request_id = extra_data.get("request_id")
-                if request_id is not None and not isinstance(request_id, str):
-                    request_id = str(request_id)
+                # 从消息中推断指标类型
+                if metric_name == "frontend_performance":
+                    message = log_entry.message.lower()
+                    if "memory" in message:
+                        metric_name = "memory_usage"
+                        metric_value = float(extra_data.get("used", 0))
+                        metric_unit = "bytes"
+                    elif "network" in message or "request" in message:
+                        metric_name = "network_request"
+                        metric_value = float(extra_data.get("duration_ms", 0))
+                        metric_unit = "ms"
+                
+                # duration_ms 只对时间类指标有意义
+                # 对于内存等非时间指标，不设置 duration_ms
+                duration_ms = None
+                if metric_unit == "ms":
+                    duration_ms = float(extra_data.get("duration_ms", metric_value))
+                
+                # 获取阈值和慢查询标识
+                threshold_ms = extra_data.get("threshold_ms") or extra_data.get("threshold")
+                is_slow = bool(extra_data.get("is_slow")) or bool(extra_data.get("performance_issue")) or (
+                    threshold_ms and duration_ms and duration_ms > threshold_ms
+                )
+                
+                # 确定日志级别
+                level = "WARNING" if is_slow else "INFO"
+                
+                # 组件名称
+                component_name = extra_data.get("component_name") or extra_data.get("url")
                 
                 await logging_service.performance(PerformanceLogCreate(
                     source="frontend",
+                    level=level,
                     metric_name=metric_name,
                     metric_value=metric_value,
                     metric_unit=metric_unit,
-                    layer=log_entry.layer,
-                    module=log_entry.module,
-                    component_name=extra_data.get("component_name"),
+                    layer="Performance",
+                    module=log_entry.module or "frontend",
+                    function=log_entry.function or "",
+                    line_number=log_entry.line_number or 0,
+                    component_name=component_name,
                     trace_id=log_entry.trace_id,
-                    request_id=request_id,
+                    request_id=str(extra_data.get("request_id", "")) if extra_data.get("request_id") else None,
                     user_id=user_id,
-                    threshold=extra_data.get("threshold_ms"),
-                    performance_issue=extra_data.get("performance_issue"),
+                    duration_ms=duration_ms,
+                    threshold_ms=float(threshold_ms) if threshold_ms else None,
+                    is_slow=is_slow,
                     web_vitals=extra_data.get("web_vitals"),
-                    extra_data=extra_data,
+                    extra_data=extra_data if extra_data else None,
                 ))
             else:
-                # Regular application log with minimal processing
+                # 统一应用日志处理 - 精简格式，避免冗余
                 await logging_service.log(AppLogCreate(
+                    timestamp=log_entry.timestamp,
                     source="frontend",
-                    level=log_entry.level,
+                    level=log_entry.level or "INFO",
                     message=log_entry.message,
-                    module=log_entry.module,
+                    layer=log_entry.layer or "Frontend",
+                    module=log_entry.module or "frontend",
                     function=log_entry.function,
                     line_number=log_entry.line_number,
                     trace_id=log_entry.trace_id,
+                    request_id=log_entry.request_id,
                     user_id=user_id,
-                    ip_address=log_entry.ip_address,
-                    user_agent=log_entry.user_agent,
-                    request_method=log_entry.request_method,
-                    request_path=log_entry.request_path,
-                    request_data=log_entry.request_data,
-                    response_status=log_entry.response_status,
                     duration_ms=log_entry.duration_ms,
-                    extra_data=log_entry.extra_data,
+                    extra_data=log_entry.extra_data if log_entry.extra_data else None,
                 ))
             return True
         except Exception as e:

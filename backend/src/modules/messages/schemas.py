@@ -2,11 +2,14 @@
 Messages schemas.
 
 Pydantic models for message-related requests and responses.
+All datetime fields are formatted to KST for display.
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 from typing import Optional, List
 from datetime import datetime
 from uuid import UUID
+
+from ...common.utils.formatters import format_kst_display
 
 
 class MessageCreate(BaseModel):
@@ -39,10 +42,19 @@ class MessageResponse(BaseModel):
     is_important: bool
     read_at: Optional[datetime]
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
+    
+    # 格式化后的显示字段
+    read_at_display: Optional[str] = None
+    created_at_display: Optional[str] = None
     
     class Config:
         from_attributes = True
+    
+    def model_post_init(self, __context) -> None:
+        """Format datetime fields after initialization."""
+        self.read_at_display = format_kst_display(self.read_at)
+        self.created_at_display = format_kst_display(self.created_at)
 
 
 class MessageListResponse(BaseModel):
@@ -92,19 +104,27 @@ class ThreadMessageResponse(BaseModel):
     """Thread message response schema."""
     
     id: UUID
-    thread_id: UUID
-    sender_id: UUID
-    sender_type: str
+    thread_id: Optional[UUID] = None
+    sender_id: Optional[UUID] = None
+    sender_type: Optional[str] = None
     sender_name: Optional[str] = None
     content: str
-    is_read: bool
-    is_important: bool
-    read_at: Optional[datetime]
+    is_read: bool = False
+    is_important: bool = False
+    read_at: Optional[datetime] = None
     created_at: datetime
     attachments: List[dict] = []
     
+    # 格式化后的显示字段
+    read_at_display: Optional[str] = None
+    created_at_display: Optional[str] = None
+    
     class Config:
         from_attributes = True
+    
+    def model_post_init(self, __context) -> None:
+        self.read_at_display = format_kst_display(self.read_at)
+        self.created_at_display = format_kst_display(self.created_at)
 
 
 class ThreadResponse(BaseModel):
@@ -112,20 +132,28 @@ class ThreadResponse(BaseModel):
     
     id: UUID
     subject: str
-    category: str
-    status: str
-    member_id: UUID
+    category: Optional[str] = "general"
+    status: Optional[str] = "open"
+    member_id: Optional[UUID] = None
     member_name: Optional[str] = None
-    created_by: UUID
-    assigned_to: Optional[UUID]
-    last_message_at: Optional[datetime]
-    message_count: int
-    unread_count: int
-    admin_unread_count: Optional[int] = None  # 管理员未读数（会员发送的消息）
+    created_by: Optional[UUID] = None
+    assigned_to: Optional[UUID] = None
+    last_message_at: Optional[datetime] = None
+    message_count: int = 0
+    unread_count: int = 0
+    admin_unread_count: Optional[int] = None
     created_at: datetime
+    
+    # 格式化后的显示字段
+    last_message_at_display: Optional[str] = None
+    created_at_display: Optional[str] = None
     
     class Config:
         from_attributes = True
+    
+    def model_post_init(self, __context) -> None:
+        self.last_message_at_display = format_kst_display(self.last_message_at)
+        self.created_at_display = format_kst_display(self.created_at)
 
 
 class ThreadWithMessagesResponse(BaseModel):
@@ -162,20 +190,30 @@ class BroadcastCreate(BaseModel):
 class BroadcastResponse(BaseModel):
     """Broadcast response schema."""
     
-    id: UUID
-    sender_id: UUID
+    id: Optional[UUID] = None
+    broadcast_id: Optional[str] = None
+    sender_id: Optional[UUID] = None
     sender_name: Optional[str] = None
-    subject: str
-    content: str
-    category: str
-    is_important: bool
-    send_to_all: bool
-    recipient_count: int
-    sent_at: Optional[datetime]
-    created_at: datetime
+    subject: Optional[str] = None
+    content: Optional[str] = None
+    category: Optional[str] = None
+    is_important: bool = False
+    send_to_all: bool = True
+    recipient_count: int = 0
+    sent_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    messages: Optional[List[dict]] = None
+    
+    # 格式化后的显示字段
+    sent_at_display: Optional[str] = None
+    created_at_display: Optional[str] = None
     
     class Config:
         from_attributes = True
+    
+    def model_post_init(self, __context) -> None:
+        self.sent_at_display = format_kst_display(self.sent_at)
+        self.created_at_display = format_kst_display(self.created_at)
 
 
 # Analytics schemas

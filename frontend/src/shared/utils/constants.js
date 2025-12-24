@@ -90,7 +90,6 @@ export const RESOURCE_TYPES = {
   PROJECT_ATTACHMENT: 'project_attachment',
   PROJECT_APPLICATION: 'project_application',
   PERFORMANCE_PROOF: 'performance_proof',
-  INQUIRY_ATTACHMENT: 'inquiry_attachment',
   NEWS_IMAGE: 'news_image',
   BANNER_IMAGE: 'banner_image',
   POPUP_IMAGE: 'popup_image'

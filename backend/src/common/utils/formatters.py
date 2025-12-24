@@ -4,8 +4,65 @@ Data formatting utilities.
 Common functions for formatting dates, times, status values, and other data
 for display purposes across all modules.
 """
-from datetime import datetime, date
+from datetime import datetime, date, timezone, timedelta
 from typing import Union, Optional
+
+# 韩国时区 (UTC+9)
+KST = timezone(timedelta(hours=9))
+
+
+def now_utc() -> datetime:
+    """Get current UTC datetime."""
+    return datetime.now(timezone.utc)
+
+
+def now_kst() -> datetime:
+    """Get current Korea Standard Time datetime."""
+    return datetime.now(KST)
+
+
+def now_iso() -> str:
+    """
+    Get current UTC datetime as ISO format string.
+    Used for database storage.
+    
+    Returns:
+        ISO format datetime string (UTC)
+    """
+    return datetime.now(timezone.utc).isoformat()
+
+
+def utc_to_kst(dt: Union[str, datetime]) -> datetime:
+    """
+    Convert UTC datetime to Korea Standard Time.
+    
+    Args:
+        dt: UTC datetime string or datetime object
+        
+    Returns:
+        KST datetime object
+    """
+    if isinstance(dt, str):
+        dt = parse_datetime(dt)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(KST)
+
+
+def format_kst_display(dt: Union[str, datetime, None]) -> str:
+    """
+    Format datetime for display in Korean timezone.
+    
+    Args:
+        dt: UTC datetime string, datetime object, or None
+        
+    Returns:
+        Formatted datetime string in KST (YYYY-MM-DD HH:MM)
+    """
+    if dt is None:
+        return ""
+    kst_dt = utc_to_kst(dt)
+    return kst_dt.strftime('%Y-%m-%d %H:%M')
 
 
 def parse_datetime(dt_input: Union[str, datetime]) -> datetime:

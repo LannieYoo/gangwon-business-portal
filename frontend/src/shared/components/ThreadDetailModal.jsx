@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '@shared/components';
 import Button from '@shared/components/Button';
-import { messagesService } from '@shared/services';
+import { messagesService, uploadService } from '@shared/services';
 import { formatDateTime } from '@shared/utils/format';
 
 export default function ThreadDetailModal({ 
@@ -20,8 +20,11 @@ export default function ThreadDetailModal({
   const [threadData, setThreadData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [replyContent, setReplyContent] = useState('');
+  const [replyAttachments, setReplyAttachments] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (isOpen && threadId) {
@@ -32,6 +35,7 @@ export default function ThreadDetailModal({
   const loadThreadDetail = async () => {
     setLoading(true);
     setReplyContent('');
+    setReplyAttachments([]);
     try {
       const response = await messagesService.getMemberThread(threadId);
       if (response) {
@@ -50,7 +54,32 @@ export default function ThreadDetailModal({
   const handleClose = () => {
     setThreadData(null);
     setReplyContent('');
+    setReplyAttachments([]);
     onClose();
+  };
+
+  const handleFileSelect = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    
+    const remainingSlots = 3 - replyAttachments.length;
+    if (remainingSlots <= 0) return;
+    
+    const filesToUpload = files.slice(0, remainingSlots);
+    setUploading(true);
+    try {
+      const uploaded = await uploadService.uploadAttachments(filesToUpload);
+      setReplyAttachments(prev => [...prev, ...uploaded]);
+    } catch (err) {
+      // 上传失败
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAttachment = (index) => {
+    setReplyAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleReply = async () => {
@@ -58,17 +87,25 @@ export default function ThreadDetailModal({
 
     setSubmitting(true);
     try {
+      // 转换附件格式
+      const attachments = replyAttachments.map(att => ({
+        fileName: att.original_name || att.name,
+        filePath: att.file_url || att.url,
+        fileSize: att.file_size || att.size || 0,
+        mimeType: att.mime_type || att.mimeType || 'application/octet-stream'
+      }));
+
       const newMessage = await messagesService.createMemberThreadMessage(threadId, {
         content: replyContent,
         isImportant: false,
-        attachments: []
+        attachments
       });
       setThreadData(prev => ({
         ...prev,
         messages: [...(prev.messages || []), newMessage]
       }));
       setReplyContent('');
-      onMessageSent?.();
+      setReplyAttachments([]);
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -85,7 +122,7 @@ export default function ThreadDetailModal({
       isOpen={isOpen}
       onClose={handleClose}
       title={threadData?.thread?.subject || t('support.inquiryDetail')}
-      size="xl"
+      size="lg"
     >
       {loading ? (
         <div className="py-12 text-center">
@@ -93,7 +130,7 @@ export default function ThreadDetailModal({
           <p className="text-sm text-gray-500">{t('common.loading')}</p>
         </div>
       ) : threadData ? (
-        <div className="flex flex-col h-[75vh]">
+        <div className="flex flex-col h-[60vh]">
           {/* 消息列表区域 */}
           <div className="flex-1 overflow-y-auto px-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {!threadData.messages || threadData.messages.length === 0 ? (
@@ -123,6 +160,49 @@ export default function ThreadDetailModal({
                         <div className="text-sm leading-relaxed whitespace-pre-wrap">
                           {msg.content}
                         </div>
+                        {msg.attachments?.length > 0 && (
+                          <div className={`mt-2 pt-2 border-t ${isMember ? 'border-primary-400/50' : 'border-gray-200'} space-y-2`}>
+                            {msg.attachments.map((att, idx) => {
+                              const isImage = att.mimeType?.startsWith('image/') || 
+                                /\.(jpg|jpeg|png|gif|webp)$/i.test(att.fileName || '');
+                              
+                              if (isImage) {
+                                return (
+                                  <a 
+                                    key={idx} 
+                                    href={att.fileUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="block"
+                                  >
+                                    <img 
+                                      src={att.fileUrl} 
+                                      alt={att.fileName}
+                                      className="max-w-[200px] max-h-[150px] rounded border border-gray-200 object-cover hover:opacity-90 transition-opacity"
+                                    />
+                                  </a>
+                                );
+                              }
+                              
+                              return (
+                                <a 
+                                  key={idx} 
+                                  href={att.fileUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  download={att.fileName}
+                                  className={`flex items-center gap-1 text-xs hover:underline ${
+                                    isMember ? 'text-primary-100 hover:text-white' : 'text-blue-600 hover:text-blue-800'
+                                  }`}
+                                >
+                                  <span>📎</span>
+                                  <span className="truncate max-w-[180px]">{att.fileName}</span>
+                                  {att.fileSize && <span className="text-[10px] opacity-70">({(att.fileSize / 1024).toFixed(0)}KB)</span>}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -142,7 +222,45 @@ export default function ThreadDetailModal({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                 rows={3}
               />
-              <div className="flex justify-end mt-2">
+              
+              {/* 已上传的附件 */}
+              {replyAttachments.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {replyAttachments.map((att, idx) => (
+                    <div key={idx} className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs">
+                      <span className="truncate max-w-[120px]">{att.original_name || att.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveAttachment(idx)}
+                        className="text-gray-400 hover:text-red-500 ml-1"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              <div className="flex justify-between items-center mt-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading || replyAttachments.length >= 3}
+                    className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1 disabled:opacity-50"
+                  >
+                    📎 {uploading ? t('common.uploading') : t('support.addAttachment')}
+                  </button>
+                  <span className="text-xs text-gray-400">({replyAttachments.length}/3)</span>
+                </div>
                 <Button
                   variant="primary"
                   size="sm"

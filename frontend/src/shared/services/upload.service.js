@@ -187,7 +187,7 @@ class UploadService {
     const type = formData.get('type') || 'private';
     
     // Determine upload endpoint based on type
-    const isPublic = type === 'banner' || type === 'notice' || type === 'public';
+    const isPublic = type === 'banner' || type === 'notice' || type === 'public' || type === 'project';
     let url = isPublic
       ? `${API_PREFIX}/upload/public`
       : `${API_PREFIX}/upload/private`;

@@ -42,12 +42,14 @@ class MemberService {
         corporationNumber: response.legal_number,
         createdAt: response.created_at,
         updatedAt: response.updated_at,
-        // Additional fields for compatibility
-        category: null, // Not in backend response yet
-        description: null, // Not in backend response yet
-        businessField: null, // Not in backend response yet
-        mainBusiness: null, // Not in backend response yet
-        cooperationFields: [], // Not in backend response yet
+        // Contact person fields
+        contactPersonName: response.contact_person_name,
+        contactPersonDepartment: response.contact_person_department,
+        contactPersonPosition: response.contact_person_position,
+        // Business info fields
+        mainBusiness: response.main_business,
+        description: response.description,
+        cooperationFields: response.cooperation_fields ? JSON.parse(response.cooperation_fields) : [],
       };
 
       return mappedResponse;
@@ -140,6 +142,26 @@ class MemberService {
     }
     if (data.corporationNumber !== undefined) {
       requestData.corporation_number = data.corporationNumber;
+    }
+    // Contact person fields
+    if (data.contactPersonName !== undefined) {
+      requestData.contact_person_name = data.contactPersonName;
+    }
+    if (data.contactPersonDepartment !== undefined) {
+      requestData.contact_person_department = data.contactPersonDepartment;
+    }
+    if (data.contactPersonPosition !== undefined) {
+      requestData.contact_person_position = data.contactPersonPosition;
+    }
+    // Business info fields
+    if (data.mainBusiness !== undefined) {
+      requestData.main_business = data.mainBusiness;
+    }
+    if (data.description !== undefined) {
+      requestData.description = data.description;
+    }
+    if (data.cooperationFields !== undefined) {
+      requestData.cooperation_fields = JSON.stringify(data.cooperationFields);
     }
 
     const response = await this._updateProfileInternal(requestData);

@@ -81,7 +81,7 @@ class Settings(BaseSettings):
     ALLOWED_DOCUMENT_EXTENSIONS: str = "pdf,doc,docx,xls,xlsx,ppt,pptx,txt"
 
     # Logging Configuration
-    LOG_LEVEL: str = "WARNING"  # DEBUG, INFO, WARNING, ERROR, CRITICAL (default: WARNING - system logs exclude DEBUG and INFO)
+    LOG_LEVEL: str = "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL (default: INFO)
     LOG_FILE: str | None = None  # Path to system log file (None = auto-detect backend/logs/system.log)
     LOG_FILE_MAX_BYTES: int = 10485760  # 10MB per log file
     LOG_FILE_BACKUP_COUNT: int = 5  # Number of backup files to keep
@@ -96,9 +96,18 @@ class Settings(BaseSettings):
         "authorization",
     ]  # Fields to mask in logs
     
+    # Per-file log level configuration (environment-based)
+    # Production: INFO for app/audit/error, WARNING for system/performance
+    # Development: DEBUG for app/audit/error, INFO for system/performance
+    LOG_LEVEL_APP: str = "INFO"  # app.log level
+    LOG_LEVEL_AUDIT: str = "INFO"  # audit.log level
+    LOG_LEVEL_ERROR: str = "INFO"  # error.log level
+    LOG_LEVEL_SYSTEM: str = "INFO"  # system.log level
+    LOG_LEVEL_PERFORMANCE: str = "INFO"  # performance.log level
+    
     # Database Logging Configuration (Supabase API)
     LOG_DB_ENABLED: bool = True  # Enable database logging (default: True)
-    LOG_DB_SYSTEM_MIN_LEVEL: str = "WARNING"  # Minimum log level for system logs (system_logs table) - WARNING/ERROR/CRITICAL
+    LOG_DB_SYSTEM_MIN_LEVEL: str = "INFO"  # Minimum log level for system logs (system_logs table) - consistent with file
     LOG_DB_APP_MIN_LEVEL: str = "INFO"  # Minimum log level for app logs (app_logs table) - INFO/WARNING/ERROR/CRITICAL
     LOG_DB_BATCH_SIZE: int = 50  # Batch size for database inserts (reduce database overhead)
     LOG_DB_BATCH_INTERVAL: float = 5.0  # Batch interval in seconds (flush batch after this time)

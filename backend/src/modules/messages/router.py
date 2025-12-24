@@ -65,6 +65,7 @@ async def get_messages(
         page_size=page_size,
         is_read=is_read,
         is_important=is_important,
+        is_admin=True,
     )
     
     return MessageListResponse(
@@ -87,8 +88,9 @@ async def get_unread_count(
     current_user = Depends(get_current_admin_user),
 ):
     """Get unread messages count for admin."""
-    count = await service.get_unread_count(current_user["id"])
-    return UnreadCountResponse(unread_count=count)
+    # 直接调用 unified 方法，跳过不必要的 _is_admin 查询
+    result = await service.get_unread_count_unified(current_user["id"], is_admin=True)
+    return UnreadCountResponse(unread_count=result.get('unread_count', 0))
 
 
 @router.get(
@@ -261,8 +263,9 @@ async def get_member_unread_count(
     current_user: Member = Depends(get_current_member_user),
 ):
     """Get unread messages count for member."""
-    count = await service.get_unread_count(current_user.id)
-    return UnreadCountResponse(unread_count=count)
+    # 直接调用 unified 方法，跳过不必要的 _is_admin 查询
+    result = await service.get_unread_count_unified(current_user.id, is_admin=False)
+    return UnreadCountResponse(unread_count=result.get('unread_count', 0))
 
 
 # Thread Endpoints (must be before /{message_id} to avoid route conflicts)
@@ -309,8 +312,10 @@ async def list_member_threads(
     tags=["messages", "threads", "member"],
     summary="Create message thread (member)",
 )
+@audit_log(action="create", resource_type="thread")
 async def create_thread(
     data: ThreadCreate,
+    request: Request,
     current_user: Member = Depends(get_current_member_user),
 ):
     """Create a new message thread (member)."""
@@ -343,9 +348,11 @@ async def get_member_thread(
     tags=["messages", "threads", "member"],
     summary="Send message in thread (member)",
 )
+@audit_log(action="reply", resource_type="thread")
 async def create_member_thread_message(
     thread_id: UUID,
     data: ThreadMessageCreate,
+    request: Request,
     current_user: Member = Depends(get_current_member_user),
 ):
     """Send a message in an existing thread (member)."""
@@ -360,6 +367,7 @@ async def create_member_thread_message(
     tags=["messages", "member"],
     summary="Send message to admin (member)",
 )
+@audit_log(action="create", resource_type="message")
 async def create_member_message(
     data: MessageCreate,
     request: Request,
@@ -408,6 +416,7 @@ async def update_member_message(
     tags=["messages", "member"],
     summary="Delete message (member)",
 )
+@audit_log(action="delete", resource_type="message")
 async def delete_member_message(
     message_id: UUID,
     request: Request,
@@ -444,9 +453,11 @@ async def get_thread(
     tags=["messages", "threads", "admin"],
     summary="Send message in thread (admin)",
 )
+@audit_log(action="reply", resource_type="thread")
 async def create_thread_message(
     thread_id: UUID,
     data: ThreadMessageCreate,
+    request: Request,
     current_user = Depends(get_current_admin_user),
 ):
     """Send a message in an existing thread (admin)."""
@@ -460,9 +471,11 @@ async def create_thread_message(
     tags=["messages", "threads", "admin"],
     summary="Update thread (admin)",
 )
+@audit_log(action="update", resource_type="thread")
 async def update_thread(
     thread_id: UUID,
     data: ThreadUpdate,
+    request: Request,
     current_user = Depends(get_current_admin_user),
 ):
     """Update thread status or assignment (admin)."""
@@ -479,8 +492,10 @@ async def update_thread(
     tags=["messages", "broadcast", "admin"],
     summary="Send broadcast message (admin)",
 )
+@audit_log(action="broadcast", resource_type="message")
 async def create_broadcast(
     data: BroadcastCreate,
+    request: Request,
     current_user = Depends(get_current_admin_user),
 ):
     """Send a broadcast message to multiple members (admin only)."""

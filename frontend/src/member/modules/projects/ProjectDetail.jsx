@@ -8,10 +8,26 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
+import LazyImage from '@shared/components/LazyImage';
+import Banner from '@shared/components/Banner';
 import { projectService } from '@shared/services';
 import { formatDate } from '@shared/utils/format';
+import { BANNER_TYPES } from '@shared/utils/constants';
 import ApplicationModal from './ApplicationModal';
 import { PageContainer } from '@member/layouts';
+
+// 生成占位符图片
+const generatePlaceholderImage = (width = 800, height = 400) => {
+  const svg = `
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#e5e7eb"/>
+      <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="24" fill="#9ca3af" text-anchor="middle" dominant-baseline="middle">
+        Project
+      </text>
+    </svg>
+  `.trim();
+  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+};
 
 export default function ProjectDetail() {
   const { t, i18n } = useTranslation();
@@ -45,6 +61,7 @@ export default function ProjectDetail() {
 
   return (
     <>
+      <Banner bannerType={BANNER_TYPES.PROJECTS} />
       <PageContainer>
         <div className="mb-8 p-0 bg-transparent shadow-none">
           <h1 className="block text-2xl font-bold text-gray-900 mb-0">{t('projects.detail', '项目详情')}</h1>
@@ -73,9 +90,22 @@ export default function ProjectDetail() {
                 )}
               </div>
             </div>
-            {project.imageUrl && (
-              <div className="mb-4 rounded-lg overflow-hidden">
-                <img src={project.imageUrl} alt={project.title} className="w-full h-auto max-h-[300px] object-cover" />
+            {(project.imageUrl || project.image_url) && (
+              <div className="mb-4 rounded-lg overflow-hidden relative bg-blue-700">
+                <LazyImage 
+                  src={project.imageUrl || project.image_url} 
+                  alt={project.title}
+                  placeholder={generatePlaceholderImage()}
+                  className="!block !w-full !h-auto !max-h-[300px] object-cover"
+                />
+                {/* 文字叠加层 */}
+                <div className="absolute inset-0 flex items-center justify-center p-6"
+                  style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5))' }}>
+                  <h2 className="text-3xl max-md:text-2xl font-bold text-white text-center m-0 leading-snug"
+                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
+                    {project.title}
+                  </h2>
+                </div>
               </div>
             )}
             <div className="mb-4 text-sm text-gray-700 leading-relaxed">

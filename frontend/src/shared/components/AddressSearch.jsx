@@ -1,190 +1,135 @@
 /**
  * Address Search Component
- * 地址搜索组件 - 集成韩国地址搜索 API (Daum Postcode)
+ * 주소 검색 컴포넌트 - Daum 주소 API 사용
  */
 
-import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { exceptionService } from "@shared/utils/errorHandler";
-import { cn } from "@shared/utils/helpers";
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import Button from './Button';
+import Input from './Input';
+import Modal from './Modal';
 
 /**
- * 地址搜索组件
+ * Daum 주소 검색 API를 사용한 주소 검색 컴포넌트
  * @param {Object} props
- * @param {string} props.value - 当前地址值
- * @param {Function} props.onSelect - 地址选择回调 (address: string, zonecode: string) => void
- * @param {string} props.className - 额外 CSS 类名
- * @param {boolean} props.disabled - 是否禁用
+ * @param {string} props.value - 현재 주소 값
+ * @param {Function} props.onChange - 주소 변경 콜백 (address, zonecode)
+ * @param {boolean} props.disabled - 비활성화 여부
+ * @param {string} props.error - 에러 메시지
+ * @param {boolean} props.required - 필수 여부
  */
-export function AddressSearch({
-  value,
-  onSelect,
-  className = "",
-  disabled = false,
+export default function AddressSearch({ 
+  value = '', 
+  onChange,
+  onSelect, 
+  disabled = false, 
+  error,
+  required = false 
 }) {
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
-  const containerRef = useRef(null);
-  const postcodeRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+  
+  // 支持 onChange 和 onSelect 两种回调方式
+  const handleAddressChange = useCallback((address, zonecode) => {
+    if (onSelect) {
+      onSelect(address, zonecode);
+    } else if (onChange) {
+      onChange(address, zonecode);
+    }
+  }, [onChange, onSelect]);
 
+  // Daum 주소 API 스크립트 로드
   useEffect(() => {
-    // 加载 Daum Postcode API 脚本
-    if (!window.daum) {
-      loadDaumPostcodeScript();
-    }
-  }, []);
-
-  /**
-   * 加载 Daum Postcode API 脚本
-   */
-  const loadDaumPostcodeScript = () => {
-    if (document.getElementById("daum-postcode-script")) {
-      return; // 脚本已加载
-    }
-
-    const script = document.createElement("script");
-    script.id = "daum-postcode-script";
-    script.src =
-      "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-    script.async = true;
-    script.onload = () => {
-      // AOP 系统会自动处理成功日志
-    };
-    script.onerror = () => {
-      const error = new Error("Failed to load Daum Postcode API");
-      // AOP 系统会自动处理异常日志
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: "LOAD_DAUM_POSTCODE_API_FAILED",
-      });
-    };
-    document.head.appendChild(script);
-  };
-
-  /**
-   * 打开地址搜索弹窗
-   */
-  const openAddressSearch = () => {
-    if (disabled || isLoading) return;
-
-    if (!window.daum || !window.daum.Postcode) {
-      // 如果 API 未加载，尝试重新加载
-      loadDaumPostcodeScript();
-      alert(t("auth.addressApiLoading", "地址搜索 API 正在加载中，请稍候再试"));
+    if (window.daum && window.daum.Postcode) {
+      setScriptLoaded(true);
       return;
     }
 
-    setIsLoading(true);
+    const script = document.createElement('script');
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    script.onload = () => setScriptLoaded(true);
+    document.head.appendChild(script);
 
-    // 创建新的 Postcode 实例
-    const postcode = new window.daum.Postcode({
-      oncomplete: (data) => {
-        // 地址选择完成
-        setIsLoading(false);
-
-        // 构建完整地址
-        let fullAddress = data.address; // 用户选择的地址
-        let extraAddress = ""; // 参考信息
-
-        // 用户选择类型为 R(도로명주소) 时
-        if (data.userSelectedType === "R") {
-          // 법정동명이 있을 경우 추가
-          if (data.bname !== "") {
-            extraAddress += data.bname;
-          }
-          // 건물명이 있을 경우 추가
-          if (data.buildingName !== "") {
-            extraAddress +=
-              extraAddress !== ""
-                ? ", " + data.buildingName
-                : data.buildingName;
-          }
-          // 조합된 참고항목을 해당 필드에 넣는다
-          if (extraAddress !== "") {
-            fullAddress += " (" + extraAddress + ")";
-          }
-        }
-
-        // 调用回调函数
-        if (onSelect) {
-          onSelect(fullAddress, data.zonecode);
-        }
-
-        // 自动关闭弹窗
-        if (postcodeRef.current) {
-          postcodeRef.current.remove();
-          postcodeRef.current = null;
-        }
-      },
-      // 不响应 onresize，保持弹窗固定大小
-      width: "100%",
-      height: "100%",
-    });
-
-    // 创建弹窗容器
-    if (!postcodeRef.current) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] max-w-[90vw] h-[500px] max-h-[80vh] z-[10000] bg-white rounded-lg shadow-2xl overflow-hidden";
-      wrapper.id = "daum-postcode-wrapper";
-      document.body.appendChild(wrapper);
-      postcodeRef.current = wrapper;
-    }
-
-    // 打开弹窗
-    postcode.embed(postcodeRef.current);
-
-    // 关闭按钮
-    const closeBtn = document.createElement("button");
-    closeBtn.className = "absolute top-2 right-2 w-8 h-8 bg-black/50 text-white border-none rounded-full text-2xl leading-none cursor-pointer z-[10001] flex items-center justify-center transition-colors duration-200 hover:bg-black/70";
-    closeBtn.innerHTML = "&times;";
-    closeBtn.onclick = () => {
-      if (postcodeRef.current) {
-        postcodeRef.current.remove();
-        postcodeRef.current = null;
-      }
-      setIsLoading(false);
-    };
-    postcodeRef.current.appendChild(closeBtn);
-  };
-
-  // 组件卸载时清理
-  useEffect(() => {
     return () => {
-      if (postcodeRef.current) {
-        postcodeRef.current.remove();
-        postcodeRef.current = null;
-      }
+      // 스크립트는 제거하지 않음 (다른 컴포넌트에서 사용할 수 있음)
     };
   }, []);
 
+  // 주소 검색 팝업 열기
+  const openAddressSearch = useCallback(() => {
+    if (!scriptLoaded || !window.daum || !window.daum.Postcode) {
+      console.error('Daum Postcode API not loaded');
+      return;
+    }
+
+    setIsModalOpen(true);
+
+    // 약간의 지연 후 팝업 생성 (모달이 열린 후)
+    setTimeout(() => {
+      const container = document.getElementById('daum-postcode-container');
+      if (!container) return;
+
+      new window.daum.Postcode({
+        oncomplete: (data) => {
+          // 도로명 주소 우선, 없으면 지번 주소
+          const address = data.roadAddress || data.jibunAddress;
+          const zonecode = data.zonecode;
+          
+          handleAddressChange(address, zonecode);
+          setIsModalOpen(false);
+        },
+        onclose: () => {
+          setIsModalOpen(false);
+        },
+        width: '100%',
+        height: '100%'
+      }).embed(container);
+    }, 100);
+  }, [scriptLoaded, handleAddressChange]);
+
   return (
-    <div className={cn("w-full", className)}>
-      <div className="flex gap-2 sm:flex-col">
-        <input
-          type="text"
-          value={value || ""}
-          readOnly
-          className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm bg-gray-50 cursor-not-allowed disabled:opacity-60 sm:w-full"
-          placeholder={t("auth.addressPlaceholder", "주소를 검색하세요")}
-          disabled={disabled}
-        />
-        <button
-          type="button"
-          className={cn(
-            "px-4 py-2 bg-[#0052a4] text-white border-none rounded-md text-sm font-medium cursor-pointer whitespace-nowrap transition-colors duration-200",
-            "hover:bg-[#003d7a] active:bg-[#003366] disabled:opacity-50 disabled:cursor-not-allowed",
-            "sm:w-full"
-          )}
-          onClick={openAddressSearch}
-          disabled={disabled || isLoading}
-        >
-          {isLoading
-            ? t("common.loading", "로딩 중...")
-            : t("auth.searchAddress", "주소 검색")}
-        </button>
+    <div className="address-search">
+      <div className="flex gap-2 items-start">
+        <div className="flex-1">
+          <Input
+            value={value}
+            onChange={(e) => handleAddressChange(e.target.value)}
+            disabled={disabled}
+            required={required}
+            error={error}
+            placeholder={t('common.addressPlaceholder', '주소를 검색하세요')}
+            readOnly={!disabled}
+            inline
+            className="w-full"
+          />
+        </div>
+        {!disabled && (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={openAddressSearch}
+            disabled={!scriptLoaded}
+            className="whitespace-nowrap h-[42px]"
+          >
+            {t('common.searchAddress', '주소 검색')}
+          </Button>
+        )}
       </div>
+
+      {/* 주소 검색 모달 */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={t('common.searchAddress', '주소 검색')}
+        size="md"
+      >
+        <div 
+          id="daum-postcode-container" 
+          style={{ width: '100%', height: '450px' }}
+        />
+      </Modal>
     </div>
   );
 }
-
-export default AddressSearch;

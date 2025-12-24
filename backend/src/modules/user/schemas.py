@@ -8,7 +8,7 @@ from typing import Optional
 from datetime import datetime, date
 from uuid import UUID
 
-# Region options (支持中文和韩文)
+# Region options (supports Chinese and Korean)
 REGION_GANGWON_ZH = "江原特别自治道"
 REGION_GANGWON_KO = "강원특별자치도"
 REGION_OUTSIDE_GANGWON_ZH = "江原以外"
@@ -43,12 +43,12 @@ class MemberRegisterRequest(BaseModel):
     region: str = Field(
         ...,
         max_length=100,
-        description="Region (所在地区). Required. Options: 江原特别自治道/강원특별자치도, 江原以外/강원 이외"
+        description="Region. Required. Options: 江原特别自治道/강원특별자치도, 江原以外/강원 이외"
     )
     company_type: Optional[str] = Field(None, max_length=100, description="Company type")
     corporate_number: Optional[str] = Field(None, max_length=20, description="Corporate number")
     address: Optional[str] = Field(None, description="Company address")
-    representative: Optional[str] = Field(None, max_length=100, description="Representative name (代表人名字)")
+    representative: Optional[str] = Field(None, max_length=100, description="Representative name")
     contact_person: Optional[str] = Field(None, max_length=100, description="Contact person name")
 
     # Step 3: Business information

@@ -61,6 +61,9 @@
       "approved": "승인 완료",
       "rejected": "거부됨"
     },
+    "period": "기간",
+    "submittedAt": "제출시간",
+    "updatedAt": "수정시간",
     "submittedDate": "제출일",
     "approvedDate": "승인일",
     "reviewer": "검토자",

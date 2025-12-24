@@ -13,7 +13,7 @@
  */
 
 import React, { useEffect, useRef, useCallback } from "react";
-import { info, warn, debug, LOG_LAYERS } from "@shared/utils/logger";
+import { info, warn, debug, LOG_LAYERS } from "@shared/logger";
 
 /**
  * 性能日志记录 Hook

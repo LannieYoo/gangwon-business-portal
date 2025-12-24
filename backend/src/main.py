@@ -13,11 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from .common.modules.config import settings
-from .common.modules.exception import (
-    register_exception_handlers,
-    add_exception_middleware,
-)
-from .common.modules.logger import HTTPLoggingMiddleware
+from .common.modules.exception import register_exception_handlers
+from .common.modules.interceptor import setup_interceptors
 
 # Create main module logger (different from logger module's logger)
 logger = logging.getLogger(__name__)
@@ -60,24 +57,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Add Exception Middleware (AOP-style exception handling)
-# This middleware handles:
-# - Wrapping all HTTP requests in try-catch logic
-# - Capturing full request context for exceptions
-# - Determining appropriate HTTP status codes
-# - Including correlation IDs in responses
-# - Recording exceptions via the exception service
-# Requirements: 7.1, 7.2, 7.3, 7.4, 7.5
-add_exception_middleware(app, debug=settings.DEBUG)
-
-# Add HTTP Logging Middleware (AOP-style request/response logging)
-# This middleware handles:
-# - TraceId and RequestId extraction/generation
-# - Request method, path, IP address logging
-# - Response status code and duration logging
-# - Slow request (>1s) WARNING level logging
-# Requirements: 6.1, 6.2, 6.3, 6.4
-app.add_middleware(HTTPLoggingMiddleware, debug=settings.DEBUG)
+# =============================================================================
+# 拦截器配置（AOP）
+# =============================================================================
+# 一站式配置所有拦截器：
+# - Router 层：ExceptionMiddleware + HTTPLoggingMiddleware
+# - Service 层：自动扫描并拦截所有 *Service 类
+# - Database 层：通过 UnifiedSupabaseClient 自动拦截
+setup_interceptors(app, debug=settings.DEBUG)
 
 # Configure CORS
 app.add_middleware(
@@ -197,5 +184,7 @@ if __name__ == "__main__":
         port=port,
         # reload=settings.DEBUG,  # 注释掉热部署，避免测试时服务器重启导致连接断开
         reload=False,
+        # 禁用 uvicorn 默认日志配置，使用我们自己的配置
+        log_config=None,
     )
 

@@ -20,7 +20,7 @@ import {
   NotificationBell
 } from '@shared/components';
 
-export default function Header({ onToggleSidebar }) {
+export default function Header({ onToggleSidebar, onToggleDesktopSidebar }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,16 +65,26 @@ export default function Header({ onToggleSidebar }) {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-[1000] shadow-sm md:px-4">
       <div className="flex items-center gap-4">
+        {/* 移动端菜单按钮 */}
         <button 
-          className="bg-transparent border-none cursor-pointer p-2 text-gray-500 transition-colors duration-200 flex items-center justify-center rounded-md hover:text-gray-900"
+          className="md:hidden bg-transparent border-none cursor-pointer p-2 text-gray-500 transition-colors duration-200 flex items-center justify-center rounded-md hover:text-gray-900 hover:bg-gray-100"
           onClick={onToggleSidebar}
+          aria-label="Toggle Mobile Menu"
+        >
+          <MenuIcon className="w-6 h-6" />
+        </button>
+        
+        {/* 桌面端侧边栏折叠按钮 */}
+        <button 
+          className="hidden md:flex bg-transparent border-none cursor-pointer p-2 text-gray-500 transition-colors duration-200 items-center justify-center rounded-md hover:text-gray-900 hover:bg-gray-100"
+          onClick={onToggleDesktopSidebar}
           aria-label="Toggle Sidebar"
         >
           <MenuIcon className="w-6 h-6" />
         </button>
         
         <Link to="/admin" className="flex items-center gap-2 no-underline text-gray-900 font-semibold text-lg">
-          <span className="whitespace-nowrap md:hidden">{t('admin.header.title')}</span>
+          <span className="whitespace-nowrap">{t('admin.header.title')}</span>
         </Link>
       </div>
 
@@ -122,7 +132,7 @@ export default function Header({ onToggleSidebar }) {
         </Link> */}
 
         {/* 通知中心 */}
-        <NotificationBell userType="admin" />
+        {isAuthenticated && <NotificationBell userType="admin" />}
 
         {/* 用户菜单或登录按钮 */}
         {isAuthenticated ? (

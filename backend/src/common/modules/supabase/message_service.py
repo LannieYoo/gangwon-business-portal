@@ -4,12 +4,22 @@ Message management service.
 Handles all message-related database operations for the unified messages table.
 """
 from typing import Dict, Any, List, Optional, Tuple
-from datetime import datetime, timezone
-from .base_service import BaseSupabaseService
+from .service import SupabaseService
+from ...utils.formatters import now_iso
 
 
-class MessageService(BaseSupabaseService):
+class MessageService(SupabaseService):
     """Service for message management operations using unified messages table."""
+    
+    # Message types
+    TYPE_DIRECT = "direct"
+    TYPE_THREAD = "thread"
+    TYPE_BROADCAST = "broadcast"
+    
+    # Sender types
+    SENDER_ADMIN = "admin"
+    SENDER_MEMBER = "member"
+    SENDER_SYSTEM = "system"
     
     # ============================================================================
     # Basic Message Operations
@@ -42,7 +52,7 @@ class MessageService(BaseSupabaseService):
         if not result.data:
             raise ValueError(f"Failed to update message {message_id}: no data returned")
         return result.data[0]
-    
+
     async def delete_message(self, message_id: str) -> bool:
         """删除消息（硬删除）"""
         self.client.table('messages')\
@@ -50,6 +60,239 @@ class MessageService(BaseSupabaseService):
             .eq('id', message_id)\
             .execute()
         return True
+    
+    # ============================================================================
+    # User/Admin Lookup (批量优化)
+    # ============================================================================
+    
+    async def get_member_name(self, member_id: str) -> Optional[str]:
+        """获取会员公司名称"""
+        if not member_id:
+            return None
+        result = self.client.table('members').select('company_name').eq('id', member_id).execute()
+        return result.data[0]['company_name'] if result.data else None
+    
+    async def get_member_names_batch(self, member_ids: List[str]) -> Dict[str, str]:
+        """批量获取会员公司名称"""
+        if not member_ids:
+            return {}
+        unique_ids = list(set(mid for mid in member_ids if mid))
+        if not unique_ids:
+            return {}
+        result = self.client.table('members').select('id, company_name').in_('id', unique_ids).execute()
+        return {m['id']: m['company_name'] for m in (result.data or [])}
+    
+    async def get_admin_name(self, admin_id: str) -> Optional[str]:
+        """Get admin name by ID"""
+        if not admin_id:
+            return "System Admin"
+        result = self.client.table('admins').select('full_name').eq('id', admin_id).execute()
+        return result.data[0]['full_name'] if result.data else "System Admin"
+    
+    async def get_admin_names_batch(self, admin_ids: List[str]) -> Dict[str, str]:
+        """Batch get admin names by IDs"""
+        if not admin_ids:
+            return {}
+        unique_ids = list(set(aid for aid in admin_ids if aid))
+        if not unique_ids:
+            return {}
+        result = self.client.table('admins').select('id, full_name').in_('id', unique_ids).execute()
+        return {a['id']: a['full_name'] for a in (result.data or [])}
+    
+    async def is_admin(self, user_id: str) -> bool:
+        """Check if user is admin"""
+        if not user_id:
+            return False
+        result = self.client.table('admins').select('id').eq('id', user_id).execute()
+        return len(result.data) > 0
+    
+    # ============================================================================
+    # Unread Count (优化版)
+    # ============================================================================
+    
+    async def get_unread_count(self, user_id: str, is_admin: bool = False) -> int:
+        """
+        获取未读消息数量（优化版，只查询 count）
+        
+        Args:
+            user_id: 用户ID
+            is_admin: 是否是管理员
+        """
+        query = self.client.table('messages').select('id', count='exact')
+        
+        if is_admin:
+            # 管理员：统计会员发送的未读消息
+            query = query.eq('sender_type', self.SENDER_MEMBER).eq('is_read', False)
+        else:
+            # 会员：统计发送给自己的未读消息
+            query = query.eq('recipient_id', user_id).eq('is_read', False)
+        
+        result = query.execute()
+        return result.count or 0
+    
+    # ============================================================================
+    # Thread Operations (批量优化)
+    # ============================================================================
+    
+    async def get_threads_paginated(
+        self,
+        page: int = 1,
+        page_size: int = 20,
+        status: Optional[str] = None,
+        sender_id: Optional[str] = None
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """
+        获取分页的 thread 列表
+        
+        Args:
+            page: 页码
+            page_size: 每页数量
+            status: 状态过滤
+            sender_id: 发送者ID过滤（用于会员端）
+        """
+        # 构建查询
+        query = self.client.table('messages').select('*', count='exact')
+        query = query.eq('message_type', self.TYPE_THREAD).is_('thread_id', 'null')
+        
+        if status:
+            query = query.eq('status', status)
+        if sender_id:
+            query = query.eq('sender_id', sender_id)
+        
+        # 获取总数
+        count_result = query.execute()
+        total_count = count_result.count or 0
+        
+        # 获取分页数据
+        offset = (page - 1) * page_size
+        threads_query = self.client.table('messages').select('*')
+        threads_query = threads_query.eq('message_type', self.TYPE_THREAD).is_('thread_id', 'null')
+        
+        if status:
+            threads_query = threads_query.eq('status', status)
+        if sender_id:
+            threads_query = threads_query.eq('sender_id', sender_id)
+        
+        threads_query = threads_query.order('created_at', desc=True)
+        threads_query = threads_query.range(offset, offset + page_size - 1)
+        
+        result = threads_query.execute()
+        return result.data or [], total_count
+    
+    async def get_thread_stats_batch(self, thread_ids: List[str], for_admin: bool = False) -> Dict[str, Dict[str, int]]:
+        """
+        批量获取 thread 的消息统计
+        
+        Args:
+            thread_ids: thread ID 列表
+            for_admin: 是否是管理员视角（影响未读数计算）
+            
+        Returns:
+            {thread_id: {'message_count': int, 'unread_count': int}}
+        """
+        if not thread_ids:
+            return {}
+        
+        # 一次查询获取所有相关消息
+        query = self.client.table('messages').select('thread_id, sender_type, is_read')
+        query = query.in_('thread_id', thread_ids)
+        result = query.execute()
+        
+        # 构建统计
+        stats = {tid: {'message_count': 0, 'unread_count': 0} for tid in thread_ids}
+        
+        for msg in (result.data or []):
+            tid = msg['thread_id']
+            if tid in stats:
+                stats[tid]['message_count'] += 1
+                # 未读数计算
+                if not msg['is_read']:
+                    if for_admin and msg['sender_type'] == self.SENDER_MEMBER:
+                        stats[tid]['unread_count'] += 1
+                    elif not for_admin and msg['sender_type'] == self.SENDER_ADMIN:
+                        stats[tid]['unread_count'] += 1
+        
+        return stats
+
+    async def get_thread_by_id(self, thread_id: str) -> Optional[Dict[str, Any]]:
+        """获取单个 thread"""
+        result = self.client.table('messages')\
+            .select('*')\
+            .eq('id', thread_id)\
+            .eq('message_type', self.TYPE_THREAD)\
+            .is_('thread_id', 'null')\
+            .execute()
+        return result.data[0] if result.data else None
+    
+    async def get_thread_messages_list(self, thread_id: str) -> List[Dict[str, Any]]:
+        """获取 thread 下的所有消息（包含附件）"""
+        result = self.client.table('messages')\
+            .select('*')\
+            .eq('thread_id', thread_id)\
+            .order('created_at', desc=False)\
+            .execute()
+        
+        messages = result.data or []
+        if not messages:
+            return messages
+        
+        # 批量获取消息的附件
+        message_ids = [msg['id'] for msg in messages]
+        attachments_result = self.client.table('attachments')\
+            .select('id, resource_id, file_url, original_name, stored_name, file_size, mime_type')\
+            .eq('resource_type', 'thread')\
+            .in_('resource_id', message_ids)\
+            .is_('deleted_at', 'null')\
+            .execute()
+        
+        # 按 message_id 分组附件
+        attachments_map = {}
+        for att in (attachments_result.data or []):
+            resource_id = att['resource_id']
+            if resource_id not in attachments_map:
+                attachments_map[resource_id] = []
+            attachments_map[resource_id].append({
+                'id': att['id'],
+                'file_url': att['file_url'],
+                'file_name': att['original_name'] or att['stored_name'],
+                'file_size': att['file_size'],
+                'mime_type': att['mime_type']
+            })
+        
+        # 将附件添加到消息中
+        for msg in messages:
+            msg['attachments'] = attachments_map.get(msg['id'], [])
+        
+        return messages
+    
+    async def mark_thread_messages_as_read(
+        self, 
+        thread_id: str, 
+        reader_type: str
+    ) -> int:
+        """
+        标记 thread 中的消息为已读
+        
+        Args:
+            thread_id: thread ID
+            reader_type: 阅读者类型 ('admin' 或 'member')
+            
+        Returns:
+            更新的消息数量
+        """
+        sender_type = self.SENDER_MEMBER if reader_type == 'admin' else self.SENDER_ADMIN
+        
+        result = self.client.table('messages')\
+            .update({
+                'is_read': True,
+                'read_at': now_iso()
+            })\
+            .eq('thread_id', thread_id)\
+            .eq('sender_type', sender_type)\
+            .eq('is_read', False)\
+            .execute()
+        
+        return len(result.data) if result.data else 0
     
     # ============================================================================
     # Direct Messages
@@ -79,7 +322,7 @@ class MessageService(BaseSupabaseService):
             "is_read": False,
             "is_important": priority in ["high", "urgent"],
             "is_broadcast": False,
-            "sent_at": datetime.now(timezone.utc).isoformat(),
+            "sent_at": now_iso(),
         }
         return await self.create_message(message_data)
     
@@ -115,10 +358,9 @@ class MessageService(BaseSupabaseService):
         """标记消息为已读"""
         update_data = {
             "is_read": True,
-            "read_at": datetime.now(timezone.utc).isoformat()
+            "read_at": now_iso()
         }
         
-        # 验证用户权限
         message = await self.get_message_by_id(message_id)
         if not message or message.get("recipient_id") != user_id:
             raise ValueError("Message not found or access denied")
@@ -132,7 +374,7 @@ class MessageService(BaseSupabaseService):
             "is_read": False
         }
         return await self.count_records('messages', filters)
-    
+
     # ============================================================================
     # Thread Messages
     # ============================================================================
@@ -161,7 +403,7 @@ class MessageService(BaseSupabaseService):
             "status": "sent",
             "is_read": False,
             "is_broadcast": False,
-            "sent_at": datetime.now(timezone.utc).isoformat(),
+            "sent_at": now_iso(),
         }
         return await self.create_message(message_data)
     
@@ -216,8 +458,8 @@ class MessageService(BaseSupabaseService):
             "is_read": False,
             "is_important": priority in ["high", "urgent"],
             "is_broadcast": True,
-            "broadcast_count": 0,  # Will be updated when recipients are added
-            "sent_at": datetime.now(timezone.utc).isoformat(),
+            "broadcast_count": 0,
+            "sent_at": now_iso(),
         }
         return await self.create_message(message_data)
     
@@ -227,17 +469,15 @@ class MessageService(BaseSupabaseService):
         recipient_ids: List[str]
     ) -> List[Dict[str, Any]]:
         """向多个接收者发送广播消息"""
-        # Get the broadcast template
         template = await self.get_message_by_id(broadcast_template_id)
         if not template or template.get("message_type") != "broadcast":
             raise ValueError("Invalid broadcast template")
         
-        # Create individual messages for each recipient
         created_messages = []
         for recipient_id in recipient_ids:
             message_data = {
                 "message_type": "broadcast",
-                "thread_id": broadcast_template_id,  # Link to original broadcast
+                "thread_id": broadcast_template_id,
                 "sender_id": template["sender_id"],
                 "sender_type": template["sender_type"],
                 "recipient_id": recipient_id,
@@ -249,13 +489,12 @@ class MessageService(BaseSupabaseService):
                 "is_read": False,
                 "is_important": template["is_important"],
                 "is_broadcast": True,
-                "sent_at": datetime.now(timezone.utc).isoformat(),
+                "sent_at": now_iso(),
             }
             
             created_message = await self.create_message(message_data)
             created_messages.append(created_message)
         
-        # Update broadcast count
         await self.update_message(broadcast_template_id, {
             "broadcast_count": len(recipient_ids)
         })
@@ -269,101 +508,191 @@ class MessageService(BaseSupabaseService):
         category: Optional[str] = None
     ) -> Tuple[List[Dict[str, Any]], int]:
         """获取广播消息模板列表"""
-        filters = {
-            "message_type": "broadcast",
-            "recipient_id": None  # Templates don't have specific recipients
-        }
+        query = self.client.table('messages').select('*', count='exact')
+        query = query.eq('message_type', 'broadcast').is_('recipient_id', 'null')
+        
         if category:
-            filters["category"] = category
+            query = query.eq('category', category)
         
-        total = await self.count_records('messages', filters)
+        count_result = query.execute()
+        total = count_result.count or 0
         
-        query = self.client.table('messages').select('*')
+        data_query = self.client.table('messages').select('*')
+        data_query = data_query.eq('message_type', 'broadcast').is_('recipient_id', 'null')
         
-        for key, value in filters.items():
-            if key == "recipient_id" and value is None:
-                query = query.is_('recipient_id', 'null')
-            else:
-                query = query.eq(key, value)
+        if category:
+            data_query = data_query.eq('category', category)
         
-        query = query.order('created_at', desc=True)\
-                    .range(offset, offset + limit - 1)
+        data_query = data_query.order('created_at', desc=True).range(offset, offset + limit - 1)
         
-        result = query.execute()
+        result = data_query.execute()
         return result.data or [], total
-    
+
     # ============================================================================
-    # Message Search and Filtering
+    # Extended Operations (for messages/service.py)
     # ============================================================================
     
-    async def search_messages(
+    async def get_messages_paginated(
         self,
         user_id: str,
-        search_term: str,
-        message_type: Optional[str] = None,
-        limit: int = 20,
-        offset: int = 0
-    ) -> Tuple[List[Dict[str, Any]], int]:
-        """搜索用户的消息"""
-        filters = {
-            "recipient_id": user_id
-        }
-        if message_type:
-            filters["message_type"] = message_type
+        page: int = 1,
+        page_size: int = 20,
+        category: Optional[str] = None,
+        is_important: Optional[bool] = None,
+        is_admin: bool = False
+    ) -> Tuple[List[Dict[str, Any]], int, int]:
+        """
+        获取用户消息列表（分页）
         
-        search_fields = ['subject', 'content']
+        Args:
+            user_id: 用户ID
+            page: 页码
+            page_size: 每页数量
+            category: 分类过滤
+            is_important: 重要性过滤
+            is_admin: 是否是管理员（管理员查看所有直接消息）
         
-        return await self._fuzzy_search_with_filters(
-            'messages', search_fields, search_term, filters, limit, offset
-        )
+        Returns:
+            (messages, total_count, unread_count)
+        """
+        # 构建基础过滤条件
+        query = self.client.table('messages').select('*', count='exact')
+        
+        if is_admin:
+            # 管理员：查看发送给管理员的消息（1对1咨询）和管理员发送的消息
+            query = query.eq('message_type', 'direct')
+            query = query.or_(f'recipient_id.eq.{user_id},sender_id.eq.{user_id}')
+        else:
+            # 会员：只查看发送给自己的消息
+            query = query.eq('recipient_id', user_id)
+        
+        if category:
+            query = query.eq('category', category)
+        if is_important is not None:
+            query = query.eq('is_important', is_important)
+        
+        count_result = query.execute()
+        total_count = count_result.count or 0
+        
+        # 获取未读数
+        unread_query = self.client.table('messages').select('id', count='exact')
+        if is_admin:
+            # 管理员：统计发送给管理员的未读消息（主要是会员的咨询）
+            unread_query = unread_query.eq('message_type', 'direct').eq('is_read', False)
+            unread_query = unread_query.or_(f'recipient_id.eq.{user_id},sender_id.eq.{user_id}')
+        else:
+            unread_query = unread_query.eq('recipient_id', user_id).eq('is_read', False)
+        
+        if category:
+            unread_query = unread_query.eq('category', category)
+        if is_important is not None:
+            unread_query = unread_query.eq('is_important', is_important)
+        
+        unread_result = unread_query.execute()
+        unread_count = unread_result.count or 0
+        
+        # 获取分页数据
+        offset = (page - 1) * page_size
+        messages_query = self.client.table('messages').select('*')
+        
+        if is_admin:
+            messages_query = messages_query.eq('message_type', 'direct')
+            messages_query = messages_query.or_(f'recipient_id.eq.{user_id},sender_id.eq.{user_id}')
+        else:
+            messages_query = messages_query.eq('recipient_id', user_id)
+        
+        if category:
+            messages_query = messages_query.eq('category', category)
+        if is_important is not None:
+            messages_query = messages_query.eq('is_important', is_important)
+        
+        messages_query = messages_query.order('created_at', desc=True)
+        messages_query = messages_query.range(offset, offset + page_size - 1)
+        
+        result = messages_query.execute()
+        return result.data or [], total_count, unread_count
     
-    async def get_messages_by_category(
+    async def get_message_with_access_check(
         self,
-        user_id: str,
-        category: str,
-        limit: int = 20,
-        offset: int = 0
-    ) -> Tuple[List[Dict[str, Any]], int]:
-        """根据分类获取消息"""
-        filters = {
-            "recipient_id": user_id,
-            "category": category
-        }
+        message_id: str,
+        user_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """获取消息并检查访问权限"""
+        result = self.client.table('messages').select('*').eq('id', message_id).execute()
         
-        total = await self.count_records('messages', filters)
+        if not result.data:
+            return None
         
-        query = self.client.table('messages').select('*')
+        message = result.data[0]
         
-        for key, value in filters.items():
-            query = query.eq(key, value)
+        # 检查访问权限
+        if message.get('sender_id') != user_id and message.get('recipient_id') != user_id:
+            return None
         
-        query = query.order('created_at', desc=True)\
-                    .range(offset, offset + limit - 1)
-        
-        result = query.execute()
-        return result.data or [], total
+        return message
     
-    async def get_important_messages(
-        self,
-        user_id: str,
-        limit: int = 20,
-        offset: int = 0
-    ) -> Tuple[List[Dict[str, Any]], int]:
-        """获取重要消息"""
-        filters = {
-            "recipient_id": user_id,
-            "is_important": True
+    async def mark_as_read(self, message_id: str) -> Dict[str, Any]:
+        """标记消息为已读"""
+        update_data = {
+            'is_read': True,
+            'read_at': now_iso()
         }
+        result = self.client.table('messages').update(update_data).eq('id', message_id).execute()
+        return result.data[0] if result.data else {}
+    
+    async def soft_delete_message(self, message_id: str) -> bool:
+        """软删除消息"""
+        self.client.table('messages')\
+            .update({'deleted_at': now_iso()})\
+            .eq('id', message_id)\
+            .execute()
+        return True
+    
+    async def insert_message(self, message_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """插入消息"""
+        result = self.client.table('messages').insert(message_data).execute()
+        return result.data[0] if result.data else None
+    
+    async def insert_messages_batch(self, messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """批量插入消息"""
+        if not messages:
+            return []
+        result = self.client.table('messages').insert(messages).execute()
+        return result.data or []
+    
+    async def update_thread_status(self, thread_id: str, update_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """更新 thread 状态"""
+        result = self.client.table('messages')\
+            .update(update_data)\
+            .eq('id', thread_id)\
+            .eq('message_type', self.TYPE_THREAD)\
+            .execute()
+        return result.data[0] if result.data else None
+    
+    async def get_active_member_ids(self) -> List[str]:
+        """获取所有活跃会员ID"""
+        result = self.client.table('members').select('id').eq('status', 'active').execute()
+        return [m['id'] for m in (result.data or [])]
+    
+    async def get_analytics_data(self, start_date: Optional[str] = None) -> Dict[str, int]:
+        """获取分析数据"""
+        # 总消息数
+        total_query = self.client.table('messages').select('id', count='exact')
+        if start_date:
+            total_query = total_query.gte('created_at', start_date)
+        total_result = total_query.execute()
         
-        total = await self.count_records('messages', filters)
+        # 未读消息数
+        unread_query = self.client.table('messages').select('id', count='exact').eq('is_read', False)
+        if start_date:
+            unread_query = unread_query.gte('created_at', start_date)
+        unread_result = unread_query.execute()
         
-        query = self.client.table('messages').select('*')
-        
-        for key, value in filters.items():
-            query = query.eq(key, value)
-        
-        query = query.order('created_at', desc=True)\
-                    .range(offset, offset + limit - 1)
-        
-        result = query.execute()
-        return result.data or [], total
+        return {
+            'total_messages': total_result.count or 0,
+            'unread_messages': unread_result.count or 0
+        }
+
+
+# 单例实例
+message_db_service = MessageService()

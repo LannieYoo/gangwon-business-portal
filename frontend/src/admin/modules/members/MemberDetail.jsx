@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Badge, Loading } from '@shared/components';
+import { Card, Button, Badge, Loading, Alert } from '@shared/components';
 import { adminService } from '@shared/services';
 import { formatDate } from '@shared/utils/format';
 
@@ -19,7 +19,8 @@ export default function MemberDetail() {
   const [niceDnbData, setNiceDnbData] = useState(null);
   const [niceDnbLoading, setNiceDnbLoading] = useState(false);
   const [niceDnbError, setNiceDnbError] = useState(null);
-
+  const [message, setMessage] = useState(null);
+  const [messageVariant, setMessageVariant] = useState('success');
 
   useEffect(() => {
     loadMemberDetail();
@@ -36,13 +37,27 @@ export default function MemberDetail() {
 
   const handleApprove = async () => {
     await adminService.approveMember(id);
-    loadMemberDetail();
+    setMessageVariant('success');
+    setMessage(t('admin.members.approveSuccess', '批准成功') || '批准成功');
+    setTimeout(() => setMessage(null), 3000);
+    // Reload without showing loading spinner to keep message visible
+    const memberData = await adminService.getMemberDetail(id);
+    if (memberData) {
+      setMember(memberData);
+    }
   };
 
   const handleReject = async () => {
     const reason = prompt(t('admin.members.rejectReason', '请输入拒绝原因（可选）') || '请输入拒绝原因（可选）');
     await adminService.rejectMember(id, reason || null);
-    loadMemberDetail();
+    setMessageVariant('success');
+    setMessage(t('admin.members.rejectSuccess', '拒绝成功') || '拒绝成功');
+    setTimeout(() => setMessage(null), 3000);
+    // Reload without showing loading spinner to keep message visible
+    const memberData = await adminService.getMemberDetail(id);
+    if (memberData) {
+      setMember(memberData);
+    }
   };
 
   const handleSearchNiceDnb = async () => {
@@ -78,6 +93,11 @@ export default function MemberDetail() {
 
   return (
     <div className="w-full">
+      {message && (
+        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+          {message}
+        </Alert>
+      )}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <Button variant="outline" onClick={() => navigate('/admin/members')}>
           {t('common.back')}
@@ -129,6 +149,18 @@ export default function MemberDetail() {
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.phone')}</label>
             <span className="text-base text-gray-900">{member.phone || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.contactPersonName', '담당자명')}</label>
+            <span className="text-base text-gray-900">{member.contactPersonName || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.contactPersonDepartment', '담당자 부서')}</label>
+            <span className="text-base text-gray-900">{member.contactPersonDepartment || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.contactPersonPosition', '담당자 직책')}</label>
+            <span className="text-base text-gray-900">{member.contactPersonPosition || '-'}</span>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.email')}</label>

@@ -14,7 +14,7 @@
  */
 
 import React from 'react';
-import { frontendExceptionService } from '@shared/utils/exception.service.js';
+import { frontendExceptionService } from '@shared/exception';
 import { cn } from '@shared/utils/helpers';
 
 class ErrorBoundary extends React.Component {

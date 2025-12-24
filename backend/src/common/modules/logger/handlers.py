@@ -72,9 +72,8 @@ class DatabaseSystemLogHandler(logging.Handler):
         """Initialize database system log handler."""
         super().__init__(level)
         self._enabled = getattr(settings, "LOG_DB_ENABLED", True)
-        # System logs should not include DEBUG and INFO levels (too verbose)
-        # Use WARNING as minimum level for system logs
-        self._min_level = getattr(settings, "LOG_DB_SYSTEM_MIN_LEVEL", "WARNING")
+        # System logs: INFO and above (consistent with system.log file)
+        self._min_level = getattr(settings, "LOG_DB_SYSTEM_MIN_LEVEL", "INFO")
         
         # Log level priority (higher = more important)
         self.log_levels = {
@@ -103,28 +102,32 @@ class DatabaseSystemLogHandler(logging.Handler):
         try:
             from ..logger.db_writer import db_log_writer
             
-            # Extract information from log record
-            # Add extra data if available
-            extra_data = {}
-            if hasattr(record, "pathname"):
-                extra_data["pathname"] = record.pathname
-            if record.exc_info:
-                import traceback
-                extra_data["exc_info"] = traceback.format_exception(*record.exc_info)
-            if hasattr(record, "exc_text") and record.exc_text:
-                extra_data["exc_text"] = record.exc_text
+            # Extract module path - use pathname if available for full path
+            module_path = None
+            if hasattr(record, "pathname") and record.pathname:
+                module_path = record.pathname
+            elif hasattr(record, "module") and record.module:
+                module_path = record.module
+            
+            # Extract function name
+            func_name = None
+            if hasattr(record, "funcName") and record.funcName and record.funcName != "<module>":
+                func_name = record.funcName
+            
+            # Extract line number
+            line_num = None
+            if hasattr(record, "lineno") and record.lineno and record.lineno > 0:
+                line_num = record.lineno
             
             # Write to system_logs table using unified db_log_writer
+            # Use getMessage() for raw message, not format() which returns JSON
             db_log_writer.write_system_log(
                 level=record.levelname,
-                message=self.format(record),
+                message=record.getMessage(),
                 logger_name=record.name,
-                module=record.module if hasattr(record, "module") else None,
-                function=record.funcName if hasattr(record, "funcName") else None,
-                line_number=record.lineno if hasattr(record, "lineno") else None,
-                process_id=record.process if hasattr(record, "process") else None,
-                thread_name=record.threadName if hasattr(record, "threadName") else None,
-                extra_data=extra_data if extra_data else None,
+                module=module_path,
+                function=func_name,
+                line_number=line_num,
             )
             
         except Exception:

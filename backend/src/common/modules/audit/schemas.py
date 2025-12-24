@@ -19,9 +19,11 @@ class AuditLogResponse(BaseModel):
     resource_id: Optional[UUID] = None
     ip_address: Optional[str] = None
     user_agent: Optional[str] = None
+    trace_id: Optional[str] = None
+    request_id: Optional[str] = None
+    request_method: Optional[str] = None
+    request_path: Optional[str] = None
     created_at: datetime
-
-    # Related user info
     user_email: Optional[str] = None
     user_company_name: Optional[str] = None
 
@@ -32,14 +34,14 @@ class AuditLogResponse(BaseModel):
 class AuditLogListQuery(BaseModel):
     """Query parameters for listing audit logs."""
 
-    page: int = Field(default=1, ge=1, description="Page number")
-    page_size: int = Field(default=20, ge=1, le=100, description="Items per page")
-    user_id: Optional[UUID] = Field(default=None, description="Filter by user ID")
-    action: Optional[str] = Field(default=None, description="Filter by action type")
-    resource_type: Optional[str] = Field(default=None, description="Filter by resource type")
-    resource_id: Optional[UUID] = Field(default=None, description="Filter by resource ID")
-    start_date: Optional[datetime] = Field(default=None, description="Start date filter")
-    end_date: Optional[datetime] = Field(default=None, description="End date filter")
+    page: int = Field(default=1, ge=1)
+    page_size: int = Field(default=20, ge=1, le=100)
+    user_id: Optional[UUID] = None
+    action: Optional[str] = None
+    resource_type: Optional[str] = None
+    resource_id: Optional[UUID] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
 
 
 class AuditLogListResponse(BaseModel):
@@ -50,26 +52,3 @@ class AuditLogListResponse(BaseModel):
     page: int
     page_size: int
     total_pages: int
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -36,6 +36,8 @@ from .schemas import (
     PopupUpdate,
     PopupResponse,
     PopupListResponse,
+    LegalContentUpdate,
+    LegalContentResponse,
 )
 
 router = APIRouter()
@@ -774,3 +776,69 @@ async def save_dashboard_popup(
         enabled=enabled,
     )
 
+
+# ============================================================================
+# Legal Content Endpoints (Terms of Service, Privacy Policy)
+# ============================================================================
+
+# Public Legal Content Endpoints
+
+@router.get(
+    "/api/legal-content/{content_type}",
+    response_model=Optional[LegalContentResponse],
+    tags=["content"],
+    summary="Get legal content",
+)
+async def get_legal_content(
+    content_type: str,
+):
+    """
+    Get legal content by type.
+    
+    - **content_type**: 'terms_of_service' or 'privacy_policy'
+    """
+    from ...common.modules.exception import ValidationError
+    
+    if content_type not in ['terms_of_service', 'privacy_policy']:
+        raise ValidationError("Invalid content_type. Must be 'terms_of_service' or 'privacy_policy'")
+    
+    legal_content = await service.get_legal_content(content_type)
+    
+    if not legal_content:
+        return None
+    
+    return LegalContentResponse(**legal_content)
+
+
+# Admin Legal Content Endpoints
+
+@router.put(
+    "/api/admin/content/legal/{content_type}",
+    response_model=LegalContentResponse,
+    tags=["content", "admin"],
+    summary="Update legal content",
+)
+@audit_log(action="update", resource_type="legal_content")
+async def update_legal_content(
+    content_type: str,
+    data: LegalContentUpdate,
+    request: Request,
+    current_user = Depends(get_current_admin_user),
+):
+    """
+    Update legal content (admin only, upsert pattern).
+    
+    - **content_type**: 'terms_of_service' or 'privacy_policy'
+    """
+    from ...common.modules.exception import ValidationError
+    
+    if content_type not in ['terms_of_service', 'privacy_policy']:
+        raise ValidationError("Invalid content_type. Must be 'terms_of_service' or 'privacy_policy'")
+    
+    legal_content = await service.update_legal_content(
+        content_type=content_type,
+        content_html=data.content_html,
+        updated_by=current_user["id"]
+    )
+    
+    return LegalContentResponse(**legal_content)

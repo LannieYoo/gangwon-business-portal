@@ -41,9 +41,9 @@ async def get_current_user(
 
     try:
         if role == "admin":
-            user = await supabase_service.get_admin_by_id(user_id)
+            user = await supabase_service.get_by_id('admins', user_id)
         else:
-            user = await supabase_service.get_member_by_id(user_id)
+            user = await supabase_service.get_by_id('members', user_id)
         
         if user is None:
             raise AuthenticationError("User not found")
@@ -68,6 +68,43 @@ async def get_current_active_user(
             raise AuthenticationError("Inactive user")
     
     return current_user
+
+
+async def get_current_user_optional(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+) -> Optional[dict]:
+    """Get current user if authenticated, otherwise return None.
+    
+    This is useful for endpoints that work with or without authentication,
+    like logout which should succeed even if the token is expired.
+    """
+    if credentials is None:
+        return None
+
+    auth_service = AuthService()
+    token = credentials.credentials
+
+    try:
+        payload = auth_service.decode_token(token)
+        user_id: str = payload.get("sub")
+        role: str = payload.get("role", "member")
+        
+        if user_id is None:
+            return None
+            
+        if role == "admin":
+            user = await supabase_service.get_by_id('admins', user_id)
+        else:
+            user = await supabase_service.get_by_id('members', user_id)
+        
+        if user is None:
+            return None
+        
+        user["role"] = role
+        return user
+    except Exception:
+        # Token invalid or expired, return None instead of raising
+        return None
 
 
 class MemberCompat:
@@ -141,7 +178,7 @@ async def get_current_member_user(
         
         if role == "member" or role is None:
             try:
-                member = await supabase_service.get_member_by_id(user_id)
+                member = await supabase_service.get_by_id('members', user_id)
                 if member is None:
                     raise AuthenticationError("Member not found")
                 
@@ -181,7 +218,7 @@ async def get_current_admin_user(
         
         if role == "admin":
             try:
-                admin = await supabase_service.get_admin_by_id(user_id)
+                admin = await supabase_service.get_by_id('admins', user_id)
                 if admin is None:
                     raise AuthenticationError("Admin not found")
                 

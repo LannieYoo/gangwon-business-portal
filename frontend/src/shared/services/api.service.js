@@ -7,8 +7,8 @@ import {
 } from "@shared/utils/constants";
 import { getStorage, setStorage, removeStorage } from "@shared/utils/storage";
 import { createApiInterceptors } from "@shared/interceptors/api.interceptor";
-import { logger } from "@shared/utils/logger";
-import { exceptionHandler } from "@shared/utils/errorHandler";
+import { logger } from "@shared/logger";
+import { exceptionHandler } from "@shared/exception";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -109,7 +109,7 @@ apiClient.interceptors.response.use(
           currentPath === "/register" ||
           currentPath.startsWith("/login") ||
           currentPath.startsWith("/register");
-        if (!isPublicPage) window.location.href = "/login";
+        if (!isPublicPage) window.location.href = "/member/home";
         return Promise.reject(refreshError);
       }
 

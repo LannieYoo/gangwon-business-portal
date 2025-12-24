@@ -1,0 +1,307 @@
+{
+  "accounts": {
+    "admin": {
+      "username": "admin",
+      "email": "admin@k-talk.kr",
+      "password": "password123",
+      "full_name": "시스템 관리자",
+      "is_active": "true"
+    },
+    "member_1": {
+      "business_number": "1108801231",
+      "email": "test1@gangwon-tech.kr",
+      "password": "password123",
+      "company_name": "강원테크솔루션주식회사",
+      "profile": {
+        "industry": "IT/소프트웨어",
+        "revenue": 85000000,
+        "employee_count": 32,
+        "region": "강원",
+        "address": "강원특별자치도 춘천시 후석로 123",
+        "representative": "김민수",
+        "phone": "033-123-4567",
+        "website": "https://gangwon-tech.kr",
+        "contact_person_name": "박지영",
+        "contact_person_department": "기획팀",
+        "contact_person_position": "과장",
+        "main_business": "기업용 소프트웨어 개발 및 IT 컨설팅",
+        "description": "강원테크솔루션은 2015년 설립된 IT 전문 기업으로, 기업용 소프트웨어 개발 및 IT 컨설팅 서비스를 제공합니다."
+      }
+    },
+    "member_2": {
+      "business_number": "7788602046",
+      "email": "test2@chuncheon-bio.kr",
+      "password": "password123",
+      "company_name": "춘천바이오주식회사",
+      "profile": {
+        "industry": "의료/바이오",
+        "revenue": 120000000,
+        "employee_count": 45,
+        "region": "강원",
+        "address": "강원특별자치도 춘천시 동면 바이오밸리로 456",
+        "representative": "이준호",
+        "phone": "033-234-5678",
+        "website": "https://chuncheon-bio.kr",
+        "contact_person_name": "최은영",
+        "contact_person_department": "연구개발팀",
+        "contact_person_position": "팀장",
+        "main_business": "바이오 의약품 연구개발 및 제조",
+        "description": "춘천바이오는 바이오 의약품 분야의 선도 기업으로, 혁신적인 치료제 개발에 주력하고 있습니다."
+      }
+    }
+  },
+  "data_definitions": {
+    "industries": [
+      "IT/소프트웨어",
+      "제조업",
+      "건설업",
+      "유통/물류",
+      "서비스업",
+      "의료/바이오",
+      "농업/수산업",
+      "식음료",
+      "관광/숙박",
+      "에너지/환경",
+      "문화/예술",
+      "교육"
+    ],
+    "gangwon_regions": [
+      "춘천시", "원주시", "강릉시", "동해시", "태백시", "속초시", "삼척시",
+      "홍천군", "횡성군", "영월군", "평창군", "정선군", "철원군", "화천군",
+      "양구군", "인제군", "고성군", "양양군"
+    ],
+    "regions": ["강원"],
+    "member_statuses": ["pending", "active", "suspended"],
+    "approval_statuses": ["pending", "approved", "rejected"],
+    "performance_types": ["sales", "support", "ip"],
+    "performance_status_distribution": {
+      "approved": 0.50,
+      "submitted": 0.25,
+      "draft": 0.15,
+      "revision_requested": 0.07,
+      "rejected": 0.03
+    },
+    "project_status_distribution": {
+      "active": 0.60,
+      "inactive": 0.30,
+      "archived": 0.10
+    },
+    "application_status_distribution": {
+      "approved": 0.40,
+      "under_review": 0.30,
+      "submitted": 0.20,
+      "rejected": 0.10
+    },
+    "banner_types": ["main_primary", "main_secondary", "about", "projects", "performance", "support", "profile"],
+    "faq_categories": ["회원가입", "성과관리", "프로젝트", "기업프로필", "문의/지원", "기타"],
+    "message_types": ["direct", "thread", "broadcast"],
+    "message_categories": ["general", "notice", "inquiry", "performance"],
+    "legal_content_types": ["terms_of_service", "privacy_policy"]
+  },
+  "data_ranges": {
+    "performance": {
+      "sales": {
+        "revenue_min": 10000000,
+        "revenue_max": 200000000,
+        "employees_min": 5,
+        "employees_max": 150,
+        "new_contracts_min": 0,
+        "new_contracts_max": 30
+      },
+      "support": {
+        "support_amount_min": 1000000,
+        "support_amount_max": 100000000,
+        "programs_min": 1,
+        "programs_max": 5,
+        "beneficiaries_min": 1,
+        "beneficiaries_max": 50
+      },
+      "ip": {
+        "patents_min": 0,
+        "patents_max": 10,
+        "trademarks_min": 0,
+        "trademarks_max": 5,
+        "copyrights_min": 0,
+        "copyrights_max": 3
+      },
+      "year_range": 3,
+      "submitted_days_ago_max": 180,
+      "created_days_ago_max": 365,
+      "review_days_min": 1,
+      "review_days_max": 14
+    },
+    "project": {
+      "start_date_days_ago": 180,
+      "start_date_days_ahead": 180,
+      "duration_days_min": 60,
+      "duration_days_max": 365,
+      "created_days_ago_max": 90
+    },
+    "application": {
+      "submitted_days_ago_max": 60,
+      "review_days_min": 3,
+      "review_days_max": 14
+    },
+    "content": {
+      "created_days_ago_max": 120
+    },
+    "message": {
+      "created_days_ago_max": 60,
+      "read_days_ago_max": 14,
+      "is_read_probability": 0.6,
+      "is_important_probability": 0.15
+    }
+  },
+  "generation_counts": {
+    "admins": 1,
+    "members": 2,
+    "performance_records": 20,
+    "projects": 10,
+    "project_applications": 15,
+    "notices": 10,
+    "press_releases": 8,
+    "banners": 7,
+    "faqs": 15,
+    "messages": 20,
+    "attachments": 10,
+    "system_infos": 1,
+    "legal_content": 2
+  },
+  "korean_data": {
+    "person_names": [
+      "김민수", "이준호", "박성민", "최동현", "정우진", "강태현", "조현우", "윤상호",
+      "임재현", "한동욱", "오세훈", "신민철", "배준영", "송현수", "노태우", "홍길동",
+      "김민정", "이수진", "박지영", "최은영", "정미경", "강혜진", "조윤아", "윤서연"
+    ],
+    "notice_titles": [
+      "2024년 4분기 기업 지원사업 안내",
+      "2024년 성과 제출 마감 안내",
+      "시스템 정기 점검 안내 (12월)",
+      "강원도 중소기업 지원 프로그램 모집",
+      "2025년 신규 지원사업 사전 안내",
+      "기업 프로필 업데이트 요청",
+      "연말 휴무 안내",
+      "보안 업데이트 완료 안내",
+      "신규 기능 출시 안내",
+      "회원 서비스 이용약관 변경 안내"
+    ],
+    "press_release_titles": [
+      "강원도, 중소기업 디지털 전환 지원 확대",
+      "춘천시 바이오산업 클러스터 조성 본격화",
+      "강원 IT기업 해외 진출 성과 발표",
+      "2024년 강원도 기업 지원 실적 공개",
+      "강원 스타트업 투자 유치 역대 최고",
+      "평창 친환경 에너지 기업 육성 계획",
+      "원주 의료기기 산업 성장세 지속",
+      "강릉 관광산업 디지털화 추진"
+    ],
+    "faq_items": [
+      {
+        "category": "회원가입",
+        "question": "회원가입은 어떻게 하나요?",
+        "answer": "홈페이지 우측 상단의 '회원가입' 버튼을 클릭하여 사업자등록번호와 기업 정보를 입력하시면 됩니다. 가입 후 관리자 승인을 거쳐 서비스를 이용하실 수 있습니다."
+      },
+      {
+        "category": "회원가입",
+        "question": "사업자등록번호 인증이 실패합니다.",
+        "answer": "사업자등록번호는 '-' 없이 10자리 숫자로 입력해 주세요. 계속 문제가 발생하면 고객센터(033-123-4567)로 문의해 주세요."
+      },
+      {
+        "category": "성과관리",
+        "question": "성과 제출 기한은 언제인가요?",
+        "answer": "분기별 성과는 해당 분기 종료 후 15일 이내에 제출해야 합니다. 예: 1분기(1-3월) 성과는 4월 15일까지 제출."
+      },
+      {
+        "category": "성과관리",
+        "question": "제출한 성과를 수정할 수 있나요?",
+        "answer": "승인 전 상태의 성과는 수정이 가능합니다. 이미 승인된 성과는 관리자에게 문의하여 수정 요청을 해주세요."
+      },
+      {
+        "category": "프로젝트",
+        "question": "지원사업 신청 자격은 무엇인가요?",
+        "answer": "강원도 소재 중소기업으로서 회원 승인이 완료된 기업이 신청 가능합니다. 각 사업별 세부 자격 요건은 공고문을 확인해 주세요."
+      },
+      {
+        "category": "프로젝트",
+        "question": "신청 결과는 언제 확인할 수 있나요?",
+        "answer": "신청 마감 후 약 2주 이내에 결과가 발표됩니다. 결과는 마이페이지 > 신청 내역에서 확인하실 수 있습니다."
+      },
+      {
+        "category": "기업프로필",
+        "question": "기업 정보는 어떻게 수정하나요?",
+        "answer": "마이페이지 > 기업 프로필에서 정보를 수정할 수 있습니다. 사업자등록번호 변경은 고객센터로 문의해 주세요."
+      },
+      {
+        "category": "문의/지원",
+        "question": "고객센터 운영 시간은 언제인가요?",
+        "answer": "평일 09:00 ~ 18:00 (점심시간 12:00 ~ 13:00 제외). 주말 및 공휴일은 휴무입니다."
+      },
+      {
+        "category": "기타",
+        "question": "비밀번호를 잊어버렸습니다.",
+        "answer": "로그인 페이지에서 '비밀번호 찾기'를 클릭하여 등록된 이메일로 재설정 링크를 받으실 수 있습니다."
+      },
+      {
+        "category": "기타",
+        "question": "회원 탈퇴는 어떻게 하나요?",
+        "answer": "마이페이지 > 설정에서 회원 탈퇴를 신청하실 수 있습니다. 탈퇴 시 모든 데이터가 삭제되며 복구가 불가능합니다."
+      }
+    ],
+    "project_titles": [
+      "2024년 중소기업 디지털 전환 지원사업",
+      "강원도 스타트업 창업 지원 프로그램",
+      "제조업 스마트공장 구축 지원",
+      "수출기업 해외시장 진출 지원사업",
+      "청년창업 인큐베이팅 프로그램",
+      "여성기업 성장 지원사업",
+      "바이오·의료기기 R&D 지원",
+      "친환경 에너지 기업 육성 프로그램",
+      "관광산업 디지털화 지원사업",
+      "농식품 가공기업 지원 프로그램"
+    ],
+    "message_subjects": [
+      "회원가입 승인 완료 안내",
+      "2024년 4분기 성과 제출 안내",
+      "지원사업 신청 결과 안내",
+      "시스템 정기 점검 안내",
+      "기업 프로필 업데이트 요청",
+      "문의사항 답변 완료",
+      "중요 공지사항 안내",
+      "성과 승인 완료 안내",
+      "성과 보완 요청 안내",
+      "신규 지원사업 안내"
+    ],
+    "legal_content": {
+      "terms_of_service": "<h1>서비스 이용약관</h1>\n<h2>제1조 (목적)</h2>\n<p>이 약관은 강원 기업 포털(이하 \"서비스\")의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.</p>\n<h2>제2조 (정의)</h2>\n<p>1. \"회원\"이란 서비스에 가입하여 이용계약을 체결한 자를 말합니다.</p>\n<p>2. \"기업회원\"이란 사업자등록번호를 보유한 법인 또는 개인사업자를 말합니다.</p>\n<h2>제3조 (약관의 효력)</h2>\n<p>이 약관은 서비스 화면에 게시하거나 기타의 방법으로 회원에게 공지함으로써 효력이 발생합니다.</p>\n<h2>제4조 (회원가입)</h2>\n<p>1. 회원가입은 이용자가 약관의 내용에 동의하고 회원가입 신청을 한 후 관리자가 승인함으로써 체결됩니다.</p>\n<p>2. 회원가입 시 사업자등록번호 인증이 필요합니다.</p>\n<h2>제5조 (서비스의 제공)</h2>\n<p>서비스는 다음과 같은 업무를 수행합니다:</p>\n<ul>\n<li>기업 지원사업 정보 제공</li>\n<li>기업 성과 관리 서비스</li>\n<li>기업 프로필 관리</li>\n<li>1:1 문의 서비스</li>\n</ul>",
+      "privacy_policy": "<h1>개인정보처리방침</h1>\n<h2>제1조 (개인정보의 수집 및 이용목적)</h2>\n<p>강원 기업 포털은 다음의 목적을 위하여 개인정보를 처리합니다:</p>\n<ul>\n<li>회원 가입 및 관리</li>\n<li>서비스 제공 및 운영</li>\n<li>민원 처리 및 고객 상담</li>\n</ul>\n<h2>제2조 (수집하는 개인정보 항목)</h2>\n<p>필수항목: 사업자등록번호, 기업명, 이메일, 비밀번호, 대표자명, 연락처</p>\n<p>선택항목: 기업 주소, 홈페이지, 업종, 매출액, 직원수</p>\n<h2>제3조 (개인정보의 보유 및 이용기간)</h2>\n<p>회원 탈퇴 시까지 보유하며, 관련 법령에 따라 일정 기간 보관이 필요한 경우 해당 기간 동안 보관합니다.</p>\n<h2>제4조 (개인정보의 제3자 제공)</h2>\n<p>원칙적으로 이용자의 개인정보를 제3자에게 제공하지 않습니다. 다만, 법령의 규정에 의한 경우는 예외로 합니다.</p>\n<h2>제5조 (개인정보의 파기)</h2>\n<p>개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체없이 해당 개인정보를 파기합니다.</p>"
+    }
+  },
+  "gangwon_addresses": {
+    "춘천시": [
+      "강원특별자치도 춘천시 중앙로 123",
+      "강원특별자치도 춘천시 후석로 456",
+      "강원특별자치도 춘천시 공지로 789"
+    ],
+    "원주시": [
+      "강원특별자치도 원주시 시청로 234",
+      "강원특별자치도 원주시 원일로 567"
+    ],
+    "강릉시": [
+      "강원특별자치도 강릉시 경강로 345",
+      "강원특별자치도 강릉시 하슬라로 678"
+    ],
+    "속초시": [
+      "강원특별자치도 속초시 중앙로 456",
+      "강원특별자치도 속초시 설악산로 789"
+    ],
+    "동해시": [
+      "강원특별자치도 동해시 천곡로 567"
+    ],
+    "태백시": [
+      "강원특별자치도 태백시 황지로 678"
+    ],
+    "평창군": [
+      "강원특별자치도 평창군 평창읍 올림픽로 123"
+    ]
+  }
+}

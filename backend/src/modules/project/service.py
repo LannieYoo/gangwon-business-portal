@@ -21,7 +21,7 @@ from .schemas import (
 
 
 class ProjectService:
-    """Project service class."""
+    """Project service class - using supabase_service helper methods and direct client."""
 
     # Public/Member operations
 
@@ -77,7 +77,8 @@ class ProjectService:
         Raises:
             NotFoundError: If project not found
         """
-        project = await supabase_service.get_project_by_id(str(project_id))
+        # Use helper method
+        project = await supabase_service.get_by_id('projects', str(project_id))
 
         if not project:
             raise NotFoundError("Project")
@@ -114,24 +115,29 @@ class ProjectService:
                 "Only active projects accept applications."
             )
 
-        # Check for duplicate application
-        is_duplicate = await supabase_service.check_duplicate_application(
-            str(member_id), str(project_id)
-        )
-        if is_duplicate:
+        # Check for duplicate application - use direct client for complex query
+        existing_app = supabase_service.client.table('project_applications')\
+            .select('id')\
+            .eq('member_id', str(member_id))\
+            .eq('project_id', str(project_id))\
+            .is_('deleted_at', 'null')\
+            .limit(1)\
+            .execute()
+        
+        if existing_app.data:
             raise ValidationError(
                 "You have already applied to this project. "
                 "Duplicate applications are not allowed."
             )
 
-        # Create application
+        # Create application - use helper method
         application_data = {
             "member_id": str(member_id),
             "project_id": str(project_id),
             "application_reason": data.application_reason,
             "status": "submitted",
         }
-        return await supabase_service.create_project_application(application_data)
+        return await supabase_service.create_record('project_applications', application_data)
 
     async def get_my_applications(
         self, member_id: UUID, query: ApplicationListQuery
@@ -176,7 +182,8 @@ class ProjectService:
             "image_url": data.image_url,
             "status": data.status.value if data.status else "active",
         }
-        return await supabase_service.create_project(project_data)
+        # Use helper method
+        return await supabase_service.create_record('projects', project_data)
 
     async def update_project(
         self, project_id: UUID, data: ProjectUpdate
@@ -215,7 +222,8 @@ class ProjectService:
         if data.status is not None:
             update_data["status"] = data.status.value
 
-        return await supabase_service.update_project(str(project_id), update_data)
+        # Use helper method
+        return await supabase_service.update_record('projects', str(project_id), update_data)
 
     async def delete_project(
         self, project_id: UUID
@@ -230,7 +238,8 @@ class ProjectService:
             NotFoundError: If project not found
         """
         await self.get_project_by_id(project_id)  # Verify exists
-        await supabase_service.delete_project(str(project_id))
+        # Use helper method for soft delete
+        await supabase_service.delete_record('projects', str(project_id))
 
     async def list_project_applications(
         self, project_id: UUID, query: ApplicationListQuery
@@ -249,13 +258,38 @@ class ProjectService:
             NotFoundError: If project not found
         """
         # Verify project exists
-        await self.get_project_by_id(project_id)
+        project = await self.get_project_by_id(project_id)
 
         applications, total = await supabase_service.list_project_applications_with_filters(
+            project_id=str(project_id),
             sort_by="submitted_at",
             sort_order="desc",
         )
-        return applications, total
+        
+        # Flatten nested data for schema compatibility
+        flattened = []
+        for app in applications:
+            flat_app = {**app}
+            # Extract project_title from nested projects object
+            if 'projects' in flat_app and flat_app['projects']:
+                flat_app['project_title'] = flat_app['projects'].get('title', '')
+                del flat_app['projects']
+            else:
+                flat_app['project_title'] = project.get('title', '') if project else ''
+            # Extract company_name from nested members object
+            if 'members' in flat_app and flat_app['members']:
+                flat_app['company_name'] = flat_app['members'].get('company_name', '')
+                flat_app['business_number'] = flat_app['members'].get('business_number', '')
+                del flat_app['members']
+            else:
+                flat_app['company_name'] = ''
+                flat_app['business_number'] = ''
+            # Ensure application_reason has a default value
+            if not flat_app.get('application_reason'):
+                flat_app['application_reason'] = ''
+            flattened.append(flat_app)
+        
+        return flattened, total
 
     async def list_all_applications(
         self, query: ApplicationListQuery, project_id: Optional[UUID] = None
@@ -294,7 +328,8 @@ class ProjectService:
         Raises:
             NotFoundError: If application not found
         """
-        application = await supabase_service.get_project_application_by_id(str(application_id))
+        # Use helper method to get application
+        application = await supabase_service.get_by_id('project_applications', str(application_id))
 
         if not application:
             raise NotFoundError("Project application")
@@ -304,7 +339,8 @@ class ProjectService:
         if status in [ApplicationStatus.approved, ApplicationStatus.rejected]:
             update_data["reviewed_at"] = datetime.utcnow().isoformat()
 
-        return await supabase_service.update_project_application(str(application_id), update_data)
+        # Use helper method
+        return await supabase_service.update_record('project_applications', str(application_id), update_data)
 
     async def export_projects_data(
         self, query: ProjectListQuery
@@ -323,10 +359,16 @@ class ProjectService:
             search=query.search,
         )
 
-        # Get application counts for each project
+        # Get application counts for each project - use direct client for complex query
         export_data = []
         for project in projects:
-            app_count = await supabase_service.get_project_application_count(str(project["id"]))
+            # Get application count for this project
+            app_count_result = supabase_service.client.table('project_applications')\
+                .select('*', count='exact')\
+                .eq('project_id', str(project["id"]))\
+                .is_('deleted_at', 'null')\
+                .execute()
+            app_count = app_count_result.count or 0
 
             export_data.append({
                 "id": str(project["id"]),
@@ -366,9 +408,9 @@ class ProjectService:
         # Convert to dict format for export
         export_data = []
         for application in applications:
-            # Get project and member info
-            project = await supabase_service.get_project_by_id(str(application["project_id"]))
-            member = await supabase_service.get_member_by_id(str(application["member_id"]))
+            # Get project and member info - use helper methods
+            project = await supabase_service.get_by_id('projects', str(application["project_id"]))
+            member = await supabase_service.get_by_id('members', str(application["member_id"]))
 
             export_data.append({
                 "id": str(application["id"]),

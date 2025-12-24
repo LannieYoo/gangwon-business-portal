@@ -8,7 +8,8 @@
         "notices": "공지사항",
         "news": "뉴스 자료",
         "faq": "FAQ",
-        "systemInfo": "시스템 소개"
+        "systemInfo": "시스템 소개",
+        "legal": "이용약관/개인정보"
       },
       "banners": {
         "title": "배너 관리",
@@ -208,8 +209,22 @@
           "imageTooLarge": "이미지 크기는 5MB를 초과할 수 없습니다",
           "contentRequired": "상세 내용을 입력하세요"
         }
+      },
+      "legal": {
+        "title": "이용약관/개인정보처리방침 관리",
+        "description": "이용약관과 개인정보처리방침 내용을 관리합니다.",
+        "termsOfService": "이용약관",
+        "privacyPolicy": "개인정보 처리방침",
+        "contentPlaceholder": "내용을 입력하세요...",
+        "helpTitle": "안내",
+        "helpText": "여기서 입력한 내용은 회원가입 시 이용약관 및 개인정보처리방침 팝업에 표시됩니다.",
+        "noContent": "미리볼 내용이 없습니다",
+        "messages": {
+          "saved": "저장되었습니다",
+          "saveFailed": "저장에 실패했습니다",
+          "contentRequired": "내용을 입력해주세요"
+        }
       }
     }
   }
 }
-

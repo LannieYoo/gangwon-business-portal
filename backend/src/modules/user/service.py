@@ -87,109 +87,54 @@ class AuthService:
         Raises:
             ValidationError: If business number or email already exists
         """
-        # Check if business number already exists
+        # Check if business number already exists - use existing method
         existing_member = await supabase_service.get_member_by_business_number(data.business_number)
         if existing_member:
             raise ValidationError("Business number already registered")
 
-        # Check if email already exists
+        # Check if email already exists - use existing method
         existing_email = await supabase_service.get_member_by_email(data.email)
         if existing_email:
             raise ValidationError("Email already registered")
 
-        # Verify company information with Nice D&B API
-        # This helps ensure data accuracy and can auto-fill company information
-        nice_dnb_data = None
-        from ...common.modules.integrations.nice_dnb import nice_dnb_client
-        
-        # Search for company information using Nice D&B API
-        response = await nice_dnb_client.search_company(data.business_number)
-        
-        if response and response.success:
-            nice_dnb_data = response.data
-            
-            # Optionally verify company name matches (if provided)
-            # Note: Name mismatch is silently ignored - registration can still proceed
-            # The admin will review the registration during approval
-            if data.company_name and nice_dnb_data.company_name:
-                # Case-insensitive comparison
-                if nice_dnb_data.company_name.lower().strip() != data.company_name.lower().strip():
-                    # Name mismatch detected but don't block registration
-                    pass
-
-        # Create member record
-        # Use Nice D&B company name if available and more accurate
-        company_name = data.company_name
-        if nice_dnb_data and nice_dnb_data.company_name:
-            # Use Nice D&B company name as it's from official records
-            # This ensures consistency with official business registration
-            company_name = nice_dnb_data.company_name
-        
         member_id = str(uuid4())
+        
+        # Create member record with profile fields (merged schema)
         member_data = {
             "id": member_id,
             "business_number": data.business_number,
-            "company_name": company_name,
+            "company_name": data.company_name,
             "email": data.email,
             "password_hash": self.get_password_hash(data.password),
             "status": "pending",
             "approval_status": "pending",
-            "created_at": datetime.utcnow().isoformat(),
-            "updated_at": datetime.utcnow().isoformat(),
-        }
-        
-        member = await supabase_service.create_member(member_data)
-        if not member:
-            raise ValidationError("Failed to create member")
-
-        # Create member profile
-        # Use Nice D&B data to auto-fill fields if available and not provided by user
-        profile_industry = data.industry
-        profile_address = data.address
-        profile_founding_date = None
-        
-        if nice_dnb_data:
-            # Auto-fill industry if not provided by user
-            if not profile_industry and nice_dnb_data.industry:
-                profile_industry = nice_dnb_data.industry
-            
-            # Auto-fill address if not provided by user
-            if not profile_address and nice_dnb_data.address:
-                profile_address = nice_dnb_data.address
-            
-            # Auto-fill founding date if not provided by user
-            if not data.founding_date and nice_dnb_data.established_date:
-                profile_founding_date = nice_dnb_data.established_date
-            elif data.founding_date:
-                profile_founding_date = data.founding_date
-        elif data.founding_date:
-            profile_founding_date = data.founding_date
-        
-        profile_data = {
-            "id": str(uuid4()),
-            "member_id": member_id,
-            "industry": profile_industry,
+            # Profile fields (merged from member_profiles)
+            "industry": data.industry,
             "revenue": data.revenue,
             "employee_count": data.employee_count,
-            "founding_date": profile_founding_date.isoformat() if profile_founding_date else None,
+            "founding_date": data.founding_date.isoformat() if data.founding_date else None,
             "region": data.region,
-            "address": profile_address,
+            "address": data.address,
             "representative": data.representative,
             "website": data.website,
             "created_at": datetime.utcnow().isoformat(),
             "updated_at": datetime.utcnow().isoformat(),
         }
         
-        profile = await supabase_service.create_member_profile(profile_data)
-        if not profile:
-            raise ValidationError("Failed to create member profile")
+        # Use helper method
+        member = await supabase_service.create_record('members', member_data)
+        if not member:
+            raise ValidationError("Failed to create member")
 
-        # Send registration confirmation email
+        # Send registration confirmation email in background (non-blocking)
         from ...common.modules.email import email_service
-        await email_service.send_registration_confirmation_email(
-            to_email=member["email"],
-            company_name=member["company_name"],
-            business_number=member["business_number"],
+        from ...common.modules.email.background import send_email_background
+        send_email_background(
+            email_service.send_registration_confirmation_email(
+                to_email=member["email"],
+                company_name=member["company_name"],
+                business_number=member["business_number"],
+            )
         )
 
         return member
@@ -237,7 +182,8 @@ class AuthService:
         Raises:
             NotFoundError: If member not found
         """
-        member = await supabase_service.get_member_by_id(member_id)
+        # Use helper method
+        member = await supabase_service.get_by_id('members', member_id)
         if not member:
             raise NotFoundError("Member")
         return member
@@ -253,7 +199,8 @@ class AuthService:
             True if user is admin, False otherwise
         """
         try:
-            admin = await supabase_service.get_admin_by_id(user_id)
+            # Use helper method
+            admin = await supabase_service.get_by_id('admins', user_id)
             if admin and admin.get("is_active") == "true":
                 return True
         except (ValueError, TypeError):
@@ -276,7 +223,7 @@ class AuthService:
         Raises:
             UnauthorizedError: If credentials are invalid or user is not admin
         """
-        # Find admin by email
+        # Find admin by email - use existing method
         admin = await supabase_service.get_admin_by_email(email)
 
         if not admin or not self.verify_password(password, admin.get("password_hash", "")):
@@ -327,14 +274,14 @@ class AuthService:
         # Set token expiration to 1 hour from now
         token_expires = datetime.utcnow() + timedelta(hours=1)
 
-        # Update member record
+        # Update member record - use helper method
         update_data = {
             "reset_token": reset_token,
             "reset_token_expires": token_expires.isoformat(),
             "updated_at": datetime.utcnow().isoformat(),
         }
         
-        await supabase_service.update_member(member["id"], update_data)
+        await supabase_service.update_record('members', member["id"], update_data)
 
         return reset_token
 
@@ -373,7 +320,7 @@ class AuthService:
         except (ValueError, AttributeError):
             raise AuthorizationError("Reset token has expired")
 
-        # Update password and clear reset token
+        # Update password and clear reset token - use helper method
         update_data = {
             "password_hash": self.get_password_hash(new_password),
             "reset_token": None,
@@ -381,7 +328,7 @@ class AuthService:
             "updated_at": datetime.utcnow().isoformat(),
         }
         
-        updated_member = await supabase_service.update_member(member["id"], update_data)
+        updated_member = await supabase_service.update_record('members', member["id"], update_data)
         if not updated_member:
             raise ValidationError("Failed to update password")
 
@@ -409,13 +356,13 @@ class AuthService:
         if not self.verify_password(current_password, member.get("password_hash", "")):
             raise AuthorizationError("Current password is incorrect")
 
-        # Update password
+        # Update password - use helper method
         update_data = {
             "password_hash": self.get_password_hash(new_password),
             "updated_at": datetime.utcnow().isoformat(),
         }
         
-        updated_member = await supabase_service.update_member(member["id"], update_data)
+        updated_member = await supabase_service.update_record('members', member["id"], update_data)
         if not updated_member:
             raise ValidationError("Failed to update password")
 

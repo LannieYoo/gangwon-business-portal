@@ -171,3 +171,4 @@ export function ModalFooter({ children, className }) {
     </div>
   );
 }
+export default Modal;

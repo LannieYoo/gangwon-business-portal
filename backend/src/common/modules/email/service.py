@@ -4,7 +4,7 @@ Email service implementation built on top of SMTP + Jinja templates.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from email.message import EmailMessage
 from email.utils import formataddr
 from pathlib import Path
@@ -16,6 +16,9 @@ from jinja2 import Environment, FileSystemLoader, TemplateNotFound, select_autoe
 from ..config.settings import settings
 
 TEMPLATE_DIR = Path(__file__).parent / "templates"
+
+# 韩国时区 (UTC+9)
+KST = timezone(timedelta(hours=9))
 
 
 @dataclass(slots=True)
@@ -89,7 +92,7 @@ class EmailService:
             smtp = aiosmtplib.SMTP(
                 hostname=self._settings.EMAIL_SMTP_HOST,
                 port=self._settings.EMAIL_SMTP_PORT,
-                use_tls=bool(self._settings.EMAIL_SMTP_USE_TLS),
+                start_tls=True,  # 587端口使用STARTTLS
             )
             await smtp.connect()
             if self._settings.EMAIL_SMTP_USER:
@@ -100,11 +103,17 @@ class EmailService:
             await smtp.send_message(message)
             await smtp.quit()
             return True
-        except aiosmtplib.SMTPAuthenticationError:
+        except aiosmtplib.SMTPAuthenticationError as e:
+            import logging
+            logging.getLogger(__name__).error(f"SMTP Authentication failed: {e}")
             return False
-        except aiosmtplib.SMTPConnectError:
+        except aiosmtplib.SMTPConnectError as e:
+            import logging
+            logging.getLogger(__name__).error(f"SMTP Connection failed: {e}")
             return False
-        except Exception:  # pragma: no cover - covered via unit tests
+        except Exception as e:  # pragma: no cover - covered via unit tests
+            import logging
+            logging.getLogger(__name__).error(f"SMTP Error: {e}")
             return False
 
     async def send_registration_confirmation_email(
@@ -210,12 +219,13 @@ class EmailService:
             f"token={reset_token}&businessNumber={business_number}"
         )
         subject = "비밀번호 재설정 안내"
+        now_kst = datetime.now(KST)
         context = {
             "title": subject,
             "reset_url": reset_url,
             "business_number": business_number,
-            "request_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"),
-            "year": datetime.now(timezone.utc).year,
+            "request_time": now_kst.strftime("%Y-%m-%d %H:%M"),
+            "year": now_kst.year,
         }
         plain_text = (
             "아래 링크를 클릭하여 비밀번호를 재설정하세요.\n"
