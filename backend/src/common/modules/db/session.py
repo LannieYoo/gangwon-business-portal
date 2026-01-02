@@ -58,7 +58,7 @@ if database_url.startswith("postgresql://") or database_url.startswith("postgres
 # Each connection is created on demand and closed after use
 engine = create_async_engine(
     database_url,
-    echo=settings.DEBUG,  # Log SQL queries in debug mode
+    echo=False,  # Disable SQL query logging (use logging config instead)
     future=True,  # Use SQLAlchemy 2.0 style
     poolclass=NullPool,  # Disable connection pooling - direct connections only
     connect_args={

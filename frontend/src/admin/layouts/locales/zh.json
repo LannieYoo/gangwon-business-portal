@@ -20,7 +20,8 @@
       "messages": "通知中心",
       "settings": "系统设置",
       "reports": "统计报表",
-      "auditLogs": "审计日志"
+      "auditLogs": "审计日志",
+      "systemLogs": "系统监控"
     },
     "footer": {
       "copyright": "江原创业门户. 版权所有.",

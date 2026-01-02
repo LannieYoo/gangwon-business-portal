@@ -515,10 +515,6 @@ export function uninstallAuthInterceptor() {
     isInstalled = false;
     interceptedAuthServices.clear?.();
     
-    if (import.meta.env.DEV) {
-      console.log('[AuthInterceptor] Uninstalled successfully');
-    }
-    
     return true;
   } catch (error) {
     console.error('[AuthInterceptor] Failed to uninstall:', error);

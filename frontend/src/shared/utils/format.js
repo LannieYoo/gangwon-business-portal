@@ -5,6 +5,75 @@
 import { format, parseISO } from 'date-fns';
 import { ko, zhCN } from 'date-fns/locale';
 
+// =============================================================================
+// 时区转换函数
+// =============================================================================
+
+/**
+ * 格式化为韩国时间显示 (KST UTC+9)
+ * 用于：业务模块（项目、会员、实绩等）
+ * @param {Date|string} date - UTC 时间
+ * @param {string} formatStr - 格式字符串
+ * @returns {string} 格式化后的韩国时间
+ */
+export function formatKST(date, formatStr = 'yyyy-MM-dd HH:mm:ss') {
+  if (!date) return '';
+  const d = typeof date === 'string' ? new Date(date) : date;
+  
+  // 使用 toLocaleString 转换到韩国时区
+  const kstStr = d.toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' });
+  // sv-SE 格式: "2026-01-02 13:44:26"
+  
+  if (formatStr === 'yyyy-MM-dd') {
+    return kstStr.split(' ')[0];
+  }
+  if (formatStr === 'yyyy-MM-dd HH:mm') {
+    return kstStr.substring(0, 16);
+  }
+  return kstStr;
+}
+
+/**
+ * 格式化为渥太华时间显示 (EST UTC-5)
+ * 用于：系统日志模块（运维人员在渥太华）
+ * @param {Date|string} date - UTC 时间
+ * @returns {string} 格式化后的渥太华时间 (yyyy-MM-dd HH:mm:ss.SSS)
+ */
+export function formatEST(date) {
+  if (!date) return '';
+  const d = typeof date === 'string' ? new Date(date) : date;
+  
+  // 使用 toLocaleString 转换到渥太华时区
+  const estStr = d.toLocaleString('sv-SE', { timeZone: 'America/Toronto' });
+  // sv-SE 格式: "2026-01-02 13:44:26"
+  
+  // 添加毫秒
+  const ms = String(d.getUTCMilliseconds()).padStart(3, '0');
+  return `${estStr}.${ms}`;
+}
+
+/**
+ * 转换为韩国时间 Date 对象
+ */
+export function toKST(date) {
+  if (!date) return null;
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return new Date(d.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+}
+
+/**
+ * 转换为渥太华时间 Date 对象
+ */
+export function toEST(date) {
+  if (!date) return null;
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return new Date(d.toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+}
+
+// =============================================================================
+// 通用格式化函数
+// =============================================================================
+
 /**
  * Format business license number: 0000000000 -> 000-00-00000
  */

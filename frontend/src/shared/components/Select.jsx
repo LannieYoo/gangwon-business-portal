@@ -18,8 +18,8 @@ export const Select = forwardRef(function Select({
   ...props
 }, ref) {
   const { t } = useTranslation();
-  // 检查 options 的第一个选项是否已经是 value='' 的"全部"
-  const hasAllOption = options.length > 0 && options[0].value === '' && options[0].label === t('common.all', '全部');
+  // 检查 options 的第一个选项是否已经是 value='' 的选项（表示"全部"类型的默认选项）
+  const hasAllOption = options.length > 0 && options[0].value === '';
   const defaultPlaceholder = placeholder !== null ? (placeholder || (hasAllOption ? null : t('common.all', '全部'))) : null;
   const selectElement = (
     <>
@@ -58,7 +58,7 @@ export const Select = forwardRef(function Select({
   }
 
   return (
-    <div className="mb-4">
+    <div>
       {label && (
         <label className={cn(
           'block text-sm font-medium text-gray-700 mb-1.5',

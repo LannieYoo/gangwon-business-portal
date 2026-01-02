@@ -125,7 +125,7 @@ class DatabaseOperationLogger:
                 level=level,
                 message=message,
                 layer="Database",
-                module="backend/src/common/modules/interceptor/database.py",
+                module="src.common.modules.interceptor.database",
                 function="log_operation",
                 line_number=68,  # log_operation 方法定义行号
                 trace_id=context.get("trace_id"),

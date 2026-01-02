@@ -106,8 +106,7 @@ export default function NotificationBell({ userType = 'member', variant = 'light
     }
     
     loadUnreadCount();
-    intervalRef.current = setInterval(loadUnreadCount, 30000);
-    return () => clearInterval(intervalRef.current);
+    // 不再轮询，只在页面加载时获取一次
   }, [userType]);
 
   useEffect(() => {

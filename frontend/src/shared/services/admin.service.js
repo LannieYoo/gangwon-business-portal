@@ -537,14 +537,16 @@ class AdminService {
         logs: response.items.map((item) => ({
           id: item.id,
           userId: item.user_id,
-          action: item.action,
-          resourceType: item.resource_type,
-          resourceId: item.resource_id,
-          ipAddress: item.ip_address,
-          userAgent: item.user_agent,
+          action: item.action || item.extra_data?.action,
+          resourceType: item.resource_type || item.extra_data?.resource_type,
+          resourceId: item.resource_id || item.extra_data?.resource_id,
+          ipAddress: item.ip_address || item.extra_data?.ip_address,
+          userAgent: item.user_agent || item.extra_data?.user_agent,
           createdAt: item.created_at,
           userEmail: item.user_email,
           userCompanyName: item.user_company_name,
+          message: item.message,
+          extraData: item.extra_data,
         })),
         pagination: {
           total: response.total,
@@ -612,6 +614,29 @@ class AdminService {
     }
 
     return response;
+  }
+
+  /**
+   * Delete a single audit log by ID (Admin)
+   * 删除单条审计日志（管理员）
+   *
+   * @param {string} logId - Audit log ID (UUID)
+   * @returns {Promise<Object>} Delete result
+   */
+  async deleteAuditLog(logId) {
+    return await apiService.delete(`${API_PREFIX}/admin/audit-logs/${logId}`);
+  }
+
+  /**
+   * Delete audit logs by action type (Admin)
+   * 删除指定操作类型的审计日志（管理员）
+   *
+   * @param {string} action - Action type to match
+   * @returns {Promise<Object>} Delete result with count
+   */
+  async deleteAuditLogsByAction(action) {
+    const encodedAction = encodeURIComponent(action);
+    return await apiService.delete(`${API_PREFIX}/admin/audit-logs/by-action?action=${encodedAction}`);
   }
 
   /**

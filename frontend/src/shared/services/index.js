@@ -12,6 +12,7 @@ export { default as contentService } from './content.service';
 export { default as supportService } from './support.service';
 export { default as uploadService } from './upload.service';
 export { default as messagesService } from './messages.service';
+export { default as logsService } from './logs.service';
 // logger is now exported from @shared/logger
 export { logger, LOG_LAYERS } from '@shared/logger';
 // exceptionService is now exported from exception.service.js

@@ -47,7 +47,6 @@ export default function LegalContentManagement() {
       }
     } catch (error) {
       // 如果没有内容，保持空白
-      console.log('No content found for', contentType);
     }
     setLoading(false);
   };

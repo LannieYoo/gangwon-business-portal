@@ -11,7 +11,9 @@ from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 import csv
 
-from ..logger import logger
+from ..logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class ExportService:

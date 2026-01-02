@@ -102,12 +102,8 @@ class DatabaseSystemLogHandler(logging.Handler):
         try:
             from ..logger.db_writer import db_log_writer
             
-            # Extract module path - use pathname if available for full path
-            module_path = None
-            if hasattr(record, "pathname") and record.pathname:
-                module_path = record.pathname
-            elif hasattr(record, "module") and record.module:
-                module_path = record.module
+            # Extract module path - convert to relative path or use logger name
+            module_path = self._get_module_path(record)
             
             # Extract function name
             func_name = None
@@ -119,6 +115,25 @@ class DatabaseSystemLogHandler(logging.Handler):
             if hasattr(record, "lineno") and record.lineno and record.lineno > 0:
                 line_num = record.lineno
             
+            # Build extra_data (same as SystemLogFormatter)
+            extra_data = {
+                "server": "uvicorn",
+            }
+            
+            # Parse uvicorn startup messages for extra_data
+            msg = record.getMessage()
+            if "running on" in msg.lower() or "started" in msg.lower():
+                if "http://" in msg:
+                    try:
+                        url_part = msg.split("http://")[1].split()[0].rstrip("()")
+                        if ":" in url_part:
+                            host, port = url_part.rsplit(":", 1)
+                            extra_data["host"] = host
+                            extra_data["port"] = int(port)
+                    except (IndexError, ValueError):
+                        pass
+                extra_data["workers"] = 1
+            
             # Write to system_logs table using unified db_log_writer
             # Use getMessage() for raw message, not format() which returns JSON
             db_log_writer.write_system_log(
@@ -128,12 +143,39 @@ class DatabaseSystemLogHandler(logging.Handler):
                 module=module_path,
                 function=func_name,
                 line_number=line_num,
+                extra_data=extra_data,
             )
             
         except Exception:
             # Don't fail if database write fails (graceful degradation)
             # Don't log here to avoid infinite recursion
             pass
+    
+    def _get_module_path(self, record: logging.LogRecord) -> str:
+        """Get module path from record, converting to relative path format.
+        
+        优先使用 logger 名称（如 src.modules.member.router），
+        因为它反映了实际调用模块。
+        """
+        # 优先使用 logger 名称
+        if record.name and record.name != "root":
+            return record.name
+        
+        # Fallback: 从 pathname 提取相对路径
+        if hasattr(record, "pathname") and record.pathname:
+            pathname = record.pathname.replace("\\", "/")
+            # 查找 backend/src 或 src 开头的路径
+            if "/backend/src/" in pathname:
+                return pathname.split("/backend/src/")[-1].replace("/", ".").replace(".py", "")
+            elif "/src/" in pathname:
+                return pathname.split("/src/")[-1].replace("/", ".").replace(".py", "")
+            # 第三方包（site-packages）
+            if "site-packages/" in pathname:
+                parts = pathname.split("site-packages/")
+                if len(parts) > 1:
+                    return parts[1].replace("/", ".").replace(".py", "")
+        
+        return record.name or "unknown"
 
 
 

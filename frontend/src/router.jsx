@@ -379,6 +379,10 @@ const AdminReports = lazy(() =>
   import("@admin/modules/reports").then((m) => ({ default: m.default }))
 );
 
+const AdminSystemLogs = lazy(() =>
+  import("@admin/modules/system-logs/SystemLogsDashboard").then((m) => ({ default: m.default }))
+);
+
 // Lazy route wrapper - 使用最小化的 fallback 避免闪烁
 function LazyRoute({ children }) {
   return (
@@ -692,6 +696,14 @@ export const router = createBrowserRouter(
               element: (
                 <LazyRoute>
                   <AdminReports />
+                </LazyRoute>
+              ),
+            },
+            {
+              path: "system-logs",
+              element: (
+                <LazyRoute>
+                  <AdminSystemLogs />
                 </LazyRoute>
               ),
             },

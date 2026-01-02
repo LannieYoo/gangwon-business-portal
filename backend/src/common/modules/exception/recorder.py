@@ -6,6 +6,7 @@ storage systems (logs, database, files).
 """
 import traceback
 import inspect
+import re
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, Union
 from uuid import UUID, uuid4
@@ -14,6 +15,38 @@ from dataclasses import dataclass, asdict
 from ..logger import logging_service
 from ..logger.schemas import ErrorLogCreate
 from .exceptions import BaseCustomException
+
+
+def file_path_to_module(file_path: Optional[str]) -> str:
+    """
+    Convert file path to module path format.
+    
+    Examples:
+        /opt/render/project/src/backend/src/common/modules/exception/recorder.py
+        -> src.common.modules.exception.recorder
+        
+        backend/src/common/modules/interceptor/router.py
+        -> src.common.modules.interceptor.router
+    """
+    if not file_path:
+        return "unknown"
+    
+    # Remove .py extension
+    path = file_path.replace('.py', '')
+    
+    # Normalize path separators
+    path = path.replace('\\', '/')
+    
+    # Find 'src/' in path and extract from there
+    match = re.search(r'(?:^|/)src/(.+)$', path)
+    if match:
+        module_path = 'src.' + match.group(1).replace('/', '.')
+        return module_path
+    
+    # Fallback: just convert slashes to dots and take last parts
+    parts = path.split('/')
+    # Take last 4-5 parts as module path
+    return '.'.join(parts[-5:]) if len(parts) > 5 else '.'.join(parts)
 
 
 @dataclass
@@ -290,6 +323,9 @@ class ExceptionRecorder:
             request_path = record.context.get('request_path')
             ip_address = record.context.get('ip_address')
             
+            # Convert file path to module path format
+            module_path = file_path_to_module(record.file)
+            
             # INFO/WARNING 级别的业务异常记录到 app.log，不污染 error.log
             if record.level in ("INFO", "WARNING"):
                 from ..logger.schemas import AppLogCreate
@@ -298,7 +334,7 @@ class ExceptionRecorder:
                     level=record.level,
                     message=f"[{record.exception_type}] {record.message}",
                     layer=record.layer,
-                    module=record.file or "backend/src/common/modules/exception/recorder.py",
+                    module=module_path,
                     function=record.function,
                     line_number=record.line_number,
                     trace_id=str(record.trace_id) if record.trace_id else None,
@@ -323,7 +359,7 @@ class ExceptionRecorder:
                     status_code=record.http_status,
                     stack_trace=record.stack_trace,
                     layer=record.layer,
-                    module=record.file or "backend/src/common/modules/exception/recorder.py",
+                    module=module_path,
                     function=record.function,
                     line_number=record.line_number,
                     trace_id=str(record.trace_id) if record.trace_id else None,

@@ -96,3 +96,48 @@ async def get_audit_log(
         user_email=user_email,
         user_company_name=user_company_name,
     )
+
+
+@router.delete("/api/admin/audit-logs/by-action")
+async def delete_audit_logs_by_action(
+    action: str = Query(..., description="Action type to match"),
+    current_user: Member = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete audit logs matching a specific action (admin only).
+    """
+    from sqlalchemy import delete
+    from ..db.models import AuditLog
+    
+    stmt = delete(AuditLog).where(AuditLog.action == action)
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    return {
+        "status": "ok",
+        "deleted": result.rowcount,
+        "message": f"Deleted {result.rowcount} audit logs with action '{action}'"
+    }
+
+
+@router.delete("/api/admin/audit-logs/{log_id}")
+async def delete_audit_log(
+    log_id: UUID,
+    current_user: Member = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete a single audit log by ID (admin only).
+    """
+    from sqlalchemy import delete
+    from ..db.models import AuditLog
+    
+    stmt = delete(AuditLog).where(AuditLog.id == log_id)
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    if result.rowcount == 0:
+        raise NotFoundError("Audit log")
+    
+    return {"status": "ok", "deleted": 1}

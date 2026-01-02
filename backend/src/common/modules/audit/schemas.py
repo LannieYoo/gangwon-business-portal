@@ -3,32 +3,47 @@ Audit log schemas.
 
 Pydantic models for audit log API requests and responses.
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class AuditLogResponse(BaseModel):
-    """Audit log response schema."""
+    """Audit log response schema.
+    
+    按日志规范：
+    - 通用字段：source, level, message, layer, module, function, line_number
+    - 追踪字段：trace_id, user_id
+    - 扩展字段：extra_data
+    """
 
     id: UUID
-    user_id: Optional[UUID] = None
-    action: str
-    resource_type: Optional[str] = None
-    resource_id: Optional[UUID] = None
-    ip_address: Optional[str] = None
-    user_agent: Optional[str] = None
+    source: Optional[str] = None
+    level: Optional[str] = None
+    message: Optional[str] = None
+    layer: Optional[str] = None
+    module: Optional[str] = None
+    function: Optional[str] = None
+    line_number: Optional[int] = None
     trace_id: Optional[str] = None
-    request_id: Optional[str] = None
-    request_method: Optional[str] = None
-    request_path: Optional[str] = None
+    user_id: Optional[UUID] = None
+    extra_data: Optional[dict] = None
     created_at: datetime
-    user_email: Optional[str] = None
-    user_company_name: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    @field_validator("created_at", mode="before")
+    @classmethod
+    def ensure_timezone(cls, v):
+        """Ensure datetime has UTC timezone for proper frontend parsing."""
+        if v is None:
+            return v
+        if isinstance(v, datetime):
+            # If naive datetime, assume UTC
+            if v.tzinfo is None:
+                return v.replace(tzinfo=timezone.utc)
+        return v
+
+    model_config = {"from_attributes": True}
 
 
 class AuditLogListQuery(BaseModel):

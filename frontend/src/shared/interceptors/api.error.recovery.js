@@ -94,7 +94,6 @@ export class ApiErrorRecovery {
     } catch (recoveryError) {
       // 如果是401错误且是/api/auth/me请求，不抛出异常
       if (error?.response?.status === 401 && config?.url?.includes('/api/auth/me')) {
-        console.log('[ApiErrorRecovery] Auth validation failed, clearing auth state');
         return null;
       }
       throw recoveryError;

@@ -64,8 +64,17 @@ def extract_or_generate_request_id(request, trace_id):
 # Initialize logging on import
 setup_logging()
 
-# Create module logger
-logger = logging.getLogger(__name__)
+
+def get_logger(name: str = None) -> logging.Logger:
+    """Get a logger instance with the given name.
+    
+    Each module should call this with __name__ to get a properly named logger:
+        logger = get_logger(__name__)
+    
+    This ensures the module path is correctly recorded in system logs.
+    """
+    return logging.getLogger(name or __name__)
+
 
 # Create service instance
 logging_service = LoggingService()
@@ -78,7 +87,7 @@ def get_logging_router():
 
 
 __all__ = [
-    "logger",
+    "get_logger",
     "setup_logging",
     "JSONFormatter",
     "file_log_writer",

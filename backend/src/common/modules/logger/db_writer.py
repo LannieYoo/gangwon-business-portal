@@ -53,12 +53,16 @@ async def _async_insert(table_name: str, data: dict) -> Optional[dict]:
         return None
 
 
-from ...utils.formatters import now_kst
+from ...utils.formatters import now_utc
 
 
 def format_timestamp() -> str:
-    """Format timestamp in unified format: YYYY-MM-DD HH:MM:SS.mmm (KST)."""
-    return now_kst().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+    """Format timestamp in ISO format with timezone for database storage.
+    
+    Uses UTC time with timezone info to ensure consistent storage in PostgreSQL.
+    The database column is TIMESTAMP WITH TIME ZONE, so we need proper timezone info.
+    """
+    return now_utc().isoformat()
 
 
 class DatabaseLogWriter:
@@ -1123,6 +1127,7 @@ class DatabaseLogWriter:
         module: Optional[str] = None,
         function: Optional[str] = None,
         line_number: Optional[int] = None,
+        extra_data: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Write a system log entry to system_logs table (async, non-blocking).
         
@@ -1135,6 +1140,7 @@ class DatabaseLogWriter:
             module: Module name
             function: Function name
             line_number: Line number
+            extra_data: Additional system data (server, host, port, workers)
         """
         if not self._enabled:
             return
@@ -1154,6 +1160,7 @@ class DatabaseLogWriter:
                 module=module,
                 function=function,
                 line_number=line_number,
+                extra_data=extra_data,
             )
             
             # Get db dict and add created_at
@@ -1219,6 +1226,30 @@ class DatabaseLogWriter:
         
         try:
             from .schemas import AuditLogCreate
+            import inspect
+            
+            # Auto-detect caller info if not provided
+            if not module or not function:
+                frame = inspect.currentframe()
+                if frame:
+                    # Go up the call stack to find the actual caller (skip write_audit_log and create_audit_log_via_api)
+                    caller_frame = frame.f_back
+                    if caller_frame:
+                        caller_frame = caller_frame.f_back  # Skip one more level
+                    if caller_frame:
+                        if not module:
+                            # Get module path from filename
+                            filename = caller_frame.f_code.co_filename.replace("\\", "/")
+                            if "/backend/src/" in filename:
+                                module = filename.split("/backend/src/")[-1].replace("/", ".").replace(".py", "")
+                            elif "/src/" in filename:
+                                module = filename.split("/src/")[-1].replace("/", ".").replace(".py", "")
+                            else:
+                                module = caller_frame.f_code.co_filename
+                        if not function:
+                            function = caller_frame.f_code.co_name
+                        if not line_number:
+                            line_number = caller_frame.f_lineno
             
             # Use schema for data conversion
             audit_log = AuditLogCreate(

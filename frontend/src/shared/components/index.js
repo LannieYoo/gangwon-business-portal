@@ -34,3 +34,4 @@ export { default as ThreadDetailModal } from "./ThreadDetailModal";
 export { RichTextEditor } from "./RichTextEditor";
 export { default as Checkbox } from "./Checkbox";
 export { default as SearchInput } from "./SearchInput";
+export { default as ConfirmModal } from "./ConfirmModal";

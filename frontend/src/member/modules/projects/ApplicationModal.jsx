@@ -109,7 +109,6 @@ export default function ApplicationModal({
       onClose();
     } catch (err) {
       // api.service.js 已经处理了错误码映射，返回 i18nKey
-      console.log('API Error:', err); // 调试用
       const i18nKey = err?.i18nKey;
       
       // 优先使用 i18n key，否则使用后端返回的 message

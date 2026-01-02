@@ -10,12 +10,17 @@ from typing import Optional, Any, Union
 from uuid import UUID, uuid4
 from pydantic import BaseModel, Field, field_validator
 
-from ...utils.formatters import now_kst
+from ...utils.formatters import now_utc, now_est
 
 
-def format_timestamp() -> str:
-    """Format timestamp in unified format: YYYY-MM-DD HH:MM:SS.mmm (KST)."""
-    return now_kst().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+def format_timestamp_db() -> str:
+    """Format timestamp in ISO format with UTC timezone for database storage."""
+    return now_utc().isoformat()
+
+
+def format_timestamp_file() -> str:
+    """Format timestamp in Ottawa time (EST) for file logging."""
+    return now_est().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
 
 # =============================================================================
@@ -134,7 +139,7 @@ class AppLogCreate(BaseModel):
         
         result = {
             # 通用字段（使用前端 timestamp 或后端生成）
-            "timestamp": self.timestamp if self.timestamp else format_timestamp(),
+            "timestamp": self.timestamp if self.timestamp else format_timestamp_file(),
             "source": self.source,
             "level": self.level,
             "message": self.message,
@@ -288,7 +293,7 @@ class ErrorLogCreate(BaseModel):
             error_extra_data.update(self.error_details)
         
         result: dict[str, Any] = {
-            "timestamp": format_timestamp(),
+            "timestamp": format_timestamp_file(),
             "source": self.source,
             "level": self.level,
             "message": self._generate_message(),
@@ -421,7 +426,7 @@ class PerformanceLogCreate(BaseModel):
             perf_extra_data.update(self.extra_data)
         
         result: dict[str, Any] = {
-            "timestamp": format_timestamp(),
+            "timestamp": format_timestamp_file(),
             "source": self.source,
             "level": self.level,
             "message": self._generate_message(),
@@ -483,9 +488,10 @@ class SystemLogCreate(BaseModel):
 
     def to_db_dict(self) -> dict:
         """Convert to dictionary for database insertion (new schema)."""
-        # Build extra_data
+        # Build extra_data - merge provided extra_data with logger_name
         extra = dict(self.extra_data) if self.extra_data else {}
-        if self.logger_name:
+        if self.logger_name and self.logger_name != self.module:
+            # Only add logger_name if different from module
             extra["logger_name"] = self.logger_name
         
         data = {
@@ -521,7 +527,7 @@ class SystemLogCreate(BaseModel):
         - extra_data: server, host, port, workers (System 层独有)
         """
         result: dict[str, Any] = {
-            "timestamp": format_timestamp(),
+            "timestamp": format_timestamp_file(),
             "source": self.source,
             "level": self.level,
             "message": self.message,
@@ -652,7 +658,7 @@ class AuditLogCreate(BaseModel):
             audit_extra_data["resource_id"] = str(self.resource_id)
         
         result: dict[str, Any] = {
-            "timestamp": format_timestamp(),
+            "timestamp": format_timestamp_file(),
             "source": self.source,
             "level": self.level,
             "message": self._generate_message(),
@@ -706,17 +712,30 @@ class AppLogResponse(BaseModel):
     user_email: Optional[str] = None
     user_company_name: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    @field_validator("created_at", mode="before")
+    @classmethod
+    def ensure_timezone(cls, v):
+        """Ensure datetime has UTC timezone for proper frontend parsing."""
+        from datetime import timezone as tz
+        if v is None:
+            return v
+        if isinstance(v, datetime):
+            # If naive datetime, assume UTC
+            if v.tzinfo is None:
+                return v.replace(tzinfo=tz.utc)
+        return v
+
+    model_config = {"from_attributes": True}
 
 
 class LogListQuery(BaseModel):
     """Query parameters for listing application logs."""
 
     page: int = Field(default=1, ge=1)
-    page_size: int = Field(default=20, ge=1, le=100)
+    page_size: int = Field(default=20, ge=1, le=500)
     source: Optional[str] = None
-    level: Optional[str] = None
+    level: Optional[str] = None  # 支持逗号分隔的多级别，如 "ERROR,CRITICAL"
+    layer: Optional[str] = None
     trace_id: Optional[str] = None
     user_id: Optional[UUID] = None
     start_date: Optional[datetime] = None

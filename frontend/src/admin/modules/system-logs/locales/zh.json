@@ -1,0 +1,237 @@
+{
+  "admin": {
+    "systemLogs": {
+      "title": "系统监控",
+      "subtitle": "实时监控系统运行状态，快速定位问题",
+      "tabs": {
+        "overview": "概览",
+        "logs": "应用日志",
+        "exceptions": "异常",
+        "performance": "性能",
+        "audit": "审计",
+        "system": "系统",
+        "database": "数据库",
+        "server": "服务器"
+      },
+      "autoRefresh": "自动刷新",
+      "refresh": "刷新",
+      "actions": {
+        "copy": "复制",
+        "copied": "已复制",
+        "delete": "删除",
+        "clean": "清理",
+        "copyLatest5": "复制最新5条",
+        "deleteLog": "删除日志",
+        "cleanLog": "清理日志",
+        "confirmDelete": "确定要删除这条日志吗？",
+        "confirmCleanLogs": "确定要清理所有包含 \"{{message}}\" 的日志吗？",
+        "confirmCleanAudit": "确定要清理所有 \"{{action}}\" 操作的日志吗？",
+        "clearAllLogs": "清理所有日志",
+        "confirmClearAll": "确定要清理所有日志吗？此操作不可恢复！将删除：应用日志、异常日志、性能日志、系统日志、审计日志。",
+        "clearAllSuccess": "已清理 {{count}} 条日志",
+        "operationFailed": "操作失败",
+        "unknownError": "未知错误"
+      },
+      "stats": {
+        "todayErrors": "今日错误",
+        "slowRequests": "慢请求",
+        "securityAlerts": "安全告警",
+        "todayRequests": "今日请求",
+        "avgResponse": "平均响应",
+        "yesterday": "昨天"
+      },
+      "overview": {
+        "serverStatus": "服务状态",
+        "databaseStatus": "数据库状态",
+        "dbResponse": "DB响应",
+        "noData": "暂无数据"
+      },
+      "issues": {
+        "recentErrors": "最近异常",
+        "slowRequests": "慢请求",
+        "securityAlerts": "安全告警",
+        "viewAll": "查看全部",
+        "noIssues": "暂无问题"
+      },
+      "health": {
+        "title": "系统健康状态",
+        "api": "API 服务",
+        "database": "数据库",
+        "cache": "缓存",
+        "storage": "存储",
+        "healthy": "正常",
+        "degraded": "降级",
+        "unhealthy": "异常",
+        "lastCheck": "最后检查"
+      },
+      "database": {
+        "title": "数据库指标",
+        "responseTime": "响应时间",
+        "size": "数据库大小",
+        "connections": "连接数",
+        "activeTotal": "活跃/总数",
+        "tables": "表数量"
+      },
+      "render": {
+        "title": "Render 部署状态",
+        "backend": "后端服务",
+        "frontend": "前端服务",
+        "responseTime": "响应时间"
+      },
+      "serverMonitor": {
+        "overallStatus": "总体状态",
+        "resources": "系统资源",
+        "cpu": "CPU",
+        "memory": "内存",
+        "disk": "磁盘",
+        "serviceDetails": "服务详情",
+        "serviceName": "服务名称",
+        "status": "状态",
+        "responseTime": "响应时间",
+        "uptime": "运行时间",
+        "noData": "暂无服务器监控数据",
+        "noDataHint": "请检查后端服务是否正常运行"
+      },
+      "databaseMonitor": {
+        "details": "详细信息",
+        "connectionPool": "连接池状态",
+        "activeConnections": "活跃连接",
+        "idleConnections": "空闲连接",
+        "totalConnections": "总连接数",
+        "maxConnections": "最大连接数",
+        "performance": "性能指标",
+        "queryCount": "查询次数",
+        "slowQueries": "慢查询",
+        "cacheHitRate": "缓存命中率",
+        "tableInfo": "表信息",
+        "tableName": "表名",
+        "rowCount": "行数",
+        "tableSize": "大小",
+        "noData": "暂无数据库监控数据",
+        "noDataHint": "请检查后端服务是否正常运行"
+      },
+      "systemLog": {
+        "searchPlaceholder": "搜索消息、模块...",
+        "noLogs": "暂无系统日志",
+        "fullMessage": "完整消息",
+        "loggerName": "日志器"
+      },
+      "quickAccess": {
+        "logs": "应用日志",
+        "logsDesc": "系统运行日志",
+        "exceptions": "异常日志",
+        "exceptionsDesc": "错误和异常",
+        "performance": "性能日志",
+        "performanceDesc": "响应时间分析",
+        "audit": "审计日志",
+        "auditDesc": "用户操作记录"
+      },
+      "filters": {
+        "allLevels": "全部级别",
+        "allLayers": "全部层级",
+        "allSources": "全部来源",
+        "allActions": "全部操作",
+        "allResources": "全部资源",
+        "allRequests": "全部请求",
+        "allDurations": "全部耗时",
+        "traceId": "Trace ID",
+        "search": "搜索...",
+        "searchPerformance": "搜索组件、路径...",
+        "searchAudit": "搜索用户、操作、资源...",
+        "searchBtn": "搜索",
+        "clearFilters": "清除筛选",
+        "startDate": "开始时间",
+        "endDate": "结束时间",
+        "searchException": "搜索异常信息...",
+        "threshold100": "> 100ms",
+        "threshold500": "> 500ms (慢)",
+        "threshold1000": "> 1s (很慢)",
+        "threshold3000": "> 3s (超时风险)"
+      },
+      "exception": {
+        "allTypes": "全部类型",
+        "noExceptions": "🎉 暂无异常记录",
+        "stackTrace": "Stack Trace",
+        "extraData": "额外数据"
+      },
+      "performance": {
+        "avgDuration": "平均响应",
+        "maxDuration": "最大响应",
+        "slowCount": "慢请求 (>500ms)",
+        "totalCount": "总记录",
+        "threshold": "阈值",
+        "noLogs": "暂无性能日志",
+        "detailData": "详细数据",
+        "webVitals": "Web Vitals"
+      },
+      "audit": {
+        "noLogs": "暂无审计日志",
+        "actionLogin": "登录",
+        "actionLogout": "登出",
+        "actionCreate": "创建",
+        "actionUpdate": "更新",
+        "actionDelete": "删除",
+        "actionApprove": "批准",
+        "actionReject": "拒绝",
+        "actionUpload": "上传",
+        "actionDownload": "下载",
+        "resourceMember": "会员",
+        "resourcePerformance": "绩效",
+        "resourceProject": "项目",
+        "resourceContent": "内容",
+        "resourceSupport": "支持",
+        "resourceUser": "用户",
+        "logId": "日志ID",
+        "userId": "用户ID",
+        "userEmail": "用户邮箱",
+        "companyName": "企业名称",
+        "userAgent": "User-Agent"
+      },
+      "table": {
+        "timestamp": "时间",
+        "level": "级别",
+        "layer": "层级",
+        "module": "模块",
+        "filename": "文件",
+        "function": "函数",
+        "lineNumber": "行号",
+        "message": "消息",
+        "source": "来源",
+        "user": "用户",
+        "action": "操作",
+        "resourceType": "资源类型",
+        "resourceId": "资源ID",
+        "ipAddress": "IP地址",
+        "duration": "耗时",
+        "type": "类型",
+        "target": "目标",
+        "location": "位置",
+        "noLogs": "暂无日志",
+        "errorMessage": "错误信息",
+        "extraData": "额外数据",
+        "time": "时间"
+      },
+      "pagination": {
+        "info": "共 {{total}} 条记录，第 {{page}}/{{totalPages}} 页",
+        "prev": "上一页",
+        "next": "下一页"
+      },
+      "detail": {
+        "traceId": "Trace ID",
+        "requestId": "Request ID",
+        "userId": "User ID",
+        "duration": "Duration",
+        "module": "Module",
+        "function": "Function",
+        "line": "Line",
+        "source": "Source",
+        "extraData": "Extra Data"
+      },
+      "time": {
+        "justNow": "刚刚",
+        "minutesAgo": "{{count}}分钟前",
+        "hoursAgo": "{{count}}小时前"
+      }
+    }
+  }
+}

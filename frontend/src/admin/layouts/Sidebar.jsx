@@ -16,7 +16,8 @@ import {
   AuditLogIcon,
   EnvelopeIcon,
   ChevronDownIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  ServerIcon
 } from '@shared/components';
 
 export default function Sidebar({ collapsed, mobileOpen = false, onClose }) {
@@ -67,6 +68,12 @@ export default function Sidebar({ collapsed, mobileOpen = false, onClose }) {
       path: '/admin/reports',
       icon: ReportIcon,
       label: t('admin.menu.reports')
+    },
+    {
+      key: 'system-logs',
+      path: '/admin/system-logs',
+      icon: ServerIcon,
+      label: t('admin.menu.systemLogs')
     },
 
   ];

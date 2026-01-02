@@ -54,7 +54,7 @@ def should_log(log_level: str, min_level: str) -> bool:
 
 # Import database models for consistent formatting
 from ..db.models import AppLog, ErrorLog, SystemLog, AuditLog, PerformanceLog
-from ...utils.formatters import now_kst
+from ...utils.formatters import now_local
 from .formatter import create_unified_log_entry
 
 if TYPE_CHECKING:
@@ -315,8 +315,8 @@ class FileLogWriter:
                     logging.warning(f"Failed to delete old log file {old_file}: {e}")
 
     def _format_timestamp(self) -> str:
-        """Format timestamp in unified format: YYYY-MM-DD HH:MM:SS.mmm (KST)."""
-        return now_kst().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        """Format timestamp in unified format: YYYY-MM-DD HH:MM:SS.mmm (Ottawa EST)."""
+        return now_local().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
     def _create_log_dict_from_model(
         self,

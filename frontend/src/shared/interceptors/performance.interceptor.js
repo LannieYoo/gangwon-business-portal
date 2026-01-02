@@ -362,10 +362,6 @@ export function uninstallPerformanceInterceptor() {
     
     isInstalled = false;
     
-    if (import.meta.env.DEV) {
-      console.log('[PerformanceInterceptor] Uninstalled successfully');
-    }
-    
     return true;
   } catch (error) {
     console.error('[PerformanceInterceptor] Failed to uninstall:', error);

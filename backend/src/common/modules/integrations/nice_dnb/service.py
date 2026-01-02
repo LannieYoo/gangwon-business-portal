@@ -13,7 +13,9 @@ from typing import Optional, Dict, Any
 from datetime import datetime, timedelta
 
 from ...config.settings import settings
-from ...logger import logger
+from ...logger import get_logger
+
+logger = get_logger(__name__)
 from .schemas import NiceDnBResponse, NiceDnBCompanyData, NiceDnBFinancialData
 
 

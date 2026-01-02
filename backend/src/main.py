@@ -98,6 +98,7 @@ from .modules.messages.router import router as messages_router
 from .common.modules.audit.router import router as audit_router
 from .common.modules.exception.router import router as exception_router
 from .common.modules.logger import get_logging_router
+from .common.modules.health import router as health_router
 
 app.include_router(auth_router)
 app.include_router(member_router)
@@ -111,6 +112,7 @@ app.include_router(messages_router)
 app.include_router(audit_router)
 app.include_router(exception_router)
 app.include_router(get_logging_router())
+app.include_router(health_router)
 
 
 # Health check endpoints
@@ -182,8 +184,7 @@ if __name__ == "__main__":
         "src.main:app",
         host="0.0.0.0",
         port=port,
-        # reload=settings.DEBUG,  # 注释掉热部署，避免测试时服务器重启导致连接断开
-        reload=False,
+        reload=settings.DEBUG,  # 开发环境启用热部署
         # 禁用 uvicorn 默认日志配置，使用我们自己的配置
         log_config=None,
     )

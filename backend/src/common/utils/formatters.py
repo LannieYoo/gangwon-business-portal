@@ -3,44 +3,55 @@ Data formatting utilities.
 
 Common functions for formatting dates, times, status values, and other data
 for display purposes across all modules.
+
+时区说明:
+- UTC: 数据库存储统一使用 UTC
+- KST (UTC+9): 韩国时间，业务模块显示用
+- EST (UTC-5): 渥太华时间，系统日志/运维用
 """
 from datetime import datetime, date, timezone, timedelta
 from typing import Union, Optional
 
-# 韩国时区 (UTC+9)
-KST = timezone(timedelta(hours=9))
 
+# =============================================================================
+# 时区常量
+# =============================================================================
+
+KST = timezone(timedelta(hours=9))   # 韩国时间 UTC+9
+EST = timezone(timedelta(hours=-5))  # 渥太华时间 UTC-5 (EST)
+
+
+# =============================================================================
+# 时区获取函数
+# =============================================================================
 
 def now_utc() -> datetime:
-    """Get current UTC datetime."""
+    """获取当前 UTC 时间（数据库存储用）"""
     return datetime.now(timezone.utc)
 
 
 def now_kst() -> datetime:
-    """Get current Korea Standard Time datetime."""
+    """获取当前韩国时间 KST（业务模块用）"""
     return datetime.now(KST)
 
 
-def now_iso() -> str:
-    """
-    Get current UTC datetime as ISO format string.
-    Used for database storage.
-    
-    Returns:
-        ISO format datetime string (UTC)
-    """
-    return datetime.now(timezone.utc).isoformat()
+def now_est() -> datetime:
+    """获取当前渥太华时间 EST（系统日志/运维用）"""
+    return datetime.now(EST)
 
+
+# 别名，保持向后兼容
+now_local = now_est
+
+
+# =============================================================================
+# 时区转换函数
+# =============================================================================
 
 def utc_to_kst(dt: Union[str, datetime]) -> datetime:
     """
-    Convert UTC datetime to Korea Standard Time.
-    
-    Args:
-        dt: UTC datetime string or datetime object
-        
-    Returns:
-        KST datetime object
+    UTC 转韩国时间 (KST UTC+9)
+    用于：业务模块显示
     """
     if isinstance(dt, str):
         dt = parse_datetime(dt)
@@ -49,20 +60,78 @@ def utc_to_kst(dt: Union[str, datetime]) -> datetime:
     return dt.astimezone(KST)
 
 
-def format_kst_display(dt: Union[str, datetime, None]) -> str:
+def utc_to_est(dt: Union[str, datetime]) -> datetime:
     """
-    Format datetime for display in Korean timezone.
+    UTC 转渥太华时间 (EST UTC-5)
+    用于：系统日志模块显示
+    """
+    if isinstance(dt, str):
+        dt = parse_datetime(dt)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(EST)
+
+
+# =============================================================================
+# 时间格式化函数
+# =============================================================================
+
+def format_utc_iso(dt: datetime = None) -> str:
+    """
+    格式化为 UTC ISO 格式（数据库存储用）
+    返回: 2026-01-02T18:30:00+00:00
+    """
+    if dt is None:
+        dt = now_utc()
+    return dt.isoformat()
+
+
+def format_kst(dt: Union[str, datetime, None], fmt: str = "%Y-%m-%d %H:%M:%S") -> str:
+    """
+    格式化为韩国时间显示（业务模块用）
     
     Args:
-        dt: UTC datetime string, datetime object, or None
-        
-    Returns:
-        Formatted datetime string in KST (YYYY-MM-DD HH:MM)
+        dt: UTC 时间
+        fmt: 格式字符串，默认 YYYY-MM-DD HH:MM:SS
     """
     if dt is None:
         return ""
     kst_dt = utc_to_kst(dt)
-    return kst_dt.strftime('%Y-%m-%d %H:%M')
+    return kst_dt.strftime(fmt)
+
+
+def format_est(dt: Union[str, datetime, None], fmt: str = "%Y-%m-%d %H:%M:%S.") -> str:
+    """
+    格式化为渥太华时间显示（系统日志/运维用）
+    
+    Args:
+        dt: UTC 时间
+        fmt: 格式字符串，默认带毫秒
+    返回: 2026-01-02 13:30:00.123
+    """
+    if dt is None:
+        return ""
+    est_dt = utc_to_est(dt)
+    if fmt.endswith('.'):
+        # 带毫秒
+        return est_dt.strftime(fmt[:-1]) + f".{est_dt.microsecond // 1000:03d}"
+    return est_dt.strftime(fmt)
+
+
+# 别名，保持向后兼容
+def format_kst_display(dt: Union[str, datetime, None]) -> str:
+    """格式化为韩国时间显示 (YYYY-MM-DD HH:MM)"""
+    return format_kst(dt, "%Y-%m-%d %H:%M")
+
+
+def now_iso() -> str:
+    """获取当前 UTC 时间的 ISO 格式字符串（数据库存储用）"""
+    return format_utc_iso()
+
+
+# =============================================================================
+# 通用解析函数
+# =============================================================================
 
 
 def parse_datetime(dt_input: Union[str, datetime]) -> datetime:

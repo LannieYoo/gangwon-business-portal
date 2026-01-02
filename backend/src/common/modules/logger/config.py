@@ -96,29 +96,43 @@ class SystemLogFormatter(logging.Formatter):
         return json.dumps(log_data, ensure_ascii=False, default=str)
     
     def _get_module_path(self, record: logging.LogRecord) -> str:
-        """Get module path from record, converting to relative path format."""
-        # Try to use pathname and convert to relative path
-        if record.pathname:
-            pathname = record.pathname
-            # Try to make it relative to site-packages or project root
-            if "site-packages" in pathname:
-                # For third-party packages like uvicorn
-                parts = pathname.split("site-packages")
-                if len(parts) > 1:
-                    # Return package path like "uvicorn/server.py"
-                    return parts[1].lstrip("/\\").replace("\\", "/")
-            elif "backend" in pathname:
-                # For project files
-                parts = pathname.split("backend")
-                if len(parts) > 1:
-                    return "backend" + parts[-1].replace("\\", "/")
+        """Get module path from record, converting to relative path format.
         
-        # Fallback: use logger name as module identifier
-        return record.name
+        优先使用 record.name (logger 名称)，因为它反映了实际调用模块。
+        """
+        # 优先使用 logger 名称（如 src.modules.member.router）
+        if record.name and record.name != "root":
+            return record.name
+        
+        # Fallback: 从 pathname 提取相对路径
+        if record.pathname:
+            pathname = record.pathname.replace("\\", "/")
+            # 查找 backend/src 或 src 开头的路径
+            if "/backend/src/" in pathname:
+                return pathname.split("/backend/src/")[-1].replace("/", ".").replace(".py", "")
+            elif "/src/" in pathname:
+                return pathname.split("/src/")[-1].replace("/", ".").replace(".py", "")
+            # 第三方包（site-packages）
+            if "site-packages" in pathname:
+                parts = pathname.split("site-packages/")
+                if len(parts) > 1:
+                    return parts[1].replace("/", ".").replace(".py", "")
+        
+        return record.name or "unknown"
     
     def _build_message(self, record: logging.LogRecord) -> str:
         """Build message following System layer format: Server {event}: {detail}"""
         msg = record.getMessage()
+        logger_name = record.name
+        
+        # SQLAlchemy 日志
+        if logger_name.startswith("sqlalchemy"):
+            if "pool" in logger_name:
+                return f"Database pool: {msg}"
+            elif "engine" in logger_name:
+                return f"Database engine: {msg}"
+            else:
+                return f"Database: {msg}"
         
         # Map common uvicorn messages to specification format
         if "Application startup complete" in msg:
@@ -227,4 +241,12 @@ def setup_logging() -> None:
     
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)
+    
+    # SQLAlchemy 日志 - 统一纳入系统日志管理
+    # 设置为 WARNING 级别，只记录警告和错误（不记录 SQL 语句）
+    # 如需调试 SQL，可临时改为 INFO 或 DEBUG
+    for sa_logger_name in ["sqlalchemy.engine", "sqlalchemy.pool", "sqlalchemy.dialects", "sqlalchemy.orm"]:
+        sa_logger = logging.getLogger(sa_logger_name)
+        sa_logger.setLevel(logging.WARNING)
+        sa_logger.propagate = True  # 传播到 root logger，使用统一的 SystemLogFormatter
 

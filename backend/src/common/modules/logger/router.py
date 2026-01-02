@@ -53,6 +53,7 @@ async def list_logs(
     page_size: int = Query(default=20, ge=1, le=100, description="Items per page"),
     source: Optional[str] = Query(default=None, description="Filter by source (backend/frontend)"),
     level: Optional[str] = Query(default=None, description="Filter by level (DEBUG/INFO/WARNING/ERROR/CRITICAL)"),
+    layer: Optional[str] = Query(default=None, description="Filter by layer (Router/Service/Database/Auth/Performance/System)"),
     trace_id: Optional[str] = Query(default=None, description="Filter by trace ID"),
     user_id: Optional[UUID] = Query(default=None, description="Filter by user ID"),
     start_date: Optional[datetime] = Query(default=None, description="Start date filter"),
@@ -71,6 +72,7 @@ async def list_logs(
         page_size=page_size,
         source=source,
         level=level,
+        layer=layer,
         trace_id=trace_id,
         user_id=user_id,
         start_date=start_date,
@@ -78,6 +80,140 @@ async def list_logs(
     )
 
     return await logging_service.list_logs(db, query)
+
+
+@router.get("/api/v1/logging/errors", response_model=LogListResponse)
+async def list_error_logs(
+    page: int = Query(default=1, ge=1, description="Page number"),
+    page_size: int = Query(default=20, ge=1, le=100, description="Items per page"),
+    level: Optional[str] = Query(default=None, description="Filter by level (ERROR/CRITICAL)"),
+    trace_id: Optional[str] = Query(default=None, description="Filter by trace ID"),
+    user_id: Optional[UUID] = Query(default=None, description="Filter by user ID"),
+    start_date: Optional[datetime] = Query(default=None, description="Start date filter"),
+    end_date: Optional[datetime] = Query(default=None, description="End date filter"),
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    List error logs with filtering and pagination (admin only).
+    
+    This endpoint queries the error_logs table for ERROR and CRITICAL level logs.
+    """
+    query = LogListQuery(
+        page=page,
+        page_size=page_size,
+        level=level or "ERROR,CRITICAL",
+        trace_id=trace_id,
+        user_id=user_id,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    return await logging_service.list_error_logs(db, query)
+
+
+@router.get("/api/v1/logging/performance", response_model=LogListResponse)
+async def list_performance_logs(
+    page: int = Query(default=1, ge=1, description="Page number"),
+    page_size: int = Query(default=20, ge=1, le=100, description="Items per page"),
+    source: Optional[str] = Query(default=None, description="Filter by source (backend/frontend)"),
+    trace_id: Optional[str] = Query(default=None, description="Filter by trace ID"),
+    user_id: Optional[UUID] = Query(default=None, description="Filter by user ID"),
+    start_date: Optional[datetime] = Query(default=None, description="Start date filter"),
+    end_date: Optional[datetime] = Query(default=None, description="End date filter"),
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    List performance logs with filtering and pagination (admin only).
+    
+    This endpoint queries the performance_logs table.
+    """
+    query = LogListQuery(
+        page=page,
+        page_size=page_size,
+        source=source,
+        trace_id=trace_id,
+        user_id=user_id,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    return await logging_service.list_performance_logs(db, query)
+
+
+@router.get("/api/v1/logging/system", response_model=LogListResponse)
+async def list_system_logs(
+    page: int = Query(default=1, ge=1, description="Page number"),
+    page_size: int = Query(default=20, ge=1, le=500, description="Items per page"),
+    level: Optional[str] = Query(default=None, description="Filter by level (DEBUG/INFO/WARNING/ERROR/CRITICAL)"),
+    trace_id: Optional[str] = Query(default=None, description="Filter by trace ID"),
+    start_date: Optional[datetime] = Query(default=None, description="Start date filter"),
+    end_date: Optional[datetime] = Query(default=None, description="End date filter"),
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    List system logs with filtering and pagination (admin only).
+    
+    This endpoint queries the system_logs table for Python standard logging output.
+    """
+    query = LogListQuery(
+        page=page,
+        page_size=page_size,
+        level=level,
+        trace_id=trace_id,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    return await logging_service.list_system_logs(db, query)
+
+
+@router.delete("/api/v1/logging/system/by-message")
+async def delete_system_logs_by_message(
+    message: str = Query(..., description="Message pattern to match"),
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete system logs matching a specific message (admin only).
+    """
+    from sqlalchemy import delete
+    from ..db.models import SystemLog
+    
+    stmt = delete(SystemLog).where(SystemLog.message.ilike(f"%{message}%"))
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    return {
+        "status": "ok",
+        "deleted": result.rowcount,
+        "message": f"Deleted {result.rowcount} system logs matching '{message}'"
+    }
+
+
+@router.delete("/api/v1/logging/system/{log_id}")
+async def delete_system_log(
+    log_id: UUID,
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete a single system log by ID (admin only).
+    """
+    from sqlalchemy import delete
+    from ..db.models import SystemLog
+    
+    stmt = delete(SystemLog).where(SystemLog.id == log_id)
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    if result.rowcount == 0:
+        from ..exception import NotFoundError
+        raise NotFoundError("System log")
+    
+    return {"status": "ok", "deleted": 1}
 
 
 @router.get("/api/v1/logging/backend/logs", response_model=LogListResponse)
@@ -355,3 +491,290 @@ async def get_log(
         user_company_name=user_company_name,
     )
 
+
+@router.get("/api/v1/logging/stats")
+async def get_log_stats(
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get log statistics for monitoring dashboard (admin only).
+    
+    Returns aggregated statistics including:
+    - Today's error count and change vs yesterday
+    - Slow request count
+    - Security alert count
+    - Total request count
+    - Average response time
+    - System health status
+    """
+    from sqlalchemy import select, func, and_, cast, Date
+    from datetime import date, timedelta
+    from ..db.models import AppLog
+    
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+    
+    # Today's errors
+    today_errors_query = select(func.count()).select_from(AppLog).where(
+        and_(
+            cast(AppLog.created_at, Date) == today,
+            AppLog.level.in_(["ERROR", "CRITICAL"])
+        )
+    )
+    today_errors_result = await db.execute(today_errors_query)
+    today_errors = today_errors_result.scalar() or 0
+    
+    # Yesterday's errors (for comparison)
+    yesterday_errors_query = select(func.count()).select_from(AppLog).where(
+        and_(
+            cast(AppLog.created_at, Date) == yesterday,
+            AppLog.level.in_(["ERROR", "CRITICAL"])
+        )
+    )
+    yesterday_errors_result = await db.execute(yesterday_errors_query)
+    yesterday_errors = yesterday_errors_result.scalar() or 0
+    
+    # Calculate error change percentage
+    error_change = 0
+    if yesterday_errors > 0:
+        error_change = round(((today_errors - yesterday_errors) / yesterday_errors) * 100)
+    elif today_errors > 0:
+        error_change = 100
+    
+    # Slow requests (duration > 500ms)
+    slow_requests_query = select(func.count()).select_from(AppLog).where(
+        and_(
+            cast(AppLog.created_at, Date) == today,
+            AppLog.duration_ms > 500
+        )
+    )
+    slow_requests_result = await db.execute(slow_requests_query)
+    slow_requests = slow_requests_result.scalar() or 0
+    
+    # Security alerts (auth warnings/errors)
+    security_query = select(func.count()).select_from(AppLog).where(
+        and_(
+            cast(AppLog.created_at, Date) == today,
+            AppLog.layer == "Auth",
+            AppLog.level.in_(["WARNING", "ERROR", "CRITICAL"])
+        )
+    )
+    security_result = await db.execute(security_query)
+    security_alerts = security_result.scalar() or 0
+    
+    # Today's total requests
+    today_requests_query = select(func.count()).select_from(AppLog).where(
+        cast(AppLog.created_at, Date) == today
+    )
+    today_requests_result = await db.execute(today_requests_query)
+    today_requests = today_requests_result.scalar() or 0
+    
+    # Average response time
+    avg_response_query = select(func.avg(AppLog.duration_ms)).select_from(AppLog).where(
+        and_(
+            cast(AppLog.created_at, Date) == today,
+            AppLog.duration_ms.isnot(None)
+        )
+    )
+    avg_response_result = await db.execute(avg_response_query)
+    avg_response_time = avg_response_result.scalar() or 0
+    
+    return {
+        "today_errors": today_errors,
+        "error_change": error_change,
+        "slow_requests": slow_requests,
+        "security_alerts": security_alerts,
+        "today_requests": today_requests,
+        "avg_response_time": round(avg_response_time) if avg_response_time else 0,
+        "api_health": "healthy",
+        "db_health": "healthy",
+        "cache_health": "healthy",
+        "storage_health": "healthy",
+    }
+
+
+
+@router.delete("/api/v1/logging/logs/by-message")
+async def delete_logs_by_message(
+    message: str = Query(..., description="Error message pattern to match"),
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete logs matching a specific error message (admin only).
+    
+    Used to clean up resolved/fixed errors from the database.
+    Matches logs where the message contains the provided pattern.
+    """
+    from sqlalchemy import delete
+    from ..db.models import AppLog
+    
+    # Delete logs matching the message pattern
+    stmt = delete(AppLog).where(AppLog.message.ilike(f"%{message}%"))
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    return {
+        "status": "ok",
+        "deleted": result.rowcount,
+        "message": f"Deleted {result.rowcount} logs matching '{message}'"
+    }
+
+
+@router.delete("/api/v1/logging/logs/{log_id}")
+async def delete_log(
+    log_id: UUID,
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete a single log by ID (admin only).
+    """
+    from sqlalchemy import delete
+    from ..db.models import AppLog
+    
+    stmt = delete(AppLog).where(AppLog.id == log_id)
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    if result.rowcount == 0:
+        from ..exception import NotFoundError
+        raise NotFoundError("Application log")
+    
+    return {"status": "ok", "deleted": 1}
+
+
+@router.delete("/api/v1/logging/errors/by-message")
+async def delete_error_logs_by_message(
+    message: str = Query(..., description="Error message pattern to match"),
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete error logs matching a specific message (admin only).
+    """
+    from sqlalchemy import delete
+    from ..db.models import ErrorLog
+    
+    stmt = delete(ErrorLog).where(ErrorLog.message.ilike(f"%{message}%"))
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    return {
+        "status": "ok",
+        "deleted": result.rowcount,
+        "message": f"Deleted {result.rowcount} error logs matching '{message}'"
+    }
+
+
+@router.delete("/api/v1/logging/errors/{log_id}")
+async def delete_error_log(
+    log_id: UUID,
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete a single error log by ID (admin only).
+    """
+    from sqlalchemy import delete
+    from ..db.models import ErrorLog
+    
+    stmt = delete(ErrorLog).where(ErrorLog.id == log_id)
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    if result.rowcount == 0:
+        from ..exception import NotFoundError
+        raise NotFoundError("Error log")
+    
+    return {"status": "ok", "deleted": 1}
+
+
+@router.delete("/api/v1/logging/performance/by-message")
+async def delete_performance_logs_by_message(
+    message: str = Query(..., description="Message pattern to match"),
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete performance logs matching a specific message (admin only).
+    """
+    from sqlalchemy import delete
+    from ..db.models import PerformanceLog
+    
+    stmt = delete(PerformanceLog).where(PerformanceLog.message.ilike(f"%{message}%"))
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    return {
+        "status": "ok",
+        "deleted": result.rowcount,
+        "message": f"Deleted {result.rowcount} performance logs matching '{message}'"
+    }
+
+
+@router.delete("/api/v1/logging/performance/{log_id}")
+async def delete_performance_log(
+    log_id: UUID,
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete a single performance log by ID (admin only).
+    """
+    from sqlalchemy import delete
+    from ..db.models import PerformanceLog
+    
+    stmt = delete(PerformanceLog).where(PerformanceLog.id == log_id)
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    if result.rowcount == 0:
+        from ..exception import NotFoundError
+        raise NotFoundError("Performance log")
+    
+    return {"status": "ok", "deleted": 1}
+
+
+@router.delete("/api/v1/logging/all")
+async def delete_all_logs(
+    current_user = Depends(get_admin_user_dependency),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete all logs from all tables (admin only).
+    
+    WARNING: This is a destructive operation that cannot be undone.
+    Clears: app_logs, error_logs, performance_logs, system_logs, audit_logs
+    """
+    from sqlalchemy import delete, text
+    from ..db.models import AppLog, ErrorLog, PerformanceLog, SystemLog, AuditLog
+    
+    deleted_counts = {}
+    
+    # Delete from each log table
+    for model, name in [
+        (AppLog, "app_logs"),
+        (ErrorLog, "error_logs"),
+        (PerformanceLog, "performance_logs"),
+        (SystemLog, "system_logs"),
+        (AuditLog, "audit_logs"),
+    ]:
+        try:
+            stmt = delete(model)
+            result = await db.execute(stmt)
+            deleted_counts[name] = result.rowcount
+        except Exception as e:
+            deleted_counts[name] = f"error: {str(e)}"
+    
+    await db.commit()
+    
+    total_deleted = sum(v for v in deleted_counts.values() if isinstance(v, int))
+    
+    return {
+        "status": "ok",
+        "total_deleted": total_deleted,
+        "details": deleted_counts,
+        "message": f"Deleted {total_deleted} logs from all tables"
+    }

@@ -138,7 +138,6 @@ class AuthRecoveryService {
       }
 
       if (!refreshMethod) {
-        console.log('[AuthRecoveryService] No token refresh method available');
         return null;
       }
 
@@ -172,7 +171,6 @@ class AuthRecoveryService {
     
     if (!refreshToken) {
       // 没有 refresh token，返回 null 而不是抛出异常
-      console.log('[AuthRecoveryService] No refresh token available, user not logged in');
       return null;
     }
 

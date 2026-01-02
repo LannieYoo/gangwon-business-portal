@@ -36,12 +36,9 @@ export default function App() {
       // isAuthenticated is already initialized from storage in authStore
       if (isAuthenticated) {
         try {
-          const user = await getCurrentUser();
-          if (!user) {
-            console.log("[App] Token validation failed, auth state cleared");
-          }
+          await getCurrentUser();
         } catch (error) {
-          console.error("[App] Token validation error:", error);
+          // Token validation failed silently
         }
       }
       setIsInitializing(false);

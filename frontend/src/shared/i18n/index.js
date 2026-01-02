@@ -51,6 +51,8 @@ import adminReportsKo from '@admin/modules/reports/locales/ko.json';
 import adminReportsZh from '@admin/modules/reports/locales/zh.json';
 import adminAuthKo from '@admin/modules/auth/locales/ko.json';
 import adminAuthZh from '@admin/modules/auth/locales/zh.json';
+import systemLogsKo from '@admin/modules/system-logs/locales/ko.json';
+import systemLogsZh from '@admin/modules/system-logs/locales/zh.json';
 
 // Deep merge function to combine translations
 const deepMerge = (target, source) => {
@@ -110,7 +112,8 @@ const adminKo = mergeModules(
   adminProjectsKo,
   adminContentKo,
   adminReportsKo,
-  adminAuthKo
+  adminAuthKo,
+  systemLogsKo
 );
 
 const adminZh = mergeModules(
@@ -121,7 +124,8 @@ const adminZh = mergeModules(
   adminProjectsZh,
   adminContentZh,
   adminReportsZh,
-  adminAuthZh
+  adminAuthZh,
+  systemLogsZh
 );
 
 // Merge all translations

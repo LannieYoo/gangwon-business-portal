@@ -5,7 +5,6 @@ Business logic for audit log operations.
 """
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
-from sqlalchemy.orm import selectinload
 from typing import Optional
 from uuid import UUID
 
@@ -139,23 +138,14 @@ class AuditLogService:
         Returns:
             Paginated list of audit logs
         """
-        # Build base query
-        base_query = select(AuditLog).options(selectinload(AuditLog.user))
+        # Build base query (no user relationship)
+        base_query = select(AuditLog)
 
         # Apply filters
         conditions = []
 
         if query.user_id:
             conditions.append(AuditLog.user_id == query.user_id)
-
-        if query.action:
-            conditions.append(AuditLog.action == query.action)
-
-        if query.resource_type:
-            conditions.append(AuditLog.resource_type == query.resource_type)
-
-        if query.resource_id:
-            conditions.append(AuditLog.resource_id == query.resource_id)
 
         if query.start_date:
             conditions.append(AuditLog.created_at >= query.start_date)
@@ -183,28 +173,24 @@ class AuditLogService:
         result = await db.execute(base_query)
         audit_logs = result.scalars().all()
 
-        # Convert to response models
+        # Convert to response models (no user relationship, use extra_data)
         items = []
         for log in audit_logs:
-            user_email = None
-            user_company_name = None
-
-            if log.user:
-                user_email = log.user.email
-                user_company_name = log.user.company_name
-
+            extra = log.extra_data or {}
             items.append(
                 AuditLogResponse(
                     id=log.id,
+                    source=log.source,
+                    level=log.level,
+                    message=log.message,
+                    layer=log.layer,
+                    module=log.module,
+                    function=log.function,
+                    line_number=log.line_number,
+                    trace_id=log.trace_id,
                     user_id=log.user_id,
-                    action=log.action,
-                    resource_type=log.resource_type,
-                    resource_id=log.resource_id,
-                    ip_address=log.ip_address,
-                    user_agent=log.user_agent,
+                    extra_data=extra,
                     created_at=log.created_at,
-                    user_email=user_email,
-                    user_company_name=user_company_name,
                 )
             )
 
@@ -235,7 +221,6 @@ class AuditLogService:
         """
         result = await db.execute(
             select(AuditLog)
-            .options(selectinload(AuditLog.user))
             .where(AuditLog.id == log_id)
         )
         return result.scalar_one_or_none()

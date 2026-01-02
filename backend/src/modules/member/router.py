@@ -482,7 +482,8 @@ async def search_nice_dnb(
         )
     except Exception as e:
         # Log error but don't fail the request
-        from ...common.modules.logger import logger
+        import logging
+        logger = logging.getLogger(__name__)
         logger.error(
             f"Failed to save Nice D&B data to database: {str(e)}",
             extra={
