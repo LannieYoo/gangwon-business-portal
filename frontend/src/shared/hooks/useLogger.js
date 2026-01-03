@@ -29,10 +29,9 @@ function parseFilePath(filePath) {
   // 去掉开头的 ./
   let cleanPath = filePath.replace(/^\.\/+/, '');
   
-  // 确保路径以 src/ 开头（用于 file_path）
-  let pathForStorage = cleanPath;
-  if (cleanPath.startsWith('src/')) {
-    pathForStorage = cleanPath.substring(4); // 去掉 "src/" 用于存储
+  // 确保路径以 src/ 开头
+  if (!cleanPath.startsWith('src/')) {
+    cleanPath = 'src/' + cleanPath;
   }
   
   // 提取模块路径（去掉文件名，转换为点分格式，保留 src 前缀）
@@ -42,7 +41,7 @@ function parseFilePath(filePath) {
     module = cleanPath.substring(0, lastSlash).replace(/\//g, '.');
   }
   
-  return { module, fullPath: 'src/' + pathForStorage };
+  return { module, fullPath: cleanPath };
 }
 
 /**

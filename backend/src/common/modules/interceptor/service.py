@@ -174,7 +174,7 @@ async def _log_method_call(
             level=level,
             message=message,
             layer=layer,
-            module="common.modules.interceptor",
+            module="src.common.modules.interceptor",
             function=method_name,
             line_number=line_number,
             file_path="src/common/modules/interceptor/service.py",

@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation, Loading, Select, logsService, createTranslator } from './adapter';
 import { SearchInput, Pagination, ConfirmModal, Button } from '@shared/components';
-import { formatEST, parseModulePath, parseFilename } from '@shared/utils/format';
+import { formatEST } from '@shared/utils/format';
 
 // 级别颜色
 const levelColors = {
@@ -289,10 +289,10 @@ function SystemLogRow({ log, expanded, onToggle, tl, onReload }) {
           {log.layer || 'System'}
         </div>
         <div className="col-span-2 text-xs text-gray-500 truncate" title={log.module}>
-          {parseModulePath(log.module)}
+          {log.module || '-'}
         </div>
-        <div className="col-span-1 text-xs text-gray-500 truncate" title={parseFilename(log.module)}>
-          {parseFilename(log.module)}
+        <div className="col-span-1 text-xs text-gray-500 truncate" title={log.filePath || '-'}>
+          {log.filePath ? log.filePath.split('/').pop() : '-'}
         </div>
         <div className="col-span-3 text-sm text-gray-900 truncate" title={log.message}>
           {log.message}

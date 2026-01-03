@@ -474,6 +474,7 @@ class LogsService {
       module: item.module,
       function: item.function,
       lineNumber: item.line_number,
+      filePath: item.file_path,
       traceId: item.trace_id,
       requestId: item.request_id,
       userId: item.user_id,

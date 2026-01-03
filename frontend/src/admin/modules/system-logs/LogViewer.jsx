@@ -125,8 +125,8 @@ export default function LogViewer({ initialFilter = null }) {
       level: log.level,
       source: log.source || 'backend',
       layer: log.layer || '-',
-      module: parseModulePath(log.module),
-      file: parseFilename(log.module, log.source, log.filePath),
+      module: log.module || '-',
+      file: log.filePath || '-',
       message: log.message,
       traceId: log.traceId,
     }));
@@ -323,10 +323,10 @@ function LogRow({ log, expanded, onToggle, tl, onReload }) {
           {log.layer || '-'}
         </div>
         <div className="col-span-2 text-xs text-gray-500 truncate" title={log.module}>
-          {parseModulePath(log.module)}
+          {log.module || '-'}
         </div>
-        <div className="col-span-1 text-xs text-gray-500 truncate" title={log.filePath || parseFilename(log.module, log.source, log.filePath)}>
-          {parseFilename(log.module, log.source, log.filePath)}
+        <div className="col-span-1 text-xs text-gray-500 truncate" title={log.filePath || '-'}>
+          {log.filePath ? log.filePath.split('/').pop() : '-'}
         </div>
         <div className="col-span-3 text-sm text-gray-900 truncate" title={log.message}>
           {log.message}

@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation, Loading, Select, adminService, createTranslator } from './adapter';
 import { SearchInput, Pagination, ConfirmModal, Button } from '@shared/components';
-import { formatEST, parseModulePath, parseFilename } from '@shared/utils/format';
+import { formatEST } from '@shared/utils/format';
 
 // 操作类型配置
 const getActionOptions = (tl) => [
@@ -325,11 +325,11 @@ function AuditLogRow({ log, expanded, onToggle, tl, onReload }) {
         <div className="col-span-1 text-xs text-gray-600">
           {log.layer || 'Auth'}
         </div>
-        <div className="col-span-2 text-xs text-gray-500 truncate">
-          {parseModulePath(log.module)}
+        <div className="col-span-2 text-xs text-gray-500 truncate" title={log.module}>
+          {log.module || '-'}
         </div>
-        <div className="col-span-1 text-xs text-gray-500 truncate">
-          {parseFilename(log.module)}
+        <div className="col-span-1 text-xs text-gray-500 truncate" title={log.filePath || '-'}>
+          {log.filePath ? log.filePath.split('/').pop() : '-'}
         </div>
         <div className="col-span-3 text-sm text-gray-900 truncate" title={log.message || `${log.action}: ${log.resourceType || ''}`}>
           {log.message || `${log.action}: ${log.resourceType || ''}`}

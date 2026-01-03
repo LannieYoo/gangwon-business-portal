@@ -125,7 +125,7 @@ class DatabaseOperationLogger:
                 level=level,
                 message=message,
                 layer="Database",
-                module="common.modules.interceptor",
+                module="src.common.modules.interceptor",
                 function="log_operation",
                 line_number=68,
                 file_path="src/common/modules/interceptor/database.py",
