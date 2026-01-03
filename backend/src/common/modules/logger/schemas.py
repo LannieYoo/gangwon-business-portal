@@ -510,7 +510,6 @@ class SystemLogCreate(BaseModel):
             "level": self.level,
             "message": self.message,
             "layer": self.layer,
-            "file_path": self.file_path,
         }
         
         # Add optional fields only if they have meaningful values
@@ -524,6 +523,9 @@ class SystemLogCreate(BaseModel):
         
         if self.line_number and self.line_number > 0:
             data["line_number"] = self.line_number
+        
+        if self.file_path:
+            data["file_path"] = self.file_path
         
         if extra:
             data["extra_data"] = extra
