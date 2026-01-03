@@ -1171,7 +1171,7 @@ class DatabaseLogWriter:
             system_log_data = system_create.to_db_dict()
             system_log_data["created_at"] = format_timestamp()
             
-            # Insert using Supabase API (async)
+            # Insert using Supabase API (sync, in thread pool if needed)
             async def _insert_system_log():
                 try:
                     client = _get_raw_supabase_client()
@@ -1180,8 +1180,17 @@ class DatabaseLogWriter:
                     # Don't log here to avoid infinite recursion
                     pass
             
-            # Run in background task (fire-and-forget)
-            asyncio.create_task(_insert_system_log())
+            # Try to run in background task if event loop is running
+            try:
+                loop = asyncio.get_running_loop()
+                asyncio.create_task(_insert_system_log())
+            except RuntimeError:
+                # No event loop running - run synchronously
+                try:
+                    client = _get_raw_supabase_client()
+                    client.table("system_logs").insert(system_log_data).execute()
+                except Exception:
+                    pass
             
         except Exception:
             # Don't fail if database write fails (graceful degradation)
