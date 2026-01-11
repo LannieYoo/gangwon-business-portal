@@ -1,24 +1,16 @@
-/**
- * Member Service
- * 会员服务 - 封装会员相关的 API 调用
- */
+// Member Service - 会员服务
 
 import apiService from "./api.service";
 import { API_PREFIX } from "@shared/utils/constants";
+import { createService } from "@shared/utils/helpers";
 
 class MemberService {
-  /**
-   * Get current member's profile
-   * 获取当前会员资料
-   *
-   * @returns {Promise<Object>} Member profile data
-   */
+  // 获取当前会员资料
   async getProfile() {
     const response = await apiService.get(`${API_PREFIX}/member/profile`);
 
-    // Map backend fields to frontend fields
     if (response) {
-      const mappedResponse = {
+      return {
         id: response.id,
         businessNumber: response.business_number,
         companyName: response.company_name,
@@ -42,133 +34,56 @@ class MemberService {
         corporationNumber: response.legal_number,
         createdAt: response.created_at,
         updatedAt: response.updated_at,
-        // Contact person fields
         contactPersonName: response.contact_person_name,
         contactPersonDepartment: response.contact_person_department,
         contactPersonPosition: response.contact_person_position,
-        // Business info fields
         mainBusiness: response.main_business,
         description: response.description,
         cooperationFields: response.cooperation_fields ? JSON.parse(response.cooperation_fields) : [],
       };
-
-      return mappedResponse;
     }
 
-    return response;
+    return null;
   }
 
-  /**
-   * Verify company information
-   * 验证公司信息
-   *
-   * @param {Object} data - Company verification data
-   * @param {string} data.businessNumber - Business registration number
-   * @param {string} [data.companyName] - Company name (optional)
-   * @returns {Promise<Object>} Verification result
-   */
+  // 验证公司信息
   async verifyCompany(data) {
     const requestData = {
-      business_number:
-        data.businessNumber?.replace(/-/g, "") || data.business_number,
-      company_name: data.companyName || null,
+      business_number: data.businessNumber?.replace(/-/g, ""),
+      company_name: data.companyName ?? null,
     };
 
-    return await this._verifyCompanyInternal(requestData);
+    return await apiService.post(`${API_PREFIX}/members/verify-company`, requestData);
   }
 
-  async _verifyCompanyInternal(requestData) {
-    return await apiService.post(
-      `${API_PREFIX}/members/verify-company`,
-      requestData
-    );
-  }
-
-  /**
-   * Update current member's profile
-   * 更新当前会员资料
-   *
-   * @param {Object} data - Profile data to update
-   * @param {string} [data.companyName] - Company name
-   * @param {string} [data.email] - Email
-   * @param {string} [data.industry] - Industry
-   * @param {number} [data.revenue] - Annual revenue
-   * @param {number} [data.employeeCount] - Employee count
-   * @param {string} [data.foundingDate] - Founding date (YYYY-MM-DD)
-   * @param {string} [data.region] - Region
-   * @param {string} [data.address] - Address
-   * @param {string} [data.website] - Website URL
-   * @returns {Promise<Object>} Updated member profile
-   */
+  // 更新当前会员资料
   async updateProfile(data) {
-    // Map frontend fields to backend fields
     const requestData = {};
 
-    if (data.companyName !== undefined) {
-      requestData.company_name = data.companyName;
-    }
-    if (data.email !== undefined) {
-      requestData.email = data.email;
-    }
-    if (data.industry !== undefined) {
-      requestData.industry = data.industry;
-    }
-    if (data.revenue !== undefined || data.sales !== undefined) {
-      requestData.revenue = data.revenue || data.sales;
-    }
-    if (data.employeeCount !== undefined) {
-      requestData.employee_count = data.employeeCount;
-    }
-    if (data.foundingDate !== undefined || data.establishedDate !== undefined) {
-      requestData.founding_date = data.foundingDate || data.establishedDate;
-    }
-    if (data.region !== undefined) {
-      requestData.region = data.region;
-    }
-    if (data.address !== undefined) {
-      requestData.address = data.address;
-    }
-    if (data.website !== undefined || data.websiteUrl !== undefined) {
-      requestData.website = data.website || data.websiteUrl;
-    }
-    if (data.phone !== undefined) {
-      requestData.phone = data.phone;
-    }
-    if (data.logoUrl !== undefined) {
-      requestData.logo_url = data.logoUrl;
-    }
-    if (data.representative !== undefined) {
-      requestData.representative = data.representative;
-    }
-    if (data.corporationNumber !== undefined) {
-      requestData.corporation_number = data.corporationNumber;
-    }
-    // Contact person fields
-    if (data.contactPersonName !== undefined) {
-      requestData.contact_person_name = data.contactPersonName;
-    }
-    if (data.contactPersonDepartment !== undefined) {
-      requestData.contact_person_department = data.contactPersonDepartment;
-    }
-    if (data.contactPersonPosition !== undefined) {
-      requestData.contact_person_position = data.contactPersonPosition;
-    }
-    // Business info fields
-    if (data.mainBusiness !== undefined) {
-      requestData.main_business = data.mainBusiness;
-    }
-    if (data.description !== undefined) {
-      requestData.description = data.description;
-    }
-    if (data.cooperationFields !== undefined) {
-      requestData.cooperation_fields = JSON.stringify(data.cooperationFields);
-    }
+    if (data.companyName !== undefined) requestData.company_name = data.companyName;
+    if (data.email !== undefined) requestData.email = data.email;
+    if (data.industry !== undefined) requestData.industry = data.industry;
+    if (data.revenue !== undefined) requestData.revenue = data.revenue;
+    if (data.employeeCount !== undefined) requestData.employee_count = data.employeeCount;
+    if (data.foundingDate !== undefined) requestData.founding_date = data.foundingDate;
+    if (data.region !== undefined) requestData.region = data.region;
+    if (data.address !== undefined) requestData.address = data.address;
+    if (data.website !== undefined) requestData.website = data.website;
+    if (data.phone !== undefined) requestData.phone = data.phone;
+    if (data.logoUrl !== undefined) requestData.logo_url = data.logoUrl;
+    if (data.representative !== undefined) requestData.representative = data.representative;
+    if (data.corporationNumber !== undefined) requestData.corporation_number = data.corporationNumber;
+    if (data.contactPersonName !== undefined) requestData.contact_person_name = data.contactPersonName;
+    if (data.contactPersonDepartment !== undefined) requestData.contact_person_department = data.contactPersonDepartment;
+    if (data.contactPersonPosition !== undefined) requestData.contact_person_position = data.contactPersonPosition;
+    if (data.mainBusiness !== undefined) requestData.main_business = data.mainBusiness;
+    if (data.description !== undefined) requestData.description = data.description;
+    if (data.cooperationFields !== undefined) requestData.cooperation_fields = JSON.stringify(data.cooperationFields);
 
-    const response = await this._updateProfileInternal(requestData);
+    const response = await apiService.put(`${API_PREFIX}/member/profile`, requestData);
 
-    // Map backend response to frontend format
     if (response) {
-      const mappedResponse = {
+      return {
         id: response.id,
         businessNumber: response.business_number,
         companyName: response.company_name,
@@ -190,16 +105,10 @@ class MemberService {
         createdAt: response.created_at,
         updatedAt: response.updated_at,
       };
-
-      return mappedResponse;
     }
 
-    return response;
-  }
-
-  async _updateProfileInternal(requestData) {
-    return await apiService.put(`${API_PREFIX}/member/profile`, requestData);
+    return null;
   }
 }
 
-export default new MemberService();
+export default createService(MemberService);

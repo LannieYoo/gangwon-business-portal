@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Badge, Loading, Alert } from '@shared/components';
 import { adminService } from '@shared/services';
-import { formatDate } from '@shared/utils/format';
+import { formatDate } from '@shared/utils';
 
 export default function MemberDetail() {
   const { t, i18n } = useTranslation();
@@ -167,7 +167,7 @@ export default function MemberDetail() {
             <span className="text-base text-gray-900">{member.email || '-'}</span>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">状态</label>
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.table.status', '状态')}</label>
             <div>
               <Badge 
                 variant={member.approvalStatus === 'approved' ? 'success' : member.approvalStatus === 'pending' ? 'warning' : 'danger'}
@@ -304,7 +304,7 @@ export default function MemberDetail() {
                 <div className="flex flex-col gap-2">
                   <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.employeeCount')}</label>
                   <span className="text-base text-gray-900">
-                    {niceDnbData.data.employeeCount ? `${niceDnbData.data.employeeCount} 人` : '-'}
+                    {niceDnbData.data.employeeCount ? `${niceDnbData.data.employeeCount} ${t('common.personUnit', '명')}` : '-'}
                     {niceDnbData.data.employeeCountDate && ` (${niceDnbData.data.employeeCountDate})`}
                   </span>
                 </div>
@@ -394,7 +394,7 @@ export default function MemberDetail() {
               {/* 财务历史数据表格 */}
               {niceDnbData.financials && niceDnbData.financials.length > 0 && (
                 <div>
-                  <h4 className="text-md font-medium text-gray-700 mb-4">财务历史数据</h4>
+                  <h4 className="text-md font-medium text-gray-700 mb-4">{t('admin.members.detail.financialHistory', '재무 이력 데이터')}</h4>
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
                       <thead>
@@ -410,13 +410,13 @@ export default function MemberDetail() {
                           <tr key={index} className="hover:bg-gray-50">
                             <td className="px-4 py-3 text-gray-700 border-b border-gray-200">{financial.year || '-'}</td>
                             <td className="px-4 py-3 text-gray-700 border-b border-gray-200">
-                              {financial.revenue ? `${(financial.revenue / 100000000).toFixed(2)} 亿韩元` : '-'}
+                              {financial.revenue ? `${(financial.revenue / 100000000).toFixed(2)} ${t('common.billionWon', '억원')}` : '-'}
                             </td>
                             <td className="px-4 py-3 text-gray-700 border-b border-gray-200">
-                              {financial.profit ? `${(financial.profit / 100000000).toFixed(2)} 亿韩元` : '-'}
+                              {financial.profit ? `${(financial.profit / 100000000).toFixed(2)} ${t('common.billionWon', '억원')}` : '-'}
                             </td>
                             <td className="px-4 py-3 text-gray-700 border-b border-gray-200">
-                              {financial.employees ? `${financial.employees.toLocaleString()} 人` : '-'}
+                              {financial.employees ? `${financial.employees.toLocaleString()} ${t('common.personUnit', '명')}` : '-'}
                             </td>
                           </tr>
                         ))}

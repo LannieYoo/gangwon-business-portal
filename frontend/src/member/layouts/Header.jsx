@@ -6,7 +6,7 @@
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import useAuthStore from "@shared/stores/authStore";
+import { useAuthStore } from "@shared/stores";
 import LanguageSwitcher from "@shared/components/LanguageSwitcher";
 import { LoginModal } from "@shared/components";
 import {
@@ -23,6 +23,21 @@ import {
   XIcon,
   NotificationBell,
 } from "@shared/components";
+
+// 统一的 hover 样式配置 - 深蓝色主题
+const HOVER_STYLES = {
+  // 深色背景上的 hover（顶部导航栏）- 浅蓝色高亮
+  dark: 'hover:text-blue-200',
+  darkBorder: 'hover:text-blue-200 hover:border-blue-300',
+  // 导航项状态
+  navItemActive: 'border-white font-bold hover:text-blue-200',
+  navItemInactive: 'border-transparent',
+  // 浅色背景上的 hover（下拉菜单、移动端菜单）- 深蓝色
+  light: 'hover:bg-blue-50 hover:text-blue-800',
+  lightBorder: 'hover:bg-blue-50 hover:text-blue-800 hover:border-l-blue-600',
+  // 危险操作 - 保持红色
+  danger: 'hover:bg-red-50 hover:text-red-800 hover:border-l-red-600',
+};
 
 function Header() {
   const { t } = useTranslation();
@@ -141,18 +156,18 @@ function Header() {
   };
 
   return (
-    <header className="member-header fixed top-0 left-0 right-0 flex items-center justify-between px-8 z-[1000] h-[70px] max-md:h-[60px] max-md:px-4 border-b-[3px] border-[#001a33] shadow-md"
-      style={{ background: 'linear-gradient(135deg, #002244 0%, #001a33 100%)' }}>
+    <header className="member-header fixed top-0 left-0 right-0 flex items-center justify-between px-8 z-[1000] h-[70px] max-md:h-[60px] max-md:px-4 border-b-[3px] border-[#003d82] shadow-md"
+      style={{ backgroundColor: '#003d82' }}>
       <div className="flex items-center gap-4 flex-shrink-0">
         <button
-          className="hidden max-md:flex bg-transparent border-none cursor-pointer py-2 px-3 text-white transition-all duration-200 rounded items-center justify-center mr-2 hover:bg-white/10"
+          className={`hidden max-md:flex bg-transparent border-none cursor-pointer py-2 px-3 text-white transition-all duration-200 rounded items-center justify-center mr-2 ${HOVER_STYLES.dark}`}
           onClick={() => setShowMobileMenu(!showMobileMenu)}
           aria-label={t("header.toggleMenu")}
         >
           {showMobileMenu ? <XIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
         </button>
 
-        <Link to="/member/home" className="flex items-center gap-3 no-underline text-white font-bold text-xl tracking-tight">
+        <Link to="/member/home" className={`flex items-center gap-3 no-underline text-white font-bold text-xl tracking-tight ${HOVER_STYLES.dark}`}>
           <span className="whitespace-nowrap font-['Noto_Sans_KR',-apple-system,BlinkMacSystemFont,sans-serif]" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
             {t("header.title")}
           </span>
@@ -172,7 +187,7 @@ function Header() {
                     to={item.path}
                     end={item.exact}
                     className={`flex items-center gap-2 px-5 py-2.5 text-white no-underline text-[0.9375rem] font-semibold whitespace-nowrap transition-all duration-200 relative border-b-[3px] max-lg:px-3.5 max-lg:py-2 ${
-                      active ? 'border-white font-bold' : 'border-transparent hover:border-white/50'
+                      active ? HOVER_STYLES.navItemActive : `${HOVER_STYLES.navItemInactive} ${HOVER_STYLES.darkBorder}`
                     }`}
                     style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}
                     onClick={(e) => handleMenuClick(e, item)}
@@ -214,8 +229,8 @@ function Header() {
                   end={item.exact}
                   className={`flex items-center gap-3 px-6 py-4 no-underline transition-colors duration-200 ${
                     active 
-                      ? 'bg-blue-50 text-blue-700 font-semibold border-l-4 border-blue-600' 
-                      : 'text-gray-900 hover:bg-gray-50'
+                      ? 'bg-primary-50 text-primary-700 font-semibold border-l-4 border-primary-600' 
+                      : `text-gray-900 ${HOVER_STYLES.light}`
                   }`}
                   onClick={(e) => {
                     handleMenuClick(e, item);
@@ -246,7 +261,7 @@ function Header() {
         {isAuthenticated ? (
           <div className="relative" ref={userMenuRef}>
             <button
-              className="flex items-center gap-2.5 bg-transparent border-none cursor-pointer py-2 px-3.5 transition-all duration-200 rounded hover:opacity-80 active:scale-[0.98]"
+              className={`flex items-center gap-2.5 bg-transparent border-none cursor-pointer py-2 px-3.5 transition-all duration-200 rounded ${HOVER_STYLES.dark} active:scale-[0.98]`}
               onClick={() => setShowUserMenu(!showUserMenu)}
             >
               <div className="w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-[0.9375rem] border-2 border-white/30 shadow-[0_2px_4px_-1px_rgba(0,76,151,0.3)]"
@@ -281,7 +296,7 @@ function Header() {
 
                 <Link
                   to="/member/performance/company-info"
-                  className="flex items-center gap-3.5 py-3.5 px-5 text-gray-900 no-underline bg-transparent w-full text-left cursor-pointer text-[0.9375rem] font-medium transition-all duration-200 border-l-[3px] border-transparent hover:bg-gray-100 hover:pl-[1.125rem] hover:border-l-blue-600"
+                  className={`flex items-center gap-3.5 py-3.5 px-5 text-gray-900 no-underline bg-transparent w-full text-left cursor-pointer text-[0.9375rem] font-medium transition-all duration-200 border-l-[3px] border-transparent hover:pl-[1.125rem] ${HOVER_STYLES.lightBorder}`}
                   onClick={() => setShowUserMenu(false)}
                 >
                   <UserIcon className="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
@@ -290,7 +305,7 @@ function Header() {
 
                 <Link
                   to="/member/support"
-                  className="flex items-center gap-3.5 py-3.5 px-5 text-gray-900 no-underline bg-transparent w-full text-left cursor-pointer text-[0.9375rem] font-medium transition-all duration-200 border-l-[3px] border-transparent hover:bg-gray-100 hover:pl-[1.125rem] hover:border-l-blue-600"
+                  className={`flex items-center gap-3.5 py-3.5 px-5 text-gray-900 no-underline bg-transparent w-full text-left cursor-pointer text-[0.9375rem] font-medium transition-all duration-200 border-l-[3px] border-transparent hover:pl-[1.125rem] ${HOVER_STYLES.lightBorder}`}
                   onClick={() => setShowUserMenu(false)}
                 >
                   <SupportIcon className="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
@@ -300,7 +315,7 @@ function Header() {
                 <div className="h-px my-2 mx-5 bg-gray-100" />
 
                 <button
-                  className="flex items-center gap-3.5 py-3.5 px-5 text-red-600 no-underline bg-transparent border-none w-full text-left cursor-pointer text-[0.9375rem] font-medium transition-all duration-200 border-l-[3px] border-transparent hover:bg-red-50 hover:pl-[1.125rem] hover:border-l-red-600 hover:text-red-800"
+                  className={`flex items-center gap-3.5 py-3.5 px-5 text-red-600 no-underline bg-transparent border-none w-full text-left cursor-pointer text-[0.9375rem] font-medium transition-all duration-200 border-l-[3px] border-transparent hover:pl-[1.125rem] ${HOVER_STYLES.danger}`}
                   onClick={handleLogout}
                 >
                   <LogoutIcon className="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
@@ -312,7 +327,7 @@ function Header() {
         ) : (
           <div className="flex items-center gap-2">
             <button
-              className="px-4 py-2 rounded-md cursor-pointer transition-all duration-200 font-medium text-sm text-white border border-white/20 hover:bg-white/25 hover:border-white/30 active:bg-white/30"
+              className="px-4 py-2 rounded-md cursor-pointer transition-all duration-200 font-medium text-sm text-white border border-white/20 hover:text-yellow-100 hover:border-yellow-400 active:bg-white/30"
               style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
               onClick={() => setShowLoginModal(true)}
             >

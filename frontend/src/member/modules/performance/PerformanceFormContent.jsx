@@ -14,7 +14,8 @@ import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
 import { Tabs, Modal, ModalFooter } from '@shared/components';
 import { performanceService } from '@shared/services';
-import useUpload from '@shared/hooks/useUpload';
+import { useUpload } from '@shared/hooks';
+import { deepSnakeToCamel } from '@shared/utils/helpers';
 import { 
   DocumentIcon,
   CheckCircleIcon, 
@@ -43,7 +44,7 @@ export default function PerformanceFormContent() {
     quarter: '',
     salesEmployment: {
       sales: { previousYear: '', currentYear: '', reportingDate: '' },
-      export: { previousYear: '', currentYear: '', reportingDate: '' },
+      export: { previousYear: '', currentYear: '', reportingDate: '', hskCode: '', exportCountry1: '', exportCountry2: '' },
       employment: {
         currentEmployees: { previousYear: '', currentYear: '' },
         newEmployees: { previousYear: '', currentYear: '' },
@@ -71,12 +72,23 @@ export default function PerformanceFormContent() {
         ? JSON.parse(record.dataJson) 
         : record.dataJson || {};
       
+      // Convert snake_case keys to camelCase for frontend use
+      const salesEmploymentData = dataJson.sales_employment 
+        ? deepSnakeToCamel(dataJson.sales_employment) 
+        : formData.salesEmployment;
+      const governmentSupportData = dataJson.government_support 
+        ? deepSnakeToCamel(dataJson.government_support) 
+        : [];
+      const intellectualPropertyData = dataJson.intellectual_property 
+        ? deepSnakeToCamel(dataJson.intellectual_property) 
+        : [];
+      
       setFormData({
         year: record.year,
         quarter: record.quarter ? record.quarter.toString() : '',
-        salesEmployment: dataJson.sales_employment || formData.salesEmployment,
-        governmentSupport: dataJson.government_support || [],
-        intellectualProperty: dataJson.intellectual_property || [],
+        salesEmployment: salesEmploymentData,
+        governmentSupport: governmentSupportData,
+        intellectualProperty: intellectualPropertyData,
         attachments: dataJson.attachments || [],
         notes: dataJson.notes || ''
       });
@@ -365,6 +377,55 @@ export default function PerformanceFormContent() {
                         type="date"
                         value={formData.salesEmployment?.export?.reportingDate || ''}
                         onChange={(e) => handleNestedChange('salesEmployment.export.reportingDate', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  {/* HSK 代码和出口国家 */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t('performance.salesEmploymentFields.hskCode', 'HSK 코드')}
+                      </label>
+                      <Input
+                        type="text"
+                        value={formData.salesEmployment?.export?.hskCode || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                          handleNestedChange('salesEmployment.export.hskCode', value);
+                        }}
+                        placeholder="0000000000"
+                        maxLength={10}
+                        error={formData.salesEmployment?.export?.hskCode && formData.salesEmployment?.export?.hskCode.length !== 10 ? t('performance.salesEmploymentFields.hskCodeError', '10자리 숫자를 입력하세요') : null}
+                      />
+                      <a 
+                        href="https://cls.kipro.or.kr/hsk" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:underline mt-1 inline-block"
+                      >
+                        {t('performance.salesEmploymentFields.hskCodeLink', 'HSK 코드 조회')} →
+                      </a>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t('performance.salesEmploymentFields.exportCountry1', '수출 국가 1')}
+                      </label>
+                      <Input
+                        type="text"
+                        value={formData.salesEmployment?.export?.exportCountry1 || ''}
+                        onChange={(e) => handleNestedChange('salesEmployment.export.exportCountry1', e.target.value)}
+                        placeholder={t('performance.salesEmploymentFields.exportCountryPlaceholder', '국가명 입력')}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t('performance.salesEmploymentFields.exportCountry2', '수출 국가 2')}
+                      </label>
+                      <Input
+                        type="text"
+                        value={formData.salesEmployment?.export?.exportCountry2 || ''}
+                        onChange={(e) => handleNestedChange('salesEmployment.export.exportCountry2', e.target.value)}
+                        placeholder={t('performance.salesEmploymentFields.exportCountryPlaceholder', '국가명 입력')}
                       />
                     </div>
                   </div>

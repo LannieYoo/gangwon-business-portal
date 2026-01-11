@@ -20,7 +20,7 @@ export default function FAQList() {
   useEffect(() => {
     const loadFAQs = async () => {
       setLoading(true);
-      const items = await supportService.listFAQs();
+      const items = await supportService.listFAQs({});
       setFaqs(items || []);
       setLoading(false);
     };

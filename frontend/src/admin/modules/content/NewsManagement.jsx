@@ -8,10 +8,9 @@ import { useTranslation } from 'react-i18next';
 import { Button, Input, Alert, Card, Modal, ModalFooter } from '@shared/components';
 import { contentService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import { validateImageFile } from '@shared/utils/fileValidation';
-import { formatDate } from '@shared/utils/format';
+import { validateImageFile, formatDate } from '@shared/utils';
 import { validateNewsForm } from './utils';
-import useUpload from '@shared/hooks/useUpload';
+import { useUpload } from '@shared/hooks';
 
 export default function NewsManagement() {
   const { t, i18n } = useTranslation();

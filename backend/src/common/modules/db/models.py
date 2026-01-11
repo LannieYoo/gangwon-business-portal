@@ -31,6 +31,9 @@ __all__ = [
     "PerformanceRecord", 
     "Project",
     "ProjectApplication",
+    "ApplicationStatusHistory",
+    "ApplicationAttachment",
+    "Notification",
     "Attachment",
     "Notice",
     "PressRelease",
@@ -74,6 +77,8 @@ class Member(Base):
     region = Column(String(100))
     address = Column(Text)
     representative = Column(String(100))
+    representative_birth_date = Column(Date)  # 代表者出生日期
+    representative_gender = Column(String(10))  # 代表者性别 (male/female)
     legal_number = Column(String(20))
     phone = Column(String(20))
     website = Column(String(255))
@@ -88,6 +93,15 @@ class Member(Base):
     main_business = Column(Text)  # 主要事业及产品
     description = Column(Text)  # 企业介绍
     cooperation_fields = Column(Text)  # 产业合作希望领域 (JSON array as text)
+    
+    # New business info fields (Task 5) - 창업구분, 한국표준산업분류코드
+    startup_type = Column(String(50))  # 창업구분: preliminary, startup_under_3years, growth_over_7years, restart
+    ksic_major = Column(String(10))  # 한국표준산업분류코드[대분류]: A-U
+    ksic_sub = Column(String(10))  # 지역주력산업코드[중분류]: 2-digit code
+    
+    # New fields for Task 6 - 참여 프로그램, 투자 유치
+    participation_programs = Column(Text)  # 참여 프로그램 (JSON array as text)
+    investment_status = Column(Text)  # 투자 유치 (JSON object as text)
     
     # Soft delete field
     deleted_at = Column(TIMESTAMP(timezone=True), nullable=True)
@@ -122,6 +136,11 @@ class PerformanceRecord(Base):
     status = Column(String(50), default="draft")  # draft, submitted, approved, rejected, revision_requested
     data_json = Column(JSONB, nullable=False)
     submitted_at = Column(TIMESTAMP(timezone=True))
+    
+    # Export fields (Task 4: HSK code and export countries)
+    hsk_code = Column(String(10), nullable=True)  # 海关税则商品分类代码 (10位数字)
+    export_country1 = Column(String(100), nullable=True)  # 出口国家1
+    export_country2 = Column(String(100), nullable=True)  # 出口国家2
     
     # Review fields (merged from performance_reviews table)
     reviewer_id = Column(UUID(as_uuid=True), ForeignKey("admins.id", ondelete="SET NULL"), nullable=True)
@@ -193,10 +212,16 @@ class ProjectApplication(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     member_id = Column(UUID(as_uuid=True), ForeignKey("members.id", ondelete="CASCADE"), nullable=False)
     project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    status = Column(String(50), default="submitted")  # submitted, under_review, approved, rejected
+    status = Column(String(50), default="submitted")  # submitted, under_review, approved, rejected, needs_supplement, cancelled
     application_reason = Column(Text)
     submitted_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     reviewed_at = Column(TIMESTAMP(timezone=True))
+    
+    # Review fields
+    review_note = Column(Text, nullable=True)  # 审核备注/拒绝原因
+    reviewed_by = Column(UUID(as_uuid=True), nullable=True)  # 审核人 (admin id)
+    material_request = Column(Text, nullable=True)  # 补充材料请求
+    material_response = Column(Text, nullable=True)  # 会员补充材料回复
     
     # Soft delete field
     deleted_at = Column(TIMESTAMP(timezone=True), nullable=True)
@@ -211,10 +236,88 @@ class ProjectApplication(Base):
     # Indexes
     __table_args__ = (
         Index("idx_project_applications_deleted_at", "deleted_at"),
+        Index("idx_project_applications_reviewed_by", "reviewed_by"),
     )
 
     def __repr__(self):
         return f"<ProjectApplication(id={self.id}, member_id={self.member_id}, project_id={self.project_id})>"
+
+
+class ApplicationStatusHistory(Base):
+    """Application status change history for audit trail."""
+
+    __tablename__ = "application_status_history"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    application_id = Column(UUID(as_uuid=True), nullable=False)
+    old_status = Column(String(50), nullable=True)
+    new_status = Column(String(50), nullable=False)
+    changed_by = Column(UUID(as_uuid=True), nullable=True)
+    changed_by_type = Column(String(20), nullable=False)  # admin, member, system
+    note = Column(Text, nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_status_history_application_id", "application_id"),
+        Index("idx_status_history_created_at", "created_at"),
+    )
+
+    def __repr__(self):
+        return f"<ApplicationStatusHistory(id={self.id}, application_id={self.application_id}, new_status={self.new_status})>"
+
+
+class ApplicationAttachment(Base):
+    """Attachments for project applications."""
+
+    __tablename__ = "application_attachments"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    application_id = Column(UUID(as_uuid=True), nullable=False)
+    file_id = Column(UUID(as_uuid=True), nullable=True)
+    file_name = Column(String(255), nullable=False)
+    file_size = Column(Integer, nullable=True)
+    file_type = Column(String(100), nullable=True)
+    file_url = Column(String(500), nullable=False)
+    uploaded_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+    deleted_at = Column(TIMESTAMP(timezone=True), nullable=True)
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_attachments_application_id", "application_id"),
+        Index("idx_application_attachments_deleted_at", "deleted_at"),
+    )
+
+    def __repr__(self):
+        return f"<ApplicationAttachment(id={self.id}, application_id={self.application_id}, file_name={self.file_name})>"
+
+
+class Notification(Base):
+    """Member notifications."""
+
+    __tablename__ = "notifications"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    member_id = Column(UUID(as_uuid=True), nullable=False)
+    type = Column(String(50), nullable=False)  # application_status, message, system
+    title = Column(String(255), nullable=False)
+    content = Column(Text, nullable=True)
+    related_id = Column(UUID(as_uuid=True), nullable=True)
+    related_type = Column(String(50), nullable=True)  # application, message, etc.
+    is_read = Column(Boolean, nullable=False, server_default="false")
+    read_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_notifications_member_id", "member_id"),
+        Index("idx_notifications_is_read", "is_read"),
+        Index("idx_notifications_created_at", "created_at"),
+        Index("idx_notifications_member_unread", "member_id", "is_read", "created_at"),
+    )
+
+    def __repr__(self):
+        return f"<Notification(id={self.id}, member_id={self.member_id}, type={self.type})>"
 
 
 class Attachment(Base):
@@ -328,6 +431,7 @@ class Banner(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     banner_type = Column(String(50), nullable=False)  # MAIN, INTRO, PROGRAM, PERFORMANCE, SUPPORT
     image_url = Column(String(500), nullable=False)
+    mobile_image_url = Column(String(500), nullable=True)  # Mobile banner image URL
     link_url = Column(String(500))  # Optional click-through URL
     # Multilingual title and subtitle (ko=Korean, zh=Chinese)
     title_ko = Column(String(200))
@@ -646,6 +750,7 @@ class Admin(Base):
     email = Column(String(255), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=True)
+    admin_type = Column(String(20), nullable=False, server_default="admin")  # admin, developer
     is_active = Column(String(10), default="true")  # "true" or "false" as string
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())

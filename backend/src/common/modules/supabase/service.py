@@ -318,8 +318,10 @@ class SupabaseService:
         # Extract profile fields from member for backward compatibility
         profile_fields = [
             'industry', 'revenue', 'employee_count', 'founding_date',
-            'region', 'address', 'representative', 'legal_number',
-            'phone', 'website', 'logo_url'
+            'region', 'address', 'representative', 'representative_birth_date',
+            'representative_gender', 'legal_number', 'phone', 'website', 'logo_url',
+            'contact_person_name', 'contact_person_department', 'contact_person_position',
+            'main_business', 'description', 'cooperation_fields'
         ]
         profile = {k: member.get(k) for k in profile_fields if k in member}
         profile['member_id'] = member_id
@@ -496,6 +498,36 @@ class SupabaseService:
         count_result = count_query.execute()
         
         return result.data or [], count_result.count or 0
+
+    async def list_member_applications_with_filters(self, **kwargs) -> Tuple[List[Dict[str, Any]], int]:
+        """List member's project applications with search support."""
+        sort_by = kwargs.get('sort_by', 'submitted_at')
+        sort_order = kwargs.get('sort_order', 'desc')
+        member_id = kwargs.get('member_id')
+        search = kwargs.get('search')
+        
+        query = self.client.table('project_applications')\
+            .select('*, projects(title), members(company_name, business_number)')\
+            .is_('deleted_at', 'null')
+        
+        # Filter by member_id (required)
+        if member_id:
+            query = query.eq('member_id', member_id)
+        
+        query = query.order(sort_by, desc=(sort_order == 'desc'))
+        
+        result = query.execute()
+        
+        # Apply search filter on project title (client-side since Supabase doesn't support nested field search easily)
+        data = result.data or []
+        if search:
+            search_lower = search.lower()
+            data = [
+                app for app in data 
+                if app.get('projects', {}).get('title', '').lower().find(search_lower) >= 0
+            ]
+        
+        return data, len(data)
 
     async def get_performance_records(self, **kwargs) -> List[Dict[str, Any]]:
         """Get performance records for dashboard."""

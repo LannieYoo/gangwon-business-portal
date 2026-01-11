@@ -9,7 +9,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, Table, Button, Badge, Pagination, SearchInput, Alert } from '@shared/components';
 import { apiService, adminService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import { formatBusinessLicense } from '@shared/utils/format';
+import { formatBusinessLicense } from '@shared/utils';
 
 export default function ProjectList() {
   const { t } = useTranslation();
@@ -117,8 +117,18 @@ export default function ProjectList() {
 
   const handleExport = async (format = 'excel') => {
     setLoading(true);
-    await adminService.exportProjects({ format });
-    setLoading(false);
+    try {
+      await adminService.exportProjects({ format });
+      setMessage(t('admin.projects.exportSuccess', '导出成功'));
+      setMessageVariant('success');
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessage(t('admin.projects.exportFailed', '导出失败'));
+      setMessageVariant('error');
+      setTimeout(() => setMessage(null), 3000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [

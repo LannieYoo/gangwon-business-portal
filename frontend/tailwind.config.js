@@ -5,25 +5,24 @@ export default {
     "./src/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
-    // 响应式断点配置（Tailwind 默认值，明确列出便于参考）
     screens: {
-      'sm': '640px',   // 小屏设备（手机横屏、小平板）
-      'md': '768px',   // 中等屏幕（平板竖屏）
-      'lg': '1024px',  // 大屏设备（平板横屏、小桌面）
-      'xl': '1280px',  // 超大屏（桌面）
-      '2xl': '1536px'  // 超超大屏（大桌面）
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px'
     },
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff',
+          50: '#e5eff9',
           100: '#dbeafe',
           200: '#bfdbfe',
           300: '#93c5fd',
           400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
+          500: '#0052a4',
+          600: '#0052a4',
+          700: '#003777',
           800: '#1e40af',
           900: '#1e3a8a',
           950: '#172554'
@@ -41,33 +40,24 @@ export default {
           900: '#14532d',
           950: '#052e16'
         },
-        gray: {
-          50: '#f9fafb',
-          100: '#f3f4f6',
-          200: '#e5e7eb',
-          300: '#d1d5db',
-          400: '#9ca3af',
-          500: '#6b7280',
-          600: '#4b5563',
-          700: '#374151',
-          800: '#1f2937',
-          900: '#111827',
-          950: '#030712'
-        }
+        accent: '#d32f2f',
+        surface: '#ffffff',
+        background: '#f5f6f7'
       },
       fontFamily: {
         sans: [
-          'Noto Sans KR',
-          'Noto Sans SC',
+          'system-ui',
           '-apple-system',
           'BlinkMacSystemFont',
           'Segoe UI',
-          'Roboto',
-          'Arial',
+          'Noto Sans KR',
+          'Apple SD Gothic Neo',
+          'Malgun Gothic',
           'sans-serif'
         ]
       },
       spacing: {
+        '18': '4.5rem',
         '128': '32rem',
         '144': '36rem'
       },
@@ -75,8 +65,15 @@ export default {
         '4xl': '2rem'
       },
       boxShadow: {
-        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        'card': '0 1px 2px rgba(15, 23, 42, 0.05)',
         'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+      },
+      maxWidth: {
+        'page': '80rem'
+      },
+      zIndex: {
+        'header': '40',
+        'dropdown': '50'
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in-out',

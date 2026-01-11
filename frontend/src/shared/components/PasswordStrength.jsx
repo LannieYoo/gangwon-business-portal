@@ -4,8 +4,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { validatePassword } from '@shared/utils/validation';
-import { cn } from '@shared/utils/helpers';
+import { validatePassword, cn } from '@shared/utils';
 
 export function PasswordStrength({ password, showStrength = true }) {
   const { t } = useTranslation();

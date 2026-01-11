@@ -12,7 +12,6 @@ import {
 import { lazy, Suspense, useState, useEffect } from "react";
 import { useAuth } from "@shared/hooks";
 import { Button, Loading, LoginModal, ErrorBoundary } from "@shared/components";
-import "@shared/styles/ErrorPages.css";
 
 // Root Layout
 function RootLayout() {
@@ -258,6 +257,9 @@ const Register = lazy(() =>
 const AdminLogin = lazy(() =>
   import("@admin/modules/auth/Login").then((m) => ({ default: m.default }))
 );
+const AdminForgotPassword = lazy(() =>
+  import("@admin/modules/auth/ForgotPassword").then((m) => ({ default: m.default }))
+);
 
 // Lazy load member modules
 const MemberHome = lazy(() =>
@@ -268,8 +270,13 @@ const MemberProjects = lazy(() =>
     default: m.default,
   }))
 );
-const MemberProjectDetail = lazy(() =>
-  import("@member/modules/projects/ProjectDetail").then((m) => ({
+const MemberProjectList = lazy(() =>
+  import("@member/modules/projects/ProjectList").then((m) => ({
+    default: m.default,
+  }))
+);
+const MemberApplicationRecords = lazy(() =>
+  import("@member/modules/projects/ApplicationRecords").then((m) => ({
     default: m.default,
   }))
 );
@@ -409,6 +416,14 @@ export const router = createBrowserRouter(
             </LazyRoute>
           ),
         },
+        {
+          path: "/admin/forgot-password",
+          element: (
+            <LazyRoute>
+              <AdminForgotPassword />
+            </LazyRoute>
+          ),
+        },
         // Note: member login page removed; login handled via modal on protected routes
         {
           path: "/unauthorized",
@@ -465,16 +480,24 @@ export const router = createBrowserRouter(
                   </LazyRoute>
                 </ProtectedRoute>
               ),
-            },
-            {
-              path: "programs/:id",
-              element: (
-                <ProtectedRoute allowedRoles={["member"]}>
-                  <LazyRoute>
-                    <MemberProjectDetail />
-                  </LazyRoute>
-                </ProtectedRoute>
-              ),
+              children: [
+                {
+                  index: true,
+                  element: (
+                    <LazyRoute>
+                      <MemberProjectList />
+                    </LazyRoute>
+                  ),
+                },
+                {
+                  path: "applications",
+                  element: (
+                    <LazyRoute>
+                      <MemberApplicationRecords />
+                    </LazyRoute>
+                  ),
+                },
+              ],
             },
             {
               path: "performance",

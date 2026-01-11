@@ -125,6 +125,10 @@ class PerformanceService:
             "type": data.type,
             "status": "draft",
             "data_json": data.data_json,
+            # Export fields (Task 4)
+            "hsk_code": data.hsk_code,
+            "export_country1": data.export_country1,
+            "export_country2": data.export_country2,
         }
         # Use helper method
         return await supabase_service.create_record('performance_records', record_data)
@@ -169,6 +173,13 @@ class PerformanceService:
             update_data["type"] = data.type
         if data.data_json is not None:
             update_data["data_json"] = data.data_json
+        # Export fields (Task 4)
+        if data.hsk_code is not None:
+            update_data["hsk_code"] = data.hsk_code
+        if data.export_country1 is not None:
+            update_data["export_country1"] = data.export_country1
+        if data.export_country2 is not None:
+            update_data["export_country2"] = data.export_country2
 
         # Use helper method
         return await supabase_service.update_record('performance_records', str(performance_id), update_data)

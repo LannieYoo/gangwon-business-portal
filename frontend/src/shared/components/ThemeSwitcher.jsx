@@ -4,7 +4,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useUIStore } from '@shared/stores/uiStore';
+import { useUIStore } from '@shared/stores';
 import { SunIcon, MoonIcon } from './Icons';
 import { cn } from '@shared/utils/helpers';
 

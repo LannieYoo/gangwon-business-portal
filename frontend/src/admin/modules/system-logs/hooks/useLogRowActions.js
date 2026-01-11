@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { formatEST } from '@shared/utils/format';
+import { formatEST } from '@shared/utils';
 
 /**
  * @param {Object} config

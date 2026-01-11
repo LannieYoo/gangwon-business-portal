@@ -142,7 +142,7 @@ class ProjectService:
         self, member_id: UUID, query: ApplicationListQuery
     ) -> tuple[list[dict], int]:
         """
-        Get member's own applications.
+        Get member's own applications with search support.
 
         Args:
             member_id: Member UUID
@@ -151,11 +151,103 @@ class ProjectService:
         Returns:
             Tuple of (applications list, total count)
         """
-        applications, total = await supabase_service.list_project_applications_with_filters(
+        applications, total = await supabase_service.list_member_applications_with_filters(
+            member_id=str(member_id),
+            search=query.search if hasattr(query, 'search') else None,
             sort_by="submitted_at",
             sort_order="desc",
         )
-        return applications, total
+        
+        # Flatten nested data for schema compatibility
+        flattened = []
+        for app in applications:
+            flat_app = {**app}
+            # Extract project_title from nested projects object
+            if 'projects' in flat_app and flat_app['projects']:
+                flat_app['project_title'] = flat_app['projects'].get('title', '')
+                del flat_app['projects']
+            else:
+                flat_app['project_title'] = ''
+            # Extract company_name from nested members object
+            if 'members' in flat_app and flat_app['members']:
+                flat_app['company_name'] = flat_app['members'].get('company_name', '')
+                flat_app['business_number'] = flat_app['members'].get('business_number', '')
+                del flat_app['members']
+            else:
+                flat_app['company_name'] = ''
+                flat_app['business_number'] = ''
+            # Ensure application_reason has a default value
+            if not flat_app.get('application_reason'):
+                flat_app['application_reason'] = ''
+            flattened.append(flat_app)
+        
+        return flattened, total
+
+    async def get_application_by_id(
+        self, application_id: UUID, member_id: UUID
+    ) -> dict:
+        """
+        Get application by ID (member only, must be owner).
+
+        Args:
+            application_id: Application UUID
+            member_id: Member UUID (for ownership verification)
+
+        Returns:
+            Application dict
+
+        Raises:
+            NotFoundError: If application not found or not owned by member
+        """
+        application = await supabase_service.get_by_id('project_applications', str(application_id))
+
+        if not application:
+            raise NotFoundError(resource_type="Project application")
+
+        if application.get('member_id') != str(member_id):
+            raise NotFoundError(resource_type="Project application")
+
+        # Get project info
+        project = await supabase_service.get_by_id('projects', str(application['project_id']))
+        if project:
+            application['project_title'] = project.get('title', '')
+            application['project'] = project
+
+        return application
+
+    async def cancel_application(
+        self, application_id: UUID, member_id: UUID
+    ) -> dict:
+        """
+        Cancel a project application (member only).
+
+        Args:
+            application_id: Application UUID
+            member_id: Member UUID (for ownership verification)
+
+        Returns:
+            Updated application dict
+
+        Raises:
+            NotFoundError: If application not found or not owned by member
+            ValidationError: If application cannot be cancelled
+        """
+        application = await self.get_application_by_id(application_id, member_id)
+
+        # Check if application can be cancelled
+        cancellable_statuses = ['pending', 'submitted', 'under_review', 'reviewing']
+        if application.get('status') not in cancellable_statuses:
+            raise ValidationError(
+                f"Cannot cancel application with status: {application.get('status')}. Only applications in pending, submitted, under_review, or reviewing status can be cancelled."
+            )
+
+        # Update status to cancelled
+        update_data = {
+            "status": "cancelled",
+            "reviewed_at": datetime.utcnow().isoformat()
+        }
+
+        return await supabase_service.update_record('project_applications', str(application_id), update_data)
 
     # Admin operations
 

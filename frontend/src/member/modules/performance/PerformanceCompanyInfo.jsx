@@ -14,7 +14,7 @@ import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
 import { Badge, Modal, ModalFooter } from '@shared/components';
 import { memberService } from '@shared/services';
-import useUpload from '@shared/hooks/useUpload';
+import { useUpload } from '@shared/hooks';
 import {
   UserIcon,
   BuildingIcon,
@@ -28,8 +28,13 @@ import {
   EditIcon,
   CheckCircleIcon
 } from '@shared/components/Icons';
-import { formatNumber, parseFormattedNumber } from '@shared/utils/format';
-import { validateImageFile } from '@shared/utils/fileValidation';
+import { formatNumber, parseFormattedNumber, validateImageFile } from '@shared/utils';
+import { 
+  STARTUP_TYPE_KEYS, 
+  KSIC_MAJOR_CATEGORY_KEYS, 
+  getSubCategoryKeysByMajor,
+  translateOptions 
+} from '@shared/data/industryClassification';
 
 export default function PerformanceCompanyInfo() {
   const { t, i18n } = useTranslation();
@@ -46,11 +51,16 @@ export default function PerformanceCompanyInfo() {
   const [messageVariant, setMessageVariant] = useState('success');
   const [companyData, setCompanyData] = useState({
     companyName: '', businessNumber: '', corporationNumber: '', establishedDate: '',
-    representative: '', phone: '', address: '', region: '', category: '', industry: '',
+    representative: '', representativeBirthDate: '', representativeGender: '', phone: '', address: '', region: '', category: '', industry: '',
     description: '', website: '', logo: null, logoPreview: null, businessField: '', sales: '', employeeCount: '',
     mainBusiness: '', cooperationFields: [], approvalStatus: null,
     // Contact person fields
-    contactPersonName: '', contactPersonDepartment: '', contactPersonPosition: ''
+    contactPersonName: '', contactPersonDepartment: '', contactPersonPosition: '',
+    // New business info fields (Task 5)
+    startupType: '', ksicMajor: '', ksicSub: '',
+    // New fields for Task 6
+    participationPrograms: [],
+    investmentStatus: { hasInvestment: false, amount: '', institution: '' }
   });
 
   // 使用 ref 存储 logoPreview URL，便于清理
@@ -75,7 +85,9 @@ export default function PerformanceCompanyInfo() {
       businessNumber: profile.businessNumber || '',
       corporationNumber: profile.corporationNumber || '',
       establishedDate: profile.establishedDate || profile.foundingDate || '',
-      representative: profile.representative || '', 
+      representative: profile.representative || '',
+      representativeBirthDate: profile.representativeBirthDate || '',
+      representativeGender: profile.representativeGender || '',
       phone: profile.phone || '',
       address: profile.address || '', 
       region: profile.region || '', 
@@ -94,7 +106,14 @@ export default function PerformanceCompanyInfo() {
       // Contact person fields
       contactPersonName: profile.contactPersonName || '',
       contactPersonDepartment: profile.contactPersonDepartment || '',
-      contactPersonPosition: profile.contactPersonPosition || ''
+      contactPersonPosition: profile.contactPersonPosition || '',
+      // New business info fields (Task 5)
+      startupType: profile.startupType || '',
+      ksicMajor: profile.ksicMajor || '',
+      ksicSub: profile.ksicSub || '',
+      // New fields for Task 6
+      participationPrograms: profile.participationPrograms || [],
+      investmentStatus: profile.investmentStatus || { hasInvestment: false, amount: '', institution: '' }
     });
     setLoading(false);
   }, [isAuthenticated, cleanupLogoPreview]);
@@ -135,6 +154,12 @@ export default function PerformanceCompanyInfo() {
       return;
     }
     
+    // Handle KSIC major category change - reset sub-category when major changes
+    if (field === 'ksicMajor') {
+      setCompanyData(prev => ({ ...prev, ksicMajor: value, ksicSub: '' }));
+      return;
+    }
+    
     setCompanyData(prev => ({ ...prev, [field]: value }));
     if (['phone', 'website', 'email'].includes(field)) validateField(field, value);
   }, [validateField]);
@@ -145,6 +170,40 @@ export default function PerformanceCompanyInfo() {
       return {
         ...prev,
         cooperationFields: checked ? [...fields, field] : fields.filter(f => f !== field)
+      };
+    });
+  }, []);
+
+  // Handler for participation programs (Task 6.2)
+  const handleParticipationProgramChange = useCallback((program, checked) => {
+    setCompanyData(prev => {
+      const programs = prev.participationPrograms || [];
+      return {
+        ...prev,
+        participationPrograms: checked ? [...programs, program] : programs.filter(p => p !== program)
+      };
+    });
+  }, []);
+
+  // Handler for investment status (Task 6.3)
+  const handleInvestmentStatusChange = useCallback((field, value) => {
+    setCompanyData(prev => {
+      const newInvestmentStatus = { ...prev.investmentStatus };
+      
+      if (field === 'hasInvestment') {
+        newInvestmentStatus.hasInvestment = value;
+        // Clear amount and institution when "no investment" is selected
+        if (!value) {
+          newInvestmentStatus.amount = '';
+          newInvestmentStatus.institution = '';
+        }
+      } else {
+        newInvestmentStatus[field] = value;
+      }
+      
+      return {
+        ...prev,
+        investmentStatus: newInvestmentStatus
       };
     });
   }, []);
@@ -189,6 +248,8 @@ export default function PerformanceCompanyInfo() {
       website: companyData.website,
       corporationNumber: companyData.corporationNumber,
       representative: companyData.representative,
+      representativeBirthDate: companyData.representativeBirthDate,
+      representativeGender: companyData.representativeGender,
       phone: companyData.phone,
       logoUrl: companyData.logo,
       // Contact person fields
@@ -198,7 +259,14 @@ export default function PerformanceCompanyInfo() {
       // Business info fields
       mainBusiness: companyData.mainBusiness,
       description: companyData.description,
-      cooperationFields: companyData.cooperationFields
+      cooperationFields: companyData.cooperationFields,
+      // New business info fields (Task 5)
+      startupType: companyData.startupType,
+      ksicMajor: companyData.ksicMajor,
+      ksicSub: companyData.ksicSub,
+      // New fields for Task 6
+      participationPrograms: companyData.participationPrograms,
+      investmentStatus: companyData.investmentStatus
     };
 
     await memberService.updateProfile(saveData);
@@ -206,8 +274,8 @@ export default function PerformanceCompanyInfo() {
     setMessageVariant('success');
     setMessage(t('performance.companyInfo.message.saveSuccess', '保存成功'));
     setTimeout(() => setMessage(null), 3000);
+    await loadProfile();
     setSaving(false);
-    loadProfile();
   }, [companyData, fieldErrors, requiredFields, t, loadProfile]);
 
   const handleCancel = useCallback(() => {
@@ -245,13 +313,25 @@ export default function PerformanceCompanyInfo() {
 
 
   const regionOptions = useMemo(() => [
-    { value: 'chuncheon', label: t('performance.companyInfo.profile.regions.chuncheon', '春川') },
-    { value: 'wonju', label: t('performance.companyInfo.profile.regions.wonju', '原州') },
-    { value: 'gangneung', label: t('performance.companyInfo.profile.regions.gangneung', '江陵') },
-    { value: 'donghae', label: t('performance.companyInfo.profile.regions.donghae', '东海') },
-    { value: 'taebaek', label: t('performance.companyInfo.profile.regions.taebaek', '太白') },
-    { value: 'sokcho', label: t('performance.companyInfo.profile.regions.sokcho', '束草') },
-    { value: 'samcheok', label: t('performance.companyInfo.profile.regions.samcheok', '三陟') }
+    { value: 'chuncheon', label: t('profile.regions.chuncheon', '춘천시') },
+    { value: 'wonju', label: t('profile.regions.wonju', '원주시') },
+    { value: 'gangneung', label: t('profile.regions.gangneung', '강릉시') },
+    { value: 'donghae', label: t('profile.regions.donghae', '동해시') },
+    { value: 'taebaek', label: t('profile.regions.taebaek', '태백시') },
+    { value: 'sokcho', label: t('profile.regions.sokcho', '속초시') },
+    { value: 'samcheok', label: t('profile.regions.samcheok', '삼척시') },
+    { value: 'hongcheon', label: t('profile.regions.hongcheon', '홍천군') },
+    { value: 'hoengseong', label: t('profile.regions.hoengseong', '횡성군') },
+    { value: 'yeongwol', label: t('profile.regions.yeongwol', '영월군') },
+    { value: 'pyeongchang', label: t('profile.regions.pyeongchang', '평창군') },
+    { value: 'jeongseon', label: t('profile.regions.jeongseon', '정선군') },
+    { value: 'cheorwon', label: t('profile.regions.cheorwon', '철원군') },
+    { value: 'hwacheon', label: t('profile.regions.hwacheon', '화천군') },
+    { value: 'yanggu', label: t('profile.regions.yanggu', '양구군') },
+    { value: 'inje', label: t('profile.regions.inje', '인제군') },
+    { value: 'goseong', label: t('profile.regions.goseong', '고성군') },
+    { value: 'yangyang', label: t('profile.regions.yangyang', '양양군') },
+    { value: 'other', label: t('profile.regions.other', '기타 지역') }
   ], [t, i18n.language]);
 
   const categoryOptions = useMemo(() => [
@@ -277,6 +357,30 @@ export default function PerformanceCompanyInfo() {
     { value: 'field2', label: t('performance.companyInfo.profile.cooperationFields.field2', '市场拓展') },
     { value: 'field3', label: t('performance.companyInfo.profile.cooperationFields.field3', '人才培养') }
   ], [t, i18n.language]);
+
+  // Participation program options (Task 6.2)
+  const participationProgramOptions = useMemo(() => [
+    { value: 'startup_center_university', label: t('performance.companyInfo.profile.participationPrograms.startupCenterUniversity', '창업중심대학') },
+    { value: 'global_business', label: t('performance.companyInfo.profile.participationPrograms.globalBusiness', '글로벌 사업') },
+    { value: 'rise_business', label: t('performance.companyInfo.profile.participationPrograms.riseBusiness', 'RISE 사업') },
+    { value: 'none', label: t('performance.companyInfo.profile.participationPrograms.none', '없음') }
+  ], [t, i18n.language]);
+
+  // Startup type options with i18n (Task 5.1)
+  const startupTypeOptions = useMemo(() => {
+    return translateOptions(STARTUP_TYPE_KEYS, t);
+  }, [t, i18n.language]);
+
+  // KSIC major categories with i18n (Task 5.2)
+  const ksicMajorOptions = useMemo(() => {
+    return translateOptions(KSIC_MAJOR_CATEGORY_KEYS, t);
+  }, [t, i18n.language]);
+
+  // KSIC sub-categories based on selected major category (Task 5.3)
+  const ksicSubOptions = useMemo(() => {
+    const subKeys = getSubCategoryKeysByMajor(companyData.ksicMajor);
+    return translateOptions(subKeys, t);
+  }, [companyData.ksicMajor, t, i18n.language]);
 
   if (!isAuthenticated) {
     return (
@@ -478,6 +582,33 @@ export default function PerformanceCompanyInfo() {
           </div>
           <div className="flex flex-col">
             <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">
+              {t('member.representativeBirthDate', '대표자 생년월일')}
+            </label>
+            <Input 
+              type="date" 
+              value={companyData.representativeBirthDate} 
+              onChange={(e) => handleChange('representativeBirthDate', e.target.value)} 
+              disabled={!isEditing}
+              error={fieldErrors.representativeBirthDate}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">
+              {t('member.representativeGender', '대표자 성별')}
+            </label>
+            <Select 
+              value={companyData.representativeGender} 
+              onChange={(e) => handleChange('representativeGender', e.target.value)} 
+              options={[
+                { value: 'male', label: t('common.male', '남성') },
+                { value: 'female', label: t('common.female', '여성') }
+              ]}
+              disabled={!isEditing}
+              placeholder={t('common.select', '선택')}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">
               {t('member.contactPersonName', '담당자명')}
             </label>
             <Input 
@@ -551,6 +682,39 @@ export default function PerformanceCompanyInfo() {
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 m-0">{t('performance.companyInfo.sections.businessInfo', '业务信息')}</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 p-6 sm:p-8 lg:p-10">
+          {/* Startup Type - Task 5.1 */}
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.startupType', '창업구분')}</label>
+            <Select 
+              value={companyData.startupType} 
+              onChange={(e) => handleChange('startupType', e.target.value)} 
+              options={startupTypeOptions} 
+              disabled={!isEditing} 
+              placeholder={t('common.select', '선택')} 
+            />
+          </div>
+          {/* KSIC Major Category - Task 5.2 */}
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.ksicMajor', '한국표준산업분류코드[대분류]')}</label>
+            <Select 
+              value={companyData.ksicMajor} 
+              onChange={(e) => handleChange('ksicMajor', e.target.value)} 
+              options={ksicMajorOptions} 
+              disabled={!isEditing} 
+              placeholder={t('common.select', '선택')} 
+            />
+          </div>
+          {/* KSIC Sub Category - Task 5.3 */}
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.ksicSub', '지역주력산업코드[중분류]')}</label>
+            <Select 
+              value={companyData.ksicSub} 
+              onChange={(e) => handleChange('ksicSub', e.target.value)} 
+              options={ksicSubOptions} 
+              disabled={!isEditing || !companyData.ksicMajor} 
+              placeholder={companyData.ksicMajor ? t('common.select', '선택') : t('member.selectMajorFirst', '대분류를 먼저 선택하세요')} 
+            />
+          </div>
           <Select label={t('member.category', 'Category')} value={companyData.category} onChange={(e) => handleChange('category', e.target.value)} options={categoryOptions} disabled={!isEditing} required placeholder={null} />
           <Select label={t('member.industry', 'Industry')} value={companyData.industry} onChange={(e) => handleChange('industry', e.target.value)} options={industryOptions} disabled={!isEditing} required placeholder={null} />
           <div className="flex flex-col">
@@ -591,9 +755,20 @@ export default function PerformanceCompanyInfo() {
             <Textarea value={companyData.description} onChange={(e) => handleChange('description', e.target.value)} disabled={!isEditing} rows={5} maxLength={500} />
             <small className="mt-2 text-xs text-gray-500">{companyData.description.length}/500</small>
           </div>
-          {isEditing && (
-            <div className="flex flex-col col-span-1 sm:col-span-2">
-              <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.cooperationFields', 'Cooperation Fields')}</label>
+        </div>
+      </Card>
+
+      {/* Additional Company Info - Task 6 */}
+      <Card className="mb-6 sm:mb-8 shadow-sm hover:shadow-md transition-all p-0">
+        <div className="flex items-center gap-3 sm:gap-4 border-b border-gray-200 p-6 sm:p-8 lg:p-10 pb-4 sm:pb-5 lg:pb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 m-0">{t('performance.companyInfo.sections.additionalInfo', '추가 정보')}</h2>
+        </div>
+        <div className="grid grid-cols-1 gap-6 sm:gap-8 p-6 sm:p-8 lg:p-10">
+          
+          {/* Task 6.1: Cooperation Fields - 产业合作期望领域 */}
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.cooperationFields', '산업협력 희망 분야')}</label>
+            {isEditing ? (
               <div className="flex flex-col gap-3 mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 {cooperationFieldOptions.map(option => (
                   <label key={option.value} className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-white transition-colors">
@@ -607,23 +782,120 @@ export default function PerformanceCompanyInfo() {
                   </label>
                 ))}
               </div>
-            </div>
-          )}
-          {!isEditing && companyData.cooperationFields?.length > 0 && (
-            <div className="flex flex-col col-span-1 sm:col-span-2">
-              <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.cooperationFields', 'Cooperation Fields')}</label>
+            ) : (
               <div className="flex flex-wrap gap-2 mt-2">
-                {companyData.cooperationFields.map((field, index) => {
-                  const fieldOption = cooperationFieldOptions.find(opt => opt.value === field);
-                  return (
-                    <span key={index} className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md">
-                      {fieldOption ? fieldOption.label : field}
-                    </span>
-                  );
-                })}
+                {companyData.cooperationFields?.length > 0 ? (
+                  companyData.cooperationFields.map((field, index) => {
+                    const fieldOption = cooperationFieldOptions.find(opt => opt.value === field);
+                    return (
+                      <span key={index} className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md">
+                        {fieldOption ? fieldOption.label : field}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span className="text-sm text-gray-500">{t('common.notSet', '미설정')}</span>
+                )}
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Task 6.2: Participation Programs */}
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.participationPrograms', '참여 프로그램')}</label>
+            {isEditing ? (
+              <div className="flex flex-col gap-3 mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                {participationProgramOptions.map(option => (
+                  <label key={option.value} className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-white transition-colors">
+                    <input 
+                      type="checkbox" 
+                      checked={companyData.participationPrograms.includes(option.value)} 
+                      onChange={(e) => handleParticipationProgramChange(option.value, e.target.checked)} 
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded" 
+                    />
+                    <span className="text-sm text-gray-700">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {companyData.participationPrograms?.length > 0 ? (
+                  companyData.participationPrograms.map((program, index) => {
+                    const programOption = participationProgramOptions.find(opt => opt.value === program);
+                    return (
+                      <span key={index} className="px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-md">
+                        {programOption ? programOption.label : program}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span className="text-sm text-gray-500">{t('common.notSet', '미설정')}</span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Task 6.3: Investment Status */}
+          <div className="flex flex-col">
+            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.investmentStatus', '투자 유치')}</label>
+            {isEditing ? (
+              <div className="flex flex-col gap-4 mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                {/* No Investment Option */}
+                <label className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-white transition-colors">
+                  <input 
+                    type="checkbox" 
+                    checked={!companyData.investmentStatus?.hasInvestment} 
+                    onChange={(e) => handleInvestmentStatusChange('hasInvestment', !e.target.checked)} 
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded" 
+                  />
+                  <span className="text-sm text-gray-700">{t('performance.companyInfo.profile.investmentStatus.none', '없음')}</span>
+                </label>
+                
+                {/* Investment Amount */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-600">{t('performance.companyInfo.profile.investmentStatus.amount', '투자 금액 (백만원)')}</label>
+                  <Input 
+                    type="text" 
+                    value={companyData.investmentStatus?.amount || ''} 
+                    onChange={(e) => handleInvestmentStatusChange('amount', e.target.value)} 
+                    disabled={!companyData.investmentStatus?.hasInvestment}
+                    placeholder="0"
+                    className={!companyData.investmentStatus?.hasInvestment ? 'bg-gray-100 cursor-not-allowed' : ''}
+                  />
+                </div>
+                
+                {/* Investment Institution */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-600">{t('performance.companyInfo.profile.investmentStatus.institution', '투자 기관')}</label>
+                  <Input 
+                    type="text" 
+                    value={companyData.investmentStatus?.institution || ''} 
+                    onChange={(e) => handleInvestmentStatusChange('institution', e.target.value)} 
+                    disabled={!companyData.investmentStatus?.hasInvestment}
+                    placeholder={t('performance.companyInfo.profile.investmentStatus.institutionPlaceholder', '투자 기관명 입력')}
+                    className={!companyData.investmentStatus?.hasInvestment ? 'bg-gray-100 cursor-not-allowed' : ''}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                {companyData.investmentStatus?.hasInvestment ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-600">{t('performance.companyInfo.profile.investmentStatus.amount', '투자 금액')}:</span>
+                      <span className="text-sm text-gray-900">{companyData.investmentStatus?.amount || '-'} {t('common.millionWon', '백만원')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-600">{t('performance.companyInfo.profile.investmentStatus.institution', '투자 기관')}:</span>
+                      <span className="text-sm text-gray-900">{companyData.investmentStatus?.institution || '-'}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-sm text-gray-500">{t('performance.companyInfo.profile.investmentStatus.none', '없음')}</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </Card>
 

@@ -223,6 +223,7 @@ class BannerCreate(BaseModel):
     
     banner_type: str = Field(..., description="Banner type: main_primary, about, projects, performance, support")
     image_url: str = Field(..., max_length=500, description="Banner image URL")
+    mobile_image_url: Optional[str] = Field(None, max_length=500, description="Mobile banner image URL")
     link_url: Optional[str] = Field(None, max_length=500, description="Optional click-through URL")
     title_ko: Optional[str] = Field(None, max_length=200, description="Korean title")
     title_zh: Optional[str] = Field(None, max_length=200, description="Chinese title")
@@ -237,6 +238,7 @@ class BannerUpdate(BaseModel):
     
     banner_type: Optional[str] = Field(None, description="Banner type")
     image_url: Optional[str] = Field(None, max_length=500, description="Banner image URL")
+    mobile_image_url: Optional[str] = Field(None, max_length=500, description="Mobile banner image URL")
     link_url: Optional[str] = Field(None, max_length=500, description="Optional click-through URL")
     title_ko: Optional[str] = Field(None, max_length=200, description="Korean title")
     title_zh: Optional[str] = Field(None, max_length=200, description="Chinese title")
@@ -252,6 +254,7 @@ class BannerResponse(BaseModel):
     id: UUID
     banner_type: str
     image_url: str
+    mobile_image_url: Optional[str] = None
     link_url: Optional[str]
     title_ko: Optional[str]
     title_zh: Optional[str]

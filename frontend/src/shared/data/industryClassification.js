@@ -1,0 +1,171 @@
+// 韩国标准产业分类 (KSIC) 第10次修订版
+// 参考: https://kssc.mods.go.kr:8443/ksscNew_web/kssc/common/ClassificationContent.do
+
+// 创业类型选项
+export const STARTUP_TYPE_KEYS = [
+  { value: 'preliminary', labelKey: 'industryClassification.startupType.preliminary' },
+  { value: 'startup_under_3years', labelKey: 'industryClassification.startupType.startup_under_3years' },
+  { value: 'growth_over_7years', labelKey: 'industryClassification.startupType.growth_over_7years' },
+  { value: 'restart', labelKey: 'industryClassification.startupType.restart' }
+];
+
+// 产业大分类 (A-U)
+export const KSIC_MAJOR_CATEGORY_KEYS = [
+  { value: 'A', labelKey: 'industryClassification.ksicMajor.A' },
+  { value: 'B', labelKey: 'industryClassification.ksicMajor.B' },
+  { value: 'C', labelKey: 'industryClassification.ksicMajor.C' },
+  { value: 'D', labelKey: 'industryClassification.ksicMajor.D' },
+  { value: 'E', labelKey: 'industryClassification.ksicMajor.E' },
+  { value: 'F', labelKey: 'industryClassification.ksicMajor.F' },
+  { value: 'G', labelKey: 'industryClassification.ksicMajor.G' },
+  { value: 'H', labelKey: 'industryClassification.ksicMajor.H' },
+  { value: 'I', labelKey: 'industryClassification.ksicMajor.I' },
+  { value: 'J', labelKey: 'industryClassification.ksicMajor.J' },
+  { value: 'K', labelKey: 'industryClassification.ksicMajor.K' },
+  { value: 'L', labelKey: 'industryClassification.ksicMajor.L' },
+  { value: 'M', labelKey: 'industryClassification.ksicMajor.M' },
+  { value: 'N', labelKey: 'industryClassification.ksicMajor.N' },
+  { value: 'O', labelKey: 'industryClassification.ksicMajor.O' },
+  { value: 'P', labelKey: 'industryClassification.ksicMajor.P' },
+  { value: 'Q', labelKey: 'industryClassification.ksicMajor.Q' },
+  { value: 'R', labelKey: 'industryClassification.ksicMajor.R' },
+  { value: 'S', labelKey: 'industryClassification.ksicMajor.S' },
+  { value: 'T', labelKey: 'industryClassification.ksicMajor.T' },
+  { value: 'U', labelKey: 'industryClassification.ksicMajor.U' }
+];
+
+// 产业中分类 (按大分类分组)
+export const KSIC_SUB_CATEGORY_KEYS = {
+  A: [
+    { value: '01', labelKey: 'industryClassification.ksicSub.01' },
+    { value: '02', labelKey: 'industryClassification.ksicSub.02' },
+    { value: '03', labelKey: 'industryClassification.ksicSub.03' }
+  ],
+  B: [
+    { value: '05', labelKey: 'industryClassification.ksicSub.05' },
+    { value: '06', labelKey: 'industryClassification.ksicSub.06' },
+    { value: '07', labelKey: 'industryClassification.ksicSub.07' },
+    { value: '08', labelKey: 'industryClassification.ksicSub.08' }
+  ],
+  C: [
+    { value: '10', labelKey: 'industryClassification.ksicSub.10' },
+    { value: '11', labelKey: 'industryClassification.ksicSub.11' },
+    { value: '12', labelKey: 'industryClassification.ksicSub.12' },
+    { value: '13', labelKey: 'industryClassification.ksicSub.13' },
+    { value: '14', labelKey: 'industryClassification.ksicSub.14' },
+    { value: '15', labelKey: 'industryClassification.ksicSub.15' },
+    { value: '16', labelKey: 'industryClassification.ksicSub.16' },
+    { value: '17', labelKey: 'industryClassification.ksicSub.17' },
+    { value: '18', labelKey: 'industryClassification.ksicSub.18' },
+    { value: '19', labelKey: 'industryClassification.ksicSub.19' },
+    { value: '20', labelKey: 'industryClassification.ksicSub.20' },
+    { value: '21', labelKey: 'industryClassification.ksicSub.21' },
+    { value: '22', labelKey: 'industryClassification.ksicSub.22' },
+    { value: '23', labelKey: 'industryClassification.ksicSub.23' },
+    { value: '24', labelKey: 'industryClassification.ksicSub.24' },
+    { value: '25', labelKey: 'industryClassification.ksicSub.25' },
+    { value: '26', labelKey: 'industryClassification.ksicSub.26' },
+    { value: '27', labelKey: 'industryClassification.ksicSub.27' },
+    { value: '28', labelKey: 'industryClassification.ksicSub.28' },
+    { value: '29', labelKey: 'industryClassification.ksicSub.29' },
+    { value: '30', labelKey: 'industryClassification.ksicSub.30' },
+    { value: '31', labelKey: 'industryClassification.ksicSub.31' },
+    { value: '32', labelKey: 'industryClassification.ksicSub.32' },
+    { value: '33', labelKey: 'industryClassification.ksicSub.33' },
+    { value: '34', labelKey: 'industryClassification.ksicSub.34' }
+  ],
+  D: [
+    { value: '35', labelKey: 'industryClassification.ksicSub.35' }
+  ],
+  E: [
+    { value: '36', labelKey: 'industryClassification.ksicSub.36' },
+    { value: '37', labelKey: 'industryClassification.ksicSub.37' },
+    { value: '38', labelKey: 'industryClassification.ksicSub.38' },
+    { value: '39', labelKey: 'industryClassification.ksicSub.39' }
+  ],
+  F: [
+    { value: '41', labelKey: 'industryClassification.ksicSub.41' },
+    { value: '42', labelKey: 'industryClassification.ksicSub.42' }
+  ],
+  G: [
+    { value: '45', labelKey: 'industryClassification.ksicSub.45' },
+    { value: '46', labelKey: 'industryClassification.ksicSub.46' },
+    { value: '47', labelKey: 'industryClassification.ksicSub.47' }
+  ],
+  H: [
+    { value: '49', labelKey: 'industryClassification.ksicSub.49' },
+    { value: '50', labelKey: 'industryClassification.ksicSub.50' },
+    { value: '51', labelKey: 'industryClassification.ksicSub.51' },
+    { value: '52', labelKey: 'industryClassification.ksicSub.52' }
+  ],
+  I: [
+    { value: '55', labelKey: 'industryClassification.ksicSub.55' },
+    { value: '56', labelKey: 'industryClassification.ksicSub.56' }
+  ],
+  J: [
+    { value: '58', labelKey: 'industryClassification.ksicSub.58' },
+    { value: '59', labelKey: 'industryClassification.ksicSub.59' },
+    { value: '60', labelKey: 'industryClassification.ksicSub.60' },
+    { value: '61', labelKey: 'industryClassification.ksicSub.61' },
+    { value: '62', labelKey: 'industryClassification.ksicSub.62' },
+    { value: '63', labelKey: 'industryClassification.ksicSub.63' }
+  ],
+  K: [
+    { value: '64', labelKey: 'industryClassification.ksicSub.64' },
+    { value: '65', labelKey: 'industryClassification.ksicSub.65' },
+    { value: '66', labelKey: 'industryClassification.ksicSub.66' }
+  ],
+  L: [
+    { value: '68', labelKey: 'industryClassification.ksicSub.68' }
+  ],
+  M: [
+    { value: '70', labelKey: 'industryClassification.ksicSub.70' },
+    { value: '71', labelKey: 'industryClassification.ksicSub.71' },
+    { value: '72', labelKey: 'industryClassification.ksicSub.72' },
+    { value: '73', labelKey: 'industryClassification.ksicSub.73' }
+  ],
+  N: [
+    { value: '74', labelKey: 'industryClassification.ksicSub.74' },
+    { value: '75', labelKey: 'industryClassification.ksicSub.75' },
+    { value: '76', labelKey: 'industryClassification.ksicSub.76' }
+  ],
+  O: [
+    { value: '84', labelKey: 'industryClassification.ksicSub.84' }
+  ],
+  P: [
+    { value: '85', labelKey: 'industryClassification.ksicSub.85' }
+  ],
+  Q: [
+    { value: '86', labelKey: 'industryClassification.ksicSub.86' },
+    { value: '87', labelKey: 'industryClassification.ksicSub.87' }
+  ],
+  R: [
+    { value: '90', labelKey: 'industryClassification.ksicSub.90' },
+    { value: '91', labelKey: 'industryClassification.ksicSub.91' }
+  ],
+  S: [
+    { value: '94', labelKey: 'industryClassification.ksicSub.94' },
+    { value: '95', labelKey: 'industryClassification.ksicSub.95' },
+    { value: '96', labelKey: 'industryClassification.ksicSub.96' }
+  ],
+  T: [
+    { value: '97', labelKey: 'industryClassification.ksicSub.97' },
+    { value: '98', labelKey: 'industryClassification.ksicSub.98' }
+  ],
+  U: [
+    { value: '99', labelKey: 'industryClassification.ksicSub.99' }
+  ]
+};
+
+// 根据大分类获取中分类
+export function getSubCategoryKeysByMajor(majorCategory) {
+  return KSIC_SUB_CATEGORY_KEYS[majorCategory] || [];
+}
+
+// 翻译选项（使用 i18n t 函数）
+export function translateOptions(options, t) {
+  return options.map(opt => ({
+    value: opt.value,
+    label: t(opt.labelKey, opt.labelKey.split('.').pop())
+  }));
+}

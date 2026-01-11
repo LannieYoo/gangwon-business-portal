@@ -17,7 +17,7 @@ import {
 } from '@shared/components';
 import { SearchIcon } from '@shared/components/Icons';
 import { supportService } from '@shared/services';
-import { formatDate } from '@shared/utils/format';
+import { formatDate } from '@shared/utils';
 
 export default function FAQManagement() {
   const { t, i18n } = useTranslation();
@@ -109,7 +109,7 @@ export default function FAQManagement() {
   const fetchFaqs = async () => {
     setLoading(true);
     try {
-      const response = await supportService.listFAQs();
+      const response = await supportService.listFAQs({});
       // supportService.listFAQs 直接返回数组，不是分页对象
       const faqList = Array.isArray(response) ? response : [];
       

@@ -10,7 +10,7 @@ import { Card, Select, Loading, MemberGrowthChart, MixedChart, Button } from '@s
 import { BuildingIcon, CurrencyDollarIcon, UsersIcon, DocumentIcon } from '@shared/components/Icons';
 import { apiService, adminService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
-import { formatCurrencyCompact } from '@shared/utils/format';
+import { formatCurrencyCompact } from '@shared/utils';
 
 export default function CompanyStatus() {
   const { t, i18n } = useTranslation();

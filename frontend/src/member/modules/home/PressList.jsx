@@ -9,7 +9,7 @@ import Card from '@shared/components/Card';
 import LazyImage from '@shared/components/LazyImage';
 import { Banner } from '@shared/components';
 import { PageContainer } from '@member/layouts';
-import { formatDate } from '@shared/utils/format';
+import { formatDate } from '@shared/utils';
 import { contentService } from '@shared/services';
 import { BANNER_TYPES } from '@shared/utils/constants';
 

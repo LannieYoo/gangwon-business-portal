@@ -474,6 +474,8 @@ class ContentService:
             update_data['subtitle_zh'] = data.subtitle_zh
         if data.image_url is not None:
             update_data['image_url'] = data.image_url
+        if data.mobile_image_url is not None:
+            update_data['mobile_image_url'] = data.mobile_image_url
         if data.link_url is not None:
             update_data['link_url'] = data.link_url
         if data.is_active is not None:

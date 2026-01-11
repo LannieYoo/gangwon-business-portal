@@ -1,6 +1,6 @@
 /**
  * Banner Management Component
- * 横幅管理组件
+ * 横幅管理组件 - 支持桌面端和移动端图片上传
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -14,16 +14,17 @@ export default function BannerManagement() {
   
   // Quick banner management state (by key)
   const [quickBanners, setQuickBanners] = useState({
-    main_primary: { image: null, file: null, url: '' },
-    about: { image: null, file: null, url: '' },
-    projects: { image: null, file: null, url: '' },
-    performance: { image: null, file: null, url: '' },
-    support: { image: null, file: null, url: '' }
+    main_primary: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' },
+    about: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' },
+    projects: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' },
+    performance: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' },
+    support: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' }
   });
   const [loadingQuick, setLoadingQuick] = useState(false);
   const [message, setMessage] = useState(null);
   const [messageVariant, setMessageVariant] = useState('success');
   const fileInputRefs = useRef({});
+  const mobileFileInputRefs = useRef({});
 
   // Quick banner management functions
   const loadQuickBanners = useCallback(async () => {
@@ -36,7 +37,9 @@ export default function BannerManagement() {
         const banner = response.banners[key] || {};
         normalizedBanners[key] = {
           image: banner.image || null,
+          mobileImage: banner.mobile_image || banner.mobileImage || null,
           file: null,
+          mobileFile: null,
           url: banner.url || ''
         };
       });
@@ -49,7 +52,7 @@ export default function BannerManagement() {
     loadQuickBanners();
   }, [loadQuickBanners]);
 
-  const handleQuickBannerImageChange = (bannerKey, file) => {
+  const handleQuickBannerImageChange = (bannerKey, file, isMobile = false) => {
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -57,8 +60,10 @@ export default function BannerManagement() {
           ...prev,
           [bannerKey]: {
             ...prev[bannerKey],
-            image: e.target.result,
-            file: file
+            ...(isMobile 
+              ? { mobileImage: e.target.result, mobileFile: file }
+              : { image: e.target.result, file: file }
+            )
           }
         }));
       };
@@ -84,6 +89,9 @@ export default function BannerManagement() {
     if (banner.file) {
       formData.append('image', banner.file);
     }
+    if (banner.mobileFile) {
+      formData.append('mobile_image', banner.mobileFile);
+    }
     formData.append('url', banner.url || '');
     
     const response = await apiService.post(
@@ -99,7 +107,11 @@ export default function BannerManagement() {
           image: response.banner.image !== null && response.banner.image !== undefined 
             ? response.banner.image 
             : prev[bannerKey].image,
+          mobileImage: response.banner.mobile_image !== null && response.banner.mobile_image !== undefined
+            ? response.banner.mobile_image
+            : prev[bannerKey].mobileImage,
           file: null,
+          mobileFile: null,
           url: response.banner.url !== undefined ? response.banner.url : prev[bannerKey].url
         }
       }));
@@ -133,14 +145,20 @@ export default function BannerManagement() {
                 <h3 className="text-lg font-semibold text-gray-800 m-0 mb-6 md:text-base md:mb-4">{label}</h3>
                 
                 <div className="flex flex-col gap-4 md:gap-3">
+                  {/* Desktop Image Upload */}
                   <div className="flex flex-col gap-3">
-                    <label className="text-sm text-gray-600 font-medium">{t('admin.content.banners.form.fields.image', '图片')}</label>
+                    <label className="text-sm text-gray-600 font-medium">
+                      {t('admin.content.banners.form.fields.desktopImage', '桌面端图片')}
+                    </label>
+                    <p className="text-xs text-gray-400 m-0">
+                      {t('admin.content.banners.form.fields.desktopImageHint', '推荐: 1920 x 600 (16:5), 最小: 1440 x 450')}
+                    </p>
                     <div className="flex flex-col gap-3">
                       {quickBanners[key].image && (
                         <img 
                           src={quickBanners[key].image} 
-                          alt={label}
-                          className="max-w-full max-h-[120px] object-contain rounded"
+                          alt={`${label} - Desktop`}
+                          className="max-w-full max-h-[100px] object-contain rounded border border-gray-200"
                         />
                       )}
                       <input
@@ -149,7 +167,7 @@ export default function BannerManagement() {
                         ref={(el) => (fileInputRefs.current[key] = el)}
                         onChange={(e) => {
                           if (e.target.files && e.target.files[0]) {
-                            handleQuickBannerImageChange(key, e.target.files[0]);
+                            handleQuickBannerImageChange(key, e.target.files[0], false);
                           }
                         }}
                         className="hidden"
@@ -163,7 +181,48 @@ export default function BannerManagement() {
                           fileInputRefs.current[key]?.click();
                         }}
                       >
-                        {t('admin.content.banners.actions.upload', '上传图片')}
+                        {t('admin.content.banners.actions.uploadDesktop', '上传桌面端图片')}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Mobile Image Upload */}
+                  <div className="flex flex-col gap-3 mt-2">
+                    <label className="text-sm text-gray-600 font-medium">
+                      {t('admin.content.banners.form.fields.mobileImage', '移动端图片')}
+                    </label>
+                    <p className="text-xs text-gray-400 m-0">
+                      {t('admin.content.banners.form.fields.mobileImageHint', '推荐: 1080 x 1350 (4:5), 最小: 750 x 938')}
+                    </p>
+                    <div className="flex flex-col gap-3">
+                      {quickBanners[key].mobileImage && (
+                        <img 
+                          src={quickBanners[key].mobileImage} 
+                          alt={`${label} - Mobile`}
+                          className="max-w-full max-h-[100px] object-contain rounded border border-gray-200"
+                        />
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={(el) => (mobileFileInputRefs.current[key] = el)}
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            handleQuickBannerImageChange(key, e.target.files[0], true);
+                          }
+                        }}
+                        className="hidden"
+                        id={`banner-${key}-mobile-file`}
+                      />
+                      <Button 
+                        variant="outline" 
+                        type="button" 
+                        className="w-full text-sm py-2"
+                        onClick={() => {
+                          mobileFileInputRefs.current[key]?.click();
+                        }}
+                      >
+                        {t('admin.content.banners.actions.uploadMobile', '上传移动端图片')}
                       </Button>
                     </div>
                   </div>

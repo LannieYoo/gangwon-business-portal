@@ -267,12 +267,33 @@ class Generator:
 
     def gen_applications(self):
         r = self.ranges["application"]
+        rejection_reasons = [
+            "제출 서류가 불충분합니다. 사업계획서와 재무제표를 다시 확인해 주세요.",
+            "신청 자격 요건을 충족하지 않습니다.",
+            "사업 내용이 지원 대상과 맞지 않습니다.",
+            "예산 계획이 적절하지 않습니다.",
+            "기존 지원 사업과 중복됩니다."
+        ]
         for _ in range(self.counts["project_applications"]):
-            self.db.table("project_applications").insert({
-                "id": str(uuid4()), "member_id": random.choice(self.member_ids), "project_id": random.choice(self.project_ids),
-                "status": weighted_choice({"approved": 0.4, "under_review": 0.3, "submitted": 0.2, "rejected": 0.1}),
-                "application_reason": "기업 성장을 위한 지원이 필요합니다.", "submitted_at": rand_dt(r["submitted_days_ago_max"])
-            }).execute()
+            status = weighted_choice({"approved": 0.25, "under_review": 0.2, "submitted": 0.15, "rejected": 0.15, "needs_supplement": 0.15, "cancelled": 0.1})
+            app_data = {
+                "id": str(uuid4()), 
+                "member_id": random.choice(self.member_ids), 
+                "project_id": random.choice(self.project_ids),
+                "status": status,
+                "application_reason": "기업 성장을 위한 지원이 필요합니다.", 
+                "submitted_at": rand_dt(r["submitted_days_ago_max"])
+            }
+            # Set reviewed_at for processed applications
+            if status in ["approved", "rejected", "needs_supplement", "cancelled"]:
+                app_data["reviewed_at"] = rand_dt(r["submitted_days_ago_max"] // 2)
+            # Add review_note (rejection reason) for rejected status
+            if status == "rejected":
+                app_data["review_note"] = random.choice(rejection_reasons)
+            # Add material_request for needs_supplement status
+            if status == "needs_supplement":
+                app_data["material_request"] = "추가 서류가 필요합니다. 사업자등록증 사본과 재무제표를 제출해 주세요."
+            self.db.table("project_applications").insert(app_data).execute()
 
     def gen_notices(self):
         titles = self.korean["notice_titles"]

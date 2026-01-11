@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Table, Button, Badge, Modal, Textarea, Pagination, Alert, SearchInput } from '@shared/components';
 import { adminService, uploadService } from '@shared/services';
-import { formatBusinessLicense, formatDateTime } from '@shared/utils/format';
+import { formatBusinessLicense, formatDateTime } from '@shared/utils';
 
 export default function PerformanceList() {
   const { t, i18n } = useTranslation();
@@ -172,15 +172,22 @@ export default function PerformanceList() {
 
   const handleExport = async (format = 'excel') => {
     setLoading(true);
-    const params = {
-      format,
-      memberId: memberId || undefined
-    };
-    await adminService.exportPerformance(params);
-    setMessageVariant('success');
-    setMessage(t('admin.performance.exportSuccess', '导出成功') || '导出成功');
-    setTimeout(() => setMessage(null), 3000);
-    setLoading(false);
+    try {
+      const params = {
+        format,
+        memberId: memberId || undefined
+      };
+      await adminService.exportPerformance(params);
+      setMessageVariant('success');
+      setMessage(t('admin.performance.exportSuccess', '导出成功') || '导出成功');
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessageVariant('error');
+      setMessage(t('admin.performance.exportFailed', '导出失败') || '导出失败');
+      setTimeout(() => setMessage(null), 3000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [

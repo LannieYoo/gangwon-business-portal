@@ -3,17 +3,13 @@
  * 登录弹窗组件
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@shared/hooks";
 import { Modal } from "./Modal";
 import { EyeIcon, EyeOffIcon } from "./Icons";
-import { formatBusinessLicense } from "@shared/utils/format";
-import { cn } from "@shared/utils/helpers";
-import { API_PREFIX } from "@shared/utils/constants";
-import ApiErrorClassifier from "@shared/interceptors/api.error.classifier";
-// Auth styles converted to Tailwind classes
+import { formatBusinessLicense, cn } from "@shared/utils";
 
 export function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegister }) {
   const { t } = useTranslation();
@@ -31,61 +27,38 @@ export function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegister }) {
     setError("");
 
     try {
-      // Remove dashes from business number for API call
       const businessNumberClean = formData.businessNumber.replace(/-/g, "");
-      // AOP 系统会自动记录登录尝试
       const response = await login({
         businessNumber: businessNumberClean,
         password: formData.password,
       });
 
-      // Successful login (UI-only handling — logging handled via AOP)
-
-      // Call success callback if provided
       if (onSuccess) {
         onSuccess(response);
       }
-
-      // Close modal
       onClose();
     } catch (err) {
-      // Use the classifier to get structured error info
-      const classification = ApiErrorClassifier.classify(err);
-
+      // 根据错误码显示对应消息
+      const errorCode = err.code || err.response?.data?.error?.code;
       let errorMessage = t("auth.loginFailed");
 
-      if (classification.subCategory === "ACCOUNT_STATUS") {
-        if (classification.code === 2001) {
-          // ACCOUNT_PENDING_APPROVAL
+      if (errorCode >= 2000 && errorCode < 3000) {
+        // 账户状态错误
+        if (errorCode === 2001) {
           errorMessage = t("auth.approvalPending");
-        } else if (classification.code === 2002) {
-          // ACCOUNT_SUSPENDED
+        } else if (errorCode === 2002) {
           errorMessage = t("auth.accountSuspended");
         } else {
           errorMessage = t("auth.accountSuspended");
         }
-      } else if (classification.subCategory === "CREDENTIALS") {
+      } else if (errorCode >= 1000 && errorCode < 2000) {
+        // 凭证错误
         errorMessage = t("auth.invalidCredentials");
       } else if (err.message) {
-        // Fallback for non-business common errors (like network)
         errorMessage = err.message;
       }
 
       setError(errorMessage);
-
-      // Log login failure
-      const businessNumberClean = formData.businessNumber.replace(/-/g, "");
-      const maskedBusinessNumber =
-        businessNumberClean.length > 3
-          ? `${businessNumberClean.substring(
-              0,
-              3
-            )}-${businessNumberClean.substring(3, 5)}-*****`
-          : "***-***-*****";
-
-      // Exception reporting is handled centrally (service layer / AOP). Component only sets UI state.
-
-      // Login failure recorded by exceptionService; additional logging via AOP
     }
   };
 
@@ -109,15 +82,11 @@ export function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegister }) {
     setShowPassword((prev) => !prev);
   };
 
-  // Reset form when modal closes
   const handleClose = () => {
-    // AOP 系统会自动记录组件事件
     setFormData({ businessNumber: "", password: "" });
     setError("");
     onClose();
   };
-
-  // 移除调试日志 - AOP 系统会自动处理组件生命周期
 
   return (
     <Modal

@@ -8,8 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Card, Button, Badge, Alert, Pagination, Modal, ModalFooter } from '@shared/components';
 import { messagesService } from '@shared/services';
-import { formatDateTime } from '@shared/utils/format';
-import useUpload from '@shared/hooks/useUpload';
+import { formatDateTime } from '@shared/utils';
+import { useUpload } from '@shared/hooks';
 
 export default function ThreadList() {
   const { t, i18n } = useTranslation();

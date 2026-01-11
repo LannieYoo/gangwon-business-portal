@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '@shared/components/Card';
-import { formatDate } from '@shared/utils/format';
+import { formatDate } from '@shared/utils';
 import { Badge } from '@shared/components';
 import { contentService } from '@shared/services';
 import { ROUTES } from '@shared/utils/constants';

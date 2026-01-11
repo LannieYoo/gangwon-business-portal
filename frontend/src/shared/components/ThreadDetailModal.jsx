@@ -8,8 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '@shared/components';
 import Button from '@shared/components/Button';
 import { messagesService } from '@shared/services';
-import { formatDateTime } from '@shared/utils/format';
-import useUpload from '@shared/hooks/useUpload';
+import { formatDateTime } from '@shared/utils';
+import { useUpload } from '@shared/hooks';
 
 export default function ThreadDetailModal({ 
   threadId, 

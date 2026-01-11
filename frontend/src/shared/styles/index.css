@@ -1,148 +1,51 @@
-/* =========================================
- * KRDS Core (index.css v2 - Minimal)
- * 只负责：Tailwind + Tokens + 全局基础样式 + 极少布局
- * =======================================*/
-
+/* 全局样式文件 - 基于 Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ========== 1. Design Tokens（核心变量） ========== */
+/* 基础样式 - 全局元素重置和默认样式 */
 @layer base {
-  :root {
-    /* ---- 颜色 ---- */
-    --gov-color-primary: #0052a4;
-    --gov-color-primary-dark: #003777;
-    --gov-color-primary-light: #e5eff9;
-
-    --gov-color-accent: #d32f2f;
-    --gov-color-bg: #f5f6f7;
-    --gov-color-surface: #ffffff;
-    --gov-color-border-subtle: #e5e7eb;
-
-    --gov-color-text-main: #111827;
-    --gov-color-text-muted: #6b7280;
-    --gov-color-text-inverse: #ffffff;
-
-    /* ---- 间距刻度（8px 系） ---- */
-    --gov-space-1: 0.5rem;   /* 8px  */
-    --gov-space-1_5: 0.75rem;/* 12px */
-    --gov-space-2: 1rem;     /* 16px */
-    --gov-space-2_5: 1.25rem;/* 20px */
-    --gov-space-3: 1.5rem;   /* 24px */
-    --gov-space-4: 2rem;     /* 32px */
-    --gov-space-5: 2.5rem;   /* 40px */
-    --gov-space-6: 3rem;     /* 48px */
-
-    /* 语义化等级（可选，用得多可以保留） */
-    --gov-space-tight: var(--gov-space-1);
-    --gov-space-sm:    var(--gov-space-2);
-    --gov-space-md:    var(--gov-space-3);
-    --gov-space-lg:    var(--gov-space-4);
-    --gov-space-xl:    var(--gov-space-5);
-
-    /* ---- 容器内边距（桌面端基准） ---- */
-    --gov-container-pad-default-x: var(--gov-space-3); /* 24px */
-    --gov-container-pad-default-y: var(--gov-space-4); /* 32px */
-    --gov-container-pad-large-x:   var(--gov-space-4); /* 32px */
-    --gov-container-pad-large-y:   var(--gov-space-5); /* 40px */
-
-    /* ---- 页面左右边距 ---- */
-    --gov-page-margin-x: 1.5rem; /* 24px - 桌面 */
-
-    /* ---- Header / z-index ---- */
-    --header-height: 4.5rem; /* 72px */
-    --z-header: 40;
-    --z-dropdown: 50;
-
-    /* ---- 圆角 & 阴影 ---- */
-    --gov-radius-md: 0.5rem;  /* 8px */
-    --gov-radius-lg: 0.75rem; /* 12px */
-    --gov-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-
-    /* ---- 字体 ---- */
-    --gov-font-sans: system-ui, -apple-system, BlinkMacSystemFont,
-      "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo",
-      "Malgun Gothic", sans-serif;
-
-    --gov-line-height-body: 1.6;
-    --gov-line-height-heading: 1.3;
-  }
-
-  @media (max-width: 639px) {
-    :root {
-      --gov-page-margin-x: 1rem; /* 16px - 移动 */
-    }
-  }
-
-  /* ---- 全局基础样式 ---- */
-  html,
-  body {
-    margin: 0;
-    padding: 0;
+  html, body {
+    @apply m-0 p-0;
   }
 
   body {
-    font-family: var(--gov-font-sans);
-    background-color: var(--gov-color-bg);
-    color: var(--gov-color-text-main);
-    line-height: var(--gov-line-height-body);
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+    @apply bg-background text-gray-900 leading-relaxed antialiased;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    color: var(--gov-color-text-main);
-    line-height: var(--gov-line-height-heading);
-    font-weight: 600;
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-gray-900 font-semibold leading-tight;
   }
 
   a {
-    color: var(--gov-color-primary);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
-  a:hover {
-    color: var(--gov-color-primary-dark);
+    @apply text-primary-600 underline underline-offset-2 hover:text-primary-700;
   }
 
   main {
-    min-height: 100vh;
+    @apply min-h-screen;
   }
 }
 
-/* ========== 2. 基础布局组件：容器 & 区块 ========== */
+/* 组件样式 - 可复用的 UI 组件 */
 @layer components {
-  /* 页面主容器：负责左右留白 + 最大宽度 */
-  .gov-page {
-    max-width: 80rem; /* 1280px */
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: var(--gov-page-margin-x);
-    padding-right: var(--gov-page-margin-x);
+  /* Error Pages */
+  .error-page {
+    @apply min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4;
   }
 
-  /* 标准内容区块 */
-  .gov-section-default {
-    background-color: var(--gov-color-surface);
-    border-radius: var(--gov-radius-md);
-    box-shadow: var(--gov-shadow-sm);
-    padding: var(--gov-container-pad-default-y)
-      var(--gov-container-pad-default-x);
+  .error-page-container {
+    @apply max-w-md w-full mx-auto text-center;
   }
 
-  /* 首页 / 重要区块 */
-  .gov-section-large {
-    background-color: var(--gov-color-surface);
-    border-radius: var(--gov-radius-md);
-    box-shadow: var(--gov-shadow-sm);
-    padding: var(--gov-container-pad-large-y)
-      var(--gov-container-pad-large-x);
+  .error-code {
+    @apply text-6xl font-bold text-primary-600 mb-4;
+  }
+
+  .error-title {
+    @apply text-3xl font-bold text-gray-900 mb-4;
+  }
+
+  .error-message {
+    @apply text-gray-600 mb-8;
   }
 }

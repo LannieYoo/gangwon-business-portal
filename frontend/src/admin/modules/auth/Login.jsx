@@ -127,7 +127,7 @@ export default function AdminLogin() {
             {t('admin.auth.notAdminUser')}{' '}
             <button
               type="button"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/member/home')}
               className="font-medium text-blue-600 hover:text-blue-500"
             >
               {t('admin.auth.goToMemberLogin')}

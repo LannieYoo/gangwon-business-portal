@@ -6,7 +6,7 @@
  */
 
 import { ConfirmModal } from '@shared/components';
-import { formatEST, parseFilename } from '@shared/utils/format';
+import { formatEST, parseFilename } from '@shared/utils';
 import { useLogRowActions } from '../hooks';
 
 // 级别颜色映射

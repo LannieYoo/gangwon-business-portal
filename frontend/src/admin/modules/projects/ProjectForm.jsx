@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Button, Input, Select, Textarea, Loading, Alert } from '@shared/components';
 import { adminService } from '@shared/services';
-import useUpload from '@shared/hooks/useUpload';
+import { useUpload } from '@shared/hooks';
 
 // Helper to format date for form (YYYY-MM-DD)
 const formatDateForInput = (dateString) => {

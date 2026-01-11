@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDateTime } from '@shared/utils/format';
+import { formatDateTime } from '@shared/utils';
 import { useNavigate } from 'react-router-dom';
 import Card, { CardBody } from '@shared/components/Card';
 import { Badge, Pagination } from '@shared/components';
@@ -36,19 +36,25 @@ export default function InquiryHistory() {
 
   const loadThreads = useCallback(async (page = 1) => {
     setLoading(true);
-    const response = await messagesService.getMemberThreads({
-      page,
-      pageSize: pagination.pageSize,
-      status: statusFilter || undefined
-    });
-    setThreads(response.items || []);
-    setPagination(prev => ({
-      ...prev,
-      page: response.page || page,
-      total: response.total || 0,
-      totalPages: response.totalPages || Math.ceil((response.total || 0) / prev.pageSize)
-    }));
-    setLoading(false);
+    try {
+      const response = await messagesService.getMemberThreads({
+        page,
+        pageSize: pagination.pageSize,
+        status: statusFilter || undefined
+      });
+      setThreads(response.items);
+      setPagination(prev => ({
+        ...prev,
+        page: response.page,
+        total: response.total,
+        totalPages: response.totalPages
+      }));
+    } catch (error) {
+      console.error('Failed to load threads:', error);
+      setThreads([]);
+    } finally {
+      setLoading(false);
+    }
   }, [pagination.pageSize, statusFilter]);
 
   useEffect(() => {

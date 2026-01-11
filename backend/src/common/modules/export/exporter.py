@@ -150,7 +150,7 @@ class ExportService:
             headers: Optional list of header names (if None, uses dict keys from first row)
 
         Returns:
-            CSV content as string
+            CSV content as string with UTF-8 BOM for Excel compatibility
         """
         try:
             if not data:
@@ -188,7 +188,8 @@ class ExportService:
                 },
             )
 
-            return csv_content
+            # Add UTF-8 BOM for Excel compatibility with Korean/Chinese characters
+            return "\ufeff" + csv_content
 
         except Exception as e:
             logger.error(

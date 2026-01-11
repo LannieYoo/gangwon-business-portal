@@ -6,9 +6,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlobeIcon } from './Icons';
-import { setStorage } from '@shared/utils/storage';
-import { exceptionService } from '@shared/exception';
-import { cn } from '@shared/utils/helpers';
+import { setStorage, cn } from '@shared/utils';
 
 /**
  * @param {Object} props
@@ -41,11 +39,7 @@ export default function LanguageSwitcher({ variant = 'dark' }) {
     try {
       localStorage.setItem('i18nextLng', code);
     } catch (error) {
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: 'PERSIST_LANGUAGE_FAILED',
-        context_data: { language_code: code }
-      });
+      console.error('[LanguageSwitcher] Failed to persist language:', error);
     }
   };
 
@@ -53,11 +47,7 @@ export default function LanguageSwitcher({ variant = 'dark' }) {
     const targetCode = nextLanguage.code;
     persistLanguagePreference(targetCode);
     i18n.changeLanguage(targetCode).catch(error => {
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: error.code || 'CHANGE_LANGUAGE_FAILED',
-        context_data: { target_language: targetCode }
-      });
+      console.error('[LanguageSwitcher] Failed to change language:', error);
     });
   };
 
@@ -72,8 +62,8 @@ export default function LanguageSwitcher({ variant = 'dark' }) {
         'px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200',
         'focus:outline-none focus:ring-2 focus:ring-offset-2',
         variant === 'light'
-          ? 'focus:ring-white text-white hover:opacity-80'
-          : 'focus:ring-primary-500 text-gray-700 dark:text-gray-300 hover:opacity-80'
+          ? 'focus:ring-white text-white hover:text-yellow-100'
+          : 'focus:ring-primary-500 text-gray-700 dark:text-gray-300 hover:text-yellow-100'
       )}
       onClick={toggleLanguage}
       title={`Switch to ${nextLanguage.label}`}

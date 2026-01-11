@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Badge } from '@shared/components';
 import { messagesService } from '@shared/services';
-import { formatDateTime } from '@shared/utils/format';
+import { formatDateTime } from '@shared/utils';
 import { EnvelopeIcon, EnvelopeOpenIcon } from '@shared/components/Icons';
 import ThreadDetailModal from './ThreadDetailModal';
 
@@ -30,7 +30,7 @@ export default function NotificationBell({ userType = 'member', variant = 'light
 
   const viewAllPath = userType === 'admin' ? '/admin/messages' : '/member/support/inquiry-history';
   const iconColorClass = variant === 'dark' 
-    ? 'text-white hover:text-white/80' 
+    ? 'text-white hover:text-yellow-100' 
     : 'text-gray-600 hover:text-gray-900';
 
   const loadUnreadCount = async () => {

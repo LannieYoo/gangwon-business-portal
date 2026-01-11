@@ -6,7 +6,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LineChart } from './';
-import { formatCurrencyCompact } from '@shared/utils/format';
+import { formatCurrencyCompact } from '@shared/utils';
 
 /**
  * PerformanceTrendChart - 绩效数据趋势图

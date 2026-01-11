@@ -36,7 +36,7 @@ export { logsService, adminService } from '@shared/services';
 // 工具函数适配
 // ============================================================
 
-export { formatDateTime } from '@shared/utils/format';
+export { formatDateTime } from '@shared/utils';
 
 // 如果新项目没有这个函数，可以使用内置实现：
 // export function formatDateTime(dateStr, format = 'yyyy-MM-dd HH:mm:ss', locale = 'zh') {

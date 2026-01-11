@@ -34,6 +34,7 @@ class ApplicationStatus(str, Enum):
     under_review = "under_review"
     approved = "approved"
     rejected = "rejected"
+    cancelled = "cancelled"
 
 
 # Project Schemas
@@ -236,6 +237,8 @@ class ProjectApplicationListItem(BaseModel):
     application_reason: str  # 必填，数据库里没有就报错
     submitted_at: datetime
     reviewed_at: Optional[datetime]  # 这个可以为空，因为可能还没审核
+    review_note: Optional[str] = None  # 审核备注/拒绝原因
+    material_request: Optional[str] = None  # 补充材料请求
 
     class Config:
         from_attributes = True
@@ -244,6 +247,9 @@ class ProjectApplicationListItem(BaseModel):
 class ApplicationListQuery(BaseModel):
     """Query parameters for listing applications."""
     status: Optional[ApplicationStatus] = Field(None, description="Filter by status")
+    search: Optional[str] = Field(None, description="Search in project title")
+    page: Optional[int] = Field(1, ge=1, description="Page number")
+    page_size: Optional[int] = Field(10, ge=1, le=100, description="Items per page")
 
 
 class ApplicationListResponsePaginated(BaseModel):

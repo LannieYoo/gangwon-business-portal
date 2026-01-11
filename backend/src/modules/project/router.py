@@ -131,6 +131,74 @@ async def get_my_applications(
     )
 
 
+@router.get(
+    "/api/member/applications",
+    response_model=ApplicationListResponsePaginated,
+    tags=["projects"],
+    summary="Get member's project applications",
+)
+async def get_member_applications(
+    query: Annotated[ApplicationListQuery, Depends()],
+    request: Request,
+    current_user: Annotated[Member, Depends(get_current_active_user)],
+):
+    """
+    Get member's own project applications with pagination and search (member only).
+    Requirements: 7.3, 7.4, 7.5
+    """
+    applications, total = await service.get_my_applications(
+        current_user.id, query
+    )
+
+    return ApplicationListResponsePaginated(
+        items=[ProjectApplicationListItem.model_validate(a) for a in applications],
+        total=total,
+        page=query.page if hasattr(query, 'page') else 1,
+        page_size=query.page_size if hasattr(query, 'page_size') else (total if total > 0 else 1),
+        total_pages=1,
+    )
+
+
+@router.get(
+    "/api/member/applications/{application_id}",
+    response_model=ProjectApplicationResponse,
+    tags=["projects"],
+    summary="Get application details",
+)
+async def get_application_detail(
+    application_id: UUID,
+    request: Request,
+    current_user: Annotated[Member, Depends(get_current_active_user)],
+):
+    """
+    Get detailed information about a specific application (member only).
+    Requirements: 7.11, 7.12
+    """
+    application = await service.get_application_by_id(application_id, current_user.id)
+    return ProjectApplicationResponse.model_validate(application)
+
+
+@router.post(
+    "/api/member/applications/{application_id}/cancel",
+    response_model=ProjectApplicationResponse,
+    tags=["projects"],
+    summary="Cancel application",
+)
+@audit_log(action="cancel", resource_type="project_application")
+async def cancel_application(
+    application_id: UUID,
+    request: Request,
+    current_user: Annotated[Member, Depends(get_current_active_user)],
+):
+    """
+    Cancel a project application (member only).
+    Only applications in pending, submitted, under_review, or reviewing status can be cancelled.
+    Requirements: 7.9, 7.10
+    """
+    application = await service.cancel_application(application_id, current_user.id)
+    return ProjectApplicationResponse.model_validate(application)
+
+
 # Admin endpoints
 
 

@@ -3,7 +3,7 @@
  * 剪贴板工具函数
  */
 
-import { formatEST } from '@shared/utils/format';
+import { formatEST } from '@shared/utils';
 
 /**
  * 复制文本到剪贴板

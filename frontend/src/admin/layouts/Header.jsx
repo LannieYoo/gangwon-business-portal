@@ -6,7 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
-import useAuthStore from '@shared/stores/authStore';
+import { useAuthStore } from '@shared/stores';
 import LanguageSwitcher from '@shared/components/LanguageSwitcher';
 import {
   MenuIcon,

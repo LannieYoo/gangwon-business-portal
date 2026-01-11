@@ -14,6 +14,7 @@ from .models import (
     PressRelease,
     FAQ,
     AuditLog,
+    NiceDnbCompanyInfo,
 )
 
 __all__ = [
@@ -30,4 +31,5 @@ __all__ = [
     "PressRelease",
     "FAQ",
     "AuditLog",
+    "NiceDnbCompanyInfo",
 ]

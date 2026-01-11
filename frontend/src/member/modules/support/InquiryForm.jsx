@@ -14,7 +14,7 @@ import Select from '@shared/components/Select';
 import Textarea from '@shared/components/Textarea';
 import { messagesService } from '@shared/services';
 import { TrashIcon, DocumentIcon } from '@shared/components/Icons';
-import useUpload from '@shared/hooks/useUpload';
+import { useUpload } from '@shared/hooks';
 
 const MAX_ATTACHMENTS = 3;
 

@@ -6,7 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import Card from '@shared/components/Card';
-import { formatDateTime } from '@shared/utils/format';
+import { formatDateTime } from '@shared/utils';
 import { Badge, Banner, Modal } from '@shared/components';
 import { PageContainer } from '@member/layouts';
 import { apiService, contentService } from '@shared/services';

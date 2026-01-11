@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Card from '@shared/components/Card';
 import LazyImage from '@shared/components/LazyImage';
 import { contentService } from '@shared/services';
-import { formatDate } from '@shared/utils/format';
+import { formatDate } from '@shared/utils';
 import { ROUTES } from '@shared/utils/constants';
 
 // 新闻卡片颜色配置（与后端 generate_news_images.py 保持一致）

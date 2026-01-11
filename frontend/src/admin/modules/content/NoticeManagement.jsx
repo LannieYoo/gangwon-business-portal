@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, RichTextEditor, Alert, Card, Modal, ModalFooter } from '@shared/components';
 import { contentService } from '@shared/services';
-import { formatDate } from '@shared/utils/format';
+import { formatDate } from '@shared/utils';
 import { validateNoticeForm } from './utils';
 
 export default function NoticeManagement() {

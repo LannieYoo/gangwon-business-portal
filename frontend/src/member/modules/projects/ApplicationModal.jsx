@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { Modal, Badge, Button, Textarea, Alert } from '@shared/components';
 import { DocumentIcon } from '@shared/components/Icons';
-import useAuthStore from '@shared/stores/authStore';
+import { useAuthStore } from '@shared/stores';
 import { projectService } from '@shared/services';
 
 export default function ApplicationModal({ 

@@ -25,6 +25,10 @@ class PerformanceRecordCreate(BaseModel):
     quarter: Optional[int] = Field(None, ge=1, le=4, description="Quarter (1-4), null for annual")
     type: str = Field(..., pattern="^(sales|support|ip)$", description="Record type: sales, support, or ip")
     data_json: dict[str, Any] = Field(..., description="Performance data in JSON format")
+    # Export fields (Task 4)
+    hsk_code: Optional[str] = Field(None, max_length=10, pattern="^[0-9]{10}$", description="HSK code (10-digit number)")
+    export_country1: Optional[str] = Field(None, max_length=100, description="Export country 1")
+    export_country2: Optional[str] = Field(None, max_length=100, description="Export country 2")
 
 
 class PerformanceRecordUpdate(BaseModel):
@@ -34,6 +38,10 @@ class PerformanceRecordUpdate(BaseModel):
     quarter: Optional[int] = Field(None, ge=1, le=4, description="Quarter (1-4)")
     type: Optional[str] = Field(None, pattern="^(sales|support|ip)$", description="Record type")
     data_json: Optional[dict[str, Any]] = Field(None, description="Performance data in JSON format")
+    # Export fields (Task 4)
+    hsk_code: Optional[str] = Field(None, max_length=10, pattern="^[0-9]{10}$", description="HSK code (10-digit number)")
+    export_country1: Optional[str] = Field(None, max_length=100, description="Export country 1")
+    export_country2: Optional[str] = Field(None, max_length=100, description="Export country 2")
 
 
 class PerformanceRecordResponse(BaseModel):

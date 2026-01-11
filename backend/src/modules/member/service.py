@@ -69,6 +69,8 @@ class MemberService:
             region=profile.get("region") if profile else None,
             address=profile.get("address") if profile else None,
             representative=profile.get("representative") if profile else None,
+            representative_birth_date=profile.get("representative_birth_date") if profile and profile.get("representative_birth_date") else None,
+            representative_gender=profile.get("representative_gender") if profile else None,
             legal_number=profile.get("legal_number") if profile else None,
             phone=profile.get("phone") if profile else None,
             website=profile.get("website") if profile else None,
@@ -81,6 +83,13 @@ class MemberService:
             main_business=profile.get("main_business") if profile else None,
             description=profile.get("description") if profile else None,
             cooperation_fields=profile.get("cooperation_fields") if profile else None,
+            # New business info fields (Task 5)
+            startup_type=profile.get("startup_type") if profile else None,
+            ksic_major=profile.get("ksic_major") if profile else None,
+            ksic_sub=profile.get("ksic_sub") if profile else None,
+            # New fields for Task 6
+            participation_programs=profile.get("participation_programs") if profile else None,
+            investment_status=profile.get("investment_status") if profile else None,
             created_at=member.get("created_at"),
             updated_at=profile.get("updated_at") if profile and profile.get("updated_at") else member.get("updated_at"),
         )
@@ -117,6 +126,8 @@ class MemberService:
             region=profile.get("region") if profile else None,
             address=profile.get("address") if profile else None,
             representative=profile.get("representative") if profile else None,
+            representative_birth_date=profile.get("representative_birth_date") if profile and profile.get("representative_birth_date") else None,
+            representative_gender=profile.get("representative_gender") if profile else None,
             legal_number=profile.get("legal_number") if profile else None,
             phone=profile.get("phone") if profile else None,
             website=profile.get("website") if profile else None,
@@ -129,6 +140,13 @@ class MemberService:
             main_business=profile.get("main_business") if profile else None,
             description=profile.get("description") if profile else None,
             cooperation_fields=profile.get("cooperation_fields") if profile else None,
+            # New business info fields (Task 5)
+            startup_type=profile.get("startup_type") if profile else None,
+            ksic_major=profile.get("ksic_major") if profile else None,
+            ksic_sub=profile.get("ksic_sub") if profile else None,
+            # New fields for Task 6
+            participation_programs=profile.get("participation_programs") if profile else None,
+            investment_status=profile.get("investment_status") if profile else None,
             created_at=member.get("created_at"),
             updated_at=profile.get("updated_at") if profile and profile.get("updated_at") else member.get("updated_at"),
         )
@@ -193,6 +211,16 @@ class MemberService:
             profile_update['address'] = data.address
         if data.representative is not None:
             profile_update['representative'] = data.representative
+        if data.representative_birth_date is not None:
+            # Convert date to ISO format string if it's a date object
+            if isinstance(data.representative_birth_date, datetime):
+                profile_update['representative_birth_date'] = data.representative_birth_date.date().isoformat()
+            elif hasattr(data.representative_birth_date, 'isoformat'):
+                profile_update['representative_birth_date'] = data.representative_birth_date.isoformat()
+            else:
+                profile_update['representative_birth_date'] = data.representative_birth_date
+        if data.representative_gender is not None:
+            profile_update['representative_gender'] = data.representative_gender
         if data.corporation_number is not None:
             profile_update['legal_number'] = data.corporation_number
         if data.phone is not None:
@@ -215,6 +243,18 @@ class MemberService:
             profile_update['description'] = data.description
         if data.cooperation_fields is not None:
             profile_update['cooperation_fields'] = data.cooperation_fields
+        # New business info fields (Task 5)
+        if data.startup_type is not None:
+            profile_update['startup_type'] = data.startup_type
+        if data.ksic_major is not None:
+            profile_update['ksic_major'] = data.ksic_major
+        if data.ksic_sub is not None:
+            profile_update['ksic_sub'] = data.ksic_sub
+        # New fields for Task 6
+        if data.participation_programs is not None:
+            profile_update['participation_programs'] = data.participation_programs
+        if data.investment_status is not None:
+            profile_update['investment_status'] = data.investment_status
 
         # Update or create profile using existing method
         if profile_update:

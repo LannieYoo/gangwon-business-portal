@@ -34,6 +34,8 @@ class MemberProfileResponse(BaseModel):
     region: Optional[str] = None
     address: Optional[str] = None
     representative: Optional[str] = None
+    representative_birth_date: Optional[date] = None
+    representative_gender: Optional[str] = None
     legal_number: Optional[str] = None
     phone: Optional[str] = None
     website: Optional[str] = None
@@ -46,6 +48,13 @@ class MemberProfileResponse(BaseModel):
     main_business: Optional[str] = None
     description: Optional[str] = None
     cooperation_fields: Optional[str] = None  # JSON array as string
+    # New business info fields (Task 5) - 창업구분, 한국표준산업분류코드
+    startup_type: Optional[str] = None  # 창업구분: preliminary, startup_under_3years, growth_over_7years, restart
+    ksic_major: Optional[str] = None  # 한국표준산업분류코드[대분류]: A-U
+    ksic_sub: Optional[str] = None  # 지역주력산업코드[중분류]: 2-digit code
+    # New fields for Task 6 - 참여 프로그램, 투자 유치
+    participation_programs: Optional[str] = None  # 참여 프로그램 (JSON array as string)
+    investment_status: Optional[str] = None  # 투자 유치 (JSON object as string)
     created_at: datetime
     updated_at: datetime
 
@@ -65,6 +74,8 @@ class MemberProfileUpdate(BaseModel):
     region: Optional[str] = Field(None, max_length=100)
     address: Optional[str] = None
     representative: Optional[str] = Field(None, max_length=100)
+    representative_birth_date: Optional[date] = Field(None, description="YYYY-MM-DD format")
+    representative_gender: Optional[str] = Field(None, max_length=10)
     corporation_number: Optional[str] = Field(None, max_length=50)
     phone: Optional[str] = Field(None, max_length=50)
     website: Optional[str] = Field(None, max_length=255)
@@ -77,6 +88,13 @@ class MemberProfileUpdate(BaseModel):
     main_business: Optional[str] = None
     description: Optional[str] = None
     cooperation_fields: Optional[str] = None  # JSON array as string
+    # New business info fields (Task 5) - 창업구분, 한국표준산업분류코드
+    startup_type: Optional[str] = Field(None, max_length=50)  # 창업구분
+    ksic_major: Optional[str] = Field(None, max_length=10)  # 한국표준산업분류코드[대분류]
+    ksic_sub: Optional[str] = Field(None, max_length=10)  # 지역주력산업코드[중분류]
+    # New fields for Task 6 - 참여 프로그램, 투자 유치
+    participation_programs: Optional[str] = None  # 참여 프로그램 (JSON array as string)
+    investment_status: Optional[str] = None  # 투자 유치 (JSON object as string)
 
     class Config:
         extra = 'forbid'  # 禁止额外字段，接收到未定义字段时抛出异常

@@ -9,7 +9,8 @@ import i18n from "@shared/i18n";
 import { router } from "./router";
 import { useAuth } from "@shared/hooks";
 import { LoadingOverlay, ErrorBoundary } from "@shared/components";
-import { useUIStore } from "@shared/stores/uiStore";
+import { useUIStore, useAuthStore } from "@shared/stores";
+import authService from "@shared/services/auth.service";
 
 export default function App() {
   const {
@@ -17,6 +18,7 @@ export default function App() {
     getCurrentUser,
     isLoading: authInProgress,
   } = useAuth();
+  const { setUser, setAuthenticated } = useAuthStore();
   const { theme } = useUIStore();
   const [isInitializing, setIsInitializing] = React.useState(true);
 
@@ -30,11 +32,15 @@ export default function App() {
     }
   }, [theme]);
 
-  // Initialize authentication state on app load - validate token
+  // Initialize authentication state on app load
   useEffect(() => {
-    const validateToken = async () => {
-      // isAuthenticated is already initialized from storage in authStore
-      if (isAuthenticated) {
+    const initAuth = async () => {
+      const storedUser = authService.getCurrentUserFromStorage();
+      const hasToken = authService.isAuthenticated();
+      
+      if (storedUser && hasToken) {
+        setUser(storedUser);
+        setAuthenticated(true);
         try {
           await getCurrentUser();
         } catch (error) {
@@ -43,7 +49,7 @@ export default function App() {
       }
       setIsInitializing(false);
     };
-    validateToken();
+    initAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

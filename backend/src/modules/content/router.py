@@ -439,11 +439,11 @@ async def get_banners_by_key(
     # Organize by banner key (直接使用前端值)
     result = {
         "banners": {
-            "main_primary": {"image": None, "url": ""},
-            "about": {"image": None, "url": ""},
-            "projects": {"image": None, "url": ""},
-            "performance": {"image": None, "url": ""},
-            "support": {"image": None, "url": ""}
+            "main_primary": {"image": None, "mobile_image": None, "url": ""},
+            "about": {"image": None, "mobile_image": None, "url": ""},
+            "projects": {"image": None, "mobile_image": None, "url": ""},
+            "performance": {"image": None, "mobile_image": None, "url": ""},
+            "support": {"image": None, "mobile_image": None, "url": ""}
         }
     }
     
@@ -462,6 +462,7 @@ async def get_banners_by_key(
             if result["banners"][banner_type]["image"] is None or is_active:
                 result["banners"][banner_type] = {
                     "image": banner.get('image_url') or None,
+                    "mobile_image": banner.get('mobile_image_url') or None,
                     "url": banner.get('link_url') or ""
                 }
     
@@ -479,13 +480,15 @@ async def update_banner_by_key(
     request: Request,
     current_user: Member = Depends(get_current_admin_user),
     image: Optional[UploadFile] = File(None),
+    mobile_image: Optional[UploadFile] = File(None),
     url: Optional[str] = Form(None),
 ):
     """
     Update a banner by banner key (admin only).
     
     - **banner_key**: One of: main_primary, about, projects, performance, support
-    - **image**: Optional image file to upload
+    - **image**: Optional desktop image file to upload
+    - **mobile_image**: Optional mobile image file to upload
     - **url**: Optional link URL
     
     If banner doesn't exist, creates a new one.
@@ -504,7 +507,7 @@ async def update_banner_by_key(
     
     banner_type = banner_key  # 直接使用，无需映射
     
-    # Upload image if provided
+    # Upload desktop image if provided
     image_url = None
     if image:
         attachment = await upload_service.upload_public_file(
@@ -513,6 +516,16 @@ async def update_banner_by_key(
             resource_type="banner",
         )
         image_url = attachment["file_url"]
+    
+    # Upload mobile image if provided
+    mobile_image_url = None
+    if mobile_image:
+        attachment = await upload_service.upload_public_file(
+            file=mobile_image,
+            user=current_user,
+            resource_type="banner",
+        )
+        mobile_image_url = attachment["file_url"]
     
     # Find existing banner of this type (optimized: direct query instead of fetching all)
     existing_banner = await service.get_banner_by_type(banner_type)
@@ -528,6 +541,10 @@ async def update_banner_by_key(
             update_data.image_url = image_url
         # Otherwise keep existing image_url (don't set it to None)
         
+        # Update mobile_image_url only if new mobile image was uploaded
+        if mobile_image_url:
+            update_data.mobile_image_url = mobile_image_url
+        
         # Update link_url if provided (even if empty string)
         if url is not None:
             update_data.link_url = url
@@ -539,6 +556,7 @@ async def update_banner_by_key(
         return {
             "banner": {
                 "image": updated_banner.get('image_url'),
+                "mobile_image": updated_banner.get('mobile_image_url'),
                 "url": updated_banner.get('link_url') or ""
             }
         }
@@ -553,6 +571,7 @@ async def update_banner_by_key(
         create_data = BannerCreate(
             banner_type=banner_type,
             image_url=image_url,
+            mobile_image_url=mobile_image_url,
             link_url=url if url is not None else "",
             is_active=True,
             display_order=0
@@ -561,6 +580,7 @@ async def update_banner_by_key(
         return {
             "banner": {
                 "image": new_banner.get('image_url'),
+                "mobile_image": new_banner.get('mobile_image_url'),
                 "url": new_banner.get('link_url') or ""
             }
         }

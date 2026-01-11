@@ -1,6 +1,6 @@
 /**
  * Banner Component - Generic
- * 通用横幅组件 - 支持轮播、自动切换、点击跳转等功能
+ * 通用横幅组件 - 支持轮播、自动切换、点击跳转、响应式图片等功能
  * 使用纯 Tailwind CSS
  */
 
@@ -9,13 +9,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   contentService,
-  exceptionService,
 } from "@shared/services";
 import { BANNER_TYPES, ROUTES } from "@shared/utils/constants";
 
 // Banner 数据缓存 - 在模块级别缓存，避免重复请求
 const bannerCache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
+
+// 移动端断点宽度
+const MOBILE_BREAKPOINT = 1024;
 
 // 路由到横幅类型的映射
 const ROUTE_TO_BANNER_TYPE = {
@@ -87,6 +89,36 @@ function BannerText({ text, isTitle }) {
 }
 
 /**
+ * Custom hook for detecting mobile screen width
+ */
+function useIsMobile(breakpoint = MOBILE_BREAKPOINT) {
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= breakpoint;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= breakpoint);
+    };
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Initial check
+    handleResize();
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
+/**
  * Generic Banner Component
  */
 export default function Banner({
@@ -110,6 +142,9 @@ export default function Banner({
   const [textKey, setTextKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true); // 初始为 true，避免闪烁
   const loadedImagesRef = useRef(new Set());
+  
+  // Use custom hook for mobile detection
+  const isMobile = useIsMobile();
 
   const getBannerType = useCallback(() => {
     if (propBannerType) return propBannerType;
@@ -168,6 +203,7 @@ export default function Banner({
         newBanners = banners.map((b) => ({
           id: b.id,
           imageUrl: b.imageUrl,
+          mobileImageUrl: b.mobileImageUrl || null, // Support mobile image URL
           link: b.linkUrl || null,
           title: i18n.language === "zh" ? b.titleZh || b.titleKo : b.titleKo || b.titleZh,
           subtitle: i18n.language === "zh" ? b.subtitleZh || b.subtitleKo : b.subtitleKo || b.subtitleZh,
@@ -176,6 +212,7 @@ export default function Banner({
         newBanners = [{
           id: "default",
           imageUrl: finalDefaultBannerImages?.[bannerType] || getDefaultPlaceholder(),
+          mobileImageUrl: null,
           link: null,
           title: null,
           subtitle: null,
@@ -183,7 +220,15 @@ export default function Banner({
       }
 
       try {
-        await Promise.all(newBanners.map((banner) => preloadImage(banner.imageUrl)));
+        // Preload both desktop and mobile images
+        const imagesToPreload = newBanners.flatMap((banner) => {
+          const images = [banner.imageUrl];
+          if (banner.mobileImageUrl) {
+            images.push(banner.mobileImageUrl);
+          }
+          return images;
+        });
+        await Promise.all(imagesToPreload.map((url) => preloadImage(url)));
       } catch (error) {
         // AOP 系统会自动处理异常日志
       }
@@ -193,16 +238,13 @@ export default function Banner({
       setDisplayBanners(newBanners);
       setCurrentBanner(0);
     } catch (error) {
-      // AOP 系统会自动处理异常日志
-      exceptionService.recordException(error, {
-        request_path: window.location.pathname,
-        error_code: error.code || "LOAD_BANNERS_FAILED",
-        context_data: { banner_type: bannerType },
-      });
+      // 使用 fallback banner
+      console.error('[Banner] Failed to load banners:', error);
 
       const fallbackBanner = [{
         id: "default",
         imageUrl: finalDefaultBannerImages?.[bannerType] || getDefaultPlaceholder(),
+        mobileImageUrl: null,
         link: null,
         title: null,
         subtitle: null,
@@ -266,6 +308,19 @@ export default function Banner({
     return bannersToDisplay[currentBanner] || bannersToDisplay[0];
   }, [bannersToDisplay, currentBanner]);
 
+  // Get the appropriate image URL based on screen size
+  const currentImageUrl = useMemo(() => {
+    if (!currentBannerData) return getDefaultPlaceholder();
+    
+    // If mobile and mobile image exists, use mobile image
+    if (isMobile && currentBannerData.mobileImageUrl) {
+      return currentBannerData.mobileImageUrl;
+    }
+    
+    // Otherwise use desktop image
+    return currentBannerData.imageUrl;
+  }, [currentBannerData, isMobile]);
+
   if (!bannerType) {
     return null;
   }
@@ -309,7 +364,9 @@ export default function Banner({
             currentBannerData.link ? "cursor-pointer hover:opacity-90" : ""
           } ${isLoading ? "opacity-90" : "opacity-100"}`}
           style={{
-            backgroundImage: `url(${currentBannerData.imageUrl})`,
+            backgroundImage: `url(${currentImageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
             height: fullWidth ? height : '100%',
           }}
           onClick={() => handleBannerClick(currentBannerData.link)}
@@ -364,3 +421,6 @@ export default function Banner({
     </section>
   );
 }
+
+// Export the useIsMobile hook for use in other components
+export { useIsMobile };

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Badge, Loading, Table, Pagination, Modal } from '@shared/components';
 import { adminService, uploadService, apiService } from '@shared/services';
-import { formatDate } from '@shared/utils/format';
+import { formatDate } from '@shared/utils';
 import { API_PREFIX } from '@shared/utils/constants';
 
 export default function ProjectDetail() {
@@ -251,9 +251,9 @@ export default function ProjectDetail() {
   if (!project) {
     return (
       <div className="p-12 text-center text-red-600">
-        <p className="mb-6">项目不存在</p>
+        <p className="mb-6">{t('admin.projects.detail.notFound', '项目不存在')}</p>
         <Button onClick={() => navigate('/admin/projects')}>
-          返回
+          {t('common.backToList', '返回')}
         </Button>
       </div>
     );
@@ -268,7 +268,7 @@ export default function ProjectDetail() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
           <Button variant="outline" onClick={() => navigate('/admin/projects')}>
-            返回
+            {t('common.backToList', '返回')}
           </Button>
         </div>
         <div className="flex gap-4">
@@ -276,7 +276,7 @@ export default function ProjectDetail() {
             variant="outline" 
             onClick={() => navigate(`/admin/projects/${id}/edit`)}
           >
-            编辑
+            {t('common.edit', '编辑')}
           </Button>
         </div>
       </div>

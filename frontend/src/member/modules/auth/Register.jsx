@@ -15,9 +15,11 @@ import {
   formatCorporationNumber, 
   formatPhoneNumber,
   formatNumber,
-  parseFormattedNumber
-} from '@shared/utils/format';
-import { validateImageFile, validateFile, ALLOWED_FILE_TYPES } from '@shared/utils/fileValidation';
+  parseFormattedNumber,
+  validateImageFile,
+  validateFile,
+  ALLOWED_FILE_TYPES
+} from '@shared/utils';
 
 const STORAGE_KEY = 'register_form_draft';
 

@@ -13,7 +13,7 @@ import {
   Alert
 } from '@shared/components';
 import { contentService } from '@shared/services';
-import useUpload from '@shared/hooks/useUpload';
+import { useUpload } from '@shared/hooks';
 
 export default function SystemInfoManagement() {
   const { t } = useTranslation();

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, SearchInput, Alert } from '@shared/components';
 import { adminService } from '@shared/services';
-import { formatDate, formatBusinessLicense } from '@shared/utils/format';
+import { formatDate, formatBusinessLicense } from '@shared/utils';
 
 export default function MemberList() {
   const { t, i18n } = useTranslation();
@@ -101,13 +101,23 @@ export default function MemberList() {
 
   const handleExport = useCallback(async (format = 'excel') => {
     setLoading(true);
-    const params = {
-      format,
-      approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
-      language: i18n.language === 'zh' ? 'zh' : 'ko'
-    };
-    await adminService.exportMembers(params);
-    setLoading(false);
+    try {
+      const params = {
+        format,
+        approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
+        language: i18n.language === 'zh' ? 'zh' : 'ko'
+      };
+      await adminService.exportMembers(params);
+      setMessageVariant('success');
+      setMessage(t('admin.members.exportSuccess', '导出成功'));
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessageVariant('error');
+      setMessage(t('admin.members.exportFailed', '导出失败'));
+      setTimeout(() => setMessage(null), 3000);
+    } finally {
+      setLoading(false);
+    }
   }, [statusFilter, i18n.language, t]);
 
   const handleApprove = useCallback(async (memberId) => {
