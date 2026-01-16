@@ -260,7 +260,7 @@ export default function MemberList() {
                   }}
                   className="text-orange-600 hover:text-orange-900 font-medium text-sm"
                 >
-                  {t('admin.members.resetPending', '取消')}
+                  {t('admin.members.resetPending', '취소')}
                 </button>
               </>
             )}

@@ -68,9 +68,21 @@ class MessagesService {
     return response.unreadCount;
   }
 
+  // 标记消息为已读（会员）
+  async markAsRead(messageId) {
+    const response = await apiService.put(`${MEMBER_BASE_URL}/${messageId}`, { is_read: true });
+    return toCamelCase(response);
+  }
+
   // 获取消息详情（管理员）
   async getMessage(messageId) {
     const response = await apiService.get(`${BASE_URL}/${messageId}`);
+    return toCamelCase(response);
+  }
+
+  // 标记消息为已读（管理员）
+  async markMessageAsRead(messageId) {
+    const response = await apiService.put(`${BASE_URL}/${messageId}`, { is_read: true });
     return toCamelCase(response);
   }
 

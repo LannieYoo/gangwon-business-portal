@@ -69,7 +69,12 @@ export default function NotificationBell({ userType = 'member', variant = 'light
           }));
         setNotifications(threadNotifications);
       } else {
-        const threadsResponse = await messagesService.getMemberThreads({ page: 1, pageSize: 10 });
+        // Get both thread notifications and direct messages (system notifications)
+        const [threadsResponse, messagesResponse] = await Promise.all([
+          messagesService.getMemberThreads({ page: 1, pageSize: 10 }),
+          messagesService.getMemberMessages({ page: 1, pageSize: 10, isRead: false }),
+        ]);
+        
         const threadNotifications = (threadsResponse.items || [])
           .filter(thread => thread.unreadCount > 0)
           .map(thread => ({
@@ -81,7 +86,26 @@ export default function NotificationBell({ userType = 'member', variant = 'light
             createdAt: thread.lastMessageAt || thread.createdAt,
             isThread: true
           }));
-        setNotifications(threadNotifications);
+        
+        const directNotifications = (messagesResponse.items || [])
+          .filter(msg => !msg.isRead)
+          .map(msg => ({
+            id: msg.id,
+            subject: msg.subject,
+            content: msg.content,
+            isRead: false,
+            isImportant: msg.isImportant,
+            createdAt: msg.createdAt,
+            isThread: false,
+            isDirect: true
+          }));
+        
+        // Combine and sort by createdAt
+        const allNotifications = [...threadNotifications, ...directNotifications]
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 10);
+        
+        setNotifications(allNotifications);
       }
     } catch (error) {
       // 401 错误表示用户未登录，静默处理
@@ -120,14 +144,24 @@ export default function NotificationBell({ userType = 'member', variant = 'light
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  const handleNotificationClick = (notification) => {
+  const handleNotificationClick = async (notification) => {
     setIsOpen(false);
     
     if (userType === 'admin') {
       navigate(`/admin/messages?threadId=${notification.id}`);
-    } else {
-      // 会员：打开 modal
+    } else if (notification.isThread) {
+      // Thread: open modal
       setSelectedThreadId(notification.id);
+    } else if (notification.isDirect) {
+      // Direct message: mark as read and show content
+      try {
+        await messagesService.markAsRead(notification.id);
+        loadUnreadCount();
+      } catch (error) {
+        console.error('Failed to mark message as read:', error);
+      }
+      // Navigate to messages page or show alert with content
+      navigate('/member/support/inquiry-history');
     }
   };
 

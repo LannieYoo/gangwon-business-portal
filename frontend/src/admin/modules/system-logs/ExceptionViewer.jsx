@@ -84,7 +84,7 @@ export default function ExceptionViewer() {
         pageSize={pageSize}
         onPageChange={setCurrentPage}
         emptyTitle={tl('exception.noExceptions')}
-        emptySubtitle={totalCount === 0 ? '暂无异常日志' : '当前搜索条件下没有匹配的异常'}
+        emptySubtitle={totalCount === 0 ? tl('exception.emptyLogs') : tl('exception.noMatchingLogs')}
         tl={tl}
         t={t}
         renderRow={(log) => (

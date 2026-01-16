@@ -63,18 +63,19 @@ export default function Sidebar({ collapsed, mobileOpen = false, onClose }) {
       icon: EnvelopeIcon,
       label: t('admin.menu.messages')
     },
-    {
-      key: 'reports',
-      path: '/admin/reports',
-      icon: ReportIcon,
-      label: t('admin.menu.reports')
-    },
-    {
-      key: 'system-logs',
-      path: '/admin/system-logs',
-      icon: ServerIcon,
-      label: t('admin.menu.systemLogs')
-    },
+    // Hidden for now - uncomment when ready
+    // {
+    //   key: 'reports',
+    //   path: '/admin/reports',
+    //   icon: ReportIcon,
+    //   label: t('admin.menu.reports')
+    // },
+    // {
+    //   key: 'system-logs',
+    //   path: '/admin/system-logs',
+    //   icon: ServerIcon,
+    //   label: t('admin.menu.systemLogs')
+    // },
 
   ];
 

@@ -279,14 +279,13 @@ class AuthService:
             Reset token string
 
         Raises:
-            NotFoundError: If member not found or email doesn't match
+            ValidationError: If business number and email don't match
         """
         # Find member by business number
         member = await supabase_service.get_member_by_business_number(business_number)
 
         if not member or member.get("email") != email:
-            # Don't reveal whether the member exists (security best practice)
-            raise NotFoundError(resource_type="Member with matching email")
+            raise ValidationError(CMessageTemplate.VALIDATION_BUSINESS_EMAIL_MISMATCH)
 
         # Generate reset token
         reset_token = self.generate_reset_token()

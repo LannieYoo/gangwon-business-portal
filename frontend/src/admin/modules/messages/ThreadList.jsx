@@ -336,7 +336,7 @@ export default function ThreadList() {
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0 ${
                             msg.senderType === 'admin' ? 'bg-blue-500' : 'bg-gray-500'
                           }`}>
-                            {msg.senderType === 'admin' ? '管' : (selectedThread.memberName || '会')[0]}
+                            {msg.senderType === 'admin' ? t('admin.messages.avatar.admin') : (selectedThread.memberName || t('admin.messages.avatar.member'))[0]}
                           </div>
                           <div className={`px-4 py-2.5 rounded-2xl shadow-sm ${
                             msg.senderType === 'admin'

@@ -539,6 +539,7 @@ class MessageService(SupabaseService):
         page_size: int = 20,
         category: Optional[str] = None,
         is_important: Optional[bool] = None,
+        is_read: Optional[bool] = None,
         is_admin: bool = False
     ) -> Tuple[List[Dict[str, Any]], int, int]:
         """
@@ -550,6 +551,7 @@ class MessageService(SupabaseService):
             page_size: 每页数量
             category: 分类过滤
             is_important: 重要性过滤
+            is_read: 已读状态过滤
             is_admin: 是否是管理员（管理员查看所有直接消息）
         
         Returns:
@@ -559,9 +561,10 @@ class MessageService(SupabaseService):
         query = self.client.table('messages').select('*', count='exact')
         
         if is_admin:
-            # 管理员：查看发送给管理员的消息（1对1咨询）和管理员发送的消息
+            # 管理员：只查看发送给管理员的消息或管理员发送的消息
+            # 排除 sender_id 为 null 且 recipient_id 不是管理员的消息（系统发给会员的通知）
             query = query.eq('message_type', 'direct')
-            query = query.or_(f'recipient_id.eq.{user_id},sender_id.eq.{user_id}')
+            query = query.eq('recipient_id', user_id)
         else:
             # 会员：只查看发送给自己的消息
             query = query.eq('recipient_id', user_id)
@@ -570,6 +573,8 @@ class MessageService(SupabaseService):
             query = query.eq('category', category)
         if is_important is not None:
             query = query.eq('is_important', is_important)
+        if is_read is not None:
+            query = query.eq('is_read', is_read)
         
         count_result = query.execute()
         total_count = count_result.count or 0
@@ -577,9 +582,9 @@ class MessageService(SupabaseService):
         # 获取未读数
         unread_query = self.client.table('messages').select('id', count='exact')
         if is_admin:
-            # 管理员：统计发送给管理员的未读消息（主要是会员的咨询）
+            # 管理员：只统计发送给管理员的未读消息
             unread_query = unread_query.eq('message_type', 'direct').eq('is_read', False)
-            unread_query = unread_query.or_(f'recipient_id.eq.{user_id},sender_id.eq.{user_id}')
+            unread_query = unread_query.eq('recipient_id', user_id)
         else:
             unread_query = unread_query.eq('recipient_id', user_id).eq('is_read', False)
         
@@ -596,8 +601,9 @@ class MessageService(SupabaseService):
         messages_query = self.client.table('messages').select('*')
         
         if is_admin:
+            # 管理员：只查看发送给管理员的消息
             messages_query = messages_query.eq('message_type', 'direct')
-            messages_query = messages_query.or_(f'recipient_id.eq.{user_id},sender_id.eq.{user_id}')
+            messages_query = messages_query.eq('recipient_id', user_id)
         else:
             messages_query = messages_query.eq('recipient_id', user_id)
         
@@ -605,6 +611,8 @@ class MessageService(SupabaseService):
             messages_query = messages_query.eq('category', category)
         if is_important is not None:
             messages_query = messages_query.eq('is_important', is_important)
+        if is_read is not None:
+            messages_query = messages_query.eq('is_read', is_read)
         
         messages_query = messages_query.order('created_at', desc=True)
         messages_query = messages_query.range(offset, offset + page_size - 1)

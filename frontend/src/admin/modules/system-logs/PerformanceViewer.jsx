@@ -139,7 +139,7 @@ export default function PerformanceViewer({ initialFilter = null }) {
         pageSize={pageSize}
         onPageChange={setCurrentPage}
         emptyTitle={tl('performance.noLogs')}
-        emptySubtitle={totalCount === 0 ? '暂无性能日志' : '当前搜索条件下没有匹配的日志'}
+        emptySubtitle={totalCount === 0 ? tl('performance.emptyLogs') : tl('performance.noMatchingLogs')}
         tl={tl}
         t={t}
         renderRow={(log) => (

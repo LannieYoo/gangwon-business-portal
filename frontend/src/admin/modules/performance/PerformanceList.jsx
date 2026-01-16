@@ -26,6 +26,8 @@ export default function PerformanceList() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [reviewComment, setReviewComment] = useState('');
   const [rejectComment, setRejectComment] = useState('');
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [approveComment, setApproveComment] = useState('');
   const [allRecords, setAllRecords] = useState([]); // 存储所有数据
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -104,11 +106,14 @@ export default function PerformanceList() {
     setTotalCount(filteredRecords.length);
   }, [filteredRecords]);
 
-  const handleApprove = async (record) => {
-    await adminService.approvePerformance(record.id);
+  const handleApprove = async () => {
+    await adminService.approvePerformance(selectedRecord.id, approveComment || null);
     setMessageVariant('success');
     setMessage(t('admin.performance.approveSuccess', '批准成功') || '批准成功');
     setTimeout(() => setMessage(null), 3000);
+    setShowApproveModal(false);
+    setApproveComment('');
+    setSelectedRecord(null);
     loadAllPerformanceRecords();
   };
 
@@ -309,7 +314,8 @@ export default function PerformanceList() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleApprove(row);
+                  setSelectedRecord(row);
+                  setShowApproveModal(true);
                 }}
                 className="text-green-600 hover:text-green-900 font-medium text-sm"
                 title={t('admin.performance.approve', '批准')}
@@ -488,6 +494,46 @@ export default function PerformanceList() {
               className="w-full md:w-auto border-red-600 text-red-600 hover:bg-red-50"
             >
               {t('admin.performance.reject', '驳回')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 批准模态框 */}
+      <Modal
+        isOpen={showApproveModal}
+        onClose={() => {
+          setShowApproveModal(false);
+          setApproveComment('');
+          setSelectedRecord(null);
+        }}
+        title={t('admin.performance.approveModal.title', '批准业绩记录')}
+      >
+        <div className="flex flex-col gap-3 md:gap-4">
+          <p>{t('admin.performance.approveModal.description', '请输入批准备注（可选）。')}</p>
+          <Textarea
+            value={approveComment}
+            onChange={(e) => setApproveComment(e.target.value)}
+            placeholder={t('admin.performance.approveModal.placeholder', '请输入批准备注...')}
+            rows={5}
+          />
+          <div className="flex flex-col-reverse md:flex-row justify-end gap-3 md:gap-4 mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowApproveModal(false);
+                setApproveComment('');
+                setSelectedRecord(null);
+              }}
+              className="w-full md:w-auto"
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button 
+              onClick={handleApprove}
+              className="w-full md:w-auto"
+            >
+              {t('admin.performance.approve', '批准')}
             </Button>
           </div>
         </div>

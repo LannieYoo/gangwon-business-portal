@@ -112,6 +112,7 @@ class MessageService:
         page_size: int = 20,
         category: Optional[str] = None,
         is_important: Optional[bool] = None,
+        is_read: Optional[bool] = None,
         is_admin: bool = False,
     ) -> Tuple[List[dict], int, int]:
         """Get paginated list of messages for a user."""
@@ -121,6 +122,7 @@ class MessageService:
             page_size=page_size,
             category=category,
             is_important=is_important,
+            is_read=is_read,
             is_admin=is_admin
         )
 

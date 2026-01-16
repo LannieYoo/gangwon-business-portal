@@ -137,23 +137,13 @@ export function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegister }) {
               >
                 {t("auth.password")}
               </label>
-              <div className="flex items-center gap-2">
-                <Link
-                  to="/find-id"
-                  className="text-gray-900 no-underline text-base font-medium hover:underline"
-                  onClick={handleClose}
-                >
-                  {t("auth.findId")}
-                </Link>
-                <span className="text-gray-400 text-xs">|</span>
-                <Link
-                  to="/forgot-password"
-                  className="text-gray-900 no-underline text-base font-medium hover:underline"
-                  onClick={handleClose}
-                >
-                  {t("auth.forgotPassword")}
-                </Link>
-              </div>
+              <Link
+                to="/forgot-password"
+                className="text-gray-900 no-underline text-base font-medium hover:underline"
+                onClick={handleClose}
+              >
+                {t("auth.forgotPassword")}
+              </Link>
             </div>
             <div className="relative flex items-center">
               <input

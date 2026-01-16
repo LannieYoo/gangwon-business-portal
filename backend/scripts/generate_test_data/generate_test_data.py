@@ -396,53 +396,119 @@ class Generator:
         }).execute()
 
     def gen_messages(self):
-        subjects = self.korean["message_subjects"]
+        """生成消息数据：1对1咨询(thread) + 系统通知(direct)"""
         
-        # 生成管理员发送给会员的消息
-        for i in range(self.counts["messages"] // 2):
-            mid = str(uuid4())
-            self.db.table("messages").insert({
-                "id": mid, "message_type": "direct", 
-                "sender_id": self.admin_id, "sender_type": "admin",
-                "recipient_id": random.choice(self.member_ids), 
-                "subject": subjects[i % len(subjects)],
-                "content": "안녕하세요. 관리자입니다.", 
-                "category": "notice", "status": "sent", "priority": "normal",
-                "is_read": random.choice([True, False]), 
-                "is_important": False, "is_broadcast": False, 
-                "created_at": rand_dt(60)
-            }).execute()
-            self.msg_ids.append(mid)
-        
-        # 생成会员发送给管理员的1对1消息（咨询）
-        inquiry_subjects = [
-            "사업 신청 관련 문의",
-            "성과 제출 방법 문의", 
-            "회원 정보 수정 요청",
-            "지원 프로그램 자격 문의",
-            "시스템 사용법 문의",
-            "서류 제출 관련 질문",
-            "프로젝트 진행 상황 문의",
-            "기술 지원 요청",
-            "계정 문제 해결 요청",
-            "기타 문의사항"
+        # ========== 1. 生成1对1咨询 (Thread) ==========
+        # 会员发起的咨询对话，包含多条来回消息
+        thread_subjects = [
+            ("사업 신청 관련 문의", "general", [
+                ("member", "안녕하세요. 2024년 중소기업 디지털 전환 지원사업에 신청하고 싶은데, 필요한 서류가 무엇인지 알려주실 수 있을까요?"),
+                ("admin", "안녕하세요. 해당 사업 신청에는 사업자등록증, 재무제표, 사업계획서가 필요합니다. 자세한 내용은 공지사항을 참고해 주세요."),
+                ("member", "감사합니다. 재무제표는 최근 몇 년치가 필요한가요?"),
+                ("admin", "최근 2년치 재무제표를 제출해 주시면 됩니다."),
+            ]),
+            ("성과 제출 방법 문의", "performance", [
+                ("member", "분기별 성과 제출 시 매출액은 어떤 기준으로 입력해야 하나요?"),
+                ("admin", "매출액은 해당 분기의 세금계산서 발행 기준 금액을 입력해 주시면 됩니다."),
+            ]),
+            ("회원 정보 수정 요청", "general", [
+                ("member", "회사 주소가 변경되었는데 어떻게 수정하나요?"),
+                ("admin", "마이페이지 > 기업 프로필에서 직접 수정하실 수 있습니다. 사업자등록증 변경이 필요한 경우 별도 문의 부탁드립니다."),
+                ("member", "확인했습니다. 감사합니다!"),
+            ]),
+            ("지원 프로그램 자격 문의", "general", [
+                ("member", "저희 회사가 스타트업 창업 지원 프로그램에 신청 가능한지 확인 부탁드립니다."),
+            ]),
+            ("기술 지원 요청", "technical", [
+                ("member", "시스템 로그인이 안 됩니다. 비밀번호를 여러 번 입력했는데 계속 실패합니다."),
+                ("admin", "계정을 확인해 보겠습니다. 잠시만 기다려 주세요."),
+                ("admin", "비밀번호를 초기화했습니다. 등록된 이메일로 재설정 링크를 보내드렸습니다."),
+                ("member", "해결되었습니다. 감사합니다."),
+            ]),
         ]
         
-        for i in range(self.counts["messages"] // 2):
-            mid = str(uuid4())
-            member_id = random.choice(self.member_ids)
+        thread_statuses = ["open", "open", "resolved", "open", "closed"]
+        
+        for i, (subject, category, conversations) in enumerate(thread_subjects):
+            member_id = self.member_ids[i % len(self.member_ids)]
+            thread_id = str(uuid4())
+            base_time = datetime.now(timezone.utc) - timedelta(days=random.randint(1, 30))
+            status = thread_statuses[i % len(thread_statuses)]
+            
+            # 创建 thread 主记录
             self.db.table("messages").insert({
-                "id": mid, "message_type": "direct",
-                "sender_id": member_id, "sender_type": "member", 
-                "recipient_id": self.admin_id,  # 관리员에게 발송
-                "subject": inquiry_subjects[i % len(inquiry_subjects)],
-                "content": "안녕하세요. 문의사항이 있어서 연락드립니다.",
-                "category": "inquiry", "status": "sent", "priority": "normal",
-                "is_read": random.choice([True, False]),
-                "is_important": False, "is_broadcast": False,
-                "created_at": rand_dt(60)
+                "id": thread_id,
+                "message_type": "thread",
+                "sender_id": member_id,
+                "sender_type": "member",
+                "recipient_id": member_id,
+                "subject": subject,
+                "content": f"Thread: {subject}",
+                "category": category,
+                "status": status,
+                "is_read": status != "open",
+                "is_important": False,
+                "is_broadcast": False,
+                "created_at": base_time.isoformat(),
+                "updated_at": (base_time + timedelta(hours=len(conversations))).isoformat(),
             }).execute()
-            self.msg_ids.append(mid)
+            
+            # 创建 thread 内的消息
+            for j, (sender_type, content) in enumerate(conversations):
+                msg_time = base_time + timedelta(hours=j+1, minutes=random.randint(0, 30))
+                sender_id = member_id if sender_type == "member" else self.admin_id
+                is_read = j < len(conversations) - 1 or status != "open"
+                
+                self.db.table("messages").insert({
+                    "id": str(uuid4()),
+                    "message_type": "thread",
+                    "thread_id": thread_id,
+                    "sender_id": sender_id,
+                    "sender_type": sender_type,
+                    "recipient_id": member_id,
+                    "subject": subject,
+                    "content": content,
+                    "category": category,
+                    "status": "sent",
+                    "is_read": is_read,
+                    "is_important": False,
+                    "is_broadcast": False,
+                    "created_at": msg_time.isoformat(),
+                }).execute()
+            
+            self.msg_ids.append(thread_id)
+        
+        # ========== 2. 生成系统通知 (Direct) ==========
+        # 系统发送给会员的通知（审批结果、公告等）
+        notification_templates = [
+            ("회원가입 승인 완료", "회원가입이 승인되었습니다. 이제 모든 서비스를 이용하실 수 있습니다.", "notice", False),
+            ("2024년 4분기 성과 제출 안내", "2024년 4분기 성과 제출 기한이 다가왔습니다. 1월 15일까지 제출해 주세요.", "notice", True),
+            ("[실적 관리] 2024년 3분기 실적이 승인되었습니다", "2024년 3분기 실적 데이터가 승인되었습니다.\n\n관리자 의견: 제출해 주신 자료가 정확합니다. 감사합니다.", "performance", False),
+            ("[실적 관리] 2024년 2분기 실적이 보완 요청되었습니다", "2024년 2분기 실적 데이터가 보완 요청되었습니다.\n\n관리자 의견: 매출액 증빙 서류를 추가로 제출해 주세요.", "performance", True),
+            ("지원사업 신청 결과 안내", "신청하신 '중소기업 디지털 전환 지원사업'이 승인되었습니다. 축하드립니다!", "notice", False),
+            ("시스템 정기 점검 안내", "12월 20일 02:00~06:00 시스템 정기 점검이 예정되어 있습니다.", "notice", False),
+        ]
+        
+        for member_id in self.member_ids:
+            # 每个会员收到 3-4 条系统通知
+            for template in random.sample(notification_templates, random.randint(3, 4)):
+                subject, content, category, is_important = template
+                self.db.table("messages").insert({
+                    "id": str(uuid4()),
+                    "message_type": "direct",
+                    "sender_id": None,  # 系统消息
+                    "sender_type": "system",
+                    "recipient_id": member_id,
+                    "subject": subject,
+                    "content": content,
+                    "category": category,
+                    "status": "sent",
+                    "priority": "high" if is_important else "normal",
+                    "is_read": random.choice([True, False]),
+                    "is_important": is_important,
+                    "is_broadcast": False,
+                    "created_at": rand_dt(60),
+                }).execute()
 
     def gen_attachments(self):
         templates = [

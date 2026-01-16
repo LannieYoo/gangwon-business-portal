@@ -317,6 +317,51 @@ class PerformanceService:
 
         return record
 
+    async def _send_performance_notification(
+        self,
+        member_id: str,
+        status: str,
+        year: Optional[int],
+        quarter: Optional[int],
+        comments: Optional[str],
+    ) -> None:
+        """Send in-app notification for performance review result."""
+        from ..messages.service import service as message_service
+        from ..messages.schemas import MessageCreate
+        
+        # Build notification subject and content
+        period = f"{year}년"
+        if quarter:
+            quarter_names = {1: "1분기", 2: "2분기", 3: "3분기", 4: "4분기"}
+            period += f" {quarter_names.get(quarter, f'{quarter}분기')}"
+        
+        status_labels = {
+            "approved": "승인",
+            "revision_requested": "보완 요청",
+            "rejected": "거부",
+        }
+        status_label = status_labels.get(status, status)
+        
+        subject = f"[실적 관리] {period} 실적이 {status_label}되었습니다"
+        content = f"{period} 실적 데이터가 {status_label}되었습니다."
+        if comments:
+            content += f"\n\n관리자 의견: {comments}"
+        
+        try:
+            await message_service.create_direct_message(
+                sender_id=None,  # System message
+                recipient_id=UUID(member_id),
+                data=MessageCreate(
+                    subject=subject,
+                    content=content,
+                    recipient_id=UUID(member_id),
+                ),
+            )
+        except Exception as e:
+            # Log error but don't fail the main operation
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to send performance notification: {e}")
+
     async def approve_performance(
         self,
         performance_id: UUID,
@@ -373,6 +418,14 @@ class PerformanceService:
                     status="approved",
                     comments=comments,
                 )
+            )
+            # Send in-app notification
+            await self._send_performance_notification(
+                member_id=record["member_id"],
+                status="approved",
+                year=record.get("year"),
+                quarter=record.get("quarter"),
+                comments=comments,
             )
 
         return updated_record
@@ -436,6 +489,14 @@ class PerformanceService:
                     revision_url=revision_url,
                 )
             )
+            # Send in-app notification
+            await self._send_performance_notification(
+                member_id=record["member_id"],
+                status="revision_requested",
+                year=record.get("year"),
+                quarter=record.get("quarter"),
+                comments=comments,
+            )
 
         return updated_record
 
@@ -479,7 +540,18 @@ class PerformanceService:
         await supabase_service.update_record('performance_records', str(performance_id), update_data)
 
         # Get updated record
-        return await supabase_service.get_by_id('performance_records', str(performance_id))
+        updated_record = await supabase_service.get_by_id('performance_records', str(performance_id))
+
+        # Send in-app notification for rejection
+        await self._send_performance_notification(
+            member_id=record["member_id"],
+            status="rejected",
+            year=record.get("year"),
+            quarter=record.get("quarter"),
+            comments=comments,
+        )
+
+        return updated_record
 
     async def export_performance_data(
         self, query: PerformanceListQuery

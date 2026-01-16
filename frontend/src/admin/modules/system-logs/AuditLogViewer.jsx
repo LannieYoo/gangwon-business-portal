@@ -105,7 +105,7 @@ export default function AuditLogViewer({ initialFilter = null }) {
         pageSize={pageSize}
         onPageChange={setCurrentPage}
         emptyTitle={tl('audit.noLogs')}
-        emptySubtitle={totalCount === 0 ? '暂无审计日志' : '当前搜索条件下没有匹配的日志'}
+        emptySubtitle={totalCount === 0 ? tl('audit.emptyLogs') : tl('audit.noMatchingLogs')}
         tl={tl}
         t={t}
         renderRow={(log) => (

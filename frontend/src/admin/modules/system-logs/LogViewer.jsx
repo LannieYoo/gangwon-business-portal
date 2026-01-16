@@ -108,7 +108,7 @@ export default function LogViewer({ initialFilter = null }) {
         pageSize={pageSize}
         onPageChange={setCurrentPage}
         emptyTitle={tl('table.noLogs')}
-        emptySubtitle={totalCount === 0 ? '暂无日志' : '当前搜索条件下没有匹配的日志'}
+        emptySubtitle={totalCount === 0 ? tl('table.emptyLogs') : tl('table.noMatchingLogs')}
         tl={tl}
         t={t}
         renderRow={(log) => (

@@ -70,6 +70,7 @@ class CMessageTemplate:
     VALIDATION_FILE_EXTENSION: Final[str] = "File extension '{extension}' is not allowed. Allowed extensions: {allowed_extensions}"
     VALIDATION_EMAIL_IN_USE: Final[str] = "Email already in use"
     VALIDATION_BUSINESS_NUMBER_IN_USE: Final[str] = "Business number already registered"
+    VALIDATION_BUSINESS_EMAIL_MISMATCH: Final[str] = "Business number and email do not match"
     VALIDATION_OPERATION_FAILED: Final[str] = "Failed to {operation}"
     
     # ========== Not Found Messages ==========

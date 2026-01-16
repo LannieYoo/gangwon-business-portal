@@ -178,8 +178,8 @@ class AdminService {
   }
 
   // 批准绩效记录
-  async approvePerformance(recordId, comments) {
-    const response = await apiService.post(`${API_PREFIX}/admin/performance/${recordId}/approve`, { comments: comments ?? null });
+  async approvePerformance(recordId, comments = null) {
+    const response = await apiService.post(`${API_PREFIX}/admin/performance/${recordId}/approve`, { comments });
 
     if (response) {
       return {

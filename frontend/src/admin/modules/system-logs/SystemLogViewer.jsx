@@ -81,7 +81,7 @@ export default function SystemLogViewer({ initialFilter = null }) {
         pageSize={pageSize}
         onPageChange={setCurrentPage}
         emptyTitle={tl('systemLog.noLogs') || '暂无系统日志'}
-        emptySubtitle={totalCount === 0 ? '系统日志为空' : '当前搜索条件下没有匹配的日志'}
+        emptySubtitle={totalCount === 0 ? tl('systemLog.emptyLogs') : tl('systemLog.noMatchingLogs')}
         tl={tl}
         t={t}
         renderRow={(log) => (

@@ -101,15 +101,7 @@ export default function AdminLogin() {
                 </label>
               </div>
               
-              <div className="text-sm flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => navigate('/admin/find-id')}
-                  className="font-medium text-blue-600 hover:text-blue-500"
-                >
-                  {t('admin.auth.findId')}
-                </button>
-                <span className="text-gray-400">|</span>
+              <div className="text-sm">
                 <button
                   type="button"
                   onClick={() => navigate('/admin/forgot-password')}

@@ -244,9 +244,9 @@ export default function PerformanceDetail() {
 
   const getTypeLabel = (type) => {
     const typeMap = {
-      sales: t('performance.type.sales', '销售业绩'),
-      support: t('performance.type.support', '支持业绩'),
-      ip: t('performance.type.ip', '知识产权业绩')
+      sales: t('performance.types.sales'),
+      support: t('performance.types.support'),
+      ip: t('performance.types.ip')
     };
     return typeMap[type] || type;
   };
@@ -351,7 +351,7 @@ export default function PerformanceDetail() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
           <Button variant="outline" onClick={() => navigate('/admin/performance')}>
-            返回
+            {t('common.back')}
           </Button>
         </div>
         {canApprove && (
@@ -460,7 +460,7 @@ export default function PerformanceDetail() {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              状态
+              {t('admin.performance.statusLabel')}
             </label>
             <div className="flex items-center gap-2">
               <Badge variant={getStatusVariant(record.status)}>

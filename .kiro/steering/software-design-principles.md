@@ -1,24 +1,34 @@
 ---
-inclusion: manual
+inclusion: always
 ---
-# 软件设计原则
 
-遵循 SOLID + DRY + KISS 原则。
+# Software Design Principles
 
-## 快速参考
+Apply SOLID + DRY + KISS principles when writing or modifying code.
 
-| 原则 | 核心要求 | 检查问题 |
-|------|---------|---------|
-| SRP | 一个类只做一件事 | 职责能用一句话描述吗？ |
-| OCP | 通过接口扩展，不修改现有代码 | 新增功能需要改现有代码吗？ |
-| LSP | 子类可安全替换父类 | 子类会抛出父类未声明的异常吗？ |
-| ISP | 接口小而专注 | 实现类需要实现所有方法吗？ |
-| DIP | 依赖抽象，使用依赖注入 | 高层依赖接口还是具体类？ |
-| DRY | 不重复，集中定义 | 修改一个逻辑需要改多处吗？ |
-| KISS | 保持简单，避免过度设计 | 新人能快速理解吗？ |
+## Principle Reference
 
-## 优先级
+| Principle | Requirement | Validation Check |
+|-----------|-------------|------------------|
+| SRP | One class, one responsibility | Can the responsibility be described in one sentence? |
+| OCP | Extend via interfaces, don't modify existing code | Does adding features require changing existing code? |
+| LSP | Subclasses must safely substitute parent classes | Does the subclass throw exceptions not declared by parent? |
+| ISP | Keep interfaces small and focused | Must implementers provide all methods? |
+| DIP | Depend on abstractions, use dependency injection | Does high-level code depend on interfaces or concrete classes? |
+| DRY | No duplication, centralize definitions | Does changing one logic require edits in multiple places? |
+| KISS | Keep it simple, avoid over-engineering | Can a newcomer understand this quickly? |
 
-KISS > SRP > DRY > OCP/DIP > LSP/ISP
+## Application Priority
 
-原则是指导，不是教条。根据实际场景灵活应用。
+**KISS > SRP > DRY > OCP/DIP > LSP/ISP**
+
+When principles conflict, favor simplicity and single responsibility over abstraction.
+
+## Guidelines for AI Assistants
+
+- Prefer simple, readable solutions over clever abstractions
+- Extract repeated logic only when duplication is clear (3+ occurrences)
+- Use dependency injection for services and repositories
+- Keep functions/methods focused on a single task
+- Avoid premature optimization or over-generalization
+- When refactoring, preserve existing behavior unless explicitly asked to change it

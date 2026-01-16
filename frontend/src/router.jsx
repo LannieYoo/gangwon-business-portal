@@ -258,6 +258,9 @@ const MemberLayout = lazy(() =>
 const Register = lazy(() =>
   import("@member/modules/auth/Register").then((m) => ({ default: m.default }))
 );
+const ForgotPassword = lazy(() =>
+  import("@member/modules/auth/ForgotPassword").then((m) => ({ default: m.default }))
+);
 const AdminLogin = lazy(() =>
   import("@admin/modules/auth/Login").then((m) => ({ default: m.default }))
 );
@@ -429,6 +432,14 @@ export const router = createBrowserRouter(
           ),
         },
         // Note: member login page removed; login handled via modal on protected routes
+        {
+          path: "/forgot-password",
+          element: (
+            <LazyRoute>
+              <ForgotPassword />
+            </LazyRoute>
+          ),
+        },
         {
           path: "/unauthorized",
           element: <Unauthorized />,

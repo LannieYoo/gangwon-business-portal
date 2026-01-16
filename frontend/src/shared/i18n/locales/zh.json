@@ -15,6 +15,7 @@
     "submit": "提交",
     "confirm": "确认",
     "back": "返回",
+    "processing": "处理中...",
     "backToList": "返回列表",
     "view": "查看",
     "viewAll": "查看全部",
@@ -662,6 +663,7 @@
       "rejectSuccess": "拒绝成功",
       "rejectFailed": "拒绝失败",
       "rejectReason": "请输入拒绝原因（可选）",
+      "resetPending": "取消",
       "search": {
         "companyName": "企业名称",
         "representative": "代表人姓名",
@@ -739,10 +741,20 @@
       "title": "通知中心",
       "tabs": {
         "threads": "1对1咨询",
+        "notifications": "系统通知",
         "list": "消息列表",
         "send": "发送消息",
         "broadcast": "群发消息",
         "analytics": "消息统计"
+      },
+      "avatar": {
+        "admin": "管",
+        "member": "会"
+      },
+      "systemNotifications": {
+        "title": "系统通知",
+        "empty": "暂无系统通知",
+        "detail": "通知详情"
       },
       "threads": {
         "title": "1对1咨询列表",
@@ -808,6 +820,7 @@
     },
     "performance": {
       "title": "业绩管理",
+      "statusLabel": "状态",
       "approve": "批准",
       "approveSuccess": "批准成功",
       "approveFailed": "批准失败",
@@ -851,6 +864,11 @@
         "title": "驳回业绩记录",
         "description": "请输入驳回原因。",
         "placeholder": "请输入驳回原因..."
+      },
+      "approveModal": {
+        "title": "批准业绩记录",
+        "description": "请输入批准备注（可选）。",
+        "placeholder": "请输入批准备注..."
       },
       "filter": {
         "yearPlaceholder": "选择年度"
@@ -1243,6 +1261,8 @@
       "systemLog": {
         "searchPlaceholder": "搜索消息、模块...",
         "noLogs": "暂无系统日志",
+        "emptyLogs": "系统日志为空",
+        "noMatchingLogs": "当前搜索条件下没有匹配的日志",
         "fullMessage": "完整消息",
         "loggerName": "日志器"
       },
@@ -1281,6 +1301,8 @@
       "exception": {
         "allTypes": "全部类型",
         "noExceptions": "🎉 暂无异常记录",
+        "emptyLogs": "暂无异常日志",
+        "noMatchingLogs": "当前搜索条件下没有匹配的异常",
         "stackTrace": "Stack Trace",
         "extraData": "额外数据"
       },
@@ -1291,11 +1313,15 @@
         "totalCount": "总记录",
         "threshold": "阈值",
         "noLogs": "暂无性能日志",
+        "emptyLogs": "暂无性能日志",
+        "noMatchingLogs": "当前搜索条件下没有匹配的日志",
         "detailData": "详细数据",
         "webVitals": "Web Vitals"
       },
       "audit": {
         "noLogs": "暂无审计日志",
+        "emptyLogs": "暂无审计日志",
+        "noMatchingLogs": "当前搜索条件下没有匹配的日志",
         "actionLogin": "登录",
         "actionLogout": "登出",
         "actionCreate": "创建",
@@ -1337,6 +1363,8 @@
         "target": "目标",
         "location": "位置",
         "noLogs": "暂无日志",
+        "emptyLogs": "暂无日志",
+        "noMatchingLogs": "当前搜索条件下没有匹配的日志",
         "errorMessage": "错误信息",
         "extraData": "额外数据",
         "stackTrace": "异常堆栈",
@@ -1367,6 +1395,11 @@
   },
   "performance": {
     "type": "成果类型",
+    "types": {
+      "sales": "销售业绩",
+      "support": "支持业绩",
+      "ip": "知识产权业绩"
+    },
     "status": {
       "approved": "已批准",
       "submitted": "已提交",
@@ -1737,6 +1770,7 @@
     "noAccount": "还没有账号？",
     "hasAccount": "已有账号？",
     "loginFailed": "登录失败",
+    "businessEmailMismatch": "营业执照号码与邮箱不匹配",
     "registerSuccess": "注册成功",
     "registerFailed": "注册失败",
     "invalidEmail": "请输入有效的邮箱地址",

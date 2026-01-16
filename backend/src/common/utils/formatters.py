@@ -143,7 +143,11 @@ def parse_datetime(dt_input: Union[str, datetime]) -> datetime:
         ValueError: If datetime string is invalid
     """
     if isinstance(dt_input, str):
-        return datetime.fromisoformat(dt_input.replace('Z', '+00:00'))
+        # Handle 'Z' suffix
+        dt_str = dt_input.replace('Z', '+00:00')
+        # Use dateutil.parser for more robust parsing
+        from dateutil import parser
+        return parser.isoparse(dt_str)
     return dt_input
 
 
@@ -161,7 +165,8 @@ def parse_date(date_input: Union[str, date, datetime]) -> date:
         ValueError: If date string is invalid
     """
     if isinstance(date_input, str):
-        dt = datetime.fromisoformat(date_input.replace('Z', '+00:00'))
+        from dateutil import parser
+        dt = parser.isoparse(date_input.replace('Z', '+00:00'))
         return dt.date()
     elif isinstance(date_input, datetime):
         return date_input.date()
