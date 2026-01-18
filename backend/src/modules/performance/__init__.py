@@ -1,6 +1,2 @@
-"""
-Performance management module.
-
-This module handles performance data submission and review.
-"""
+"""业绩管理模块"""
 

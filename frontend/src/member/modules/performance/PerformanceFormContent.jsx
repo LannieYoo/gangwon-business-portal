@@ -12,17 +12,14 @@ import Button from '@shared/components/Button';
 import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
-import { Tabs, Modal, ModalFooter } from '@shared/components';
+import { Tabs, Modal, ModalFooter, FileAttachments } from '@shared/components';
 import { performanceService } from '@shared/services';
 import { useUpload } from '@shared/hooks';
 import { toCamelCase } from '@shared/utils/helpers';
 import { 
-  DocumentIcon,
   CheckCircleIcon, 
-  XIcon,
   PlusIcon,
-  TrashIcon,
-  UploadIcon
+  TrashIcon
 } from '@shared/components/Icons';
 
 export default function PerformanceFormContent() {
@@ -49,11 +46,11 @@ export default function PerformanceFormContent() {
         currentEmployees: { previousYear: '', currentYear: '' },
         newEmployees: { previousYear: '', currentYear: '' },
         totalEmployees: { previousYear: '', currentYear: '' }
-      }
+      },
+      attachments: []
     },
     governmentSupport: [],
     intellectualProperty: [],
-    attachments: [],
     notes: ''
   });
 
@@ -66,34 +63,59 @@ export default function PerformanceFormContent() {
   const loadRecord = async () => {
     if (!id) return;
     setLoading(true);
-    const record = await performanceService.getRecord(id);
-    if (record) {
-      const dataJson = typeof record.dataJson === 'string' 
-        ? JSON.parse(record.dataJson) 
-        : record.dataJson || {};
+    try {
+      const record = await performanceService.getRecord(id);
       
-      // Convert snake_case keys to camelCase for frontend use
-      const salesEmploymentData = dataJson.sales_employment 
-        ? toCamelCase(dataJson.sales_employment) 
-        : formData.salesEmployment;
-      const governmentSupportData = dataJson.government_support 
-        ? toCamelCase(dataJson.government_support) 
-        : [];
-      const intellectualPropertyData = dataJson.intellectual_property 
-        ? toCamelCase(dataJson.intellectual_property) 
-        : [];
-      
-      setFormData({
-        year: record.year,
-        quarter: record.quarter ? record.quarter.toString() : '',
-        salesEmployment: salesEmploymentData,
-        governmentSupport: governmentSupportData,
-        intellectualProperty: intellectualPropertyData,
-        attachments: dataJson.attachments || [],
-        notes: dataJson.notes || ''
-      });
+      if (record) {
+        const dataJson = typeof record.dataJson === 'string' 
+          ? JSON.parse(record.dataJson) 
+          : record.dataJson || {};
+        
+        const salesEmploymentData = dataJson.salesEmployment 
+          ? { ...dataJson.salesEmployment }
+          : { ...formData.salesEmployment };
+        
+        if (record.hskCode || record.exportCountry1 || record.exportCountry2) {
+          if (!salesEmploymentData.export) {
+            salesEmploymentData.export = {};
+          }
+          if (record.hskCode) {
+            salesEmploymentData.export.hskCode = record.hskCode;
+          }
+          if (record.exportCountry1) {
+            salesEmploymentData.export.exportCountry1 = record.exportCountry1;
+          }
+          if (record.exportCountry2) {
+            salesEmploymentData.export.exportCountry2 = record.exportCountry2;
+          }
+        }
+        
+        const governmentSupportData = dataJson.governmentSupport 
+          ? dataJson.governmentSupport.map(item => ({ ...item, attachments: item.attachments || [] }))
+          : [];
+        
+        const intellectualPropertyData = dataJson.intellectualProperty 
+          ? dataJson.intellectualProperty.map(item => ({ ...item, attachments: item.attachments || [] }))
+          : [];
+        
+        if (!salesEmploymentData.attachments) {
+          salesEmploymentData.attachments = [];
+        }
+        
+        setFormData({
+          year: record.year,
+          quarter: record.quarter ? record.quarter.toString() : '',
+          salesEmployment: salesEmploymentData,
+          governmentSupport: governmentSupportData,
+          intellectualProperty: intellectualPropertyData,
+          notes: dataJson.notes || ''
+        });
+      }
+    } catch (error) {
+      alert(`加载失败: ${error.response?.data?.error?.message || error.message}`);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleChange = (field, value) => {
@@ -118,16 +140,21 @@ export default function PerformanceFormContent() {
 
   const handleSaveDraft = async () => {
     setSaving(true);
-    const backendData = performanceService.convertFormDataToBackendFormat(formData);
-    
-    if (id) {
-      await performanceService.updateRecord(id, backendData);
-    } else {
-      await performanceService.createRecord(backendData);
+    try {
+      const backendData = performanceService.convertFormDataToBackendFormat(formData);
+      
+      if (id) {
+        await performanceService.updateRecord(id, backendData);
+      } else {
+        await performanceService.createRecord(backendData);
+      }
+      
+      setSaving(false);
+      navigate('/member/performance/list');
+    } catch (error) {
+      setSaving(false);
+      alert(`保存失败: ${JSON.stringify(error.response?.data?.error || error.message)}`);
     }
-    
-    setSaving(false);
-    navigate('/member/performance/list');
   };
 
   const handleSubmit = () => {
@@ -198,29 +225,6 @@ export default function PerformanceFormContent() {
     { value: 'pct', label: t('performance.intellectualPropertyFields.overseasTypes.pct', 'PCT 해외 신청') },
     { value: 'general', label: t('performance.intellectualPropertyFields.overseasTypes.general', '일반 해외 신청') }
   ], [t]);
-
-  // 附件上传处理
-  const handleFileUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
-    
-    const uploadedFiles = await uploadAttachments(files);
-    if (uploadedFiles) {
-      setFormData(prev => ({
-        ...prev,
-        attachments: [...(prev.attachments || []), ...uploadedFiles]
-      }));
-    }
-    e.target.value = '';
-  };
-
-  // 删除附件
-  const handleRemoveAttachment = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      attachments: prev.attachments.filter((_, i) => i !== index)
-    }));
-  };
 
   if (loading) {
     return (
@@ -393,18 +397,10 @@ export default function PerformanceFormContent() {
                           const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
                           handleNestedChange('salesEmployment.export.hskCode', value);
                         }}
-                        placeholder="0000000000"
+                        placeholder="대표 주력 수출품목 HSK코드 기재 (숫자 10자리)"
                         maxLength={10}
                         error={formData.salesEmployment?.export?.hskCode && formData.salesEmployment?.export?.hskCode.length !== 10 ? t('performance.salesEmploymentFields.hskCodeError', '10자리 숫자를 입력하세요') : null}
                       />
-                      <a 
-                        href="https://cls.kipro.or.kr/hsk" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-xs text-blue-600 hover:underline mt-1 inline-block"
-                      >
-                        {t('performance.salesEmploymentFields.hskCodeLink', 'HSK 코드 조회')} →
-                      </a>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -517,6 +513,38 @@ export default function PerformanceFormContent() {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* 증빙서류 (证明文件) */}
+                <div>
+                  <h3 className="text-md font-semibold mb-4 pb-2 border-b border-gray-200">
+                    {t('performance.salesEmploymentFields.attachments', '증빙서류')}
+                  </h3>
+                  <FileAttachments
+                    attachments={formData.salesEmployment?.attachments || []}
+                    onChange={async (files) => {
+                      if (Array.isArray(files) && files.length > 0 && files[0] instanceof File) {
+                        const uploadedFiles = await uploadAttachments(files);
+                        if (uploadedFiles && uploadedFiles.length > 0) {
+                          const newAttachments = uploadedFiles.map(f => ({
+                            fileId: f.fileId,
+                            fileName: f.fileName,
+                            fileUrl: f.fileUrl,
+                            fileSize: f.fileSize
+                          }));
+                          const currentAttachments = formData.salesEmployment?.attachments || [];
+                          handleNestedChange('salesEmployment.attachments', [...currentAttachments, ...newAttachments]);
+                        }
+                      } else {
+                        handleNestedChange('salesEmployment.attachments', files);
+                      }
+                    }}
+                    uploading={uploading}
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    {t('performance.salesEmploymentFields.attachmentsHint', '매출액, 수출액, 고용 관련 증빙서류를 업로드하세요')}
+                  </p>
                 </div>
               </div>
             )}
@@ -655,6 +683,37 @@ export default function PerformanceFormContent() {
                           }}
                         />
                       </div>
+                    </div>
+                    
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <FileAttachments
+                        label={t('performance.governmentSupportFields.proofDocument', '증빙서류')}
+                        attachments={item.attachments || []}
+                        onChange={async (files) => {
+                          const updated = [...formData.governmentSupport];
+                          if (Array.isArray(files) && files.length > 0 && files[0] instanceof File) {
+                            const uploadedFiles = await uploadAttachments(files);
+                            if (uploadedFiles && uploadedFiles.length > 0) {
+                              const newAttachments = uploadedFiles.map(f => ({
+                                fileId: f.fileId,
+                                fileName: f.fileName,
+                                fileUrl: f.fileUrl,
+                                fileSize: f.fileSize
+                              }));
+                              const currentAttachments = item.attachments || [];
+                              updated[index] = { 
+                                ...item, 
+                                attachments: [...currentAttachments, ...newAttachments]
+                              };
+                            }
+                          } else {
+                            updated[index] = { ...item, attachments: files };
+                          }
+                          setFormData(prev => ({ ...prev, governmentSupport: updated }));
+                        }}
+                        uploading={uploading}
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                      />
                     </div>
                   </Card>
                 ))}
@@ -818,78 +877,42 @@ export default function PerformanceFormContent() {
                         </label>
                       </div>
                     </div>
+                    
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <FileAttachments
+                        label={t('performance.intellectualPropertyFields.proofDocument', '증빙서류')}
+                        attachments={item.attachments || []}
+                        onChange={async (files) => {
+                          const updated = [...formData.intellectualProperty];
+                          if (Array.isArray(files) && files.length > 0 && files[0] instanceof File) {
+                            const uploadedFiles = await uploadAttachments(files);
+                            if (uploadedFiles && uploadedFiles.length > 0) {
+                              const newAttachments = uploadedFiles.map(f => ({
+                                fileId: f.fileId,
+                                fileName: f.fileName,
+                                fileUrl: f.fileUrl,
+                                fileSize: f.fileSize
+                              }));
+                              const currentAttachments = item.attachments || [];
+                              updated[index] = { 
+                                ...item, 
+                                attachments: [...currentAttachments, ...newAttachments]
+                              };
+                            }
+                          } else {
+                            updated[index] = { ...item, attachments: files };
+                          }
+                          setFormData(prev => ({ ...prev, intellectualProperty: updated }));
+                        }}
+                        uploading={uploading}
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                      />
+                    </div>
                   </Card>
                 ))}
               </div>
             )}
           </div>
-        </div>
-      </Card>
-
-      {/* 증빙서류 (证明文件) */}
-      <Card className="mt-6">
-        <div className="p-6">
-          <h2 className="text-lg font-semibold mb-2">{t('performance.proofDocument', '증빙서류')}</h2>
-          <p className="text-sm text-gray-500 mb-4">{t('performance.proofDocumentsDesc', '매출액, 고용인원, 정부지원 등 관련 증빙서류를 업로드해주세요.')}</p>
-          
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-            <input
-              type="file"
-              id="attachment-upload"
-              multiple
-              accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-              onChange={handleFileUpload}
-              className="hidden"
-              disabled={uploading}
-            />
-            <label 
-              htmlFor="attachment-upload" 
-              className="cursor-pointer flex flex-col items-center"
-            >
-              {uploading ? (
-                <>
-                  <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-2"></div>
-                  <span className="text-sm text-blue-600">{t('common.uploading', '업로드 중...')}</span>
-                </>
-              ) : (
-                <>
-                  <UploadIcon className="w-10 h-10 text-gray-400 mb-2" />
-                  <span className="text-sm text-gray-600">{t('common.clickToUpload', '클릭하여 파일 업로드')}</span>
-                  <span className="text-xs text-gray-400 mt-1">{t('performance.fileUploadHint', '파일 형식: PDF / 최대 10MB')}</span>
-                </>
-              )}
-            </label>
-          </div>
-          
-          {/* 已上传文件列表 */}
-          {(formData.attachments || []).length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">{t('performance.uploadedFiles', '업로드된 파일')}</h3>
-              <div className="space-y-2">
-                {formData.attachments.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="flex items-center gap-2">
-                      <DocumentIcon className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm text-gray-700">{file.originalName || file.name}</span>
-                      {file.fileSize && (
-                        <span className="text-xs text-gray-400">
-                          ({(file.fileSize / 1024).toFixed(1)} KB)
-                        </span>
-                      )}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="small"
-                      onClick={() => handleRemoveAttachment(index)}
-                      className="text-red-600 hover:bg-red-50"
-                    >
-                      <XIcon className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </Card>
 

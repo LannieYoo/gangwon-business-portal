@@ -3,9 +3,9 @@
  * 内容管理（横幅、弹窗、公告）
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, Tabs } from '@shared/components';
+import { TabContainer } from '@shared/components';
 import BannerManagement from './BannerManagement';
 import NoticeManagement from './NoticeManagement';
 import FAQManagement from './FAQManagement';
@@ -14,40 +14,42 @@ import LegalContentManagement from './LegalContentManagement';
 
 export default function ContentManagement() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('banners');
 
   // 使用 useMemo 缓存 tabs 配置
   const tabs = useMemo(() => [
-    { key: 'banners', label: t('admin.content.tabs.banners') },
-    { key: 'notices', label: t('admin.content.tabs.notices') },
-    { key: 'faq', label: t('admin.content.tabs.faq') },
-    { key: 'systemInfo', label: t('admin.content.tabs.systemInfo') },
-    { key: 'legal', label: t('admin.content.tabs.legal', '약관관리') }
+    { 
+      key: 'banners', 
+      label: t('admin.content.tabs.banners'),
+      content: <BannerManagement />
+    },
+    { 
+      key: 'notices', 
+      label: t('admin.content.tabs.notices'),
+      content: <NoticeManagement />
+    },
+    { 
+      key: 'faq', 
+      label: t('admin.content.tabs.faq'),
+      content: <FAQManagement />
+    },
+    { 
+      key: 'systemInfo', 
+      label: t('admin.content.tabs.systemInfo'),
+      content: <SystemInfoManagement />
+    },
+    { 
+      key: 'legal', 
+      label: t('admin.content.tabs.legal', '약관관리'),
+      content: <LegalContentManagement />
+    }
   ], [t]);
 
-
-
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-xl md:text-2xl font-semibold text-gray-900 m-0">{t('admin.content.title')}</h1>
-      </div>
-
-      <Card>
-        <Tabs
-          tabs={tabs}
-          activeTab={activeTab}
-          onChange={setActiveTab}
-        />
-
-        <div className="mt-6 p-6">
-          {activeTab === 'banners' && <BannerManagement />}
-          {activeTab === 'notices' && <NoticeManagement />}
-          {activeTab === 'faq' && <FAQManagement />}
-          {activeTab === 'systemInfo' && <SystemInfoManagement />}
-          {activeTab === 'legal' && <LegalContentManagement />}
-        </div>
-      </Card>
-    </div>
+    <TabContainer
+      tabs={tabs}
+      defaultTab="banners"
+      title={t('admin.content.title')}
+      lazy={true}
+    />
   );
 }

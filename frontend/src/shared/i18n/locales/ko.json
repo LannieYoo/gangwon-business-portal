@@ -34,6 +34,7 @@
     "download": "다운로드",
     "upload": "업로드",
     "uploading": "업로드 중...",
+    "send": "전송",
     "sending": "전송 중...",
     "add": "추가",
     "remove": "제거",
@@ -82,7 +83,7 @@
     "addressDetail": "상세주소",
     "region": "소재지",
     "category": "기업 유형",
-    "industry": "업종",
+    "industry": "창업유형",
     "establishedDate": "설립일",
     "employeeCount": "직원 수",
     "sales": "매출액",
@@ -132,6 +133,20 @@
   },
   "industryClassification": {
     "startupType": {
+      "student_startup": "학생창업",
+      "faculty_startup": "교원창업",
+      "women_enterprise": "여성기업",
+      "research_institute": "연구소기업",
+      "venture_company": "벤처기업",
+      "non_venture": "비벤처",
+      "preliminary_social_enterprise": "예비사회적기업",
+      "social_enterprise": "사회적기업",
+      "youth_enterprise": "청년기업",
+      "cooperative": "협동조합",
+      "village_enterprise": "마을기업",
+      "other": "기타"
+    },
+    "startupStage": {
       "preliminary": "예비",
       "startup_under_3years": "창업 3년 이하",
       "growth_over_7years": "도약 7년 이상",
@@ -323,7 +338,7 @@
       "dashboard": "대시보드",
       "members": "기업 회원",
       "performance": "실적 관리",
-      "projects": "사업공고",
+      "projects": "지원사업관리",
       "content": "콘텐츠 관리",
       "messages": "알림 센터",
       "settings": "시스템 설정",
@@ -376,7 +391,7 @@
         "types": {
           "mainBanner": "메인 배너",
           "systemIntro": "시스템 소개",
-          "projects": "프로젝트",
+          "projects": "지원사업",
           "performance": "성과",
           "support": "지원"
         },
@@ -487,7 +502,8 @@
           "new": "새로 만들기",
           "create": "생성",
           "update": "업데이트",
-          "confirmDelete": "이 공지사항을 삭제하시겠습니까?"
+          "confirmDelete": "이 공지사항을 삭제하시겠습니까?",
+          "confirmDeleteMessage": "이 작업은 취소할 수 없습니다. 계속하시겠습니까?"
         },
         "messages": {
           "validationError": "필수 항목을 입력해주세요",
@@ -541,7 +557,7 @@
           "general": "일반 문의",
           "registration": "등록 관련",
           "performance": "성과 관리",
-          "project": "프로젝트 신청",
+          "project": "지원사업 신청",
           "technical": "기술 지원"
         },
         "question": "질문",
@@ -648,7 +664,7 @@
         "title": "배너 관리",
         "mainBanner": "메인 배너",
         "systemIntro": "시스템 소개 배너",
-        "projects": "프로젝트 배너",
+        "projects": "지원사업 배너",
         "performance": "실적 관리 배너",
         "support": "원스톱 지원 배너",
         "popup": "팝업",
@@ -848,7 +864,7 @@
         "categoryGeneral": "일반",
         "categorySupport": "지원",
         "categoryPerformance": "성과",
-        "categoryProject": "프로젝트"
+        "categoryProject": "지원사업"
       }
     },
     "performance": {
@@ -879,6 +895,7 @@
         "fileName": "파일명",
         "memberName": "기업명",
         "businessNumber": "사업자등록번호",
+        "companyPhone": "기업 전화번호",
         "year": "연도",
         "quarter": "분기",
         "type": "유형",
@@ -951,12 +968,12 @@
       }
     },
     "projects": {
-      "title": "프로젝트 관리",
-      "create": "프로젝트 생성",
-      "noProjects": "프로젝트 데이터가 없습니다",
-      "noProjectsHint": "첫 번째 프로젝트를 생성하거나 페이지를 새로고침하세요",
-      "noMatchingProjects": "현재 필터 조건에 맞는 프로젝트가 없습니다",
-      "searchPlaceholder": "프로젝트명, 목표기업, 사업자등록번호 등 검색",
+      "title": "지원사업관리",
+      "create": "공고 생성",
+      "noProjects": "공고 데이터가 없습니다",
+      "noProjectsHint": "첫 번째 공고를 생성하거나 페이지를 새로고침하세요",
+      "noMatchingProjects": "현재 필터 조건에 맞는 공고가 없습니다",
+      "searchPlaceholder": "공고명, 목표기업, 사업자등록번호 등 검색",
       "status": {
         "active": "진행중",
         "inactive": "종료됨",
@@ -964,7 +981,7 @@
         "draft": "초안"
       },
       "table": {
-        "title": "프로젝트명",
+        "title": "지원사업명",
         "target": "접수 대상",
         "targetCompany": "목표 기업",
         "targetCompanyName": "목표 기업명",
@@ -973,11 +990,13 @@
         "startDate": "시작일",
         "endDate": "종료일",
         "status": "상태",
+        "viewCount": "조회수",
+        "applicationsCount": "신청인원",
         "actions": "작업"
       },
       "detail": {
         "basicInfo": "기본 정보",
-        "title": "프로젝트 제목",
+        "title": "지원사업",
         "target": "신청 대상",
         "targetCompany": "목표 기업",
         "targetCompanyName": "기업명",
@@ -986,7 +1005,7 @@
         "startDate": "시작일",
         "endDate": "종료일",
         "createdAt": "생성일",
-        "content": "프로젝트 상세",
+        "content": "지원사업",
         "image": "대표 이미지",
         "attachments": "첨부파일 목록",
         "attachmentCount": "개 첨부파일",
@@ -1000,27 +1019,27 @@
         "viewAllApplications": "모든 신청 보기",
         "applicationList": "신청 목록",
         "noApplications": "신청이 없습니다",
-        "notFound": "프로젝트를 찾을 수 없습니다",
-        "loadError": "프로젝트 상세 정보 로드 실패",
+        "notFound": "지원사업을 찾을 수 없습니다",
+        "loadError": "지원사업 정보 로드 실패",
         "fileNotFound": "파일을 찾을 수 없습니다",
         "downloadError": "파일 다운로드 실패"
       },
       "form": {
-        "editTitle": "프로젝트 수정",
-        "createTitle": "프로젝트 생성",
-        "title": "프로젝트 제목",
-        "titlePlaceholder": "프로젝트 제목을 입력하세요",
+        "editTitle": "지원사업 수정",
+        "createTitle": "지원사업 생성",
+        "title": "지원사업",
+        "titlePlaceholder": "지원사업을 입력하세요",
         "targetCompany": "목표 기업명 (선택사항)",
         "targetCompanyPlaceholder": "예: 삼성전자주식회사 (비워두면 공개 모집)",
         "businessNumber": "사업자등록번호 (선택사항)",
         "businessNumberPlaceholder": "예: 123-45-67890",
         "startDate": "시작일",
         "endDate": "종료일",
-        "status": "프로젝트 상태",
-        "description": "프로젝트 상세",
-        "descriptionPlaceholder": "프로젝트 상세 설명을 입력하세요...",
-        "coverImage": "프로젝트 대표 이미지",
-        "coverImageAlt": "프로젝트 대표 이미지",
+        "status": "지원사업 상태",
+        "description": "지원사업",
+        "descriptionPlaceholder": "지원사업 상세 설명을 입력하세요...",
+        "coverImage": "지원사업 대표 이미지",
+        "coverImageAlt": "지원사업 대표 이미지",
         "imageHint": "JPG, PNG 형식 지원, 권장 크기 800x400",
         "selectImage": "이미지 선택",
         "changeImage": "이미지 변경",
@@ -1028,17 +1047,17 @@
         "targetHint": "비워두면 공개 모집",
         "uploadError": "이미지 업로드 실패, 다시 시도해주세요",
         "uploading": "업로드 중...",
-        "requiredFields": "필수 항목을 입력하세요: 프로젝트 제목, 시작일, 종료일",
+        "requiredFields": "필수 항목을 입력하세요: 지원사업, 시작일, 종료일",
         "dateError": "종료일은 시작일보다 이전일 수 없습니다",
-        "updateSuccess": "프로젝트가 성공적으로 업데이트되었습니다",
-        "createSuccess": "프로젝트가 성공적으로 생성되었습니다",
+        "updateSuccess": "지원사업이 성공적으로 업데이트되었습니다",
+        "createSuccess": "지원사업이 성공적으로 생성되었습니다",
         "submitError": "저장 실패, 다시 시도해주세요",
         "targetCompanyName": "목표 기업명",
         "targetCompanyNamePlaceholder": "예: 삼성전자주식회사 (선택사항)",
         "targetBusinessNumber": "사업자등록번호",
         "targetBusinessNumberPlaceholder": "예: 123-45-67890 (선택사항)"
       },
-      "confirmDelete": "이 프로젝트를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+      "confirmDelete": "이 지원사업을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
       "exportExcel": "Excel 내보내기",
       "exportCsv": "CSV 내보내기",
       "exportSuccess": "내보내기 성공"
@@ -1046,7 +1065,7 @@
     "applications": {
       "title": "신청 관리",
       "table": {
-        "project": "프로젝트명",
+        "project": "지원사업명",
         "company": "기업명",
         "contact": "담당자",
         "applicationReason": "신청 사유",
@@ -1062,7 +1081,7 @@
         "rejected": "거부됨"
       },
       "filter": {
-        "project": "프로젝트",
+        "project": "지원사업",
         "status": "상태"
       },
       "detail": "신청 상세",
@@ -1166,7 +1185,7 @@
         "quickExportDesc": "각 모듈의 개별 내보내기 기능:",
         "exportMembers": "기업 목록 내보내기",
         "exportPerformance": "성과 데이터 내보내기",
-        "exportProjects": "프로젝트 정보 내보내기",
+        "exportProjects": "지원사업 정보 내보내기",
         "modules": {
           "dashboard": "대시보드 통계",
           "dashboardDesc": "기업 요약 통계 데이터",
@@ -1174,10 +1193,10 @@
           "membersDesc": "기업 회원 정보",
           "performance": "성과 데이터",
           "performanceDesc": "기업 성과 기록",
-          "projects": "프로젝트 정보",
-          "projectsDesc": "프로젝트 목록 및 상세 정보",
+          "projects": "지원사업 정보",
+          "projectsDesc": "지원사업 목록 및 상세 정보",
           "applications": "신청 기록",
-          "applicationsDesc": "프로젝트 신청 기록"
+          "applicationsDesc": "지원사업 신청 기록"
         }
       }
     },
@@ -1366,7 +1385,7 @@
         "actionDownload": "다운로드",
         "resourceMember": "회원",
         "resourcePerformance": "실적",
-        "resourceProject": "프로젝트",
+        "resourceProject": "지원사업",
         "resourceContent": "콘텐츠",
         "resourceSupport": "지원",
         "resourceUser": "사용자",
@@ -1548,14 +1567,17 @@
       "currentEmployees": "현재 직원 수",
       "newEmployees": "신규 고용 인원",
       "totalEmployees": "총 인원",
+      "attachments": "증빙서류",
+      "uploadAttachments": "파일 업로드 (여러 개 선택 가능)",
+      "attachmentsHint": "매출액, 수출액, 고용 관련 증빙서류를 업로드하세요",
       "unit": {
         "won": "원",
         "people": "명"
       }
     },
     "governmentSupportFields": {
-      "projectName": "실행 프로젝트명",
-      "startupProjectName": "창업 프로젝트명",
+      "projectName": "실행 지원사업명",
+      "startupProjectName": "창업 지원사업명",
       "supportPeriod": "지원 기간",
       "startDate": "시작일",
       "endDate": "종료일",
@@ -1606,6 +1628,7 @@
         "basicInfo": "기본 정보",
         "addressInfo": "주소 정보",
         "businessInfo": "사업 정보",
+        "contactInfo": "연락처 정보",
         "logo": "기업 로고",
         "additionalInfo": "추가 정보"
       },
@@ -2077,10 +2100,10 @@
       "fileTooLarge": "파일 크기가 너무 큽니다. (최대 10MB)",
       "featureComingSoon": "기능 준비 중입니다"
     },
-    "alreadyApplied": "이미 신청한 프로젝트입니다",
-    "notFound": "프로젝트를 찾을 수 없습니다",
+    "alreadyApplied": "이미 신청한 지원사업입니다",
+    "notFound": "지원사업을 찾을 수 없습니다",
     "applicationNotFound": "신청 기록을 찾을 수 없습니다",
-    "closed": "프로젝트가 마감되어 신청할 수 없습니다",
+    "closed": "지원사업이 마감되어 신청할 수 없습니다",
     "deadlinePassed": "신청 마감일이 지났습니다",
     "reapply": "재신청",
     "resubmit": "재제출",
@@ -2098,7 +2121,7 @@
       "registration": "회원가입",
       "general": "일반",
       "performance": "성과관리",
-      "project": "프로젝트",
+      "project": "지원사업",
       "profile": "기업프로필",
       "support": "문의/지원",
       "other": "기타"

@@ -1,7 +1,5 @@
 """
 Performance service.
-
-Business logic for performance record management operations.
 """
 from typing import Optional
 from uuid import UUID
@@ -15,34 +13,22 @@ from .schemas import PerformanceRecordCreate, PerformanceRecordUpdate, Performan
 
 
 class PerformanceService:
-    """Performance service class - using supabase_service helper methods and direct client."""
+    """Performance service class."""
 
     async def list_performance_records(
         self, member_id: UUID, query: PerformanceListQuery
     ) -> tuple[list[dict], int]:
-        """
-        List performance records for a specific member.
-
-        Args:
-            member_id: Member UUID
-            query: Query parameters
-
-        Returns:
-            Tuple of (performance records list, total count)
-        """
-        # 先获取 member 信息
+        """列出会员的业绩记录"""
         member = await supabase_service.get_by_id('members', str(member_id))
         member_company_name = member.get('company_name', '') if member else ''
         member_business_number = member.get('business_number', '') if member else ''
         
-        # 查询当前用户的记录
         db_query = supabase_service.client.table('performance_records')\
             .select('*', count='exact')\
             .eq('member_id', str(member_id))\
             .is_('deleted_at', 'null')\
             .order('created_at', desc=True)
         
-        # 应用筛选条件
         if query.year:
             db_query = db_query.eq('year', query.year)
         if query.quarter:
@@ -54,45 +40,21 @@ class PerformanceService:
         records = result.data or []
         total = result.count or 0
         
-        # 添加 member 信息到每条记录
         for record in records:
             record['member_company_name'] = member_company_name
             record['member_business_number'] = member_business_number
-        
-        # 附件数据现在直接存储在记录的attachments字段中
-        for record in records:
-            # 确保attachments字段存在且为列表格式
-            if record.get('attachments') is None:
-                record['attachments'] = []
-            elif not isinstance(record.get('attachments'), list):
-                record['attachments'] = []
         
         return records, total
 
     async def get_performance_by_id(
         self, performance_id: UUID, member_id: UUID
     ) -> dict:
-        """
-        Get performance record by ID with authorization check.
-
-        Args:
-            performance_id: Performance record UUID
-            member_id: Member UUID (for authorization)
-
-        Returns:
-            Performance record dict
-
-        Raises:
-            NotFoundError: If record not found
-            AuthorizationError: If member doesn't own the record
-        """
-        # Use helper method to get record
+        """获取业绩记录"""
         record = await supabase_service.get_by_id('performance_records', str(performance_id))
 
         if not record:
             raise NotFoundError(resource_type="Performance record")
 
-        # Compare as strings to handle both UUID objects and string IDs
         if str(record["member_id"]) != str(member_id):
             raise AuthorizationError(
                 CMessageTemplate.AUTHZ_NO_PERMISSION.format(action="access this record")
@@ -103,19 +65,7 @@ class PerformanceService:
     async def create_performance(
         self, member_id: UUID, data: PerformanceRecordCreate
     ) -> dict:
-        """
-        Create new performance record.
-
-        Args:
-            member_id: Member UUID
-            data: Performance data
-
-        Returns:
-            Created performance record dict
-
-        Raises:
-            ValidationError: If validation fails
-        """
+        """创建业绩记录"""
         record_data = {
             "id": str(uuid.uuid4()),
             "member_id": str(member_id),
@@ -124,13 +74,12 @@ class PerformanceService:
             "type": data.type,
             "status": "draft",
             "data_json": data.data_json,
-            # Export fields (Task 4)
             "hsk_code": data.hsk_code,
             "export_country1": data.export_country1,
             "export_country2": data.export_country2,
         }
-        # Use helper method
-        return await supabase_service.create_record('performance_records', record_data)
+        created = await supabase_service.create_record('performance_records', record_data)
+        return created
 
     async def update_performance(
         self,
@@ -138,31 +87,22 @@ class PerformanceService:
         member_id: UUID,
         data: PerformanceRecordUpdate,
     ) -> dict:
-        """
-        Update performance record (draft or revision_requested only).
-
-        Args:
-            performance_id: Performance record UUID
-            member_id: Member UUID (for authorization)
-            data: Update data
-
-        Returns:
-            Updated performance record dict
-
-        Raises:
-            NotFoundError: If record not found
-            AuthorizationError: If member doesn't own the record
-            ValidationError: If record status doesn't allow editing
-        """
+        """更新业绩记录"""
         record = await self.get_performance_by_id(performance_id, member_id)
 
-        # Only allow editing draft or revision_requested records
         if record["status"] not in ["draft", "revision_requested"]:
             raise ValidationError(
                 CMessageTemplate.PERFORMANCE_EDIT_NOT_ALLOWED.format(status=record['status'])
             )
 
-        # Build update data
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"=== Update Performance Debug ===")
+        logger.warning(f"Performance ID: {performance_id}")
+        logger.warning(f"Incoming data.hsk_code: {data.hsk_code}")
+        logger.warning(f"Incoming data.export_country1: {data.export_country1}")
+        logger.warning(f"Incoming data.export_country2: {data.export_country2}")
+
         update_data = {}
         if data.year is not None:
             update_data["year"] = data.year
@@ -172,7 +112,6 @@ class PerformanceService:
             update_data["type"] = data.type
         if data.data_json is not None:
             update_data["data_json"] = data.data_json
-        # Export fields (Task 4)
         if data.hsk_code is not None:
             update_data["hsk_code"] = data.hsk_code
         if data.export_country1 is not None:
@@ -180,56 +119,33 @@ class PerformanceService:
         if data.export_country2 is not None:
             update_data["export_country2"] = data.export_country2
 
-        # Use helper method
-        return await supabase_service.update_record('performance_records', str(performance_id), update_data)
+        logger.warning(f"Update data to be sent: {update_data}")
+
+        updated = await supabase_service.update_record('performance_records', str(performance_id), update_data)
+        
+        logger.warning(f"Updated record: {updated}")
+        
+        return updated
 
     async def delete_performance(
         self, performance_id: UUID, member_id: UUID
     ) -> None:
-        """
-        Delete performance record (draft only).
-
-        Args:
-            performance_id: Performance record UUID
-            member_id: Member UUID (for authorization)
-
-        Raises:
-            NotFoundError: If record not found
-            AuthorizationError: If member doesn't own the record
-            ValidationError: If record is not draft
-        """
+        """删除业绩记录（仅草稿）"""
         record = await self.get_performance_by_id(performance_id, member_id)
 
-        # Only allow deleting draft records
         if record["status"] != "draft":
             raise ValidationError(
                 CMessageTemplate.PERFORMANCE_DELETE_NOT_ALLOWED.format(status=record['status'])
             )
 
-        # Use helper method for soft delete
         await supabase_service.delete_record('performance_records', str(performance_id))
 
     async def submit_performance(
         self, performance_id: UUID, member_id: UUID
     ) -> dict:
-        """
-        Submit performance record for review.
-
-        Args:
-            performance_id: Performance record UUID
-            member_id: Member UUID (for authorization)
-
-        Returns:
-            Updated performance record dict
-
-        Raises:
-            NotFoundError: If record not found
-            AuthorizationError: If member doesn't own the record
-            ValidationError: If record is not draft
-        """
+        """提交业绩记录审核"""
         record = await self.get_performance_by_id(performance_id, member_id)
 
-        # Only allow submitting draft or revision_requested records
         if record["status"] not in ["draft", "revision_requested"]:
             raise ValidationError(
                 CMessageTemplate.PERFORMANCE_SUBMIT_NOT_ALLOWED.format(status=record['status'])
@@ -239,74 +155,36 @@ class PerformanceService:
             "status": "submitted",
             "submitted_at": datetime.utcnow().isoformat(),
         }
-        # Use helper method
-        return await supabase_service.update_record('performance_records', str(performance_id), update_data)
-
-    # Admin operations
+        updated = await supabase_service.update_record('performance_records', str(performance_id), update_data)
+        return updated
 
     async def list_all_performance_records(
         self, query: PerformanceListQuery
     ) -> tuple[list[dict], int]:
-        """
-        List all performance records with filtering (admin only).
-
-        Args:
-            query: Query parameters
-
-        Returns:
-            Tuple of (performance records list, total count)
-        """
-        # 现在 list_performance_records_with_filters 已经包含了 member 信息的批量获取
+        """列出所有业绩记录（管理员）"""
         records, total = await supabase_service.list_performance_records_with_filters(
-            sort_by="updated_at",  # 按更新时间倒序，最新的在前面
+            sort_by="updated_at",
             sort_order="desc",
         )
-        
-        # 附件数据现在直接存储在记录的attachments字段中
-        for record in records:
-            # 确保attachments字段存在且为列表格式
-            if record.get('attachments') is None:
-                record['attachments'] = []
-            elif not isinstance(record.get('attachments'), list):
-                record['attachments'] = []
         
         return records, total
 
     async def get_performance_by_id_admin(
         self, performance_id: UUID
     ) -> dict:
-        """
-        Get performance record by ID (admin - no ownership check).
-
-        Args:
-            performance_id: Performance record UUID
-
-        Returns:
-            Performance record dict with attachments
-
-        Raises:
-            NotFoundError: If record not found
-        """
-        # Use helper method to get record
+        """获取业绩记录（管理员，无权限检查）"""
         record = await supabase_service.get_by_id('performance_records', str(performance_id))
 
         if not record:
             raise NotFoundError(resource_type="Performance record")
 
-        # Get attachments using existing method
-        try:
-            attachments = await supabase_service.get_attachments_by_resource(
-                'performance', str(performance_id)
-            )
-            record['attachments'] = attachments
-        except Exception as e:
-            # If attachments table doesn't exist, just set empty array
-            import logging
-            logging.getLogger(__name__).warning(f"Failed to get attachments: {e}")
-            record['attachments'] = []
+        if record.get('member_id'):
+            member = await supabase_service.get_by_id('members', str(record['member_id']))
+            if member:
+                record['member_phone'] = member.get('phone')
+                record['member_company_name'] = member.get('company_name')
+                record['member_business_number'] = member.get('business_number')
 
-        # Reviews are now integrated into the main record, but for backward compatibility
-        # create a reviews array if review data exists
         reviews = []
         if record.get('review_status'):
             reviews.append({
@@ -329,11 +207,10 @@ class PerformanceService:
         quarter: Optional[int],
         comments: Optional[str],
     ) -> None:
-        """Send in-app notification for performance review result."""
+        """发送业绩审核结果通知"""
         from ..messages.service import service as message_service
         from ..messages.schemas import MessageCreate
         
-        # Build notification subject and content
         period = f"{year}년"
         if quarter:
             quarter_names = {1: "1분기", 2: "2분기", 3: "3분기", 4: "4분기"}
@@ -353,7 +230,7 @@ class PerformanceService:
         
         try:
             await message_service.create_direct_message(
-                sender_id=None,  # System message
+                sender_id=None,
                 recipient_id=UUID(member_id),
                 data=MessageCreate(
                     subject=subject,
@@ -362,56 +239,36 @@ class PerformanceService:
                 ),
             )
         except Exception as e:
-            # Log error but don't fail the main operation
             import logging
             logging.getLogger(__name__).warning(f"Failed to send performance notification: {e}")
 
     async def approve_performance(
         self,
         performance_id: UUID,
-        reviewer_id: Optional[UUID],  # Can be None for admin reviewers
+        reviewer_id: Optional[UUID],
         comments: Optional[str],
     ) -> dict:
-        """
-        Approve performance record (admin only).
-
-        Args:
-            performance_id: Performance record UUID
-            reviewer_id: Admin member UUID
-            comments: Review comments
-
-        Returns:
-            Updated performance record dict
-
-        Raises:
-            NotFoundError: If record not found
-            ValidationError: If record is not submitted
-        """
+        """批准业绩记录（管理员）"""
         record = await self.get_performance_by_id_admin(performance_id)
 
-        # Only allow approving submitted records
         if record["status"] != "submitted":
             raise ValidationError(
                 CMessageTemplate.PERFORMANCE_APPROVE_NOT_ALLOWED.format(status=record['status'])
             )
 
-        # Update record status and review fields in one operation - use helper method
         update_data = {
             "status": "approved",
-            "reviewer_id": None,  # Admin is not a member, so set to None
+            "reviewer_id": None,
             "review_status": "approved",
             "review_comments": comments,
             "reviewed_at": datetime.utcnow().isoformat(),
         }
         await supabase_service.update_record('performance_records', str(performance_id), update_data)
 
-        # Get updated record
         updated_record = await supabase_service.get_by_id('performance_records', str(performance_id))
 
-        # Send approval notification email in background (non-blocking)
         from ...common.modules.email import email_service
         from ...common.modules.email.background import send_email_background
-        # Get member email
         member = await supabase_service.get_by_id('members', str(record["member_id"]))
         if member:
             send_email_background(
@@ -423,7 +280,6 @@ class PerformanceService:
                     comments=comments,
                 )
             )
-            # Send in-app notification
             await self._send_performance_notification(
                 member_id=record["member_id"],
                 status="approved",
@@ -437,49 +293,30 @@ class PerformanceService:
     async def request_fix_performance(
         self,
         performance_id: UUID,
-        reviewer_id: Optional[UUID],  # Can be None for admin reviewers
+        reviewer_id: Optional[UUID],
         comments: Optional[str],
     ) -> dict:
-        """
-        Request revision of performance record (admin only).
-
-        Args:
-            performance_id: Performance record UUID
-            reviewer_id: Admin member UUID
-            comments: Review comments explaining what needs to be fixed
-
-        Returns:
-            Updated performance record dict
-
-        Raises:
-            NotFoundError: If record not found
-            ValidationError: If record is not submitted
-        """
+        """要求修改业绩记录（管理员）"""
         record = await self.get_performance_by_id_admin(performance_id)
 
-        # Only allow requesting revision for submitted records
         if record["status"] != "submitted":
             raise ValidationError(
                 CMessageTemplate.PERFORMANCE_REVISION_NOT_ALLOWED.format(status=record['status'])
             )
 
-        # Update record status and review fields in one operation - use helper method
         update_data = {
             "status": "revision_requested",
-            "reviewer_id": None,  # Admin is not a member, so set to None
+            "reviewer_id": None,
             "review_status": "revision_requested",
             "review_comments": comments,
             "reviewed_at": datetime.utcnow().isoformat(),
         }
         await supabase_service.update_record('performance_records', str(performance_id), update_data)
 
-        # Get updated record
         updated_record = await supabase_service.get_by_id('performance_records', str(performance_id))
 
-        # Send revision request email in background (non-blocking)
         from ...common.modules.email import email_service
         from ...common.modules.email.background import send_email_background
-        # Get member email
         member = await supabase_service.get_by_id('members', str(record["member_id"]))
         if member and comments:
             from ...common.modules.config.settings import settings
@@ -493,7 +330,6 @@ class PerformanceService:
                     revision_url=revision_url,
                 )
             )
-            # Send in-app notification
             await self._send_performance_notification(
                 member_id=record["member_id"],
                 status="revision_requested",
@@ -507,46 +343,28 @@ class PerformanceService:
     async def reject_performance(
         self,
         performance_id: UUID,
-        reviewer_id: Optional[UUID],  # Can be None for admin reviewers
+        reviewer_id: Optional[UUID],
         comments: Optional[str],
     ) -> dict:
-        """
-        Reject performance record (admin only).
-
-        Args:
-            performance_id: Performance record UUID
-            reviewer_id: Admin member UUID
-            comments: Rejection reason
-
-        Returns:
-            Updated performance record dict
-
-        Raises:
-            NotFoundError: If record not found
-            ValidationError: If record is not submitted
-        """
+        """驳回业绩记录（管理员）"""
         record = await self.get_performance_by_id_admin(performance_id)
 
-        # Only allow rejecting submitted records
         if record["status"] != "submitted":
             raise ValidationError(
                 CMessageTemplate.PERFORMANCE_REJECT_NOT_ALLOWED.format(status=record['status'])
             )
 
-        # Update record status and review fields in one operation - use helper method
         update_data = {
             "status": "rejected",
-            "reviewer_id": None,  # Admin is not a member, so set to None
+            "reviewer_id": None,
             "review_status": "rejected",
             "review_comments": comments,
             "reviewed_at": datetime.utcnow().isoformat(),
         }
         await supabase_service.update_record('performance_records', str(performance_id), update_data)
 
-        # Get updated record
         updated_record = await supabase_service.get_by_id('performance_records', str(performance_id))
 
-        # Send in-app notification for rejection
         await self._send_performance_notification(
             member_id=record["member_id"],
             status="rejected",
@@ -560,15 +378,7 @@ class PerformanceService:
     async def export_performance_data(
         self, query: PerformanceListQuery
     ) -> list[dict]:
-        """
-        Export performance data for download (admin only).
-
-        Args:
-            query: Filter parameters
-
-        Returns:
-            List of performance records as dictionaries
-        """
+        """导出业绩数据（管理员）"""
         records = await supabase_service.export_performance_records(
             member_id=str(query.member_id) if query.member_id else None,
             year=query.year,
@@ -577,7 +387,6 @@ class PerformanceService:
             type=query.type,
         )
 
-        # Convert to export format
         export_data = []
         for record in records:
             export_data.append({

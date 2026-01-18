@@ -249,13 +249,77 @@ class Generator:
         for _ in range(self.counts["performance_records"]):
             pid = str(uuid4())
             t = random.choice(types)
-            tr = r[t]
-            if t == "sales":
-                data = {"revenue": random.randint(tr["revenue_min"], tr["revenue_max"]), "employees": random.randint(tr["employees_min"], tr["employees_max"])}
-            elif t == "support":
-                data = {"support_amount": random.randint(tr["support_amount_min"], tr["support_amount_max"]), "programs": random.randint(tr["programs_min"], tr["programs_max"])}
-            else:
-                data = {"patents": random.randint(tr["patents_min"], tr["patents_max"]), "trademarks": random.randint(tr["trademarks_min"], tr["trademarks_max"])}
+            tr = r["sales"]
+            
+            prev_sales = random.randint(tr["revenue_min"], tr["revenue_max"])
+            curr_sales = int(prev_sales * random.uniform(0.9, 1.3))
+            prev_export = random.randint(tr["revenue_min"] // 3, tr["revenue_max"] // 3)
+            curr_export = int(prev_export * random.uniform(0.85, 1.4))
+            prev_emp = random.randint(tr["employees_min"], tr["employees_max"])
+            curr_emp = prev_emp + random.randint(-5, 10)
+            new_emp_prev = random.randint(0, 15)
+            new_emp_curr = random.randint(0, 20)
+            
+            num_gov_support = random.randint(1, 3)
+            gov_support_list = []
+            for i in range(num_gov_support):
+                gov_support_list.append({
+                    "projectName": random.choice(["기술개발지원", "수출지원", "인력양성", "R&D지원", "마케팅지원"]),
+                    "startupProjectName": random.choice(["창업지원프로그램", "스타트업육성", "기업성장지원", ""]),
+                    "supportOrganization": random.choice(["강원도청", "중소벤처기업부", "산업통상자원부", "강원테크노파크"]),
+                    "supportAmount": random.randint(5000, 50000),
+                    "startDate": f"{year - random.randint(0, 2)}-{random.randint(1, 12):02d}-01",
+                    "endDate": f"{year + random.randint(0, 1)}-{random.randint(1, 12):02d}-28"
+                })
+            
+            num_ip = random.randint(2, 5)
+            ip_list = []
+            for i in range(num_ip):
+                ip_list.append({
+                    "name": f"특허{i+1}호" if random.random() > 0.5 else f"상표{i+1}호",
+                    "number": f"{random.randint(10, 99)}-{random.randint(1000000, 9999999)}",
+                    "type": random.choice(["patent", "trademark", "utility", "design"]),
+                    "registrationType": random.choice(["application", "registered"]),
+                    "country": random.choice(["korea", "usa", "china", "japan"]),
+                    "overseasType": random.choice(["domestic", "pct", "general"]),
+                    "registrationDate": f"{year - random.randint(0, 3)}-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}",
+                    "publicDisclosure": random.choice([True, False])
+                })
+            
+            data = {
+                "salesEmployment": {
+                    "sales": {
+                        "previousYear": prev_sales,
+                        "currentYear": curr_sales,
+                        "reportingDate": f"{year}-12-31"
+                    },
+                    "export": {
+                        "previousYear": prev_export,
+                        "currentYear": curr_export,
+                        "reportingDate": f"{year}-12-31",
+                        "hskCode": f"{random.randint(1000000000, 9999999999)}",
+                        "exportCountry1": random.choice(["중국", "일본", "미국", "베트남", "독일"]),
+                        "exportCountry2": random.choice(["한국", "싱가포르", "태국", "말레이시아", ""])
+                    },
+                    "employment": {
+                        "currentEmployees": {
+                            "previousYear": prev_emp,
+                            "currentYear": curr_emp
+                        },
+                        "newEmployees": {
+                            "previousYear": new_emp_prev,
+                            "currentYear": new_emp_curr
+                        },
+                        "totalEmployees": {
+                            "previousYear": prev_emp + new_emp_prev,
+                            "currentYear": curr_emp + new_emp_curr
+                        }
+                    }
+                },
+                "governmentSupport": gov_support_list,
+                "intellectualProperty": ip_list
+            }
+            
             self.db.table("performance_records").insert({
                 "id": pid, "member_id": random.choice(self.member_ids),
                 "year": random.randint(year - r["year_range"], year), "quarter": random.randint(1, 4),
@@ -475,7 +539,7 @@ class Generator:
             }).execute()
             
             # 创建 thread 内的消息
-            for j, (sender_type, content) in enumerate(conversations):
+            for j, (sender_type, content, attachments) in enumerate(conversations):
                 msg_time = base_time + timedelta(hours=j+1, minutes=random.randint(0, 30))
                 sender_id = member_id if sender_type == "member" else self.admin_id
                 is_read = j < len(conversations) - 1 or status != "open"

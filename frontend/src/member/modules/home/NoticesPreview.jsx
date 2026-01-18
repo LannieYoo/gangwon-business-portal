@@ -19,7 +19,8 @@ function NoticesPreview() {
 
   async function loadNotices() {
     setLoading(true);
-    const noticesData = await homeService.getLatestNotices();
+    const response = await homeService.getLatestNotices();
+    const noticesData = Array.isArray(response) ? response : (response.items || []);
     
     if (Array.isArray(noticesData) && noticesData.length > 0) {
       const formattedNotices = noticesData.slice(0, 4).map(n => ({

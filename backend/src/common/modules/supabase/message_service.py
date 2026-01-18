@@ -1,29 +1,18 @@
-"""
-Message management service.
-
-Handles all message-related database operations for the unified messages table.
-"""
 from typing import Dict, Any, List, Optional, Tuple
 from .service import SupabaseService
 from ...utils.formatters import now_iso
 
 
 class MessageService(SupabaseService):
-    """Service for message management operations using unified messages table."""
+    """消息管理服务类，处理统一消息表的所有数据库操作"""
     
-    # Message types
     TYPE_DIRECT = "direct"
     TYPE_THREAD = "thread"
     TYPE_BROADCAST = "broadcast"
     
-    # Sender types
     SENDER_ADMIN = "admin"
     SENDER_MEMBER = "member"
     SENDER_SYSTEM = "system"
-    
-    # ============================================================================
-    # Basic Message Operations
-    # ============================================================================
     
     async def get_message_by_id(self, message_id: str) -> Optional[Dict[str, Any]]:
         """根据ID获取消息"""
@@ -61,10 +50,6 @@ class MessageService(SupabaseService):
             .execute()
         return True
     
-    # ============================================================================
-    # User/Admin Lookup (批量优化)
-    # ============================================================================
-    
     async def get_member_name(self, member_id: str) -> Optional[str]:
         """获取会员公司名称"""
         if not member_id:
@@ -83,14 +68,14 @@ class MessageService(SupabaseService):
         return {m['id']: m['company_name'] for m in (result.data or [])}
     
     async def get_admin_name(self, admin_id: str) -> Optional[str]:
-        """Get admin name by ID"""
+        """获取管理员名称"""
         if not admin_id:
             return "System Admin"
         result = self.client.table('admins').select('full_name').eq('id', admin_id).execute()
         return result.data[0]['full_name'] if result.data else "System Admin"
     
     async def get_admin_names_batch(self, admin_ids: List[str]) -> Dict[str, str]:
-        """Batch get admin names by IDs"""
+        """批量获取管理员名称"""
         if not admin_ids:
             return {}
         unique_ids = list(set(aid for aid in admin_ids if aid))
@@ -100,39 +85,23 @@ class MessageService(SupabaseService):
         return {a['id']: a['full_name'] for a in (result.data or [])}
     
     async def is_admin(self, user_id: str) -> bool:
-        """Check if user is admin"""
+        """检查用户是否是管理员"""
         if not user_id:
             return False
         result = self.client.table('admins').select('id').eq('id', user_id).execute()
         return len(result.data) > 0
     
-    # ============================================================================
-    # Unread Count (优化版)
-    # ============================================================================
-    
     async def get_unread_count(self, user_id: str, is_admin: bool = False) -> int:
-        """
-        获取未读消息数量（优化版，只查询 count）
-        
-        Args:
-            user_id: 用户ID
-            is_admin: 是否是管理员
-        """
+        """获取未读消息数量"""
         query = self.client.table('messages').select('id', count='exact')
         
         if is_admin:
-            # 管理员：统计会员发送的未读消息
             query = query.eq('sender_type', self.SENDER_MEMBER).eq('is_read', False)
         else:
-            # 会员：统计发送给自己的未读消息
             query = query.eq('recipient_id', user_id).eq('is_read', False)
         
         result = query.execute()
         return result.count or 0
-    
-    # ============================================================================
-    # Thread Operations (批量优化)
-    # ============================================================================
     
     async def get_threads_paginated(
         self,
@@ -141,16 +110,7 @@ class MessageService(SupabaseService):
         status: Optional[str] = None,
         sender_id: Optional[str] = None
     ) -> Tuple[List[Dict[str, Any]], int]:
-        """
-        获取分页的 thread 列表
-        
-        Args:
-            page: 页码
-            page_size: 每页数量
-            status: 状态过滤
-            sender_id: 发送者ID过滤（用于会员端）
-        """
-        # 构建查询
+        """获取分页的 thread 列表"""
         query = self.client.table('messages').select('*', count='exact')
         query = query.eq('message_type', self.TYPE_THREAD).is_('thread_id', 'null')
         
@@ -159,11 +119,9 @@ class MessageService(SupabaseService):
         if sender_id:
             query = query.eq('sender_id', sender_id)
         
-        # 获取总数
         count_result = query.execute()
         total_count = count_result.count or 0
         
-        # 获取分页数据
         offset = (page - 1) * page_size
         threads_query = self.client.table('messages').select('*')
         threads_query = threads_query.eq('message_type', self.TYPE_THREAD).is_('thread_id', 'null')
@@ -180,32 +138,20 @@ class MessageService(SupabaseService):
         return result.data or [], total_count
     
     async def get_thread_stats_batch(self, thread_ids: List[str], for_admin: bool = False) -> Dict[str, Dict[str, int]]:
-        """
-        批量获取 thread 的消息统计
-        
-        Args:
-            thread_ids: thread ID 列表
-            for_admin: 是否是管理员视角（影响未读数计算）
-            
-        Returns:
-            {thread_id: {'message_count': int, 'unread_count': int}}
-        """
+        """批量获取 thread 的消息统计"""
         if not thread_ids:
             return {}
         
-        # 一次查询获取所有相关消息
         query = self.client.table('messages').select('thread_id, sender_type, is_read')
         query = query.in_('thread_id', thread_ids)
         result = query.execute()
         
-        # 构建统计
         stats = {tid: {'message_count': 0, 'unread_count': 0} for tid in thread_ids}
         
         for msg in (result.data or []):
             tid = msg['thread_id']
             if tid in stats:
                 stats[tid]['message_count'] += 1
-                # 未读数计算
                 if not msg['is_read']:
                     if for_admin and msg['sender_type'] == self.SENDER_MEMBER:
                         stats[tid]['unread_count'] += 1
@@ -236,8 +182,6 @@ class MessageService(SupabaseService):
         if not messages:
             return messages
         
-        # 附件数据已经存储在 messages 表的 attachments 字段中（JSONB）
-        # 确保 attachments 字段存在且为数组格式
         for msg in messages:
             if msg.get('attachments') is None:
                 msg['attachments'] = []
@@ -251,16 +195,7 @@ class MessageService(SupabaseService):
         thread_id: str, 
         reader_type: str
     ) -> int:
-        """
-        标记 thread 中的消息为已读
-        
-        Args:
-            thread_id: thread ID
-            reader_type: 阅读者类型 ('admin' 或 'member')
-            
-        Returns:
-            更新的消息数量
-        """
+        """标记 thread 中的消息为已读"""
         sender_type = self.SENDER_MEMBER if reader_type == 'admin' else self.SENDER_ADMIN
         
         result = self.client.table('messages')\
@@ -274,10 +209,6 @@ class MessageService(SupabaseService):
             .execute()
         
         return len(result.data) if result.data else 0
-    
-    # ============================================================================
-    # Direct Messages
-    # ============================================================================
     
     async def create_direct_message(
         self,
@@ -356,10 +287,6 @@ class MessageService(SupabaseService):
         }
         return await self.count_records('messages', filters)
 
-    # ============================================================================
-    # Thread Messages
-    # ============================================================================
-    
     async def create_thread_message(
         self,
         thread_id: str,
@@ -412,10 +339,6 @@ class MessageService(SupabaseService):
         
         result = query.execute()
         return result.data or [], total
-    
-    # ============================================================================
-    # Broadcast Messages
-    # ============================================================================
     
     async def create_broadcast_message(
         self,
@@ -509,10 +432,6 @@ class MessageService(SupabaseService):
         result = data_query.execute()
         return result.data or [], total
 
-    # ============================================================================
-    # Extended Operations (for messages/service.py)
-    # ============================================================================
-    
     async def get_messages_paginated(
         self,
         user_id: str,
@@ -523,31 +442,13 @@ class MessageService(SupabaseService):
         is_read: Optional[bool] = None,
         is_admin: bool = False
     ) -> Tuple[List[Dict[str, Any]], int, int]:
-        """
-        获取用户消息列表（分页）
-        
-        Args:
-            user_id: 用户ID
-            page: 页码
-            page_size: 每页数量
-            category: 分类过滤
-            is_important: 重要性过滤
-            is_read: 已读状态过滤
-            is_admin: 是否是管理员（管理员查看所有直接消息）
-        
-        Returns:
-            (messages, total_count, unread_count)
-        """
-        # 构建基础过滤条件
+        """获取用户消息列表（分页）"""
         query = self.client.table('messages').select('*', count='exact')
         
         if is_admin:
-            # 管理员：只查看发送给管理员的消息或管理员发送的消息
-            # 排除 sender_id 为 null 且 recipient_id 不是管理员的消息（系统发给会员的通知）
             query = query.eq('message_type', 'direct')
             query = query.eq('recipient_id', user_id)
         else:
-            # 会员：只查看发送给自己的消息
             query = query.eq('recipient_id', user_id)
         
         if category:
@@ -560,10 +461,8 @@ class MessageService(SupabaseService):
         count_result = query.execute()
         total_count = count_result.count or 0
         
-        # 获取未读数
         unread_query = self.client.table('messages').select('id', count='exact')
         if is_admin:
-            # 管理员：只统计发送给管理员的未读消息
             unread_query = unread_query.eq('message_type', 'direct').eq('is_read', False)
             unread_query = unread_query.eq('recipient_id', user_id)
         else:
@@ -577,12 +476,10 @@ class MessageService(SupabaseService):
         unread_result = unread_query.execute()
         unread_count = unread_result.count or 0
         
-        # 获取分页数据
         offset = (page - 1) * page_size
         messages_query = self.client.table('messages').select('*')
         
         if is_admin:
-            # 管理员：只查看发送给管理员的消息
             messages_query = messages_query.eq('message_type', 'direct')
             messages_query = messages_query.eq('recipient_id', user_id)
         else:
@@ -614,7 +511,6 @@ class MessageService(SupabaseService):
         
         message = result.data[0]
         
-        # 检查访问权限
         if message.get('sender_id') != user_id and message.get('recipient_id') != user_id:
             return None
         
@@ -667,56 +563,46 @@ class MessageService(SupabaseService):
         """获取分析数据"""
         from datetime import datetime as dt
         
-        # 总消息数
         total_query = self.client.table('messages').select('id', count='exact')
         if start_date:
             total_query = total_query.gte('created_at', start_date)
         total_result = total_query.execute()
         
-        # 未读消息数
         unread_query = self.client.table('messages').select('id', count='exact').eq('is_read', False)
         if start_date:
             unread_query = unread_query.gte('created_at', start_date)
         unread_result = unread_query.execute()
         
-        # 按天统计消息数
         messages_by_day = []
         messages_by_category = []
         response_time_by_day = []
         avg_response_time = 0.0
         
-        # 获取消息列表用于统计
         messages_query = self.client.table('messages').select('created_at, category, thread_id, sender_type')
         if start_date:
             messages_query = messages_query.gte('created_at', start_date)
         messages_result = messages_query.execute()
         
         if messages_result.data:
-            # 按天分组
             day_counts = {}
             category_counts = {}
             
-            # 用于计算响应时间的数据结构
-            thread_messages = {}  # thread_id -> list of messages
+            thread_messages = {}
             
             for msg in messages_result.data:
-                # 按天统计
                 if msg.get('created_at'):
-                    day = msg['created_at'][:10]  # YYYY-MM-DD
+                    day = msg['created_at'][:10]
                     day_counts[day] = day_counts.get(day, 0) + 1
                 
-                # 按分类统计
                 category = msg.get('category') or 'general'
                 category_counts[category] = category_counts.get(category, 0) + 1
                 
-                # 收集线程消息用于计算响应时间
                 thread_id = msg.get('thread_id')
                 if thread_id:
                     if thread_id not in thread_messages:
                         thread_messages[thread_id] = []
                     thread_messages[thread_id].append(msg)
             
-            # 转换为列表格式
             messages_by_day = [
                 {'date': day, 'count': count}
                 for day, count in sorted(day_counts.items())
@@ -726,15 +612,12 @@ class MessageService(SupabaseService):
                 for cat, count in category_counts.items()
             ]
             
-            # 计算响应时间（从会员消息到管理员回复的时间）
             response_times = []
             day_response_times = {}
             
             for thread_id, msgs in thread_messages.items():
-                # 按时间排序
                 sorted_msgs = sorted(msgs, key=lambda x: x.get('created_at', ''))
                 
-                # 找到第一条会员消息和第一条管理员回复
                 first_member_msg = None
                 first_admin_reply = None
                 
@@ -763,11 +646,9 @@ class MessageService(SupabaseService):
                     except (ValueError, TypeError):
                         pass
             
-            # 计算平均响应时间
             if response_times:
                 avg_response_time = sum(response_times) / len(response_times)
             
-            # 按天计算平均响应时间
             response_time_by_day = [
                 {'date': day, 'responseTime': round(sum(times) / len(times), 1)}
                 for day, times in sorted(day_response_times.items())
@@ -783,5 +664,4 @@ class MessageService(SupabaseService):
         }
 
 
-# 单例实例
 message_db_service = MessageService()

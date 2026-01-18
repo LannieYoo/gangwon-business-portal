@@ -186,6 +186,7 @@ class Project(Base):
     end_date = Column(Date)
     image_url = Column(String(500))
     status = Column(String(50), default="active")  # active, inactive, archived
+    view_count = Column(Integer, nullable=False, server_default='0')  # 浏览次数
     attachments = Column(JSONB, nullable=True)  # Store file attachments as JSON array
     
     # Soft delete field

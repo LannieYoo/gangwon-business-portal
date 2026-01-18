@@ -103,13 +103,14 @@ class ProjectService:
         return projects, total
 
     async def get_project_by_id(
-        self, project_id: UUID
+        self, project_id: UUID, increment_view: bool = False
     ) -> dict:
         """
         Get project by ID (public access).
 
         Args:
             project_id: Project UUID
+            increment_view: Whether to increment view count
 
         Returns:
             Project dict
@@ -123,8 +124,15 @@ class ProjectService:
         if not project:
             raise NotFoundError(resource_type="Project")
 
-        print(f"[DEBUG] Project detail: {project}")
-        print(f"[DEBUG] Attachments: {project.get('attachments')}")
+        # Increment view count if requested
+        if increment_view:
+            current_count = project.get('view_count', 0)
+            await supabase_service.update_record(
+                'projects',
+                str(project_id),
+                {'view_count': current_count + 1}
+            )
+            project['view_count'] = current_count + 1
         
         return project
 

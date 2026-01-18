@@ -76,7 +76,6 @@ export default function ApplicationModal({
   // 当打开弹窗且为查看模式时，加载已有申请数据
   useEffect(() => {
     if (isOpen && actualViewMode && existingApplication) {
-      console.log('Loading existing application:', existingApplication);
       setApplicationReason(existingApplication.applicationReason || '');
       setAttachments(existingApplication.attachments || []);
       setApplicantName(existingApplication.applicantName || '');

@@ -1,6 +1,6 @@
 /**
  * Project List Component - Admin Portal
- * 项目管理列表
+ * 事业公告列表
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -80,21 +80,6 @@ export default function ProjectList() {
       render: (value) => value || ''
     },
     {
-      key: 'targetCompanyName',
-      label: t('admin.projects.table.targetCompanyName', '목표 기업명'),
-      render: (value, row) => {
-        if (!value && !row.targetBusinessNumber) {
-          return t('admin.projects.table.publicRecruitment', '公开招募');
-        }
-        return value || '';
-      }
-    },
-    {
-      key: 'targetBusinessNumber',
-      label: t('admin.projects.table.targetBusinessNumber', '사업자등록번호'),
-      render: (value) => value ? formatBusinessLicense(value) : ''
-    },
-    {
       key: 'startDate',
       label: t('admin.projects.table.startDate'),
       render: (value) => value || ''
@@ -108,6 +93,16 @@ export default function ProjectList() {
       key: 'status',
       label: t('admin.projects.table.status'),
       render: (value) => t(`admin.projects.status.${value}`, value)
+    },
+    {
+      key: 'viewCount',
+      label: t('admin.projects.table.viewCount', '조회수'),
+      render: (value) => value?.toString() || '0'
+    },
+    {
+      key: 'applicationsCount',
+      label: t('admin.projects.table.applicationsCount', '신청인원'),
+      render: (value) => value?.toString() || '0'
     }
   ], [t]);
 
@@ -165,23 +160,6 @@ export default function ProjectList() {
       label: t('admin.projects.table.title')
     },
     {
-      key: 'targetCompanyName',
-      label: t('admin.projects.table.targetCompanyName', '목표 기업명'),
-      render: (value, row) => {
-        if (!value && !row.targetBusinessNumber) {
-          return <span className="text-gray-400">{t('admin.projects.table.publicRecruitment', '公开招募')}</span>;
-        }
-        return value || '-';
-      }
-    },
-    {
-      key: 'targetBusinessNumber',
-      label: t('admin.projects.table.targetBusinessNumber', '사업자등록번호'),
-      render: (value) => {
-        return value ? formatBusinessLicense(value) : '-';
-      }
-    },
-    {
       key: 'startDate',
       label: t('admin.projects.table.startDate')
     },
@@ -211,6 +189,20 @@ export default function ProjectList() {
             {t(`admin.projects.status.${value}`, value)}
           </Badge>
         );
+      }
+    },
+    {
+      key: 'viewCount',
+      label: t('admin.projects.table.viewCount', '조회수'),
+      render: (value) => {
+        return <span className="text-gray-700">{value || 0}</span>;
+      }
+    },
+    {
+      key: 'applicationsCount',
+      label: t('admin.projects.table.applicationsCount', '신청인원'),
+      render: (value) => {
+        return <span className="text-gray-700">{value || 0}</span>;
       }
     },
     {

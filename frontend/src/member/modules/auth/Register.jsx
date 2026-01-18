@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@shared/hooks';
-import { AddressSearch, TermsModal, TERM_TYPES, FileUploadButton } from '@shared/components';
+import { AddressSearch, TermsModal, TERM_TYPES, FileUploadButton, LoginModal } from '@shared/components';
 import { EyeIcon, EyeOffIcon } from '@shared/components/Icons';
 import { authService } from '@shared/services';
 import { 
@@ -113,6 +113,7 @@ export default function Register() {
   const [fileErrors, setFileErrors] = useState({});
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [currentTermType, setCurrentTermType] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   
   const handleAddressSelect = (address) => setFormData(prev => ({ ...prev, address }));
   const handleViewTerms = (termType) => { setCurrentTermType(termType); setTermsModalOpen(true); };
@@ -604,10 +605,18 @@ export default function Register() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                   >
                     <option value="">{t('member.selectStartupType')}</option>
-                    <option value="preliminary">{t('industryClassification.startupType.preliminary')}</option>
-                    <option value="startup_under_3years">{t('industryClassification.startupType.startup_under_3years')}</option>
-                    <option value="growth_over_7years">{t('industryClassification.startupType.growth_over_7years')}</option>
-                    <option value="restart">{t('industryClassification.startupType.restart')}</option>
+                    <option value="student_startup">{t('industryClassification.startupType.student_startup')}</option>
+                    <option value="faculty_startup">{t('industryClassification.startupType.faculty_startup')}</option>
+                    <option value="women_enterprise">{t('industryClassification.startupType.women_enterprise')}</option>
+                    <option value="research_institute">{t('industryClassification.startupType.research_institute')}</option>
+                    <option value="venture_company">{t('industryClassification.startupType.venture_company')}</option>
+                    <option value="non_venture">{t('industryClassification.startupType.non_venture')}</option>
+                    <option value="preliminary_social_enterprise">{t('industryClassification.startupType.preliminary_social_enterprise')}</option>
+                    <option value="social_enterprise">{t('industryClassification.startupType.social_enterprise')}</option>
+                    <option value="youth_enterprise">{t('industryClassification.startupType.youth_enterprise')}</option>
+                    <option value="cooperative">{t('industryClassification.startupType.cooperative')}</option>
+                    <option value="village_enterprise">{t('industryClassification.startupType.village_enterprise')}</option>
+                    <option value="other">{t('industryClassification.startupType.other')}</option>
                   </select>
                 </div>
 
@@ -745,10 +754,26 @@ export default function Register() {
 
           <p className="mt-6 text-center text-sm text-gray-500">
             {t('auth.hasAccount')}{' '}
-            <Link to="/login" className="text-blue-600 hover:underline font-medium">{t('common.login')}</Link>
+            <button 
+              type="button"
+              onClick={() => setShowLoginModal(true)} 
+              className="text-blue-600 hover:underline font-medium"
+            >
+              {t('common.login')}
+            </button>
           </p>
         </div>
       </div>
+
+      {/* 登录弹窗 */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={() => {
+          setShowLoginModal(false);
+          navigate('/member/home');
+        }}
+      />
 
       <TermsModal isOpen={termsModalOpen} termType={currentTermType} onClose={handleCloseTermsModal} />
 

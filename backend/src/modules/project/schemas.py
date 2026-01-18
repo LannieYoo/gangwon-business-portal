@@ -96,11 +96,13 @@ class ProjectListItem(BaseModel):
     image_url: Optional[str]
     status: str
     attachments: Optional[list] = None
+    view_count: int = Field(default=0, description="Number of views")
     applications_count: int
     
     # Formatted display fields
     status_display: str
     date_range_display: str
+    view_count_display: str
     applications_count_display: str
     created_at_display: str
     updated_at_display: str
@@ -128,6 +130,7 @@ class ProjectListItem(BaseModel):
         # Basic fields - use .get() for optional fields with safe defaults
         # application_count may come as 'application_count' or 'applications_count'
         app_count = data.get("application_count", data.get("applications_count", 0))
+        view_count = data.get("view_count", 0)
         
         item_data = {
             "id": data["id"],
@@ -140,6 +143,7 @@ class ProjectListItem(BaseModel):
             "image_url": data.get("image_url", ""),
             "status": data["status"],
             "attachments": data.get("attachments", []),
+            "view_count": view_count,
             "applications_count": app_count,
             
             # Formatted display fields
@@ -148,6 +152,7 @@ class ProjectListItem(BaseModel):
                 data["start_date"], 
                 data["end_date"]
             ),
+            "view_count_display": format_count_display(view_count),
         }
         
         # Add admin-specific fields if requested

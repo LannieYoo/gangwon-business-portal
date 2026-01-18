@@ -32,8 +32,6 @@ export default function ProjectForm() {
 
   const [formData, setFormData] = useState({
     title: '',
-    targetCompanyName: '',
-    targetBusinessNumber: '',
     startDate: '',
     endDate: '',
     status: 'active',
@@ -55,8 +53,6 @@ export default function ProjectForm() {
     if (data) {
       setFormData({
         title: data.title || '',
-        targetCompanyName: data.targetCompanyName || '',
-        targetBusinessNumber: data.targetBusinessNumber || '',
         startDate: formatDateForInput(data.startDate),
         endDate: formatDateForInput(data.endDate),
         status: data.status || 'active',
@@ -97,8 +93,6 @@ export default function ProjectForm() {
       const payload = {
         title: formData.title,
         description: formData.content,
-        targetCompanyName: formData.targetCompanyName || null,
-        targetBusinessNumber: formData.targetBusinessNumber || null,
         startDate: formData.startDate,
         endDate: formData.endDate,
         status: formData.status,
@@ -282,25 +276,6 @@ export default function ProjectForm() {
                     { value: 'archived', label: t('admin.projects.status.archived', '已归档') }
                   ]}
                 />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input
-                    label={t('admin.projects.form.targetCompany', '目标企业名称')}
-                    name="targetCompanyName"
-                    value={formData.targetCompanyName}
-                    onChange={handleChange}
-                    placeholder={t('admin.projects.form.targetCompanyPlaceholder', '留空表示公开招募')}
-                  />
-
-                  <Input
-                    label={t('admin.projects.form.businessNumber', '营业执照号')}
-                    name="targetBusinessNumber"
-                    value={formData.targetBusinessNumber}
-                    onChange={handleChange}
-                    placeholder={t('admin.projects.form.businessNumberPlaceholder', '例：123-45-67890')}
-                    maxLength={12}
-                  />
-                </div>
 
                 <Textarea
                   label={t('admin.projects.form.description', '项目详情')}

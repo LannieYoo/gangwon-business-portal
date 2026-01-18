@@ -1,12 +1,28 @@
 // 韩国标准产业分类 (KSIC) 第10次修订版
 // 参考: https://kssc.mods.go.kr:8443/ksscNew_web/kssc/common/ClassificationContent.do
 
-// 创业类型选项
+// 创业类型选项 (업종 -> 창업유형)
 export const STARTUP_TYPE_KEYS = [
-  { value: 'preliminary', labelKey: 'industryClassification.startupType.preliminary' },
-  { value: 'startup_under_3years', labelKey: 'industryClassification.startupType.startup_under_3years' },
-  { value: 'growth_over_7years', labelKey: 'industryClassification.startupType.growth_over_7years' },
-  { value: 'restart', labelKey: 'industryClassification.startupType.restart' }
+  { value: 'student_startup', labelKey: 'industryClassification.startupType.student_startup' },
+  { value: 'faculty_startup', labelKey: 'industryClassification.startupType.faculty_startup' },
+  { value: 'women_enterprise', labelKey: 'industryClassification.startupType.women_enterprise' },
+  { value: 'research_institute', labelKey: 'industryClassification.startupType.research_institute' },
+  { value: 'venture_company', labelKey: 'industryClassification.startupType.venture_company' },
+  { value: 'non_venture', labelKey: 'industryClassification.startupType.non_venture' },
+  { value: 'preliminary_social_enterprise', labelKey: 'industryClassification.startupType.preliminary_social_enterprise' },
+  { value: 'social_enterprise', labelKey: 'industryClassification.startupType.social_enterprise' },
+  { value: 'youth_enterprise', labelKey: 'industryClassification.startupType.youth_enterprise' },
+  { value: 'cooperative', labelKey: 'industryClassification.startupType.cooperative' },
+  { value: 'village_enterprise', labelKey: 'industryClassification.startupType.village_enterprise' },
+  { value: 'other', labelKey: 'industryClassification.startupType.other' }
+];
+
+// 旧的创业阶段选项 (保留用于其他用途)
+export const STARTUP_STAGE_KEYS = [
+  { value: 'preliminary', labelKey: 'industryClassification.startupStage.preliminary' },
+  { value: 'startup_under_3years', labelKey: 'industryClassification.startupStage.startup_under_3years' },
+  { value: 'growth_over_7years', labelKey: 'industryClassification.startupStage.growth_over_7years' },
+  { value: 'restart', labelKey: 'industryClassification.startupStage.restart' }
 ];
 
 // 产业大分类 (A-U)

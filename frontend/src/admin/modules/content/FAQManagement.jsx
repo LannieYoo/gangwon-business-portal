@@ -110,10 +110,8 @@ export default function FAQManagement() {
     setLoading(true);
     try {
       const response = await supportService.listFAQs({});
-      // supportService.listFAQs 直接返回数组，不是分页对象
-      const faqList = Array.isArray(response) ? response : [];
+      const faqList = response.items;
       
-      // 如果提供了搜索词，进行客户端过滤
       let filteredFaqs = faqList;
       if (searchTerm && searchTerm.trim()) {
         const searchLower = searchTerm.toLowerCase().trim();

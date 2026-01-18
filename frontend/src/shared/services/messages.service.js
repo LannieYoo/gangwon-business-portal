@@ -21,7 +21,7 @@ class MessagesService {
 
     if (response && response.items) {
       return {
-        items: response.items, // API interceptor已经转换为camelCase
+        items: response.items, 
         total: response.total,
         page: response.page,
         pageSize: response.pageSize,
@@ -45,7 +45,7 @@ class MessagesService {
 
     if (response && response.items) {
       return {
-        items: response.items, // API interceptor已经转换为camelCase
+        items: response.items, 
         total: response.total,
         page: response.page,
         pageSize: response.pageSize,
@@ -71,25 +71,25 @@ class MessagesService {
   // 标记消息为已读（会员）
   async markAsRead(messageId) {
     const response = await apiService.put(`${MEMBER_BASE_URL}/${messageId}`, { is_read: true });
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 获取消息详情（管理员）
   async getMessage(messageId) {
     const response = await apiService.get(`${BASE_URL}/${messageId}`);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 标记消息为已读（管理员）
   async markMessageAsRead(messageId) {
     const response = await apiService.put(`${BASE_URL}/${messageId}`, { is_read: true });
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 获取消息详情（会员）
   async getMemberMessage(messageId) {
     const response = await apiService.get(`${MEMBER_BASE_URL}/${messageId}`);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
 
@@ -102,7 +102,7 @@ class MessagesService {
       is_important: data.isImportant,
     };
     const response = await apiService.post(BASE_URL, payload);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 更新消息（管理员）
@@ -112,7 +112,7 @@ class MessagesService {
     if (data.isImportant !== undefined) payload.is_important = data.isImportant;
 
     const response = await apiService.put(`${BASE_URL}/${messageId}`, payload);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 更新消息（会员）
@@ -122,7 +122,7 @@ class MessagesService {
     if (data.isImportant !== undefined) payload.is_important = data.isImportant;
 
     const response = await apiService.put(`${MEMBER_BASE_URL}/${messageId}`, payload);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 删除消息（管理员）
@@ -147,7 +147,7 @@ class MessagesService {
 
     if (response && response.items) {
       return {
-        items: response.items, // API interceptor已经转换为camelCase
+        items: response.items, 
         total: response.total,
         page: response.page,
         pageSize: response.pageSize,
@@ -171,7 +171,7 @@ class MessagesService {
 
     if (response && response.items) {
       return {
-        items: response.items, // API interceptor已经转换为camelCase
+        items: response.items, 
         total: response.total,
         page: response.page,
         pageSize: response.pageSize,
@@ -191,20 +191,20 @@ class MessagesService {
       attachments: data.attachments,
     };
     const response = await apiService.post(`${MEMBER_BASE_URL}/threads`, payload);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
 
   // 获取会话详情（管理员）
   async getThread(threadId) {
     const response = await apiService.get(`${BASE_URL}/threads/${threadId}`);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 获取会话详情（会员）
   async getMemberThread(threadId) {
     const response = await apiService.get(`${MEMBER_BASE_URL}/threads/${threadId}`);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 更新会话（管理员）
@@ -213,7 +213,7 @@ class MessagesService {
     if (data.status !== undefined) payload.status = data.status;
 
     const response = await apiService.put(`${BASE_URL}/threads/${threadId}`, payload);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 在会话中创建消息（管理员）
@@ -224,7 +224,7 @@ class MessagesService {
       attachments: data.attachments,
     };
     const response = await apiService.post(`${BASE_URL}/threads/${threadId}/messages`, payload);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 在会话中创建消息（会员）
@@ -235,7 +235,7 @@ class MessagesService {
       attachments: data.attachments,
     };
     const response = await apiService.post(`${MEMBER_BASE_URL}/threads/${threadId}/messages`, payload);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 创建广播消息
@@ -250,7 +250,7 @@ class MessagesService {
       attachments: data.attachments,
     };
     const response = await apiService.post(`${BASE_URL}/broadcast`, payload);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 
   // 获取消息分析数据
@@ -259,7 +259,7 @@ class MessagesService {
     if (params?.timeRange) queryParams.time_range = params.timeRange;
 
     const response = await apiService.get(`${BASE_URL}/analytics`, queryParams);
-    return response; // API interceptor已经转换为camelCase
+    return response; 
   }
 }
 

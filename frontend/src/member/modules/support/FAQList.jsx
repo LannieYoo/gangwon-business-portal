@@ -27,9 +27,9 @@ export default function FAQList() {
     const loadFAQs = async () => {
       setLoading(true);
       try {
-        const items = await supportService.listFAQs({});
-        setAllFaqs(items || []);
-        setFilteredFaqs(items || []);
+        const response = await supportService.listFAQs({});
+        setAllFaqs(response.items);
+        setFilteredFaqs(response.items);
       } catch (error) {
         console.error('Failed to load FAQs:', error);
         setAllFaqs([]);

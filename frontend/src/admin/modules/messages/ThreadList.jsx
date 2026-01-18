@@ -440,7 +440,7 @@ export default function ThreadList() {
                       <div className="flex flex-wrap gap-2 mt-2">
                         {replyAttachments.map((att, idx) => (
                           <div key={idx} className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs">
-                            <span className="truncate max-w-[120px]">{att.originalName || att.name}</span>
+                            <span className="truncate max-w-[120px]">{att.fileName}</span>
                             <button
                               type="button"
                               onClick={() => handleRemoveAttachment(idx)}
@@ -467,7 +467,7 @@ export default function ThreadList() {
                         <span className="text-xs text-gray-400">({replyAttachments.length}/3)</span>
                       </div>
                       <Button variant="primary" onClick={handleSendReply} disabled={!replyContent.trim() || sending} className="px-4 py-2 rounded-lg">
-                        {sending ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : '发送'}
+                        {sending ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : t('common.send', '发送')}
                       </Button>
                     </div>
                   </div>

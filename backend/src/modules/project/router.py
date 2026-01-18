@@ -13,7 +13,7 @@ from fastapi import Request
 
 from ...common.modules.db.models import Member
 from ...common.modules.audit import audit_log
-from ..user.dependencies import get_current_active_user_compat as get_current_active_user, get_current_admin_user
+from ..user.dependencies import get_current_active_user_compat as get_current_active_user, get_current_admin_user, get_current_user_optional
 from .service import ProjectService
 from .schemas import (
     ProjectCreate,
@@ -94,12 +94,15 @@ async def get_latest_project(
 async def get_project(
     project_id: UUID,
     request: Request = None,
+    current_user: Annotated[Optional[dict], Depends(get_current_user_optional)] = None,
 ):
     """
     Get detailed information about a specific project (public access).
+    Increments view count for non-admin users.
     """
-    project = await service.get_project_by_id(project_id)
-    return ProjectResponse.model_validate(project)
+    # Increment view count only for non-admin users
+    increment_view = current_user is None or current_user.get('role') != 'admin'
+    project = await service.get_project_by_id(project_id, increment_view=increment_view)
     return ProjectResponse.model_validate(project)
 
 

@@ -1,8 +1,4 @@
-"""
-Performance router.
-
-API endpoints for performance record management.
-"""
+"""业绩管理路由"""
 from fastapi import APIRouter, Depends, status, Query, Response
 from uuid import UUID
 from typing import Annotated
@@ -44,20 +40,11 @@ async def list_my_performance_records(
     request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
 ):
-    """
-    List member's own performance records with filtering.
-    Data formatting is handled by schemas.
-
-    - **year**: Filter by year
-    - **quarter**: Filter by quarter (1-4)
-    - **status**: Filter by status (draft, submitted, approved, rejected, revision_requested)
-    - **type**: Filter by type (sales, support, ip)
-    """
+    """获取会员业绩记录列表"""
     records, total = await service.list_performance_records(
         current_user.id, query
     )
 
-    # Use schema to format data - no manual conversion needed
     return PerformanceListResponsePaginated(
         items=[PerformanceListItem.from_db_dict(r, include_admin_fields=False) for r in records],
         total=total,
@@ -78,11 +65,7 @@ async def get_performance_record(
     request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
 ):
-    """
-    Get detailed information about a specific performance record.
-
-    Only the owner can access their own records.
-    """
+    """获取业绩记录详情"""
     record = await service.get_performance_by_id(performance_id, current_user.id)
     
     return PerformanceRecordResponse.model_validate(record)
@@ -101,11 +84,7 @@ async def create_performance_record(
     request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
 ):
-    """
-    Create a new performance record in draft status.
-
-    The record can be edited until it is submitted for review.
-    """
+    """创建业绩记录"""
     record = await service.create_performance(current_user.id, data)
     return PerformanceRecordResponse.model_validate(record)
 
@@ -123,11 +102,7 @@ async def update_performance_record(
     request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
 ):
-    """
-    Update a performance record (draft or revision_requested only).
-
-    Only draft or revision_requested records can be edited.
-    """
+    """更新业绩记录"""
     record = await service.update_performance(
         performance_id, current_user.id, data
     )
@@ -146,11 +121,7 @@ async def delete_performance_record(
     request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
 ):
-    """
-    Delete a performance record (draft only).
-
-    Only draft records can be deleted.
-    """
+    """删除业绩记录"""
     await service.delete_performance(performance_id, current_user.id)
 
 
@@ -166,12 +137,7 @@ async def submit_performance_record(
     request: Request,
     current_user: Annotated[Member, Depends(get_current_active_user)],
 ):
-    """
-    Submit a performance record for admin review.
-
-    Changes status from draft/revision_requested to submitted.
-    Once submitted, the record cannot be edited unless admin requests revision.
-    """
+    """提交业绩记录供审核"""
     record = await service.submit_performance(performance_id, current_user.id)
     return PerformanceRecordResponse.model_validate(record)
 
@@ -190,19 +156,9 @@ async def list_all_performance_records(
     request: Request,
     current_admin: Annotated[Member, Depends(get_current_admin_user)],
 ):
-    """
-    List all performance records with filtering (admin only).
-    Data formatting is handled by schemas with admin-specific fields.
-
-    - **member_id**: Filter by specific member
-    - **year**: Filter by year
-    - **quarter**: Filter by quarter (1-4)
-    - **status**: Filter by status
-    - **type**: Filter by type (sales, support, ip)
-    """
+    """获取所有业绩记录列表"""
     records, total = await service.list_all_performance_records(query)
 
-    # Use schema to format data with admin fields
     return PerformanceListResponsePaginated(
         items=[PerformanceListItem.from_db_dict(r, include_admin_fields=True) for r in records],
         total=total,
@@ -224,17 +180,11 @@ async def export_performance_data(
     current_admin: Annotated[Admin, Depends(get_current_admin_user)],
     export_format: str = Query("excel", alias="format", regex="^(excel|csv)$", description="Export format: excel or csv"),
 ):
-    """
-    Export performance data to Excel or CSV (admin only).
-
-    Supports the same filtering options as the list endpoint.
-    """
+    """导出业绩数据"""
     from ...common.modules.export import ExportService
     
-    # Get export data
     export_data = await service.export_performance_data(query)
     
-    # Generate export file
     if export_format == "excel":
         excel_bytes = ExportService.export_to_excel(
             data=export_data,
@@ -248,7 +198,7 @@ async def export_performance_data(
                 "Content-Disposition": f'attachment; filename="performance_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
             },
         )
-    else:  # CSV
+    else:
         csv_content = ExportService.export_to_csv(
             data=export_data,
         )
@@ -272,9 +222,7 @@ async def get_performance_record_admin(
     request: Request,
     current_admin: Annotated[Member, Depends(get_current_admin_user)],
 ):
-    """
-    Get detailed information about any performance record (admin only).
-    """
+    """获取业绩记录详情"""
     record = await service.get_performance_by_id_admin(performance_id)
     return PerformanceRecordResponse.model_validate(record)
 
@@ -292,15 +240,9 @@ async def approve_performance_record(
     request: Request,
     current_admin: Annotated[Admin, Depends(get_current_admin_user)],
 ):
-    """
-    Approve a performance record (admin only).
-
-    Updates the record's review status to approved.
-    """
-    # Note: reviewer_id is not used because admin is not in members table
-    # The review fields are now integrated into the performance_records table
+    """批准业绩记录"""
     record = await service.approve_performance(
-        performance_id, None, data.comments  # reviewer_id set to None for admin
+        performance_id, None, data.comments
     )
     return PerformanceRecordResponse.model_validate(record)
 
@@ -318,15 +260,9 @@ async def request_fix_performance_record(
     request: Request,
     current_admin: Annotated[Admin, Depends(get_current_admin_user)],
 ):
-    """
-    Request revision of a performance record (admin only).
-
-    Creates a review record and changes status to revision_requested.
-    Member will be able to edit the record again.
-    """
-    # Note: reviewer_id is not used because admin is not in members table
+    """请求修改业绩记录"""
     record = await service.request_fix_performance(
-        performance_id, None, data.comments  # reviewer_id set to None for admin
+        performance_id, None, data.comments
     )
     return PerformanceRecordResponse.model_validate(record)
 
@@ -344,13 +280,8 @@ async def reject_performance_record(
     request: Request,
     current_admin: Annotated[Admin, Depends(get_current_admin_user)],
 ):
-    """
-    Reject a performance record (admin only).
-
-    Creates a review record and changes status to rejected.
-    """
-    # Note: reviewer_id is not used because admin is not in members table
+    """驳回业绩记录"""
     record = await service.reject_performance(
-        performance_id, None, data.comments  # reviewer_id set to None for admin
+        performance_id, None, data.comments
     )
     return PerformanceRecordResponse.model_validate(record)

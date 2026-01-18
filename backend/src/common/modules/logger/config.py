@@ -371,11 +371,13 @@ def setup_logging() -> None:
     )
     context_filter = ContextFilter()
 
-    # Add console handler for development
-    console_handler = create_console_handler(formatter, system_level)
-    console_handler.addFilter(sensitive_filter)
-    console_handler.addFilter(context_filter)
-    root_logger.addHandler(console_handler)
+    # Add console handler for development (can be disabled via LOG_ENABLE_CONSOLE)
+    enable_console = getattr(settings, "LOG_ENABLE_CONSOLE", True)
+    if enable_console:
+        console_handler = create_console_handler(formatter, system_level)
+        console_handler.addFilter(sensitive_filter)
+        console_handler.addFilter(context_filter)
+        root_logger.addHandler(console_handler)
 
     # File handler for system logs (Python standard logging)
     # Note: 

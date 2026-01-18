@@ -196,7 +196,8 @@ export default function Banner({
     setIsLoading(true);
 
     try {
-      const banners = await homeService.getBanners({ bannerType });
+      const response = await homeService.getBanners({ bannerType });
+      const banners = response.items || response || [];
       let newBanners = [];
 
       if (Array.isArray(banners) && banners.length > 0) {

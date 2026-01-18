@@ -30,12 +30,12 @@ class UploadService {
   async downloadFile(fileId, filename) {
     const fileInfo = await this.getFileInfo(fileId);
 
-    if (!fileInfo.file_url) {
+    if (!fileInfo.fileUrl) {
       throw new Error("File URL not available");
     }
 
-    const downloadFilename = filename ?? fileInfo.original_name ?? `file-${fileId}`;
-    await this.downloadFromUrl(fileInfo.file_url, downloadFilename);
+    const downloadFilename = filename ?? fileInfo.originalName ?? `file-${fileId}`;
+    await this.downloadFromUrl(fileInfo.fileUrl, downloadFilename);
   }
 
   // 通过 URL 下载文件
@@ -84,17 +84,7 @@ class UploadService {
     const uploadedFiles = [];
     for (const file of files) {
       const response = await this.uploadPublic(file);
-      uploadedFiles.push({
-        fileId: response.fileId ?? response.file_id ?? response.id,
-        fileUrl: response.fileUrl ?? response.file_url ?? response.url,
-        fileName: response.fileName ?? response.file_name ?? file.name,
-        fileSize: response.fileSize ?? response.file_size ?? file.size,
-        mimeType: response.mimeType ?? response.mime_type ?? file.type,
-        // 保持向后兼容的字段
-        original_name: file.name,
-        file_url: response.fileUrl ?? response.file_url ?? response.url,
-        file_size: file.size,
-      });
+      uploadedFiles.push(response);
     }
     return uploadedFiles;
   }
@@ -118,14 +108,7 @@ class UploadService {
       url += `?${queryParams.toString()}`;
     }
 
-    const response = await apiService.upload(url, file, onUploadProgress);
-
-    return {
-      id: response.id,
-      filePath: response.file_url ?? response.file_path,
-      fileUrl: response.file_url ?? response.file_path,
-      ...response,
-    };
+    return await apiService.upload(url, file, onUploadProgress);
   }
 }
 

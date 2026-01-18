@@ -256,7 +256,7 @@ export default function ThreadDetailModal({
                 <div className="flex flex-wrap gap-2 mt-2">
                   {replyAttachments.map((att, idx) => (
                     <div key={idx} className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs">
-                      <span className="truncate max-w-[120px]">{att.originalName || att.name}</span>
+                      <span className="truncate max-w-[120px]">{att.fileName}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveAttachment(idx)}

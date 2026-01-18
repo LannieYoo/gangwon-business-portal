@@ -19,13 +19,7 @@ class AuthService {
   // 会员登录
   async login(credentials) {
     this.clearAuth();
-
-    const requestData = {
-      business_number: credentials.businessNumber,
-      password: credentials.password,
-    };
-
-    const response = await apiService.post(`${API_PREFIX}/auth/login`, requestData);
+    const response = await apiService.post(`${API_PREFIX}/auth/login`, credentials);
 
     if (response.accessToken) {
       setStorage(ACCESS_TOKEN_KEY, response.accessToken);
@@ -42,13 +36,7 @@ class AuthService {
   // 管理员登录
   async adminLogin(credentials) {
     this.clearAuth();
-
-    const requestData = {
-      email: credentials.email,
-      password: credentials.password,
-    };
-
-    const response = await apiService.post(`${API_PREFIX}/auth/admin-login`, requestData);
+    const response = await apiService.post(`${API_PREFIX}/auth/admin-login`, credentials);
 
     if (response.accessToken) {
       setStorage(ACCESS_TOKEN_KEY, response.accessToken);
@@ -138,12 +126,12 @@ class AuthService {
     }
 
     const response = await apiService.post(`${API_PREFIX}/auth/refresh`, {
-      refresh_token: refreshToken,
+      refreshToken,
     });
 
-    if (response.access_token) {
-      setStorage(ACCESS_TOKEN_KEY, response.access_token);
-      setStorage("token_expiry", response.expires_at);
+    if (response.accessToken) {
+      setStorage(ACCESS_TOKEN_KEY, response.accessToken);
+      setStorage("token_expiry", response.expiresAt);
     }
 
     return response;
@@ -188,19 +176,14 @@ class AuthService {
 
   // 忘记密码
   async forgotPassword(data) {
-    const requestData = {
-      business_number: data.businessNumber?.replace(/-/g, "") || data.business_number,
-      email: data.email,
-    };
-
-    return await apiService.post(`${API_PREFIX}/auth/password-reset-request`, requestData);
+    return await apiService.post(`${API_PREFIX}/auth/password-reset-request`, data);
   }
 
   // 重置密码
   async resetPassword(token, newPassword) {
     return await apiService.post(`${API_PREFIX}/auth/password-reset`, {
       token,
-      new_password: newPassword,
+      newPassword,
     });
   }
 

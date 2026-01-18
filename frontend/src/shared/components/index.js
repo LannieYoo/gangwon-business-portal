@@ -16,6 +16,7 @@ export * from "./Loading";
 export * from "./Pagination";
 export * from "./Table";
 export * from "./Tabs";
+export * from "./TabContainer";
 export * from "./Icons";
 export { default as LanguageSwitcher } from "./LanguageSwitcher";
 export { default as ThemeSwitcher } from "./ThemeSwitcher";

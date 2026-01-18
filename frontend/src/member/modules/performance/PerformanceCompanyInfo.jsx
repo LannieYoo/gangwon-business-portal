@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@shared/hooks';
 import Card from '@shared/components/Card';
 import Button from '@shared/components/Button';
-import { Alert, Loading, AddressSearch } from '@shared/components';
+import { Alert, Loading, AddressSearch, LoginModal } from '@shared/components';
 import Input from '@shared/components/Input';
 import Textarea from '@shared/components/Textarea';
 import Select from '@shared/components/Select';
@@ -43,6 +43,7 @@ export default function PerformanceCompanyInfo() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // 使用统一的上传 hook
   const { uploading: uploadingLogo, upload: uploadLogo } = useUpload();
@@ -407,12 +408,22 @@ export default function PerformanceCompanyInfo() {
             <h2 className="text-2xl font-bold mb-4 text-gray-900">{t('performance.companyInfo.profile.loginRequired', '需要登录')}</h2>
             <p className="text-gray-500 mb-8">{t('performance.companyInfo.profile.loginRequiredDesc', '请先登录以查看企业信息')}</p>
             <div className="flex gap-4 justify-center">
-              <Link to="/login"><Button variant="primary">{t('common.login', 'Login')}</Button></Link>
+              <Button variant="primary" onClick={() => setShowLoginModal(true)}>{t('common.login', 'Login')}</Button>
               <Link to="/member/register"><Button variant="secondary">{t('common.register', 'Register')}</Button></Link>
             </div>
           </div>
         </Card>
       </div>
+
+      {/* 登录弹窗 */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={() => {
+          setShowLoginModal(false);
+          window.location.reload();
+        }}
+      />
     );
   }
 
@@ -756,7 +767,7 @@ export default function PerformanceCompanyInfo() {
             />
           </div>
           <Select label={t('member.category', 'Category')} value={companyData.category} onChange={(e) => handleChange('category', e.target.value)} options={categoryOptions} disabled={!isEditing} required placeholder={null} />
-          <Select label={t('member.industry', 'Industry')} value={companyData.industry} onChange={(e) => handleChange('industry', e.target.value)} options={industryOptions} disabled={!isEditing} required placeholder={null} />
+          <Select label={t('member.industry', 'Industry')} value={companyData.industry} onChange={(e) => handleChange('industry', e.target.value)} options={startupTypeOptions} disabled={!isEditing} required placeholder={null} />
           <div className="flex flex-col">
             <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.businessField', 'Business Field')}</label>
             <Select value={companyData.businessField} onChange={(e) => handleChange('businessField', e.target.value)} options={categoryOptions} disabled={!isEditing} placeholder={null} />

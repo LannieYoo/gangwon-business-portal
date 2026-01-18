@@ -11,9 +11,11 @@ import { BuildingIcon, CurrencyDollarIcon, UsersIcon, DocumentIcon } from '@shar
 import { apiService, adminService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import { formatCurrencyCompact } from '@shared/utils';
+import { useDateFormatter } from '@shared/hooks';
 
 export default function CompanyStatus() {
   const { t, i18n } = useTranslation();
+  const { formatDateTime, formatDate, formatNumber, formatValue } = useDateFormatter();
   const [selectedYear, setSelectedYear] = useState('all');
   const [selectedQuarter, setSelectedQuarter] = useState('all');
   const [loading, setLoading] = useState(false);
@@ -81,7 +83,7 @@ export default function CompanyStatus() {
         });
         result += `${param.seriesName}: ${formatted}<br/>`;
       } else {
-        result += `${param.seriesName}: ${param.value.toLocaleString()}<br/>`;
+        result += `${param.seriesName}: ${formatNumber(param.value)}<br/>`;
       }
     });
     return result;
@@ -181,7 +183,7 @@ export default function CompanyStatus() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm text-gray-500 m-0 mb-2 font-medium uppercase tracking-wide flex items-center flex-wrap gap-1 md:text-xs">{t('admin.dashboard.stats.totalMembers')}</h3>
-                <p className="text-[30px] font-bold text-gray-900 m-0 leading-tight md:text-xl">{stats.totalMembers.toLocaleString()}</p>
+                <p className="text-[30px] font-bold text-gray-900 m-0 leading-tight md:text-xl">{formatNumber(stats.totalMembers)}</p>
               </div>
             </Card>
 
@@ -212,7 +214,7 @@ export default function CompanyStatus() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm text-gray-500 m-0 mb-2 font-medium uppercase tracking-wide flex items-center flex-wrap gap-1 md:text-xs">{t('admin.dashboard.stats.totalEmployment')}</h3>
-                <p className="text-[30px] font-bold text-gray-900 m-0 leading-tight md:text-xl">{stats.totalEmployment.toLocaleString()}</p>
+                <p className="text-[30px] font-bold text-gray-900 m-0 leading-tight md:text-xl">{formatNumber(stats.totalEmployment)}</p>
               </div>
             </Card>
 
@@ -222,7 +224,7 @@ export default function CompanyStatus() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm text-gray-500 m-0 mb-2 font-medium uppercase tracking-wide flex items-center flex-wrap gap-1 md:text-xs">{t('admin.dashboard.stats.totalIP')}</h3>
-                <p className="text-[30px] font-bold text-gray-900 m-0 leading-tight md:text-xl">{stats.totalIntellectualProperty.toLocaleString()}</p>
+                <p className="text-[30px] font-bold text-gray-900 m-0 leading-tight md:text-xl">{formatNumber(stats.totalIntellectualProperty)}</p>
               </div>
             </Card>
           </div>
@@ -283,7 +285,7 @@ export default function CompanyStatus() {
                       name: t('admin.dashboard.stats.totalEmployment'),
                       position: 'right',
                       axisLabel: {
-                        formatter: (value) => value.toLocaleString()
+                        formatter: (value) => formatNumber(value)
                       }
                     }
                   ]}

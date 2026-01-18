@@ -8,19 +8,19 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Badge, Loading, Alert } from '@shared/components';
 import { adminService } from '@shared/services';
-import { formatDate } from '@shared/utils';
+import { useDateFormatter, useMessage } from '@shared/hooks';
 
 export default function MemberDetail() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const { formatDateTime, formatDate: formatDateOnly, formatNumber, formatValue } = useDateFormatter();
+  const { message, messageVariant, showSuccess, showError, showWarning, clearMessage } = useMessage();
   const [loading, setLoading] = useState(true);
   const [member, setMember] = useState(null);
   const [niceDnbData, setNiceDnbData] = useState(null);
   const [niceDnbLoading, setNiceDnbLoading] = useState(false);
   const [niceDnbError, setNiceDnbError] = useState(null);
-  const [message, setMessage] = useState(null);
-  const [messageVariant, setMessageVariant] = useState('success');
 
   useEffect(() => {
     loadMemberDetail();
@@ -37,10 +37,7 @@ export default function MemberDetail() {
 
   const handleApprove = async () => {
     await adminService.approveMember(id);
-    setMessageVariant('success');
-    setMessage(t('admin.members.approveSuccess', '批准成功') || '批准成功');
-    setTimeout(() => setMessage(null), 3000);
-    // Reload without showing loading spinner to keep message visible
+    showSuccess(t('admin.members.approveSuccess', '批准成功'));
     const memberData = await adminService.getMemberDetail(id);
     if (memberData) {
       setMember(memberData);
@@ -50,10 +47,7 @@ export default function MemberDetail() {
   const handleReject = async () => {
     const reason = prompt(t('admin.members.rejectReason', '请输入拒绝原因（可选）') || '请输入拒绝原因（可选）');
     await adminService.rejectMember(id, reason || null);
-    setMessageVariant('success');
-    setMessage(t('admin.members.rejectSuccess', '拒绝成功') || '拒绝成功');
-    setTimeout(() => setMessage(null), 3000);
-    // Reload without showing loading spinner to keep message visible
+    showSuccess(t('admin.members.rejectSuccess', '拒绝成功'));
     const memberData = await adminService.getMemberDetail(id);
     if (memberData) {
       setMember(memberData);
@@ -94,7 +88,7 @@ export default function MemberDetail() {
   return (
     <div className="w-full">
       {message && (
-        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+        <Alert variant={messageVariant} className="mb-4" onClose={clearMessage}>
           {message}
         </Alert>
       )}
@@ -116,12 +110,13 @@ export default function MemberDetail() {
         </div>
       </div>
 
+      {/* Basic Info Card */}
       <Card className="mb-6 p-6">
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 m-0">{t('admin.members.detail.basicInfo')}</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.businessNumber')}</label>
             <span className="text-base text-gray-900">{member.businessNumber || '-'}</span>
@@ -135,36 +130,34 @@ export default function MemberDetail() {
             <span className="text-base text-gray-900">{member.representative || '-'}</span>
           </div>
           <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.representativeBirthDate', '대표자 생년월일')}</label>
+            <span className="text-base text-gray-900">
+              {member.representativeBirthDate ? formatDate(member.representativeBirthDate, 'yyyy-MM-dd', i18n.language) : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.representativeGender', '대표자 성별')}</label>
+            <span className="text-base text-gray-900">
+              {member.representativeGender ? t(`common.${member.representativeGender}`, member.representativeGender) : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.representativePhone', '대표자 전화번호')}</label>
+            <span className="text-base text-gray-900">{member.representativePhone || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.legalNumber')}</label>
-            <span className="text-base text-gray-900">{member.legalNumber || '-'}</span>
+            <span className="text-base text-gray-900">{member.legalNumber || member.corporationNumber || '-'}</span>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.address')}</label>
-            <span className="text-base text-gray-900">{member.address || '-'}</span>
+            <label className="text-sm text-gray-600 font-medium">{t('member.establishedDate', '설립일')}</label>
+            <span className="text-base text-gray-900">
+              {member.establishedDate ? formatDate(member.establishedDate, 'yyyy-MM-dd', i18n.language) : '-'}
+            </span>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.industry')}</label>
-            <span className="text-base text-gray-900">{member.industry || '-'}</span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.phone')}</label>
-            <span className="text-base text-gray-900">{member.phone || '-'}</span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.contactPersonName', '담당자명')}</label>
-            <span className="text-base text-gray-900">{member.contactPersonName || '-'}</span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.contactPersonDepartment', '담당자 부서')}</label>
-            <span className="text-base text-gray-900">{member.contactPersonDepartment || '-'}</span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.contactPersonPosition', '담당자 직책')}</label>
-            <span className="text-base text-gray-900">{member.contactPersonPosition || '-'}</span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.email')}</label>
-            <span className="text-base text-gray-900">{member.email || '-'}</span>
+            <label className="text-sm text-gray-600 font-medium">{t('member.category', '기업 유형')}</label>
+            <span className="text-base text-gray-900">{member.category || '-'}</span>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">{t('admin.members.table.status', '状态')}</label>
@@ -183,8 +176,164 @@ export default function MemberDetail() {
             </span>
           </div>
         </div>
+      </Card>
 
+      {/* Address Info Card */}
+      <Card className="mb-6 p-6">
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900 m-0">{t('performance.companyInfo.sections.addressInfo', '地址信息')}</h2>
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.region', '소재지')}</label>
+            <span className="text-base text-gray-900">{member.region || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2 md:col-span-2">
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.address')}</label>
+            <span className="text-base text-gray-900">{member.address || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2 md:col-span-3">
+            <label className="text-sm text-gray-600 font-medium">{t('member.addressDetail', '상세주소')}</label>
+            <span className="text-base text-gray-900">{member.addressDetail || '-'}</span>
+          </div>
+        </div>
+      </Card>
+
+      {/* Business Info Card */}
+      <Card className="mb-6 p-6">
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900 m-0">{t('performance.companyInfo.sections.businessInfo', '业务信息')}</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.industry', '창업유형')}</label>
+            <span className="text-base text-gray-900">
+              {member.industry ? t(`industryClassification.startupType.${member.industry}`, member.industry) : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.startupType', '창업구분')}</label>
+            <span className="text-base text-gray-900">
+              {member.startupType ? t(`industryClassification.startupType.${member.startupType}`, member.startupType) : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.ksicMajor', '한국표준산업분류코드[대분류]')}</label>
+            <span className="text-base text-gray-900">
+              {member.ksicMajor ? t(`industryClassification.ksicMajor.${member.ksicMajor}`, member.ksicMajor) : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.ksicSub', '지역주력산업코드[중분류]')}</label>
+            <span className="text-base text-gray-900">
+              {member.ksicSub ? t(`industryClassification.ksicSub.${member.ksicSub}`, member.ksicSub) : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.businessField', '사업분야')}</label>
+            <span className="text-base text-gray-900">{member.businessField || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.sales', '매출액')}</label>
+            <span className="text-base text-gray-900">
+              {member.sales || member.revenue ? `${formatNumber(member.sales || member.revenue)} 원` : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.employeeCount', '직원 수')}</label>
+            <span className="text-base text-gray-900">
+              {member.employeeCount ? `${formatNumber(member.employeeCount)} 명` : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2 md:col-span-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.websiteUrl', '웹사이트')}</label>
+            <span className="text-base text-gray-900">
+              {member.website || member.websiteUrl ? (
+                <a href={member.website || member.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  {member.website || member.websiteUrl}
+                </a>
+              ) : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2 md:col-span-3">
+            <label className="text-sm text-gray-600 font-medium">{t('member.mainBusiness', '주요 사업')}</label>
+            <span className="text-base text-gray-900">{member.mainBusiness || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2 md:col-span-3">
+            <label className="text-sm text-gray-600 font-medium">{t('member.description', '기업소개')}</label>
+            <p className="text-base text-gray-900 whitespace-pre-wrap">{member.description || '-'}</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Contact Info Card */}
+      <Card className="mb-6 p-6">
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900 m-0">{t('performance.companyInfo.sections.contactInfo', '联系信息')}</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.phone')}</label>
+            <span className="text-base text-gray-900">{member.phone || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.email')}</label>
+            <span className="text-base text-gray-900">{member.email || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.contactPersonName', '담당자명')}</label>
+            <span className="text-base text-gray-900">{member.contactPersonName || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.contactPersonDepartment', '담당자 부서')}</label>
+            <span className="text-base text-gray-900">{member.contactPersonDepartment || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.contactPersonPosition', '담당자 직책')}</label>
+            <span className="text-base text-gray-900">{member.contactPersonPosition || '-'}</span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.contactPersonPhone', '담당자 전화번호')}</label>
+            <span className="text-base text-gray-900">{member.contactPersonPhone || '-'}</span>
+          </div>
+        </div>
+      </Card>
+
+      {/* Additional Info Card */}
+      <Card className="mb-6 p-6">
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900 m-0">{t('performance.companyInfo.sections.additionalInfo', '附加信息')}</h2>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.cooperationFields', '산업협력 희망 분야')}</label>
+            <span className="text-base text-gray-900">
+              {member.cooperationFields && member.cooperationFields.length > 0 
+                ? member.cooperationFields.join(', ') 
+                : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.participationPrograms', '참여 프로그램')}</label>
+            <span className="text-base text-gray-900">
+              {member.participationPrograms && member.participationPrograms.length > 0 
+                ? member.participationPrograms.join(', ') 
+                : '-'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">{t('member.investmentStatus', '투자 유치')}</label>
+            <span className="text-base text-gray-900">
+              {member.investmentStatus?.hasInvestment 
+                ? `${member.investmentStatus.amount || '-'} (${member.investmentStatus.institution || '-'})`
+                : t('member.notSet', '미설정')}
+            </span>
+          </div>
+        </div>
       </Card>
 
       {/* Nice D&B 信息卡片 */}
@@ -351,7 +500,7 @@ export default function MemberDetail() {
                       <div className="p-4 bg-gray-50 rounded">
                         <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.salesAmount')}</label>
                         <p className="text-lg font-semibold text-gray-900">
-                          {niceDnbData.data.salesAmount.toLocaleString()}
+                          {formatNumber(niceDnbData.data.salesAmount)}
                         </p>
                       </div>
                     )}
@@ -359,7 +508,7 @@ export default function MemberDetail() {
                       <div className="p-4 bg-gray-50 rounded">
                         <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.operatingProfit')}</label>
                         <p className="text-lg font-semibold text-gray-900">
-                          {niceDnbData.data.operatingProfit.toLocaleString()}
+                          {formatNumber(niceDnbData.data.operatingProfit)}
                         </p>
                       </div>
                     )}
@@ -367,7 +516,7 @@ export default function MemberDetail() {
                       <div className="p-4 bg-gray-50 rounded">
                         <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.shareholderEquity')}</label>
                         <p className="text-lg font-semibold text-gray-900">
-                          {niceDnbData.data.shareholderEquity.toLocaleString()}
+                          {formatNumber(niceDnbData.data.shareholderEquity)}
                         </p>
                       </div>
                     )}
@@ -375,7 +524,7 @@ export default function MemberDetail() {
                       <div className="p-4 bg-gray-50 rounded">
                         <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.debtAmount')}</label>
                         <p className="text-lg font-semibold text-gray-900">
-                          {niceDnbData.data.debtAmount.toLocaleString()}
+                          {formatNumber(niceDnbData.data.debtAmount)}
                         </p>
                       </div>
                     )}
@@ -383,7 +532,7 @@ export default function MemberDetail() {
                       <div className="p-4 bg-gray-50 rounded">
                         <label className="text-sm text-gray-600 font-medium">{t('admin.members.detail.assetAmount')}</label>
                         <p className="text-lg font-semibold text-gray-900">
-                          {niceDnbData.data.assetAmount.toLocaleString()}
+                          {formatNumber(niceDnbData.data.assetAmount)}
                         </p>
                       </div>
                     )}
@@ -416,7 +565,7 @@ export default function MemberDetail() {
                               {financial.profit ? `${(financial.profit / 100000000).toFixed(2)} ${t('common.billionWon', '억원')}` : '-'}
                             </td>
                             <td className="px-4 py-3 text-gray-700 border-b border-gray-200">
-                              {financial.employees ? `${financial.employees.toLocaleString()} ${t('common.personUnit', '명')}` : '-'}
+                              {financial.employees ? `${formatNumber(financial.employees)} ${t('common.personUnit', '명')}` : '-'}
                             </td>
                           </tr>
                         ))}

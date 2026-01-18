@@ -8,16 +8,16 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Table, Button, Badge, Modal, Textarea, Pagination, Alert, SearchInput } from '@shared/components';
 import { adminService, uploadService } from '@shared/services';
-import { formatBusinessLicense, formatDateTime } from '@shared/utils';
+import { formatBusinessLicense } from '@shared/utils';
+import { useDateFormatter, useMessage } from '@shared/hooks';
 
 export default function PerformanceList() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const memberId = searchParams.get('memberId');
-  
-  // Get current language for number formatting
-  const currentLanguage = i18n.language === 'zh' ? 'zh' : 'ko';
+  const { formatDateTime, formatDate, formatNumber, formatValue } = useDateFormatter();
+  const { message, messageVariant, showSuccess, showError, showWarning, clearMessage } = useMessage();
   
   const [loading, setLoading] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -32,8 +32,6 @@ export default function PerformanceList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
-  const [message, setMessage] = useState(null);
-  const [messageVariant, setMessageVariant] = useState('success');
 
   // 使用 useCallback 包装 setFilteredRecords 避免无限循环
   const handleFilterChange = useCallback((filtered) => {
@@ -109,9 +107,7 @@ export default function PerformanceList() {
 
   const handleApprove = async () => {
     await adminService.approvePerformance(selectedRecord.id, approveComment || null);
-    setMessageVariant('success');
-    setMessage(t('admin.performance.approveSuccess', '批准成功') || '批准成功');
-    setTimeout(() => setMessage(null), 3000);
+    showSuccess(t('admin.performance.approveSuccess', '批准成功'));
     setShowApproveModal(false);
     setApproveComment('');
     setSelectedRecord(null);
@@ -120,16 +116,12 @@ export default function PerformanceList() {
 
   const handleRequestRevision = async () => {
     if (!reviewComment.trim()) {
-      setMessageVariant('warning');
-      setMessage(t('admin.performance.revisionCommentRequired', '请输入修改意见') || '请输入修改意见');
-      setTimeout(() => setMessage(null), 3000);
+      showWarning(t('admin.performance.revisionCommentRequired', '请输入修改意见'));
       return;
     }
 
     await adminService.requestPerformanceRevision(selectedRecord.id, reviewComment);
-    setMessageVariant('success');
-    setMessage(t('admin.performance.revisionSuccess', '修改请求已发送') || '修改请求已发送');
-    setTimeout(() => setMessage(null), 3000);
+    showSuccess(t('admin.performance.revisionSuccess', '修改请求已发送'));
     setShowReviewModal(false);
     setReviewComment('');
     setSelectedRecord(null);
@@ -138,16 +130,12 @@ export default function PerformanceList() {
 
   const handleReject = async () => {
     if (!rejectComment.trim()) {
-      setMessageVariant('warning');
-      setMessage(t('admin.performance.rejectCommentRequired', '请输入驳回原因') || '请输入驳回原因');
-      setTimeout(() => setMessage(null), 3000);
+      showWarning(t('admin.performance.rejectCommentRequired', '请输入驳回原因'));
       return;
     }
 
     await adminService.rejectPerformance(selectedRecord.id, rejectComment);
-    setMessageVariant('success');
-    setMessage(t('admin.performance.rejectSuccess', '驳回成功') || '驳回成功');
-    setTimeout(() => setMessage(null), 3000);
+    showSuccess(t('admin.performance.rejectSuccess', '驳回成功'));
     setShowRejectModal(false);
     setRejectComment('');
     setSelectedRecord(null);
@@ -156,9 +144,7 @@ export default function PerformanceList() {
 
   const handleViewDetail = (recordId) => {
     if (!recordId) {
-      setMessageVariant('error');
-      setMessage(t('admin.performance.detail.notFound', '记录ID不存在') || '记录ID不存在');
-      setTimeout(() => setMessage(null), 3000);
+      showError(t('admin.performance.detail.notFound', '记录ID不存在'));
       return;
     }
     const idString = typeof recordId === 'string' ? recordId : String(recordId);
@@ -184,13 +170,9 @@ export default function PerformanceList() {
         memberId: memberId || undefined
       };
       await adminService.exportPerformance(params);
-      setMessageVariant('success');
-      setMessage(t('admin.performance.exportSuccess', '导出成功') || '导出成功');
-      setTimeout(() => setMessage(null), 3000);
+      showSuccess(t('admin.performance.exportSuccess', '导出成功'));
     } catch (error) {
-      setMessageVariant('error');
-      setMessage(t('admin.performance.exportFailed', '导出失败') || '导出失败');
-      setTimeout(() => setMessage(null), 3000);
+      showError(t('admin.performance.exportFailed', '导出失败'));
     } finally {
       setLoading(false);
     }
@@ -223,11 +205,6 @@ export default function PerformanceList() {
       render: (value) => value ? `Q${value}` : t('performance.annual', '年度')
     },
     {
-      key: 'type',
-      label: t('admin.performance.table.type', '类型'),
-      render: (value) => t(`performance.types.${value}`, value)
-    },
-    {
       key: 'status',
       label: t('admin.performance.table.status'),
       render: (value) => {
@@ -238,12 +215,9 @@ export default function PerformanceList() {
     {
       key: 'submittedAt',
       label: t('admin.performance.table.submittedAt', '提交时间'),
-      render: (value) => {
-        if (!value) return '-';
-        return formatDateTime(value, 'yyyy-MM-dd HH:mm', currentLanguage);
-      }
+      render: (value) => formatDateTime(value)
     }
-  ], [t, currentLanguage, getStatusConfig]);
+  ], [t, getStatusConfig]);
 
   const tableColumns = [
     {
@@ -270,11 +244,6 @@ export default function PerformanceList() {
       render: (value) => value ? `Q${value}` : t('performance.annual', '年度')
     },
     {
-      key: 'type',
-      label: t('admin.performance.table.type', '类型'),
-      render: (value) => t(`performance.types.${value}`, value)
-    },
-    {
       key: 'status',
       label: t('admin.performance.table.status'),
       render: (value) => {
@@ -289,10 +258,7 @@ export default function PerformanceList() {
     {
       key: 'submittedAt',
       label: t('admin.performance.table.submittedAt', '提交时间'),
-      render: (value) => {
-        if (!value) return '-';
-        return formatDateTime(value, 'yyyy-MM-dd HH:mm', currentLanguage);
-      }
+      render: (value) => formatDateTime(value)
     },
     {
       key: 'actions',
@@ -303,9 +269,7 @@ export default function PerformanceList() {
             onClick={(e) => {
               e.stopPropagation();
               if (!row.id) {
-                setMessageVariant('error');
-                setMessage('记录ID不存在，无法查看详情');
-                setTimeout(() => setMessage(null), 3000);
+                showError('记录ID不存在，无法查看详情');
                 return;
               }
               handleViewDetail(row.id);
@@ -363,7 +327,7 @@ export default function PerformanceList() {
   return (
     <div className="w-full">
       {message && (
-        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+        <Alert variant={messageVariant} className="mb-4" onClose={clearMessage}>
           {message}
         </Alert>
       )}

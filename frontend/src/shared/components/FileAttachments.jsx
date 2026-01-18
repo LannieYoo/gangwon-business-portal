@@ -101,7 +101,7 @@ export function FileAttachments({
       {attachments.length > 0 && (
         <div className="space-y-2 mb-3">
           {attachments.map((attachment, index) => {
-            const fileName = attachment.originalName || attachment.fileName || attachment.name || 'Unknown';
+            const fileName = attachment.fileName || attachment.originalName || attachment.name || 'Unknown';
             const fileSize = attachment.fileSize || attachment.size;
             
             return (
