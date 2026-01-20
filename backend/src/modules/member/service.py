@@ -254,6 +254,8 @@ class MemberService:
             profile_update['ksic_sub'] = data.ksic_sub
         if data.category is not None:
             profile_update['category'] = data.category
+        if data.business_field is not None:
+            profile_update['business_field'] = data.business_field
         # New fields for Task 6
         if data.participation_programs is not None:
             profile_update['participation_programs'] = data.participation_programs

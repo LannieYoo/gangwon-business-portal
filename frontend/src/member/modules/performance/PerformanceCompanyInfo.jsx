@@ -33,6 +33,7 @@ import {
   STARTUP_TYPE_KEYS, 
   KSIC_MAJOR_CATEGORY_KEYS, 
   getSubCategoryKeysByMajor,
+  BUSINESS_FIELD_KEYS,
   translateOptions 
 } from '@shared/data/industryClassification';
 
@@ -103,7 +104,15 @@ export default function PerformanceCompanyInfo() {
       sales: profile.sales || profile.revenue ? formatNumber(profile.sales || profile.revenue) : '',
       employeeCount: profile.employeeCount ? formatNumber(profile.employeeCount) : '',
       mainBusiness: profile.mainBusiness || '', 
-      cooperationFields: Array.isArray(profile.cooperationFields) ? profile.cooperationFields : [],
+      cooperationFields: (() => {
+        try {
+          return typeof profile.cooperationFields === 'string' 
+            ? JSON.parse(profile.cooperationFields) 
+            : (Array.isArray(profile.cooperationFields) ? profile.cooperationFields : []);
+        } catch {
+          return [];
+        }
+      })(),
       approvalStatus: profile.approvalStatus || null,
       // Contact person fields
       contactPersonName: profile.contactPersonName || '',
@@ -115,8 +124,24 @@ export default function PerformanceCompanyInfo() {
       ksicMajor: profile.ksicMajor || '',
       ksicSub: profile.ksicSub || '',
       // New fields for Task 6
-      participationPrograms: Array.isArray(profile.participationPrograms) ? profile.participationPrograms : [],
-      investmentStatus: profile.investmentStatus || { hasInvestment: false, amount: '', institution: '' }
+      participationPrograms: (() => {
+        try {
+          return typeof profile.participationPrograms === 'string' 
+            ? JSON.parse(profile.participationPrograms) 
+            : (Array.isArray(profile.participationPrograms) ? profile.participationPrograms : []);
+        } catch {
+          return [];
+        }
+      })(),
+      investmentStatus: (() => {
+        try {
+          return typeof profile.investmentStatus === 'string' 
+            ? JSON.parse(profile.investmentStatus) 
+            : (profile.investmentStatus || { hasInvestment: false, amount: '', institution: '' });
+        } catch {
+          return { hasInvestment: false, amount: '', institution: '' };
+        }
+      })()
     });
     setLoading(false);
   }, [isAuthenticated, cleanupLogoPreview]);
@@ -272,15 +297,16 @@ export default function PerformanceCompanyInfo() {
       // Business info fields
       mainBusiness: companyData.mainBusiness,
       description: companyData.description,
-      cooperationFields: companyData.cooperationFields,
+      cooperationFields: JSON.stringify(companyData.cooperationFields),
       // New business info fields (Task 5)
       startupType: companyData.startupType,
       ksicMajor: companyData.ksicMajor,
       ksicSub: companyData.ksicSub,
       category: companyData.category,
+      businessField: companyData.businessField,
       // New fields for Task 6
-      participationPrograms: companyData.participationPrograms,
-      investmentStatus: companyData.investmentStatus
+      participationPrograms: JSON.stringify(companyData.participationPrograms),
+      investmentStatus: JSON.stringify(companyData.investmentStatus)
     };
 
     await memberService.updateProfile(saveData);
@@ -356,15 +382,9 @@ export default function PerformanceCompanyInfo() {
     { value: 'other', label: t('performance.companyInfo.profile.categories.other', '其他') }
   ], [t, i18n.language]);
 
-  const industryOptions = useMemo(() => [
-    { value: 'software', label: t('performance.companyInfo.profile.industries.software', '软件') },
-    { value: 'hardware', label: t('performance.companyInfo.profile.industries.hardware', '硬件') },
-    { value: 'biotechnology', label: t('performance.companyInfo.profile.industries.biotechnology', '生物技术') },
-    { value: 'healthcare', label: t('performance.companyInfo.profile.industries.healthcare', '医疗保健') },
-    { value: 'education', label: t('performance.companyInfo.profile.industries.education', '教育') },
-    { value: 'finance', label: t('performance.companyInfo.profile.industries.finance', '金融') },
-    { value: 'other', label: t('performance.companyInfo.profile.industries.other', '其他') }
-  ], [t, i18n.language]);
+  const businessFieldOptions = useMemo(() => {
+    return translateOptions(BUSINESS_FIELD_KEYS, t);
+  }, [t, i18n.language]);
 
   const cooperationFieldOptions = useMemo(() => [
     { value: 'field1', label: t('performance.companyInfo.profile.cooperationFields.field1', '技术合作') },
@@ -734,17 +754,6 @@ export default function PerformanceCompanyInfo() {
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 m-0">{t('performance.companyInfo.sections.businessInfo', '业务信息')}</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 p-6 sm:p-8 lg:p-10">
-          {/* Startup Type - Task 5.1 */}
-          <div className="flex flex-col">
-            <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.startupType', '창업구분')}</label>
-            <Select 
-              value={companyData.startupType} 
-              onChange={(e) => handleChange('startupType', e.target.value)} 
-              options={startupTypeOptions} 
-              disabled={!isEditing} 
-              placeholder={t('common.select', '선택')} 
-            />
-          </div>
           {/* KSIC Major Category - Task 5.2 */}
           <div className="flex flex-col">
             <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.ksicMajor', '한국표준산업분류코드[대분류]')}</label>
@@ -771,7 +780,7 @@ export default function PerformanceCompanyInfo() {
           <Select label={t('member.industry', 'Industry')} value={companyData.industry} onChange={(e) => handleChange('industry', e.target.value)} options={startupTypeOptions} disabled={!isEditing} required placeholder={null} />
           <div className="flex flex-col">
             <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">{t('member.businessField', 'Business Field')}</label>
-            <Select value={companyData.businessField} onChange={(e) => handleChange('businessField', e.target.value)} options={categoryOptions} disabled={!isEditing} placeholder={null} />
+            <Select value={companyData.businessField} onChange={(e) => handleChange('businessField', e.target.value)} options={businessFieldOptions} disabled={!isEditing} placeholder={null} />
           </div>
           <div className="flex flex-col">
             <label className="text-sm sm:text-base font-medium text-gray-700 mb-2">

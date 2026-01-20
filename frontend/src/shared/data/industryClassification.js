@@ -25,6 +25,23 @@ export const STARTUP_STAGE_KEYS = [
   { value: 'restart', labelKey: 'industryClassification.startupStage.restart' }
 ];
 
+// 사업분야 (Business Field) - Manufacturing focused options
+export const BUSINESS_FIELD_KEYS = [
+  { value: '13', labelKey: 'industryClassification.businessField.13' },
+  { value: '20', labelKey: 'industryClassification.businessField.20' },
+  { value: '21', labelKey: 'industryClassification.businessField.21' },
+  { value: '22', labelKey: 'industryClassification.businessField.22' },
+  { value: '23', labelKey: 'industryClassification.businessField.23' },
+  { value: '24', labelKey: 'industryClassification.businessField.24' },
+  { value: '25', labelKey: 'industryClassification.businessField.25' },
+  { value: '26', labelKey: 'industryClassification.businessField.26' },
+  { value: '27', labelKey: 'industryClassification.businessField.27' },
+  { value: '28', labelKey: 'industryClassification.businessField.28' },
+  { value: '29', labelKey: 'industryClassification.businessField.29' },
+  { value: '30', labelKey: 'industryClassification.businessField.30' },
+  { value: '31', labelKey: 'industryClassification.businessField.31' }
+];
+
 // 产业大分类 (A-U)
 export const KSIC_MAJOR_CATEGORY_KEYS = [
   { value: 'A', labelKey: 'industryClassification.ksicMajor.A' },

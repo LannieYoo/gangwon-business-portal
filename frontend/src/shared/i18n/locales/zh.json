@@ -100,14 +100,14 @@
     "contactPersonPosition": "负责人职位",
     "contactPersonPhone": "负责人电话",
     "mainBusiness": "主要业务",
-    "businessField": "业务领域",
+    "businessField": "地区主力产业代码",
     "cooperationFields": "产业合作期望领域",
     "participationPrograms": "参与支援事业",
     "investmentStatus": "投资引进",
     "notSet": "未设置",
     "startupType": "创业类型",
     "ksicMajor": "韩国标准产业分类代码[大分类]",
-    "ksicSub": "地区主力产业代码[中分类]",
+    "ksicSub": "韩国标准事业分类代码[中分类]",
     "selectMajorFirst": "请先选择大分类",
     "male": "男",
     "female": "女",
@@ -151,6 +151,21 @@
       "startup_under_3years": "创业3年以下",
       "growth_over_7years": "跃升7年以上",
       "restart": "再创业"
+    },
+    "businessField": {
+      "13": "13 - 纺织品制造业; 服装除外",
+      "20": "20 - 化学物质及化学制品制造业; 医药品除外",
+      "21": "21 - 医用物质及医药品制造业",
+      "22": "22 - 橡胶及塑料制品制造业",
+      "23": "23 - 非金属矿物制品制造业",
+      "24": "24 - 初级金属制造业",
+      "25": "25 - 金属加工制品制造业; 机械及家具除外",
+      "26": "26 - 电子元件、计算机、影像、音响及通信设备制造业",
+      "27": "27 - 医疗、精密、光学仪器及钟表制造业",
+      "28": "28 - 电气设备制造业",
+      "29": "29 - 其他机械及设备制造业",
+      "30": "30 - 汽车及拖车制造业",
+      "31": "31 - 其他运输设备制造业"
     },
     "ksicMajor": {
       "A": "A - 农业、林业及渔业",
@@ -283,9 +298,9 @@
       "other": "其他地区"
     },
     "categories": {
-      "tech": "科技",
-      "manufacturing": "制造业",
-      "service": "服务业",
+      "tech": "个人事业者",
+      "manufacturing": "法人事业者",
+      "service": "非营利事业者",
       "retail": "零售业",
       "other": "其他"
     },
@@ -1664,9 +1679,9 @@
           "samcheok": "三陟"
         },
         "categories": {
-          "tech": "科技",
-          "manufacturing": "制造业",
-          "service": "服务业",
+          "tech": "个人事业者",
+          "manufacturing": "法人事业者",
+          "service": "非营利事业者",
           "retail": "零售业",
           "other": "其他"
         },
@@ -1940,17 +1955,17 @@
     }
   },
   "projects": {
-    "title": "支援事业管理",
+    "title": "事业公告",
     "subtitle": "查看支持支援事业公告并申请",
     "tabs": {
-      "projectList": "支援事业列表",
+      "projectList": "事业公告",
       "applicationRecords": "申请记录"
     },
     "searchPlaceholder": "按支援事业名称或关键词搜索",
     "resultsCount": "共{{count}}个支援事业",
     "perPage": "条/页",
     "itemsPerPage": "每页显示",
-    "apply": "程序申请",
+    "apply": "支援事业申请",
     "detail": "支援事业",
     "attachments": "附件",
     "companyInfo": "企业信息",
