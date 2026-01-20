@@ -56,6 +56,8 @@ class MemberProfileResponse(BaseModel):
     ksic_sub: Optional[str] = None  # 지역주력산업코드[중분류]: 2-digit code
     category: Optional[str] = None  # 기업 유형
     business_field: Optional[str] = None  # 지역주력산업코드
+    main_industry_ksic_major: Optional[str] = None  # 주력산업 KSIC 코드[대분류]
+    main_industry_ksic_codes: Optional[str] = None  # 주력산업 KSIC 코드[세부코드] (JSON array as string)
     # New fields for Task 6 - 참여 프로그램, 투자 유치
     participation_programs: Optional[str] = None  # 참여 프로그램 (JSON array as string)
     investment_status: Optional[str] = None  # 투자 유치 (JSON object as string)
@@ -100,6 +102,8 @@ class MemberProfileUpdate(BaseModel):
     ksic_sub: Optional[str] = Field(None, max_length=10)  # 지역주력산업코드[중분류]
     category: Optional[str] = Field(None, max_length=50)  # 기업 유형
     business_field: Optional[str] = Field(None, max_length=10)  # 지역주력산업코드
+    main_industry_ksic_major: Optional[str] = Field(None, max_length=50)  # 주력산업 KSIC 코드[대분류]
+    main_industry_ksic_codes: Optional[str] = None  # 주력산업 KSIC 코드[세부코드] (JSON array as string)
     # New fields for Task 6 - 참여 프로그램, 투자 유치
     participation_programs: Optional[str] = None  # 참여 프로그램 (JSON array as string)
     investment_status: Optional[str] = None  # 투자 유치 (JSON object as string)

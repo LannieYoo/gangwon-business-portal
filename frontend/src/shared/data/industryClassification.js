@@ -195,6 +195,63 @@ export function getSubCategoryKeysByMajor(majorCategory) {
   return KSIC_SUB_CATEGORY_KEYS[majorCategory] || [];
 }
 
+// 主力产业 KSIC 代码 - 第1层级（大分类）
+export const MAIN_INDUSTRY_KSIC_MAJOR_KEYS = [
+  { value: 'natural_bio', labelKey: 'industryClassification.mainIndustryKsic.natural_bio' },
+  { value: 'ceramic', labelKey: 'industryClassification.mainIndustryKsic.ceramic' },
+  { value: 'digital_health', labelKey: 'industryClassification.mainIndustryKsic.digital_health' }
+];
+
+// 主力产业 KSIC 代码 - 第2层级（具体代码）
+export const MAIN_INDUSTRY_KSIC_CODES = {
+  natural_bio: [
+    { value: '10501', labelKey: 'industryClassification.mainIndustryKsicCodes.10501' },
+    { value: '10795', labelKey: 'industryClassification.mainIndustryKsicCodes.10795' },
+    { value: '10797', labelKey: 'industryClassification.mainIndustryKsicCodes.10797' },
+    { value: '11209', labelKey: 'industryClassification.mainIndustryKsicCodes.11209' },
+    { value: '20422', labelKey: 'industryClassification.mainIndustryKsicCodes.20422' },
+    { value: '20423', labelKey: 'industryClassification.mainIndustryKsicCodes.20423' },
+    { value: '20499', labelKey: 'industryClassification.mainIndustryKsicCodes.20499' },
+    { value: '21101', labelKey: 'industryClassification.mainIndustryKsicCodes.21101' },
+    { value: '21102', labelKey: 'industryClassification.mainIndustryKsicCodes.21102' },
+    { value: '21210', labelKey: 'industryClassification.mainIndustryKsicCodes.21210' },
+    { value: '21220', labelKey: 'industryClassification.mainIndustryKsicCodes.21220' }
+  ],
+  ceramic: [
+    { value: '20129', labelKey: 'industryClassification.mainIndustryKsicCodes.20129' },
+    { value: '20412', labelKey: 'industryClassification.mainIndustryKsicCodes.20412' },
+    { value: '20499_ceramic', labelKey: 'industryClassification.mainIndustryKsicCodes.20499' },
+    { value: '23129', labelKey: 'industryClassification.mainIndustryKsicCodes.23129' },
+    { value: '23222', labelKey: 'industryClassification.mainIndustryKsicCodes.23222' },
+    { value: '23311', labelKey: 'industryClassification.mainIndustryKsicCodes.23311' },
+    { value: '23312', labelKey: 'industryClassification.mainIndustryKsicCodes.23312' },
+    { value: '23993', labelKey: 'industryClassification.mainIndustryKsicCodes.23993' },
+    { value: '23999', labelKey: 'industryClassification.mainIndustryKsicCodes.23999' },
+    { value: '24113', labelKey: 'industryClassification.mainIndustryKsicCodes.24113' },
+    { value: '26299', labelKey: 'industryClassification.mainIndustryKsicCodes.26299' },
+    { value: '26429', labelKey: 'industryClassification.mainIndustryKsicCodes.26429' },
+    { value: '29174', labelKey: 'industryClassification.mainIndustryKsicCodes.29174' },
+    { value: '29271', labelKey: 'industryClassification.mainIndustryKsicCodes.29271' }
+  ],
+  digital_health: [
+    { value: '21300', labelKey: 'industryClassification.mainIndustryKsicCodes.21300' },
+    { value: '26299_health', labelKey: 'industryClassification.mainIndustryKsicCodes.26299' },
+    { value: '27111', labelKey: 'industryClassification.mainIndustryKsicCodes.27111' },
+    { value: '27112', labelKey: 'industryClassification.mainIndustryKsicCodes.27112' },
+    { value: '27192', labelKey: 'industryClassification.mainIndustryKsicCodes.27192' },
+    { value: '27199', labelKey: 'industryClassification.mainIndustryKsicCodes.27199' },
+    { value: '28519', labelKey: 'industryClassification.mainIndustryKsicCodes.28519' },
+    { value: '28909', labelKey: 'industryClassification.mainIndustryKsicCodes.28909' },
+    { value: '58221', labelKey: 'industryClassification.mainIndustryKsicCodes.58221' },
+    { value: '58222', labelKey: 'industryClassification.mainIndustryKsicCodes.58222' }
+  ]
+};
+
+// 根据主力产业大分类获取具体代码
+export function getMainIndustryKsicCodesByMajor(majorCategory) {
+  return MAIN_INDUSTRY_KSIC_CODES[majorCategory] || [];
+}
+
 // 翻译选项（使用 i18n t 函数）
 export function translateOptions(options, t) {
   return options.map(opt => ({

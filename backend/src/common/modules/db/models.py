@@ -99,6 +99,8 @@ class Member(Base):
     ksic_sub = Column(String(10))  # 지역주력산업코드[중분류]: 2-digit code
     category = Column(String(50))  # 기업 유형: tech, manufacturing, service, retail, other
     business_field = Column(String(10))  # 지역주력산업코드: 13, 20-31 등
+    main_industry_ksic_major = Column(String(50))  # 주력산업 KSIC 코드[대분류]: natural_bio, ceramic, digital_health
+    main_industry_ksic_codes = Column(Text)  # 주력산업 KSIC 코드[세부코드]: JSON array of KSIC codes
     
     # New fields for Task 6 - 참여 프로그램, 투자 유치
     participation_programs = Column(Text)  # 참여 프로그램 (JSON array as text)
