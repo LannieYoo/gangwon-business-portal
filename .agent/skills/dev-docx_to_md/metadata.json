@@ -1,0 +1,23 @@
+{
+  "name": "docx-to-md",
+  "display_name": "DOCX to Markdown Converter",
+  "category": "development",
+  "keywords": [
+    "docx",
+    "word",
+    "markdown",
+    "md",
+    "convert",
+    "转换",
+    "word to markdown",
+    "docx to md",
+    "document conversion",
+    "文档转换",
+    "pandoc",
+    "mammoth",
+    "python-docx"
+  ],
+  "version": "1.0.0",
+  "created_at": "2026-01-22",
+  "updated_at": "2026-01-22"
+}

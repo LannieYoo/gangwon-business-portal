@@ -10,7 +10,7 @@ import { router } from "./router";
 import { useAuth } from "@shared/hooks";
 import { LoadingOverlay, ErrorBoundary } from "@shared/components";
 import { useUIStore, useAuthStore } from "@shared/stores";
-import authService from "@shared/services/auth.service";
+import authService from "@features/auth/services/auth.service";
 
 export default function App() {
   const {
@@ -37,7 +37,7 @@ export default function App() {
     const initAuth = async () => {
       const storedUser = authService.getCurrentUserFromStorage();
       const hasToken = authService.isAuthenticated();
-      
+
       if (storedUser && hasToken) {
         setUser(storedUser);
         setAuthenticated(true);

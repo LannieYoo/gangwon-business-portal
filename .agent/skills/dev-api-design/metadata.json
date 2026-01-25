@@ -1,0 +1,19 @@
+{
+  "name": "dev-api-design",
+  "displayName": "API Design Expert",
+  "description": "RESTful API 设计专家，提供 API 契约、错误处理和文档指导",
+  "keywords": [
+    "api",
+    "rest",
+    "restful",
+    "openapi",
+    "swagger",
+    "api design",
+    "http",
+    "API设计",
+    "接口设计"
+  ],
+  "version": "1.0.0",
+  "author": "AI Assistant",
+  "category": "development"
+}

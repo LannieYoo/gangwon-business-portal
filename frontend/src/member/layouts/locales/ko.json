@@ -1,0 +1,28 @@
+{
+  "common": {
+    "appName": "강원비즈니스포털"
+  },
+  "header": {
+    "toggleMenu": "메뉴 전환",
+    "title": "강원비즈니스포털",
+    "login": "로그인",
+    "mobileMenuLabel": "모바일 내비게이션",
+    "mainNav": "주요 탐색",
+    "profile": "기업 정보",
+    "support": "고객 지원",
+    "logout": "로그아웃"
+  },
+  "menu": {
+    "home": "홈",
+    "about": "소개",
+    "projects": "지원사업",
+    "performance": "경영성과",
+    "support": "원스톱지원"
+  },
+  "footer": {
+    "copyright": "강원도청. All Rights Reserved.",
+    "termsOfService": "이용약관",
+    "privacyPolicy": "개인정보처리방침",
+    "version": "버전"
+  }
+}

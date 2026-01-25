@@ -2,16 +2,16 @@
 
 ## 技术栈
 
-| 类别 | 技术 |
-|------|------|
-| 框架 | React 18 |
-| 构建 | Vite |
-| 路由 | React Router v6 |
-| 状态管理 | Zustand |
-| HTTP | Axios |
-| 样式 | Tailwind CSS |
-| 国际化 | i18next |
-| Mock | MSW (开发环境) |
+| 类别     | 技术            |
+| -------- | --------------- |
+| 框架     | React 18        |
+| 构建     | Vite            |
+| 路由     | React Router v6 |
+| 状态管理 | Zustand         |
+| HTTP     | Axios           |
+| 样式     | Tailwind CSS    |
+| 国际化   | i18next         |
+| Mock     | MSW (开发环境)  |
 
 ## 目录结构
 
@@ -44,56 +44,56 @@ src/
 
 ## 规范文档索引
 
-| 目录 | 文档 | 说明 |
-|------|------|------|
-| `shared/components/` | [COMPONENT_GUIDELINES.md](./shared/components/COMPONENT_GUIDELINES.md) | 组件开发规范 |
-| `shared/hooks/` | [HOOKS_GUIDELINES.md](./shared/hooks/HOOKS_GUIDELINES.md) | Hook 开发规范 |
-| `shared/services/` | [SERVICES_GUIDELINES.md](./shared/services/SERVICES_GUIDELINES.md) | API 服务规范 |
-| `shared/stores/` | [STORES_GUIDELINES.md](./shared/stores/STORES_GUIDELINES.md) | Zustand Store 规范 |
-| `shared/utils/` | [UTILS_GUIDELINES.md](./shared/utils/UTILS_GUIDELINES.md) | 工具函数规范 |
-| `shared/interceptors/` | [INTERCEPTORS_GUIDELINES.md](./shared/interceptors/INTERCEPTORS_GUIDELINES.md) | 拦截器规范 |
-| `shared/i18n/` | [I18N_GUIDELINES.md](./shared/i18n/I18N_GUIDELINES.md) | 国际化规范 |
-| `shared/config/` | [CONFIG_GUIDELINES.md](./shared/config/CONFIG_GUIDELINES.md) | 配置文件规范 |
-| `shared/styles/` | [STYLES_GUIDELINES.md](./shared/styles/STYLES_GUIDELINES.md) | 样式规范 |
-| `mocks/` | [MOCKS_GUIDELINES.md](./mocks/MOCKS_GUIDELINES.md) | Mock 数据规范 |
-| `admin/` | [MODULES_GUIDELINES.md](./admin/MODULES_GUIDELINES.md) | 管理员端模块规范 |
-| `member/` | [MODULES_GUIDELINES.md](./member/MODULES_GUIDELINES.md) | 会员端模块规范 |
+| 目录                   | 文档                                                                           | 说明               |
+| ---------------------- | ------------------------------------------------------------------------------ | ------------------ |
+| `shared/components/`   | [COMPONENT_GUIDELINES.md](./shared/components/COMPONENT_GUIDELINES.md)         | 组件开发规范       |
+| `shared/hooks/`        | [HOOKS_GUIDELINES.md](./shared/hooks/HOOKS_GUIDELINES.md)                      | Hook 开发规范      |
+| `shared/services/`     | [SERVICES_GUIDELINES.md](./shared/services/SERVICES_GUIDELINES.md)             | API 服务规范       |
+| `shared/stores/`       | [STORES_GUIDELINES.md](./shared/stores/STORES_GUIDELINES.md)                   | Zustand Store 规范 |
+| `shared/utils/`        | [UTILS_GUIDELINES.md](./shared/utils/UTILS_GUIDELINES.md)                      | 工具函数规范       |
+| `shared/interceptors/` | [INTERCEPTORS_GUIDELINES.md](./shared/interceptors/INTERCEPTORS_GUIDELINES.md) | 拦截器规范         |
+| `shared/i18n/`         | [I18N_GUIDELINES.md](./shared/i18n/I18N_GUIDELINES.md)                         | 国际化规范         |
+| `shared/config/`       | [CONFIG_GUIDELINES.md](./shared/config/CONFIG_GUIDELINES.md)                   | 配置文件规范       |
+| `shared/styles/`       | [STYLES_GUIDELINES.md](./shared/styles/STYLES_GUIDELINES.md)                   | 样式规范           |
+| `mocks/`               | [MOCKS_GUIDELINES.md](./mocks/MOCKS_GUIDELINES.md)                             | Mock 数据规范      |
+| `admin/`               | [MODULES_GUIDELINES.md](./admin/MODULES_GUIDELINES.md)                         | 管理员端模块规范   |
+| `member/`              | [MODULES_GUIDELINES.md](./member/MODULES_GUIDELINES.md)                        | 会员端模块规范     |
 
 ---
 
 ## 命名规范
 
-| 类型 | 规范 | 示例 |
-|------|------|------|
-| 组件文件 | PascalCase.jsx | `Button.jsx`, `MemberList.jsx` |
-| Hook 文件 | camelCase.js | `useAuth.js`, `useDebounce.js` |
-| Service 文件 | kebab-case.service.js | `auth.service.js` |
-| Store 文件 | camelCase + Store.js | `authStore.js` |
-| 工具文件 | camelCase.js | `format.js`, `helpers.js` |
-| 拦截器文件 | kebab-case.interceptor.js | `api.interceptor.js` |
-| 配置文件 | kebab-case.config.js | `logger.config.js` |
-| 常量 | UPPER_SNAKE_CASE | `API_PREFIX`, `USER_ROLES` |
-| 翻译键 | camelCase | `common.save`, `auth.loginFailed` |
-| 模块目录 | kebab-case | `audit-logs/`, `members/` |
-| 布局组件 | PascalCase + Layout | `AdminLayout.jsx` |
+| 类型         | 规范                      | 示例                              |
+| ------------ | ------------------------- | --------------------------------- |
+| 组件文件     | PascalCase.jsx            | `Button.jsx`, `MemberList.jsx`    |
+| Hook 文件    | camelCase.js              | `useAuth.js`, `useDebounce.js`    |
+| Service 文件 | kebab-case.service.js     | `auth.service.js`                 |
+| Store 文件   | camelCase + Store.js      | `authStore.js`                    |
+| 工具文件     | camelCase.js              | `format.js`, `helpers.js`         |
+| 拦截器文件   | kebab-case.interceptor.js | `api.interceptor.js`              |
+| 配置文件     | kebab-case.config.js      | `logger.config.js`                |
+| 常量         | UPPER_SNAKE_CASE          | `API_PREFIX`, `USER_ROLES`        |
+| 翻译键       | camelCase                 | `common.save`, `auth.loginFailed` |
+| 模块目录     | kebab-case                | `audit-logs/`, `members/`         |
+| 布局组件     | PascalCase + Layout       | `AdminLayout.jsx`                 |
 
 ## 导入路径别名
 
 ```js
 // 共享资源
-import { Button } from '@shared/components';
-import { useAuth } from '@shared/hooks';
-import { authService } from '@shared/services';
-import { useAuthStore } from '@shared/stores';
-import { formatDate } from '@shared/utils';
+import { Button } from "@shared/components";
+import { useAuth } from "@shared/hooks";
+import authService from "@features/auth/services/auth.service";
+import { useAuthStore } from "@shared/stores";
+import { formatDate } from "@shared/utils";
 
 // 管理员模块
-import { MemberList } from '@admin/modules/members';
-import AdminLayout from '@admin/layouts';
+import { MemberList } from "@admin/modules/members";
+import AdminLayout from "@admin/layouts";
 
 // 会员模块
-import { Home } from '@member/modules/home';
-import MemberLayout from '@member/layouts';
+import { Home } from "@member/modules/home";
+import MemberLayout from "@member/layouts";
 ```
 
 ---
@@ -135,7 +135,7 @@ const handleSubmit = async () => {
   setSubmitting(true);
   await adminService.createProject(payload);
   setSubmitting(false);
-  navigate('/admin/projects');
+  navigate("/admin/projects");
 };
 
 // ❌ 错误：包含日志和错误处理
@@ -143,8 +143,8 @@ const handleSubmit = async () => {
   try {
     await adminService.createProject(payload);
   } catch (error) {
-    console.error('Failed:', error);
-    alert('保存失败');
+    console.error("Failed:", error);
+    alert("保存失败");
   }
 };
 ```
@@ -154,7 +154,7 @@ const handleSubmit = async () => {
 日志和拦截器必须过滤敏感信息：
 
 ```js
-const sensitiveFields = ['password', 'token', 'secret', 'key', 'auth'];
+const sensitiveFields = ["password", "token", "secret", "key", "auth"];
 ```
 
 ---
@@ -169,11 +169,13 @@ const sensitiveFields = ['password', 'token', 'secret', 'key', 'auth'];
 const [message, setMessage] = useState(null);
 
 // 显示消息
-setMessage('保存成功');
+setMessage("保存成功");
 setTimeout(() => setMessage(null), 3000);
 
 // JSX
-{message && <Alert variant="success">{message}</Alert>}
+{
+  message && <Alert variant="success">{message}</Alert>;
+}
 ```
 
 Alert variant: `success` | `error` | `warning` | `info`
@@ -195,10 +197,15 @@ const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
     <p className="text-gray-600">此操作不可撤销</p>
   </div>
   <ModalFooter>
-    <Button variant="outline" onClick={() => setDeleteConfirm({ open: false, id: null })}>取消</Button>
+    <Button
+      variant="outline"
+      onClick={() => setDeleteConfirm({ open: false, id: null })}
+    >
+      取消
+    </Button>
     <Button onClick={confirmDelete}>删除</Button>
   </ModalFooter>
-</Modal>
+</Modal>;
 ```
 
 ### 按钮样式
@@ -257,10 +264,10 @@ modules/members/
  * 会员列表页面
  */
 
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Table, Pagination, Loading } from '@shared/components';
-import { memberService } from '@shared/services';
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { Table, Pagination, Loading } from "@shared/components";
+import { memberService } from "@shared/services";
 
 export default function MemberList() {
   const { t } = useTranslation();
@@ -268,9 +275,11 @@ export default function MemberList() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  
-  useEffect(() => { loadData(); }, [page]);
-  
+
+  useEffect(() => {
+    loadData();
+  }, [page]);
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -281,14 +290,19 @@ export default function MemberList() {
       setLoading(false);
     }
   };
-  
+
   if (loading) return <Loading />;
-  
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{t('members.title')}</h1>
+      <h1 className="text-2xl font-bold">{t("members.title")}</h1>
       <Table columns={columns} data={data} />
-      <Pagination current={page} total={total} pageSize={10} onChange={setPage} />
+      <Pagination
+        current={page}
+        total={total}
+        pageSize={10}
+        onChange={setPage}
+      />
     </div>
   );
 }
@@ -297,16 +311,16 @@ export default function MemberList() {
 ### 路由配置
 
 ```jsx
-import { MemberList, MemberDetail } from '@admin/modules/members';
+import { MemberList, MemberDetail } from "@admin/modules/members";
 
 const adminRoutes = [
   {
-    path: 'members',
+    path: "members",
     children: [
       { index: true, element: <MemberList /> },
-      { path: ':id', element: <MemberDetail /> }
-    ]
-  }
+      { path: ":id", element: <MemberDetail /> },
+    ],
+  },
 ];
 ```
 

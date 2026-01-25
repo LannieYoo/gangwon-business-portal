@@ -1,0 +1,9 @@
+{
+  "name": "dev-markdown_check",
+  "displayName": "Markdown Format Checker",
+  "description": "Validate and fix markdown formatting issues",
+  "version": "1.0.0",
+  "author": "System",
+  "tags": ["markdown", "validation", "formatting", "quality", "linting"],
+  "category": "development"
+}

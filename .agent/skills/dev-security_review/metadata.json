@@ -1,0 +1,31 @@
+{
+  "name": "dev-security_review",
+  "version": "1.0.0",
+  "description": "Comprehensive security review checklist and patterns for authentication, input validation, and vulnerability prevention",
+  "keywords": [
+    "security",
+    "security review",
+    "authentication",
+    "authorization",
+    "input validation",
+    "SQL injection",
+    "XSS",
+    "CSRF",
+    "secrets management",
+    "rate limiting",
+    "vulnerability",
+    "OWASP",
+    "安全",
+    "安全审查",
+    "认证",
+    "授权",
+    "输入验证",
+    "SQL注入",
+    "跨站脚本",
+    "密钥管理",
+    "限流",
+    "漏洞"
+  ],
+  "author": "Adapted from everything-claude-code",
+  "license": "MIT"
+}

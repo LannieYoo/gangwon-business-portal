@@ -1,0 +1,25 @@
+{
+  "name": "项目文档管理",
+  "description": "项目文档的创建、组织、维护和管理最佳实践",
+  "keywords": [
+    "project documentation",
+    "docs management", 
+    "documentation",
+    "readme",
+    "api docs",
+    "technical writing",
+    "project docs",
+    "文档管理",
+    "项目文档",
+    "文档",
+    "说明文档",
+    "API文档",
+    "技术文档",
+    "文档维护",
+    "文档组织"
+  ],
+  "category": "development",
+  "version": "1.0.0",
+  "created": "2025-01-23",
+  "updated": "2025-01-23"
+}
