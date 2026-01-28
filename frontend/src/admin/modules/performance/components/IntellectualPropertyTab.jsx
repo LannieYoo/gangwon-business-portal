@@ -72,7 +72,7 @@ export default function IntellectualPropertyTab({ record, onDownload, onDownload
                 {t('performance.intellectualPropertyFields.publicDisclosure', '공개 희망 여부')}
               </label>
               <span className="text-base text-gray-900">
-                {item.publicDisclosure ? t('common.yes', '예')) : t('common.no', '아니오'))}
+                {item.publicDisclosure ? t('common.yes', '예') : t('common.no', '아니오')}
               </span>
             </div>
           </div>
