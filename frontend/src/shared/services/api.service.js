@@ -189,7 +189,9 @@ class ApiService {
       downloadFilename = `download-${timestamp}`;
     }
 
-    const blob = new Blob([response.data]);
+    // 使用服务器返回的 Content-Type 创建 Blob
+    const contentType = response.headers["content-type"] || response.headers["Content-Type"] || "application/octet-stream";
+    const blob = new Blob([response.data], { type: contentType });
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
     link.download = downloadFilename;
