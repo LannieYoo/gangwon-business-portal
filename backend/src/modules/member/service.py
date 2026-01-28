@@ -87,6 +87,7 @@ class MemberService:
             cooperation_fields=member.get("cooperation_fields"),
             # New business info fields (Task 5)
             startup_type=member.get("startup_type"),
+            startup_stage=member.get("startup_stage"),
             ksic_major=member.get("ksic_major"),
             ksic_sub=member.get("ksic_sub"),
             category=member.get("category"),
@@ -150,6 +151,7 @@ class MemberService:
             cooperation_fields=member.get("cooperation_fields"),
             # New business info fields (Task 5)
             startup_type=member.get("startup_type"),
+            startup_stage=member.get("startup_stage"),
             ksic_major=member.get("ksic_major"),
             ksic_sub=member.get("ksic_sub"),
             category=member.get("category"),
@@ -265,6 +267,8 @@ class MemberService:
         # New business info fields (Task 5)
         if data.startup_type is not None:
             profile_update['startup_type'] = data.startup_type
+        if data.startup_stage is not None:
+            profile_update['startup_stage'] = data.startup_stage
         if data.ksic_major is not None:
             profile_update['ksic_major'] = data.ksic_major
         if data.ksic_sub is not None:

@@ -95,6 +95,9 @@
         "attachmentUploadError": "附件上传失败，请重试"
       },
       "confirmDelete": "确定要删除这个支援事业吗？此操作无法撤销。",
+      "deleteConfirmTitle": "删除支援事业",
+      "deleteSuccess": "已删除",
+      "deleteFailed": "删除失败",
       "exportExcel": "导出 Excel",
       "exportCsv": "导出 CSV",
       "exportSuccess": "导出成功",
@@ -131,7 +134,13 @@
       "detail": "申请详情",
       "viewMember": "企业",
       "viewMemberDetail": "查看企业详情",
-      "updateStatusFailed": "状态更新失败"
+      "updateStatusFailed": "状态更新失败",
+      "rejectReasonPrompt": "请输入拒绝原因:",
+      "rejectReasonRequired": "请输入拒绝原因",
+      "rejectReasonTitle": "输入拒绝原因",
+      "rejectReasonLabel": "拒绝原因",
+      "rejectReasonPlaceholder": "请输入拒绝原因...",
+      "rejectSuccess": "拒绝成功"
     }
   }
 }

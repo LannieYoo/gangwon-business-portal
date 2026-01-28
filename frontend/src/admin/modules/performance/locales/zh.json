@@ -98,6 +98,49 @@
                 "approved": "已批准",
                 "revisionRequested": "需要修改",
                 "rejected": "已拒绝"
+            },
+            "intellectualPropertyFields": {
+                "name": "知识产权名",
+                "number": "知识产权号",
+                "type": "知识产权区分",
+                "registrationType": "知识产权注册区分",
+                "country": "注册国家",
+                "overseasType": "海外申请区分",
+                "registrationDate": "注册日期",
+                "publicDisclosure": "公开希望与否",
+                "proofDocument": "证明文件"
+            },
+            "ipType": {
+                "patent": "专利",
+                "utilityModel": "实用新型",
+                "design": "外观设计",
+                "trademark": "商标",
+                "copyright": "著作权"
+            },
+            "ipRegistrationType": {
+                "application": "申请中",
+                "registration": "已注册",
+                "publication": "已公开"
+            },
+            "country": {
+                "korea": "韩国",
+                "usa": "美国",
+                "china": "中国",
+                "japan": "日本",
+                "eu": "欧盟",
+                "other": "其他"
+            },
+            "overseasApplicationType": {
+                "pct": "PCT",
+                "paris": "巴黎公约",
+                "direct": "直接申请",
+                "none": "无"
+            },
+            "quarter": {
+                "q1": "第1季度",
+                "q2": "第2季度",
+                "q3": "第3季度",
+                "q4": "第4季度"
             }
         }
     }

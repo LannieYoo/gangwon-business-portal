@@ -95,6 +95,7 @@ class Member(Base):
     
     # New business info fields (Task 5) - 창업구분, 한국표준산업분류코드
     startup_type = Column(String(50))  # 창업구분: preliminary, startup_under_3years, growth_over_7years, restart
+    startup_stage = Column(String(50))  # 창업구분 (예비창업, 3년 이하, 도약 7년 이상, 재창업)
     ksic_major = Column(String(10))  # 한국표준산업분류코드[대분류]: A-U
     ksic_sub = Column(String(10))  # 지역주력산업코드[중분류]: 2-digit code
     category = Column(String(50))  # 기업 유형: tech, manufacturing, service, retail, other

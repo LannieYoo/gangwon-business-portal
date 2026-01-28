@@ -69,6 +69,7 @@ export const useCompanyInfo = () => {
     contactPersonPosition: "",
     contactPersonPhone: "",
     startupType: "",
+    startupStage: "",
     ksicMajor: "",
     ksicSub: "",
     mainIndustryKsicMajor: "",
@@ -131,6 +132,7 @@ export const useCompanyInfo = () => {
         contactPersonPosition: profile.contactPersonPosition || "",
         contactPersonPhone: profile.contactPersonPhone || "",
         startupType: profile.startupType || "",
+        startupStage: profile.startupStage || "",
         ksicMajor: profile.ksicMajor || "",
         ksicSub: profile.ksicSub || "",
         mainIndustryKsicMajor: profile.mainIndustryKsicMajor || "",
@@ -282,6 +284,7 @@ export const useCompanyInfo = () => {
       foundingDate: t("member.establishedDate", "Established Date"),
       representative: t("member.representative", "Representative"),
       phone: t("member.phone", "Phone"),
+      region: t("member.region", "Region"),
       address: t("member.address", "Address"),
     };
     const requiredFields = Object.keys(requiredFieldsMap);
@@ -342,6 +345,7 @@ export const useCompanyInfo = () => {
         cooperationFields: JSON.stringify(companyData.cooperationFields),
         // New business info fields (Task 5)
         startupType: companyData.startupType,
+        startupStage: companyData.startupStage,
         ksicMajor: companyData.ksicMajor,
         ksicSub: companyData.ksicSub,
         category: companyData.category,

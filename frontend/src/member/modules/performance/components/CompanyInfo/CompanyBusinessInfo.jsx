@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { Card, Input, Select, Badge } from "@shared/components";
 import {
   STARTUP_TYPE_KEYS,
+  STARTUP_STAGE_KEYS,
   KSIC_MAJOR_CATEGORY_KEYS,
   getSubCategoryKeysByMajor,
   BUSINESS_FIELD_KEYS,
@@ -30,6 +31,10 @@ const CompanyBusinessInfo = ({
   // Options
   const startupTypeOptions = useMemo(
     () => translateOptions(STARTUP_TYPE_KEYS, t),
+    [t, i18n.language],
+  );
+  const startupStageOptions = useMemo(
+    () => translateOptions(STARTUP_STAGE_KEYS, t),
     [t, i18n.language],
   );
   const ksicMajorOptions = useMemo(
@@ -175,6 +180,20 @@ const CompanyBusinessInfo = ({
             value={data.mainIndustryKsicCodes}
             onChange={(e) => onChange("mainIndustryKsicCodes", e.target.value)}
             options={mainIndustryKsicCodeOptions}
+            disabled={!isEditing}
+          />
+        </div>
+
+        {/* Startup Stage */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Select
+            label={t(
+              "performance.companyInfo.fields.startupStage",
+              "创业阶段",
+            )}
+            value={data.startupStage}
+            onChange={(e) => onChange("startupStage", e.target.value)}
+            options={startupStageOptions}
             disabled={!isEditing}
           />
         </div>

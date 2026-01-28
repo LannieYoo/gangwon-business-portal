@@ -98,6 +98,49 @@
                 "approved": "승인됨",
                 "revisionRequested": "수정 필요",
                 "rejected": "거부됨"
+            },
+            "intellectualPropertyFields": {
+                "name": "지식재산권명",
+                "number": "지식재산권번호",
+                "type": "지식재산권 구분",
+                "registrationType": "지식재산권 등록 구분",
+                "country": "등록 국가",
+                "overseasType": "해외 신청 구분",
+                "registrationDate": "등록일",
+                "publicDisclosure": "공개 희망 여부",
+                "proofDocument": "증빙서류"
+            },
+            "ipType": {
+                "patent": "특허",
+                "utilityModel": "실용신안",
+                "design": "디자인",
+                "trademark": "상표",
+                "copyright": "저작권"
+            },
+            "ipRegistrationType": {
+                "application": "출원",
+                "registration": "등록",
+                "publication": "공개"
+            },
+            "country": {
+                "korea": "한국",
+                "usa": "미국",
+                "china": "중국",
+                "japan": "일본",
+                "eu": "유럽연합",
+                "other": "기타"
+            },
+            "overseasApplicationType": {
+                "pct": "PCT",
+                "paris": "파리조약",
+                "direct": "직접출원",
+                "none": "없음"
+            },
+            "quarter": {
+                "q1": "1분기",
+                "q2": "2분기",
+                "q3": "3분기",
+                "q4": "4분기"
             }
         }
     }

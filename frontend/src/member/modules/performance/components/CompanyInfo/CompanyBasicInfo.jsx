@@ -5,7 +5,7 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Input, Textarea, Select, Button } from "@shared/components";
 
@@ -18,6 +18,19 @@ const CompanyBasicInfo = ({
   errors,
 }) => {
   const { t } = useTranslation();
+
+  // 地区选项
+  const regionOptions = useMemo(() => {
+    const regions = [
+      'chuncheon', 'wonju', 'gangneung', 'donghae', 'taebaek', 'sokcho', 'samcheok',
+      'hongcheon', 'hoengseong', 'yeongwol', 'pyeongchang', 'jeongseon',
+      'cheorwon', 'hwacheon', 'yanggu', 'inje', 'goseong', 'yangyang', 'other'
+    ];
+    return regions.map(region => ({
+      value: t(`performance.companyInfo.profile.regions.${region}`),
+      label: t(`performance.companyInfo.profile.regions.${region}`)
+    }));
+  }, [t]);
 
   return (
     <Card className="shadow-sm p-0">
@@ -172,6 +185,18 @@ const CompanyBasicInfo = ({
           />
         </div>
         <div className="grid grid-cols-1 gap-6">
+          <Select
+            label={t('performance.companyInfo.fields.region', '소재지역')}
+            value={data.region}
+            onChange={(e) => onChange("region", e.target.value)}
+            disabled={!isEditing}
+            required
+            error={errors.region}
+            options={[
+              { value: '', label: t('performance.companyInfo.fields.selectRegion', '지역 선택') },
+              ...regionOptions
+            ]}
+          />
           <Input
             label={t('performance.companyInfo.fields.address', '주소')}
             value={data.address}

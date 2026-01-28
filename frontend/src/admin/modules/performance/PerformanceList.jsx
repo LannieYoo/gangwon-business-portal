@@ -202,7 +202,7 @@ export default function PerformanceList() {
     {
       key: 'quarter',
       label: t('admin.performance.table.quarter'),
-      render: (value) => value ? `Q${value}` : t('performance.annual', '연간')
+      render: (value) => value ? t(`performance.quarter.q${value}`, `${value}분기`) : t('performance.annual', '연간')
     },
     {
       key: 'status',
@@ -241,7 +241,7 @@ export default function PerformanceList() {
     {
       key: 'quarter',
       label: t('admin.performance.table.quarter'),
-      render: (value) => value ? `Q${value}` : t('performance.annual', '연간')
+      render: (value) => value ? t(`performance.quarter.q${value}`, `${value}분기`) : t('performance.annual', '연간')
     },
     {
       key: 'status',

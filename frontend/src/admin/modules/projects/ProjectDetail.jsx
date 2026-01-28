@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Badge, Loading, Table, Pagination, Modal } from '@shared/components';
+import { Card, Button, Badge, Loading, Table, Pagination, Modal, Alert } from '@shared/components';
 import { adminService, uploadService, apiService } from '@shared/services';
 import { formatDate } from '@shared/utils';
 import { API_PREFIX } from '@shared/utils/constants';
@@ -26,6 +26,11 @@ export default function ProjectDetail() {
   const [applicationsTotal, setApplicationsTotal] = useState(0);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectingApplicationId, setRejectingApplicationId] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [messageVariant, setMessageVariant] = useState('success');
 
 
   useEffect(() => {
@@ -119,17 +124,67 @@ export default function ProjectDetail() {
   };
 
   const handleStatusChange = async (applicationId, newStatus) => {
+    if (newStatus === 'rejected') {
+      setRejectingApplicationId(applicationId);
+      setRejectReason('');
+      setShowRejectModal(true);
+      return;
+    }
+    
     try {
-      await apiService.patch(
+      await apiService.put(
         `${API_PREFIX}/admin/applications/${applicationId}/status`,
-        { status: newStatus }
+        { 
+          status: newStatus,
+          reviewNotes: null 
+        }
       );
       loadApplications();
       setShowApplicationModal(false);
     } catch (error) {
       console.error('Failed to update application status:', error);
-      alert(t('admin.applications.updateStatusFailed', '상태 업데이트 실패'));
+      setMessageVariant('error');
+      setMessage(t('admin.applications.updateStatusFailed', '상태 업데이트 실패'));
+      setTimeout(() => setMessage(null), 3000);
     }
+  };
+
+  const handleConfirmReject = async () => {
+    if (!rejectReason.trim()) {
+      setMessageVariant('warning');
+      setMessage(t('admin.applications.rejectReasonRequired', '거부 사유를 입력하세요'));
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
+    
+    try {
+      await apiService.put(
+        `${API_PREFIX}/admin/applications/${rejectingApplicationId}/status`,
+        { 
+          status: 'rejected',
+          reviewNotes: rejectReason 
+        }
+      );
+      loadApplications();
+      setShowApplicationModal(false);
+      setShowRejectModal(false);
+      setRejectReason('');
+      setRejectingApplicationId(null);
+      setMessageVariant('success');
+      setMessage(t('admin.applications.rejectSuccess', '거부 성공'));
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error('Failed to reject application:', error);
+      setMessageVariant('error');
+      setMessage(t('admin.applications.updateStatusFailed', '상태 업데이트 실패'));
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
+  const handleCancelReject = () => {
+    setShowRejectModal(false);
+    setRejectReason('');
+    setRejectingApplicationId(null);
   };
 
   const handleViewApplication = (application) => {
@@ -276,7 +331,11 @@ export default function ProjectDetail() {
 
   return (
     <div className="w-full">
-
+      {message && (
+        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+          {message}
+        </Alert>
+      )}
       
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
@@ -686,6 +745,45 @@ export default function ProjectDetail() {
                 )}
               </div>
             )}
+          </div>
+        </Modal>
+      )}
+
+      {/* Reject Reason Modal */}
+      {showRejectModal && (
+        <Modal
+          isOpen={showRejectModal}
+          onClose={handleCancelReject}
+          title={t('admin.applications.rejectReasonTitle', '거부 사유 입력')}
+          size="md"
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('admin.applications.rejectReasonLabel', '거부 사유')}
+              </label>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder={t('admin.applications.rejectReasonPlaceholder', '거부 사유를 입력하세요...')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end space-x-3">
+              <Button
+                variant="outline"
+                onClick={handleCancelReject}
+              >
+                {t('common.cancel', '취소')}
+              </Button>
+              <Button
+                variant="danger"
+                onClick={handleConfirmReject}
+              >
+                {t('common.confirm', '확인')}
+              </Button>
+            </div>
           </div>
         </Modal>
       )}

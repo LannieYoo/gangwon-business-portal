@@ -36,7 +36,9 @@
     "mainIndustryKsicCodes": "主力产业 KSIC 详细代码",
     "selectMainIndustryKsicCodes": "请选择详细代码",
     "selectMainIndustryKsicMajorFirst": "请先选择主力产业",
-    "sales": "销售额",
+    "startupStage": "创业阶段",
+    "selectStartupStage": "请选择创业阶段",
+    "sales": "年销售额 (元)",
     "employeeCount": "员工人数",
     "websiteUrl": "网站地址",
     "mainBusiness": "主营业务",
@@ -155,9 +157,9 @@
       "other": "其他"
     },
     "startupStage": {
-      "preliminary": "预备",
-      "startup_under_3years": "创业3年以下",
-      "growth_over_7years": "跃升7年以上",
+      "preliminary": "预备创业",
+      "startup_under_3years": "3年以下",
+      "growth_over_7years": "飞跃7年以上",
       "restart": "再创业"
     },
     "passwordCheck": {

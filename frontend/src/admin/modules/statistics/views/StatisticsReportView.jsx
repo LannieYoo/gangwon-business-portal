@@ -1,7 +1,9 @@
 /*
  * StatisticsReportView - 统计报告主视图
  */
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Alert } from "@shared/components";
 import { useStatistics } from "../hooks/useStatistics";
 import { useStatisticsFilters } from "../hooks/useStatisticsFilters";
 import { FilterPanel } from "../components/Filter/FilterPanel";
@@ -12,6 +14,8 @@ import { ReportError } from "../components/Report/ReportError";
 
 export const StatisticsReportView = () => {
   const { t } = useTranslation();
+  const [message, setMessage] = useState(null);
+  const [messageVariant, setMessageVariant] = useState('success');
 
   // 1. 业务数据 Hooks
   const {
@@ -44,12 +48,19 @@ export const StatisticsReportView = () => {
   const handleExport = async () => {
     const success = await exportToExcel();
     if (success) {
-      alert(t("statistics.messages.exportSuccess"));
+      setMessageVariant('success');
+      setMessage(t("statistics.messages.exportSuccess"));
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
   return (
     <div className="w-full">
+      {message && (
+        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+          {message}
+        </Alert>
+      )}
       {/* 1. 页头：参照标准行政管理页头 */}
       <ReportHeader
         loading={loading}

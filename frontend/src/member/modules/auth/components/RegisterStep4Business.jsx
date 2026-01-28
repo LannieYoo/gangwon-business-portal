@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import {
   STARTUP_TYPE_KEYS,
+  STARTUP_STAGE_KEYS,
   KSIC_MAJOR_CATEGORY_KEYS,
   BUSINESS_FIELD_KEYS,
   MAIN_INDUSTRY_KSIC_MAJOR_KEYS,
@@ -43,6 +44,7 @@ export const RegisterStep4Business = ({
   }, [formData.mainIndustryKsicMajor, t, setFormData]);
 
   const startupTypeOptions = translateOptions(STARTUP_TYPE_KEYS, t);
+  const startupStageOptions = translateOptions(STARTUP_STAGE_KEYS, t);
   const ksicMajorOptions = translateOptions(KSIC_MAJOR_CATEGORY_KEYS, t);
   const businessFieldOptions = translateOptions(BUSINESS_FIELD_KEYS, t);
   const mainIndustryMajorOptions = translateOptions(
@@ -195,6 +197,28 @@ export const RegisterStep4Business = ({
             ))}
           </select>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t("auth.startupStage", "창업구분")} <span className="text-red-500">*</span>
+        </label>
+        <select
+          name="startupStage"
+          value={formData.startupStage || ""}
+          onChange={handleChange}
+          required
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+        >
+          <option value="">
+            {t("auth.selectStartupStage", "창업구분을 선택하세요")}
+          </option>
+          {startupStageOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

@@ -52,6 +52,7 @@ class MemberProfileResponse(BaseModel):
     cooperation_fields: Optional[str] = None  # JSON array as string
     # New business info fields (Task 5) - 창업구분, 한국표준산업분류코드
     startup_type: Optional[str] = None  # 창업구분: preliminary, startup_under_3years, growth_over_7years, restart
+    startup_stage: Optional[str] = None  # 창업구분 (예비창업, 3년 이하, 도약 7년 이상, 재창업)
     ksic_major: Optional[str] = None  # 한국표준산업분류코드[대분류]: A-U
     ksic_sub: Optional[str] = None  # 지역주력산업코드[중분류]: 2-digit code
     category: Optional[str] = None  # 기업 유형
@@ -98,6 +99,7 @@ class MemberProfileUpdate(BaseModel):
     cooperation_fields: Optional[str] = None  # JSON array as string
     # New business info fields (Task 5) - 창업구분, 한국표준산업분류코드
     startup_type: Optional[str] = Field(None, max_length=50)  # 창업구분
+    startup_stage: Optional[str] = Field(None, max_length=50)  # 창업구분 (예비창업, 3년 이하, 도약 7년 이상, 재창업)
     ksic_major: Optional[str] = Field(None, max_length=10)  # 한국표준산업분류코드[대분류]
     ksic_sub: Optional[str] = Field(None, max_length=10)  # 지역주력산업코드[중분류]
     category: Optional[str] = Field(None, max_length=50)  # 기업 유형

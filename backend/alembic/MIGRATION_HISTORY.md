@@ -17,6 +17,7 @@
 | 9 | `20260119124431` | `20260119124431_add_business_field.py` | 2026-01-19 12:44:31 | 添加业务字段 |
 | 10 | `20260119222343` | `20260119222343_add_main_industry_ksic_fields.py` | 2026-01-19 22:23:43 | 添加主要行业 KSIC 字段 |
 | 11 | `5a2e21fac597` | `5a2e21fac597_add_applicant_fields_to_project_.py` | 2026-01-27 19:52:15 | 添加申请人姓名和电话字段 |
+| 12 | `441a201965a6` | `441a201965a6_add_startup_stage_to_members.py` | 2026-01-27 21:50:00 | 添加创业阶段字段到会员表 |
 
 ## 命名规范
 
@@ -39,6 +40,7 @@ YYYYMMDDHHMMSS_description.py
 - `24b6df71a64d` - 添加浏览计数
 - `897911e63f9f` - 移除绩效附件
 - `5a2e21fac597` - 添加申请人字段
+- `441a201965a6` - 添加创业阶段字段
 
 **注意：不要重命名这些文件！** Alembic 在数据库的 `alembic_version` 表中记录了这些 revision ID。重命名文件会导致迁移链断裂。
 

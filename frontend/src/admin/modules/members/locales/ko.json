@@ -18,12 +18,15 @@
       "rejectSuccess": "거부 성공",
       "rejectFailed": "거부 실패",
       "rejectReason": "거부 사유를 입력하세요 (선택사항)",
+      "rejectReasonTitle": "거부 사유 입력",
+      "rejectReasonLabel": "거부 사유 (선택사항)",
+      "rejectReasonPlaceholder": "거부 사유를 입력하세요...",
       "resetPending": "취소",
       "search": {
         "companyName": "기업명",
         "representative": "대표자명",
-        "businessField": "업종",
-        "placeholder": "기업명, 대표자, 사업자등록번호, 주소, 업종 등 검색"
+        "businessField": "창업유형",
+        "placeholder": "기업명, 대표자, 사업자등록번호, 주소, 창업유형 등 검색"
       },
       "status": {
         "pending": "승인 대기",
@@ -35,7 +38,7 @@
         "representative": "대표자",
         "businessNumber": "사업자번호",
         "address": "주소",
-        "industry": "업종",
+        "industry": "창업유형",
         "createdAt": "가입일",
         "status": "상태",
         "actions": "작업",
@@ -49,7 +52,7 @@
         "representative": "대표자",
         "legalNumber": "법인번호",
         "address": "주소",
-        "industry": "업종",
+        "industry": "창업유형",
         "phone": "전화번호",
         "email": "이메일",
         "contactPersonName": "담당자명",
@@ -97,7 +100,10 @@
         "nicednbWarning": "알림:",
         "nicednbNoBusinessNumber": "사업자등록번호를 사용할 수 없습니다"
       },
-      "resetSuccess": "검토 대기로 재설정되었습니다"
+      "resetSuccess": "检토 대기로 재설정되었습니다"
     }
+  },
+  "member": {
+    "industry": "창업유형"
   }
 }

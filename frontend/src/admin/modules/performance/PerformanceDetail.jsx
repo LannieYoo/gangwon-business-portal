@@ -274,7 +274,7 @@ export default function PerformanceDetail() {
               {t('admin.performance.table.quarter', '분기')}
             </label>
             <span className="text-base text-gray-900">
-              {record.quarter ? `Q${record.quarter}` : t('performance.annual', '연간')}
+              {record.quarter ? t(`performance.quarter.q${record.quarter}`, `${record.quarter}분기`) : t('performance.annual', '연간')}
             </span>
           </div>
           <div className="flex flex-col gap-2">

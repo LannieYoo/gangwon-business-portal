@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Badge, Pagination, SearchInput, Alert } from '@shared/components';
+import { Table, Button, Badge, Pagination, SearchInput, Alert, Modal } from '@shared/components';
 import { adminService } from '@shared/services';
 import { formatDate, formatBusinessLicense } from '@shared/utils';
 
@@ -23,6 +23,9 @@ export default function MemberList() {
   const [totalCount, setTotalCount] = useState(0);
   const [message, setMessage] = useState(null);
   const [messageVariant, setMessageVariant] = useState('success');
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectingMemberId, setRejectingMemberId] = useState(null);
 
   // 使用 useCallback 包装 setFilteredMembers 避免无限循环
   const handleFilterChange = useCallback((filtered) => {
@@ -102,15 +105,34 @@ export default function MemberList() {
     loadAllMembers();
   }, [loadAllMembers, t]);
 
-  const handleReject = useCallback(async (memberId) => {
-    const reason = prompt(t('admin.members.rejectReason', '거부 사유를 입력하세요 (선택사항)') || '请输入拒绝原因（可选）');
-    if (reason === null) return; // 用户点击了取消
-    await adminService.rejectMember(memberId, reason || null);
-    setMessageVariant('success');
-    setMessage(t('admin.members.rejectSuccess', '거부 성공'));
-    setTimeout(() => setMessage(null), 3000);
-    loadAllMembers();
-  }, [loadAllMembers, t]);
+  const handleReject = useCallback((memberId) => {
+    setRejectingMemberId(memberId);
+    setRejectReason('');
+    setShowRejectModal(true);
+  }, []);
+
+  const handleConfirmReject = useCallback(async () => {
+    try {
+      await adminService.rejectMember(rejectingMemberId, rejectReason || null);
+      setShowRejectModal(false);
+      setRejectingMemberId(null);
+      setRejectReason('');
+      setMessageVariant('success');
+      setMessage(t('admin.members.rejectSuccess', '거부 성공'));
+      setTimeout(() => setMessage(null), 3000);
+      loadAllMembers();
+    } catch (error) {
+      console.error('Failed to reject member:', error);
+      setMessageVariant('error');
+      setMessage(t('admin.members.rejectFailed', '거부 실패'));
+    }
+  }, [rejectingMemberId, rejectReason, loadAllMembers, t]);
+
+  const handleCancelReject = useCallback(() => {
+    setShowRejectModal(false);
+    setRejectingMemberId(null);
+    setRejectReason('');
+  }, []);
 
   const handleResetToPending = useCallback(async (memberId) => {
     await adminService.resetMemberToPending(memberId);
@@ -368,6 +390,39 @@ export default function MemberList() {
           );
         })()}
       </div>
+
+      {/* Reject Reason Modal */}
+      {showRejectModal && (
+        <Modal
+          isOpen={showRejectModal}
+          onClose={handleCancelReject}
+          title={t('admin.members.rejectReasonTitle', '거부 사유 입력')}
+          size="md"
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('admin.members.rejectReasonLabel', '거부 사유 (선택사항)')}
+              </label>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder={t('admin.members.rejectReasonPlaceholder', '거부 사유를 입력하세요...')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end space-x-3">
+              <Button variant="outline" onClick={handleCancelReject}>
+                {t('common.cancel', '취소')}
+              </Button>
+              <Button variant="danger" onClick={handleConfirmReject}>
+                {t('common.confirm', '확인')}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

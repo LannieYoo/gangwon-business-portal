@@ -259,6 +259,7 @@
     "businessLicenseFile": "营业执照文件",
     "startupType": "创业类型",
     "selectStartupType": "选择创业类型",
+    "startupStage": "创业阶段",
     "ksicMajor": "韩国标准产业分类代码 [大类]",
     "selectKsicMajor": "选择大类",
     "ksicSub": "韩国标准产业分类代码 [中类]",

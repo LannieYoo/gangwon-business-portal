@@ -47,6 +47,35 @@ export const STARTUP_STAGE_KEYS = [
   { value: 'restart', labelKey: 'industryClassification.startupStage.restart' }
 ];
 
+// ==================== 地区选项 ====================
+
+/**
+ * 江原道地区选项 (Gangwon Province Regions)
+ * 
+ * 用于: 注册页面、会员信息、统计筛选
+ */
+export const REGION_KEYS = [
+  { value: 'chuncheon', labelKey: 'industryClassification.region.chuncheon' },
+  { value: 'wonju', labelKey: 'industryClassification.region.wonju' },
+  { value: 'gangneung', labelKey: 'industryClassification.region.gangneung' },
+  { value: 'donghae', labelKey: 'industryClassification.region.donghae' },
+  { value: 'taebaek', labelKey: 'industryClassification.region.taebaek' },
+  { value: 'sokcho', labelKey: 'industryClassification.region.sokcho' },
+  { value: 'samcheok', labelKey: 'industryClassification.region.samcheok' },
+  { value: 'hongcheon', labelKey: 'industryClassification.region.hongcheon' },
+  { value: 'hoengseong', labelKey: 'industryClassification.region.hoengseong' },
+  { value: 'yeongwol', labelKey: 'industryClassification.region.yeongwol' },
+  { value: 'pyeongchang', labelKey: 'industryClassification.region.pyeongchang' },
+  { value: 'jeongseon', labelKey: 'industryClassification.region.jeongseon' },
+  { value: 'cheorwon', labelKey: 'industryClassification.region.cheorwon' },
+  { value: 'hwacheon', labelKey: 'industryClassification.region.hwacheon' },
+  { value: 'yanggu', labelKey: 'industryClassification.region.yanggu' },
+  { value: 'inje', labelKey: 'industryClassification.region.inje' },
+  { value: 'goseong', labelKey: 'industryClassification.region.goseong' },
+  { value: 'yangyang', labelKey: 'industryClassification.region.yangyang' },
+  { value: 'other', labelKey: 'industryClassification.region.other' }
+];
+
 // ==================== 业务领域 ====================
 
 /**

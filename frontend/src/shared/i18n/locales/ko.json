@@ -259,6 +259,7 @@
     "businessLicenseFile": "사업자등록증 파일",
     "startupType": "창업 유형",
     "selectStartupType": "창업 유형 선택",
+    "startupStage": "창업구분",
     "ksicMajor": "한국표준산업분류코드 [대분류]",
     "selectKsicMajor": "대분류 선택",
     "ksicSub": "한국표준산업분류코드 [중분류]",

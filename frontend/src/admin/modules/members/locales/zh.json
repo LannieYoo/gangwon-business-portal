@@ -18,12 +18,15 @@
       "rejectSuccess": "拒绝成功",
       "rejectFailed": "拒绝失败",
       "rejectReason": "请输入拒绝原因（可选）",
+      "rejectReasonTitle": "输入拒绝原因",
+      "rejectReasonLabel": "拒绝原因（可选）",
+      "rejectReasonPlaceholder": "请输入拒绝原因...",
       "resetPending": "取消",
       "search": {
         "companyName": "企业名称",
         "representative": "代表人姓名",
-        "businessField": "业务领域",
-        "placeholder": "搜索企业名称、代表、营业执照号、地址、行业等"
+        "businessField": "创业类型",
+        "placeholder": "搜索企业名称、代表、营业执照号、地址、创业类型等"
       },
       "status": {
         "pending": "待审批",
@@ -35,7 +38,7 @@
         "representative": "代表人",
         "businessNumber": "营业执照号",
         "address": "地址",
-        "industry": "行业",
+        "industry": "创业类型",
         "createdAt": "注册时间",
         "status": "状态",
         "actions": "操作",
@@ -49,7 +52,7 @@
         "representative": "代表人",
         "legalNumber": "法人号码",
         "address": "地址",
-        "industry": "行业",
+        "industry": "创业类型",
         "phone": "电话",
         "email": "邮箱",
         "contactPersonName": "负责人姓名",
@@ -99,5 +102,8 @@
       },
       "resetSuccess": "已重置为待审核"
     }
+  },
+  "member": {
+    "industry": "创业类型"
   }
 }

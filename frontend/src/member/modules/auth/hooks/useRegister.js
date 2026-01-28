@@ -93,6 +93,7 @@ export const useRegister = () => {
     contactPersonDepartment: "",
     contactPersonPosition: "",
     startupType: "",
+    startupStage: "",
     ksicMajor: "",
     ksicSub: "",
     businessField: "",

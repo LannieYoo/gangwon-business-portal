@@ -6,7 +6,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, Button, Badge, Loading, Alert } from "@shared/components";
+import { Card, Button, Badge, Loading, Alert, Modal } from "@shared/components";
 import { adminService } from "@shared/services";
 import { useDateFormatter, useMessage } from "@shared/hooks";
 
@@ -33,6 +33,8 @@ export default function MemberDetail() {
   const [niceDnbData, setNiceDnbData] = useState(null);
   const [niceDnbLoading, setNiceDnbLoading] = useState(false);
   const [niceDnbError, setNiceDnbError] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
 
   useEffect(() => {
     loadMemberDetail();
@@ -56,17 +58,30 @@ export default function MemberDetail() {
     }
   };
 
-  const handleReject = async () => {
-    const reason = prompt(
-      t('admin.members.rejectReason', '거부 사유를 입력하세요 (선택사항)') ||
-        "请输入拒绝原因（可选）",
-    );
-    await adminService.rejectMember(id, reason || null);
-    showSuccess(t('admin.members.rejectSuccess', '거부 성공'));
-    const memberData = await adminService.getMemberDetail(id);
-    if (memberData) {
-      setMember(memberData);
+  const handleReject = () => {
+    setRejectReason('');
+    setShowRejectModal(true);
+  };
+
+  const handleConfirmReject = async () => {
+    try {
+      await adminService.rejectMember(id, rejectReason || null);
+      setShowRejectModal(false);
+      setRejectReason('');
+      showSuccess(t('admin.members.rejectSuccess', '거부 성공'));
+      const memberData = await adminService.getMemberDetail(id);
+      if (memberData) {
+        setMember(memberData);
+      }
+    } catch (error) {
+      console.error('Failed to reject member:', error);
+      showError(t('admin.members.rejectFailed', '거부 실패'));
     }
+  };
+
+  const handleCancelReject = () => {
+    setShowRejectModal(false);
+    setRejectReason('');
   };
 
   const handleSearchNiceDnb = async () => {
@@ -335,6 +350,32 @@ export default function MemberDetail() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
+              {t("member.startupType", "창업유형")}
+            </label>
+            <span className="text-base text-gray-900">
+              {member.startupType
+                ? t(
+                    `industryClassification.startupType.${member.startupType}`,
+                    member.startupType,
+                  )
+                : "-"}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">
+              {t("member.businessField", "사업분야")}
+            </label>
+            <span className="text-base text-gray-900">
+              {member.businessField
+                ? t(
+                    `industryClassification.businessField.${member.businessField}`,
+                    member.businessField,
+                  )
+                : "-"}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">
               {t("member.ksicMajor", "한국표준산업분류코드[대분류]")}
             </label>
             <span className="text-base text-gray-900">
@@ -348,7 +389,7 @@ export default function MemberDetail() {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t("member.ksicSub", "지역주력산업코드[중분류]")}
+              {t("member.ksicSub", "한국표준사업분류코드[중분류]")}
             </label>
             <span className="text-base text-gray-900">
               {member.ksicSub
@@ -387,46 +428,20 @@ export default function MemberDetail() {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t("member.category", "기업 유형")}
+              {t("member.startupStage", "창업구분")}
             </label>
             <span className="text-base text-gray-900">
-              {member.category
+              {member.startupStage
                 ? t(
-                    `performance.companyInfo.profile.categories.${member.category}`,
-                    member.category,
+                    `industryClassification.startupStage.${member.startupStage}`,
+                    member.startupStage,
                   )
                 : "-"}
             </span>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t("member.industry", "업종")}
-            </label>
-            <span className="text-base text-gray-900">
-              {member.industry
-                ? t(
-                    `industryClassification.startupType.${member.industry}`,
-                    member.industry,
-                  )
-                : "-"}
-            </span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">
-              {t("member.businessField", "사업분야")}
-            </label>
-            <span className="text-base text-gray-900">
-              {member.businessField
-                ? t(
-                    `industryClassification.businessField.${member.businessField}`,
-                    member.businessField,
-                  )
-                : "-"}
-            </span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">
-              {t("member.sales", "매출액")}
+              {t("member.sales", "연간 매출액")}
             </label>
             <span className="text-base text-gray-900">
               {member.revenue ? `${formatNumber(member.revenue)} ${t('common.currency.krw', '원')}` : "-"}
@@ -947,6 +962,39 @@ export default function MemberDetail() {
           </div>
         )}
       </Card>
+
+      {/* Reject Reason Modal */}
+      {showRejectModal && (
+        <Modal
+          isOpen={showRejectModal}
+          onClose={handleCancelReject}
+          title={t('admin.members.rejectReasonTitle', '거부 사유 입력')}
+          size="md"
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('admin.members.rejectReasonLabel', '거부 사유 (선택사항)')}
+              </label>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder={t('admin.members.rejectReasonPlaceholder', '거부 사유를 입력하세요...')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end space-x-3">
+              <Button variant="outline" onClick={handleCancelReject}>
+                {t('common.cancel', '취소')}
+              </Button>
+              <Button variant="danger" onClick={handleConfirmReject}>
+                {t('common.confirm', '확인')}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

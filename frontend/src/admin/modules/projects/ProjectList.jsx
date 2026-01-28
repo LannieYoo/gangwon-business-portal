@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card, Table, Button, Badge, Pagination, SearchInput, Alert } from '@shared/components';
+import { Card, Table, Button, Badge, Pagination, SearchInput, Alert, Modal } from '@shared/components';
 import { apiService, adminService } from '@shared/services';
 import { API_PREFIX } from '@shared/utils/constants';
 import { formatBusinessLicense } from '@shared/utils';
@@ -16,10 +16,12 @@ export default function ProjectList() {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const [allProjects, setAllProjects] = useState([]); // 存储所有数据
-  const [filteredProjects, setFilteredProjects] = useState([]); // 过滤后的数据
+  const [allProjects, setAllProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
   const [message, setMessage] = useState(null);
   const [messageVariant, setMessageVariant] = useState('success');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingProjectId, setDeletingProjectId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -130,12 +132,30 @@ export default function ProjectList() {
     navigate(`/admin/projects/${projectId}`);
   };
 
-  const handleDelete = async (projectId) => {
-    if (!confirm(t('admin.projects.confirmDelete', '이 지원사업을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.'))) {
-      return;
+  const handleDelete = (projectId) => {
+    setDeletingProjectId(projectId);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await apiService.delete(`${API_PREFIX}/admin/projects/${deletingProjectId}`);
+      setShowDeleteModal(false);
+      setDeletingProjectId(null);
+      loadAllProjects();
+      setMessage(t('admin.projects.deleteSuccess', '삭제되었습니다'));
+      setMessageVariant('success');
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error('Failed to delete project:', error);
+      setMessage(t('admin.projects.deleteFailed', '삭제 실패'));
+      setMessageVariant('error');
     }
-    await apiService.delete(`${API_PREFIX}/admin/projects/${projectId}`);
-    loadAllProjects();
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setDeletingProjectId(null);
   };
 
   const handleExport = async (format = 'excel') => {
@@ -331,6 +351,30 @@ export default function ProjectList() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <Modal
+          isOpen={showDeleteModal}
+          onClose={handleCancelDelete}
+          title={t('admin.projects.deleteConfirmTitle', '지원사업 삭제')}
+          size="sm"
+        >
+          <div className="space-y-4">
+            <p className="text-gray-600">
+              {t('admin.projects.confirmDelete', '이 지원사업을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.')}
+            </p>
+            <div className="flex justify-end space-x-3">
+              <Button variant="outline" onClick={handleCancelDelete}>
+                {t('common.cancel', '취소')}
+              </Button>
+              <Button variant="danger" onClick={handleConfirmDelete}>
+                {t('common.delete', '삭제')}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
