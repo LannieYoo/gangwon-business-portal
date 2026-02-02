@@ -1,0 +1,61 @@
+{
+  "name": "full-development",
+  "displayName": "Full Development",
+  "version": "1.0.0",
+  "category": "development",
+  "keywords": [
+    "full-stack",
+    "complete-project",
+    "end-to-end",
+    "lifecycle",
+    "requirements",
+    "architecture",
+    "implementation",
+    "deployment",
+    "project-setup",
+    "new-project",
+    "workflow",
+    "phase-management",
+    "quality-gates",
+    "documentation",
+    "prd",
+    "stories",
+    "epics"
+  ],
+  "tags": [
+    "project-management",
+    "software-development",
+    "agile",
+    "devops",
+    "quality-assurance"
+  ],
+  "dependencies": [
+    "dev-product_manager",
+    "dev-senior_architect",
+    "dev-senior_backend",
+    "dev-senior_frontend",
+    "dev-senior_data_engineer",
+    "dev-senior_qa",
+    "dev-code_reviewer",
+    "dev-senior_devops"
+  ],
+  "outputs": [
+    "docs/requirements.md",
+    "docs/prd.md",
+    "docs/architecture.md",
+    "docs/stories.md",
+    "docs/database.md",
+    "src/",
+    "tests/",
+    ".dev-state.yaml"
+  ],
+  "workflows": [
+    "1-analysis/create-product-brief",
+    "2-plan-workflows/create-prd",
+    "3-solutioning/create-architecture",
+    "3-solutioning/create-epics-and-stories",
+    "4-implementation/dev-story",
+    "4-implementation/code-review",
+    "testarch/automate"
+  ]
+}

@@ -20,7 +20,7 @@ export function useApplicationRecords() {
     cancelApplication,
   } = useMyApplications();
 
-  const [filteredApplications, setFilteredApplications] = useState([]);
+  const [filteredApplications, setFilteredApplications] = useState(allApplications);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);

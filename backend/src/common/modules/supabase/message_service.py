@@ -92,16 +92,59 @@ class MessageService(SupabaseService):
         return len(result.data) > 0
     
     async def get_unread_count(self, user_id: str, is_admin: bool = False) -> int:
-        """获取未读消息数量"""
-        query = self.client.table('messages').select('id', count='exact')
-        
+        """获取未读消息数量（线程内的消息 + 直接消息）"""
         if is_admin:
-            query = query.eq('sender_type', self.SENDER_MEMBER).eq('is_read', False)
+            # 管理员：统计线程内会员发送的未读消息 + 直接消息（系统通知）
+            total_count = 0
+            
+            # 1. 线程内会员发送的未读消息
+            thread_query = self.client.table('messages').select('id', count='exact')
+            thread_query = thread_query.not_.is_('thread_id', 'null')
+            thread_query = thread_query.eq('sender_type', self.SENDER_MEMBER)
+            thread_query = thread_query.eq('is_read', False)
+            thread_result = thread_query.execute()
+            total_count += thread_result.count or 0
+            
+            # 2. 直接消息（发送给管理员的系统通知）
+            direct_query = self.client.table('messages').select('id', count='exact')
+            direct_query = direct_query.eq('message_type', self.TYPE_DIRECT)
+            direct_query = direct_query.eq('recipient_id', user_id)
+            direct_query = direct_query.eq('is_read', False)
+            direct_result = direct_query.execute()
+            total_count += direct_result.count or 0
+            
+            return total_count
         else:
-            query = query.eq('recipient_id', user_id).eq('is_read', False)
-        
-        result = query.execute()
-        return result.count or 0
+            # 会员：统计线程内管理员回复 + 系统直接消息
+            # 需要先获取该会员的所有线程ID
+            threads_query = self.client.table('messages').select('id')
+            threads_query = threads_query.eq('message_type', self.TYPE_THREAD)
+            threads_query = threads_query.is_('thread_id', 'null')
+            threads_query = threads_query.eq('sender_id', user_id)
+            threads_result = threads_query.execute()
+            thread_ids = [t['id'] for t in (threads_result.data or [])]
+            
+            # 统计未读消息
+            total_count = 0
+            
+            # 1. 线程内管理员发送的未读消息
+            if thread_ids:
+                thread_query = self.client.table('messages').select('id', count='exact')
+                thread_query = thread_query.in_('thread_id', thread_ids)
+                thread_query = thread_query.eq('sender_type', self.SENDER_ADMIN)
+                thread_query = thread_query.eq('is_read', False)
+                thread_result = thread_query.execute()
+                total_count += thread_result.count or 0
+            
+            # 2. 直接消息（系统通知）
+            direct_query = self.client.table('messages').select('id', count='exact')
+            direct_query = direct_query.eq('message_type', self.TYPE_DIRECT)
+            direct_query = direct_query.eq('recipient_id', user_id)
+            direct_query = direct_query.eq('is_read', False)
+            direct_result = direct_query.execute()
+            total_count += direct_result.count or 0
+            
+            return total_count
     
     async def get_threads_paginated(
         self,
@@ -440,6 +483,7 @@ class MessageService(SupabaseService):
         category: Optional[str] = None,
         is_important: Optional[bool] = None,
         is_read: Optional[bool] = None,
+        message_type: Optional[str] = None,
         is_admin: bool = False
     ) -> Tuple[List[Dict[str, Any]], int, int]:
         """获取用户消息列表（分页）"""
@@ -451,6 +495,8 @@ class MessageService(SupabaseService):
         else:
             query = query.eq('recipient_id', user_id)
         
+        if message_type:
+            query = query.eq('message_type', message_type)
         if category:
             query = query.eq('category', category)
         if is_important is not None:
@@ -468,6 +514,8 @@ class MessageService(SupabaseService):
         else:
             unread_query = unread_query.eq('recipient_id', user_id).eq('is_read', False)
         
+        if message_type:
+            unread_query = unread_query.eq('message_type', message_type)
         if category:
             unread_query = unread_query.eq('category', category)
         if is_important is not None:
@@ -485,6 +533,8 @@ class MessageService(SupabaseService):
         else:
             messages_query = messages_query.eq('recipient_id', user_id)
         
+        if message_type:
+            messages_query = messages_query.eq('message_type', message_type)
         if category:
             messages_query = messages_query.eq('category', category)
         if is_important is not None:

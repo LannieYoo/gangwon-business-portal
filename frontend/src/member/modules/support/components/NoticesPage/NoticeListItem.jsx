@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { Card, Badge } from "@shared/components";
+import { Badge } from "@shared/components";
 
 export default function NoticeListItem({
   notice,
@@ -15,9 +15,8 @@ export default function NoticeListItem({
   const badgeInfo = getBadgeInfo(notice);
 
   return (
-    <Card
-      key={notice.id}
-      className="p-4 cursor-pointer hover:shadow-md transition-all duration-200 hover:border-blue-200"
+    <div
+      className="p-4 border border-gray-200 rounded-lg cursor-pointer hover:shadow-md transition-all duration-200 hover:border-blue-200 bg-white"
       onClick={() => handleNoticeClick(notice.id)}
     >
       <div className="flex items-start justify-between gap-4">
@@ -31,6 +30,6 @@ export default function NoticeListItem({
         </div>
         <div className="flex-shrink-0 text-sm text-gray-500">{notice.date}</div>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -5,60 +5,53 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { projectService } from "../services/project.service";
+import { useApiCache, clearCache } from "@shared/hooks/useApiCache";
 
 export function useMyApplications() {
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
   const fetchApplications = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = {
-        page: 1,
-        pageSize: 100,
-      };
-      const response = await projectService.getMyApplications(params);
-      if (response && response.items) {
-        setApplications(response.items);
-      } else {
-        setApplications([]);
-      }
-    } catch (err) {
-      console.error("Failed to load applications:", err);
-      setError("Failed to load applications");
-      setApplications([]);
-    } finally {
-      setLoading(false);
-    }
+    const params = {
+      page: 1,
+      pageSize: 100,
+    };
+    const response = await projectService.getMyApplications(params);
+    return response && response.items ? response.items : [];
   }, []);
 
-  useEffect(() => {
-    fetchApplications();
-  }, [fetchApplications]);
+  const { data: applications, loading, error, refresh } = useApiCache(
+    fetchApplications,
+    'my-applications',
+    {
+      cacheDuration: 1 * 60 * 1000, // 1分钟缓存
+      enabled: true
+    }
+  );
 
   const cancelApplication = useCallback(
     async (applicationId) => {
       try {
         await projectService.cancelApplication(applicationId);
-        await fetchApplications(); // Refresh list
+        // 清除缓存并刷新
+        clearCache('my-applications');
+        await refresh();
         return true;
       } catch (error) {
         console.error("Failed to cancel application:", error);
         return false;
       }
     },
-    [fetchApplications],
+    [refresh],
   );
 
+  // 使用 useMemo 确保返回稳定的数组引用
+  const stableApplications = useMemo(() => applications ?? [], [applications]);
+
   return {
-    applications,
+    applications: stableApplications,
     loading,
-    error,
-    refresh: fetchApplications,
+    error: error ? "Failed to load applications" : null,
+    refresh,
     cancelApplication,
   };
 }

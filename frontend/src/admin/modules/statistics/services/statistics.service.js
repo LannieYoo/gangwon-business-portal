@@ -96,6 +96,46 @@ class StatisticsService {
   }
 
   /**
+   * 导出企业统计数据为 CSV
+   *
+   * @param {Object} params - 查询参数 (与 queryCompanies 相同)
+   * @param {string} [filename] - 自定义文件名 (不含扩展名)
+   *
+   * @returns {Promise<void>}
+   *
+   * @example
+   * await statisticsService.exportToCsv({
+   *   year: 2024,
+   *   participatingPrograms: ['startup_university']
+   * }, '创业中心大学企业统计_2024');
+   */
+  async exportToCsv(params, filename = null) {
+    try {
+      // 清理空值参数
+      const cleanParams = buildQueryParams(params);
+
+      // 生成文件名
+      const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      const defaultFilename = `${EXPORT_CONFIG.FILE_PREFIX}_${timestamp}.csv`;
+      const downloadFilename = filename
+        ? `${filename}.csv`
+        : defaultFilename;
+
+      // 使用 apiService 的 download 方法
+      await apiService.download(
+        `${STATISTICS_API.EXPORT}/csv`,
+        cleanParams,
+        downloadFilename,
+      );
+
+      return { success: true, filename: downloadFilename };
+    } catch (error) {
+      console.error("[StatisticsService] exportToCsv error:", error);
+      throw error;
+    }
+  }
+
+  /**
    * 获取统计摘要信息
    * (可选功能，如需要总览统计)
    *

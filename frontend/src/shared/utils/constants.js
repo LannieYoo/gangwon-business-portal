@@ -52,7 +52,13 @@ export const PERFORMANCE_TYPES = {
 };
 
 // File Upload
-export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+export const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB in bytes
+export const MAX_FILE_SIZE_MB = 20; // 20MB for display
+export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+export const MAX_IMAGE_SIZE_MB = 5; // 5MB for display
+export const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024; // 20MB in bytes
+export const MAX_DOCUMENT_SIZE_MB = 20; // 20MB for display
+
 export const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",

@@ -1,13 +1,14 @@
 /**
  * Thread Detail Modal Component
  * 消息详情模态框 - 可复用组件（精简版）
+ * 
+ * 遵循 dev-frontend_patterns skill 规范 - 通过 props 接收服务方法
  */
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, FileUploadButton } from '@shared/components';
 import Button from '@shared/components/Button';
-import { messagesService } from '@shared/services';
 import { formatDateTime } from '@shared/utils';
 import { useUpload } from '@shared/hooks';
 
@@ -15,7 +16,8 @@ export default function ThreadDetailModal({
   threadId, 
   isOpen, 
   onClose, 
-  onMessageSent 
+  onMessageSent,
+  services // 通过 props 接收服务方法
 }) {
   const { t } = useTranslation();
   const [threadData, setThreadData] = useState(null);
@@ -35,11 +37,13 @@ export default function ThreadDetailModal({
   }, [isOpen, threadId]);
 
   const loadThreadDetail = async () => {
+    if (!services?.getThread) return;
+    
     setLoading(true);
     setReplyContent('');
     setReplyAttachments([]);
     try {
-      const response = await messagesService.getMemberThread(threadId);
+      const response = await services.getThread(threadId);
       
       if (response) {
         setThreadData(response);
@@ -83,7 +87,7 @@ export default function ThreadDetailModal({
   };
 
   const handleReply = async () => {
-    if (!threadId || !replyContent.trim()) return;
+    if (!threadId || !replyContent.trim() || !services?.createMessage) return;
 
     setSubmitting(true);
     try {
@@ -95,7 +99,7 @@ export default function ThreadDetailModal({
         mimeType: att.mimeType || att.type || 'application/octet-stream'
       }));
 
-      const newMessage = await messagesService.createMemberThreadMessage(threadId, {
+      const newMessage = await services.createMessage(threadId, {
         content: replyContent,
         isImportant: false,
         attachments

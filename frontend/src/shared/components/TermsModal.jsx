@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from './Modal';
 import { Loading } from './Loading';
 import { Alert } from './Alert';
-import { homeService } from '@shared/services';
+import { contentService } from '@shared/services';
 import { cn } from '@shared/utils/helpers';
 
 /**
@@ -75,7 +75,7 @@ export function TermsModal({ isOpen, termType, onClose }) {
     setError(null);
 
     try {
-      const response = await homeService.getLegalContent(type);
+      const response = await contentService.getLegalContent(type);
       if (response && response.contentHtml) {
         setContent(response.contentHtml);
       } else {

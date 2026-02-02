@@ -58,6 +58,8 @@ import adminPerformanceKo from "../../admin/modules/performance/locales/ko.json"
 import adminPerformanceZh from "../../admin/modules/performance/locales/zh.json";
 import adminProjectsKo from "../../admin/modules/projects/locales/ko.json";
 import adminProjectsZh from "../../admin/modules/projects/locales/zh.json";
+import adminStatisticsKo from "../../admin/modules/statistics/locales/ko.json";
+import adminStatisticsZh from "../../admin/modules/statistics/locales/zh.json";
 
 // Helper to safely merge locales (shallow deep merge for top-level objects)
 const safeMerge = (...locales) => {
@@ -97,7 +99,8 @@ const resources = {
       adminMembersKo,
       adminMessagesKo,
       adminPerformanceKo,
-      adminProjectsKo
+      adminProjectsKo,
+      adminStatisticsKo
     ),
   },
   zh: {
@@ -117,7 +120,8 @@ const resources = {
       adminMembersZh,
       adminMessagesZh,
       adminPerformanceZh,
-      adminProjectsZh
+      adminProjectsZh,
+      adminStatisticsZh
     ),
   },
 };

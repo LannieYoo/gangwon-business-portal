@@ -7,7 +7,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, Table, Button, Badge, Pagination, SearchInput, Alert, Modal } from '@shared/components';
-import { apiService, adminService } from '@shared/services';
+import { apiService } from '@shared/services';
+import projectsService from './services/projects.service';
 import { API_PREFIX } from '@shared/utils/constants';
 import { formatBusinessLicense } from '@shared/utils';
 
@@ -161,7 +162,7 @@ export default function ProjectList() {
   const handleExport = async (format = 'excel') => {
     setLoading(true);
     try {
-      await adminService.exportProjects({ format });
+      await projectsService.exportProjects({ format });
       setMessage(t('admin.projects.exportSuccess', '내보내기 성공'));
       setMessageVariant('success');
       setTimeout(() => setMessage(null), 3000);

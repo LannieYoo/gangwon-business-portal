@@ -38,6 +38,7 @@ class MessageResponse(BaseModel):
     recipient_name: Optional[str] = Field(None, description="Recipient company name")
     subject: str
     content: str
+    message_type: str = Field(default="direct", description="Message type: direct, thread, broadcast")
     is_read: bool
     is_important: bool
     read_at: Optional[datetime]

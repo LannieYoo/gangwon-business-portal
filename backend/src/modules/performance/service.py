@@ -156,6 +156,45 @@ class PerformanceService:
             "submitted_at": datetime.utcnow().isoformat(),
         }
         updated = await supabase_service.update_record('performance_records', str(performance_id), update_data)
+        
+        # Send notification to all admins about new performance submission
+        try:
+            from ...modules.messages.service import service as message_service
+            from ...modules.messages.schemas import MessageCreate
+            
+            # Get member info
+            member = await supabase_service.get_by_id('members', str(member_id))
+            company_name = member.get('company_name', '알 수 없음') if member else '알 수 없음'
+            
+            # Get all active admins
+            admins_result = supabase_service.client.table('admins').select('id').eq('is_active', 'true').execute()
+            admin_ids = [admin['id'] for admin in (admins_result.data or [])]
+            
+            # Send notification to each admin
+            for admin_id in admin_ids:
+                try:
+                    notification_data = {
+                        "type": "performance_submission",
+                        "company_name": company_name,
+                        "year": updated.get('year'),
+                        "quarter": updated.get('quarter'),
+                    }
+                    await message_service.create_direct_message(
+                        sender_id=member_id,
+                        recipient_id=UUID(admin_id),
+                        data=MessageCreate(
+                            subject=json.dumps(notification_data, ensure_ascii=False),
+                            content=json.dumps(notification_data, ensure_ascii=False),
+                            recipient_id=UUID(admin_id),
+                        ),
+                    )
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Failed to send admin notification: {e}")
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to notify admins about performance submission: {e}")
+        
         return updated
 
     async def list_all_performance_records(
@@ -207,26 +246,23 @@ class PerformanceService:
         quarter: Optional[int],
         comments: Optional[str],
     ) -> None:
-        """发送业绩审核结果通知"""
+        """发送业绩审核结果通知（发送结构化数据，前端处理国际化）"""
         from ..messages.service import service as message_service
         from ..messages.schemas import MessageCreate
+        import json
         
-        period = f"{year}년"
-        if quarter:
-            quarter_names = {1: "1분기", 2: "2분기", 3: "3분기", 4: "4분기"}
-            period += f" {quarter_names.get(quarter, f'{quarter}분기')}"
-        
-        status_labels = {
-            "approved": "승인",
-            "revision_requested": "보완 요청",
-            "rejected": "거부",
+        # 构建结构化数据，前端根据类型和状态自动翻译
+        notification_data = {
+            "type": "performance_review",
+            "status": status,
+            "year": year,
+            "quarter": quarter,
+            "comments": comments,
         }
-        status_label = status_labels.get(status, status)
         
-        subject = f"[실적 관리] {period} 실적이 {status_label}되었습니다"
-        content = f"{period} 실적 데이터가 {status_label}되었습니다."
-        if comments:
-            content += f"\n\n관리자 의견: {comments}"
+        # 发送 JSON 格式的数据，前端检测并解析
+        subject = json.dumps(notification_data, ensure_ascii=False)
+        content = json.dumps(notification_data, ensure_ascii=False)
         
         try:
             await message_service.create_direct_message(
@@ -258,7 +294,7 @@ class PerformanceService:
 
         update_data = {
             "status": "approved",
-            "reviewer_id": None,
+            "reviewer_id": str(reviewer_id) if reviewer_id else None,
             "review_status": "approved",
             "review_comments": comments,
             "reviewed_at": datetime.utcnow().isoformat(),
@@ -306,7 +342,7 @@ class PerformanceService:
 
         update_data = {
             "status": "revision_requested",
-            "reviewer_id": None,
+            "reviewer_id": str(reviewer_id) if reviewer_id else None,
             "review_status": "revision_requested",
             "review_comments": comments,
             "reviewed_at": datetime.utcnow().isoformat(),
@@ -356,7 +392,7 @@ class PerformanceService:
 
         update_data = {
             "status": "rejected",
-            "reviewer_id": None,
+            "reviewer_id": str(reviewer_id) if reviewer_id else None,
             "review_status": "rejected",
             "review_comments": comments,
             "reviewed_at": datetime.utcnow().isoformat(),
@@ -375,10 +411,51 @@ class PerformanceService:
 
         return updated_record
 
+    async def cancel_review_performance(
+        self,
+        performance_id: UUID,
+    ) -> dict:
+        """取消审核，重置为已提交状态（管理员）"""
+        record = await self.get_performance_by_id_admin(performance_id)
+
+        # 只有已审核的记录才能取消
+        if record["status"] not in ["approved", "rejected", "revision_requested"]:
+            raise ValidationError(
+                f"只有已审核的记录才能取消审核，当前状态: {record['status']}"
+            )
+
+        update_data = {
+            "status": "submitted",
+            "reviewer_id": None,
+            "review_status": None,
+            "review_comments": None,
+            "reviewed_at": None,
+        }
+        await supabase_service.update_record('performance_records', str(performance_id), update_data)
+
+        updated_record = await supabase_service.get_by_id('performance_records', str(performance_id))
+
+        await self._send_performance_notification(
+            member_id=record["member_id"],
+            status="submitted",
+            year=record.get("year"),
+            quarter=record.get("quarter"),
+            comments="审核已取消",
+        )
+
+        return updated_record
+
     async def export_performance_data(
         self, query: PerformanceListQuery
     ) -> list[dict]:
-        """导出业绩数据（管理员）"""
+        """
+        导出业绩数据（管理员）
+        
+        方案A（适度放宽）:
+        - Performance_records 表所有字段
+        - 关联标识: member_company_name, member_business_number
+        - 移除: 附件字段
+        """
         records = await supabase_service.export_performance_records(
             member_id=str(query.member_id) if query.member_id else None,
             year=query.year,
@@ -389,7 +466,11 @@ class PerformanceService:
 
         export_data = []
         for record in records:
+            # 获取会员信息用于标识
+            member = await supabase_service.get_by_id('members', str(record["member_id"]))
+            
             export_data.append({
+                # Performance_records 表字段
                 "id": str(record["id"]),
                 "member_id": str(record["member_id"]),
                 "year": record["year"],
@@ -400,6 +481,10 @@ class PerformanceService:
                 "submitted_at": record.get("submitted_at"),
                 "created_at": record.get("created_at"),
                 "updated_at": record.get("updated_at"),
+                
+                # 关联标识字段（让 member_id 有意义）
+                "member_company_name": member.get("company_name") if member else None,
+                "member_business_number": member.get("business_number") if member else None,
             })
 
         return export_data

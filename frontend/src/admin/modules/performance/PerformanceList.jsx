@@ -7,7 +7,9 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Table, Button, Badge, Modal, Textarea, Pagination, Alert, SearchInput } from '@shared/components';
-import { adminService, uploadService } from '@shared/services';
+import performanceService from './services/performance.service';
+import membersService from '../members/services/members.service';
+import { uploadService } from '@shared/services';
 import { formatBusinessLicense } from '@shared/utils';
 import { useDateFormatter, useMessage } from '@shared/hooks';
 
@@ -48,15 +50,18 @@ export default function PerformanceList() {
         page: 1,
         pageSize: 1000
       };
-      const response = await adminService.listPerformanceRecords(params);
+      const response = await performanceService.listPerformanceRecords(params);
       if (response && response.items) {
         setAllRecords(response.items);
+        setFilteredRecords(response.items); // 同时更新过滤后的记录
       } else {
         setAllRecords([]);
+        setFilteredRecords([]);
       }
     } catch (error) {
       console.error('Failed to load performance records:', error);
       setAllRecords([]);
+      setFilteredRecords([]);
     } finally {
       setLoading(false);
     }
@@ -106,12 +111,17 @@ export default function PerformanceList() {
   }, [filteredRecords]);
 
   const handleApprove = async () => {
-    await adminService.approvePerformance(selectedRecord.id, approveComment || null);
-    showSuccess(t('admin.performance.approveSuccess', '승인 성공'));
-    setShowApproveModal(false);
-    setApproveComment('');
-    setSelectedRecord(null);
-    loadAllPerformanceRecords();
+    try {
+      await performanceService.approvePerformance(selectedRecord.id, approveComment || null);
+      showSuccess(t('admin.performance.approveSuccess', '승인 성공'));
+      setShowApproveModal(false);
+      setApproveComment('');
+      setSelectedRecord(null);
+      await loadAllPerformanceRecords();
+    } catch (error) {
+      console.error('Approve error:', error);
+      showError(t('admin.performance.approveFailed', '승인 실패'));
+    }
   };
 
   const handleRequestRevision = async () => {
@@ -120,12 +130,17 @@ export default function PerformanceList() {
       return;
     }
 
-    await adminService.requestPerformanceRevision(selectedRecord.id, reviewComment);
-    showSuccess(t('admin.performance.revisionSuccess', '수정 요청이 전송되었습니다'));
-    setShowReviewModal(false);
-    setReviewComment('');
-    setSelectedRecord(null);
-    loadAllPerformanceRecords();
+    try {
+      await performanceService.requestPerformanceRevision(selectedRecord.id, reviewComment);
+      showSuccess(t('admin.performance.revisionSuccess', '수정 요청이 전송되었습니다'));
+      setShowReviewModal(false);
+      setReviewComment('');
+      setSelectedRecord(null);
+      await loadAllPerformanceRecords();
+    } catch (error) {
+      console.error('Request revision error:', error);
+      showError(t('admin.performance.revisionFailed', '수정 요청 실패'));
+    }
   };
 
   const handleReject = async () => {
@@ -134,12 +149,28 @@ export default function PerformanceList() {
       return;
     }
 
-    await adminService.rejectPerformance(selectedRecord.id, rejectComment);
-    showSuccess(t('admin.performance.rejectSuccess', '거부 성공'));
-    setShowRejectModal(false);
-    setRejectComment('');
-    setSelectedRecord(null);
-    loadAllPerformanceRecords();
+    try {
+      await performanceService.rejectPerformance(selectedRecord.id, rejectComment);
+      showSuccess(t('admin.performance.rejectSuccess', '거부 성공'));
+      setShowRejectModal(false);
+      setRejectComment('');
+      setSelectedRecord(null);
+      await loadAllPerformanceRecords();
+    } catch (error) {
+      console.error('Reject error:', error);
+      showError(t('admin.performance.rejectFailed', '거부 실패'));
+    }
+  };
+
+  const handleCancelReview = async (record) => {
+    try {
+      await performanceService.cancelReviewPerformance(record.id);
+      showSuccess(t('admin.performance.cancelReviewSuccess', '취소 성공'));
+      await loadAllPerformanceRecords();
+    } catch (error) {
+      console.error('Cancel review error:', error);
+      showError(t('admin.performance.cancelReviewFailed', '취소 실패'));
+    }
   };
 
   const handleViewDetail = (recordId) => {
@@ -169,7 +200,7 @@ export default function PerformanceList() {
         format,
         memberId: memberId || undefined
       };
-      await adminService.exportPerformance(params);
+      await performanceService.exportPerformance(params);
       showSuccess(t('admin.performance.exportSuccess', '내보내기 성공'));
     } catch (error) {
       showError(t('admin.performance.exportFailed', '내보내기 실패'));
@@ -278,8 +309,8 @@ export default function PerformanceList() {
           >
             {t('common.view')}
           </button>
-          {/* 显示操作按钮：只有 submitted 或 pending 状态的记录可以操作 */}
-          {(row.status === 'submitted' || row.status === 'pending') && (
+          {/* 显示操作按钮：只有 submitted 状态的记录可以审核 */}
+          {row.status === 'submitted' && (
             <>
               <span className="text-gray-300">|</span>
               <button
@@ -316,6 +347,22 @@ export default function PerformanceList() {
                 title={t('admin.performance.approve', '승인')}
               >
                 {t('admin.performance.approve')}
+              </button>
+            </>
+          )}
+          {/* 显示取消审核按钮：已审核的记录可以取消 */}
+          {(row.status === 'approved' || row.status === 'rejected' || row.status === 'revision_requested') && (
+            <>
+              <span className="text-gray-300">|</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCancelReview(row);
+                }}
+                className="text-orange-600 hover:text-orange-900 font-medium text-sm"
+                title={t('admin.performance.cancelReview', '취소')}
+              >
+                {t('admin.performance.cancelReview', '취소')}
               </button>
             </>
           )}

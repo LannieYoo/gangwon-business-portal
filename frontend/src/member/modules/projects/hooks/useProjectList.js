@@ -22,7 +22,7 @@ export function useProjectList() {
   const { getStatusInfo } = useProjectStatus();
 
   // Local state for filtering and modal
-  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState(allProjects);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 

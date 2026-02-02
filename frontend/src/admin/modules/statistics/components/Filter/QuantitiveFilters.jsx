@@ -1,98 +1,160 @@
 /*
  * QuantitiveFilters - 量化指标筛选组件 (年销售额 / 员工人数)
- * 支持范围筛选 (Min ~ Max) 以实现“大于、小于、区间”逻辑
+ * 支持预设区间选择 + 自定义区间输入
  */
-import { Input } from "@shared/components";
+import { Input, Select } from "@shared/components";
 import { useTranslation } from "react-i18next";
+import { REVENUE_RANGE_OPTIONS, EMPLOYEE_RANGE_OPTIONS } from "../../enum";
 
 export const QuantitiveFilters = ({
+  revenueRange,
   minRevenue,
   maxRevenue,
+  employeeRange,
   minEmployees,
   maxEmployees,
   onChange,
 }) => {
   const { t } = useTranslation();
 
+  // 处理年营收区间变化
+  const handleRevenueRangeChange = (value) => {
+    const option = REVENUE_RANGE_OPTIONS.find((opt) => opt.value === value);
+
+    if (!option) return;
+
+    onChange("revenueRange", value);
+
+    if (value === "all") {
+      onChange("minRevenue", null);
+      onChange("maxRevenue", null);
+    } else if (value === "custom") {
+      // 保持当前的 min/max 值
+    } else {
+      onChange("minRevenue", option.min);
+      onChange("maxRevenue", option.max);
+    }
+  };
+
+  // 处理员工人数区间变化
+  const handleEmployeeRangeChange = (value) => {
+    const option = EMPLOYEE_RANGE_OPTIONS.find((opt) => opt.value === value);
+
+    if (!option) return;
+
+    onChange("employeeRange", value);
+
+    if (value === "all") {
+      onChange("minEmployees", null);
+      onChange("maxEmployees", null);
+    } else if (value === "custom") {
+      // 保持当前的 min/max 值
+    } else {
+      onChange("minEmployees", option.min);
+      onChange("maxEmployees", option.max);
+    }
+  };
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-x-10 gap-y-4">
-      {/* 销售额区间 */}
-      <div className="flex items-center gap-2">
-        <span className="text-[13px] text-gray-500 font-medium min-w-[60px]">
-          {t("statistics.filters.quantitive.revenue") || t("member.sales")}
-        </span>
-        <div className="flex items-center gap-1.5">
-          <Input
-            type="number"
-            placeholder="Min"
-            value={minRevenue || ""}
-            containerClassName="mb-0"
-            className="w-24 h-9"
-            onChange={(e) =>
-              onChange(
-                "minRevenue",
-                e.target.value ? parseInt(e.target.value) : null,
-              )
-            }
-          />
-          <span className="text-gray-400">~</span>
-          <Input
-            type="number"
-            placeholder="Max"
-            value={maxRevenue || ""}
-            containerClassName="mb-0"
-            className="w-24 h-9"
-            onChange={(e) =>
-              onChange(
-                "maxRevenue",
-                e.target.value ? parseInt(e.target.value) : null,
-              )
-            }
-          />
-          <span className="text-xs text-gray-400 ml-1">
-            {t("statistics.filters.investment.amountUnit", "만원")}
-          </span>
-        </div>
+    <div className="space-y-4">
+      {/* 年营收区间 */}
+      <div>
+        <Select
+          label={t("statistics.filters.quantitive.revenue")}
+          value={revenueRange || "all"}
+          options={REVENUE_RANGE_OPTIONS.map((opt) => ({
+            value: opt.value,
+            label: t(opt.labelKey),
+          }))}
+          onChange={(e) => handleRevenueRangeChange(e.target.value)}
+          containerClassName="mb-0"
+          className="w-56 h-9"
+        />
+
+        {revenueRange === "custom" && (
+          <div className="flex items-center gap-2 mt-2 ml-4">
+            <Input
+              type="number"
+              placeholder={t("statistics.filters.investment.minAmount", "最小值")}
+              value={minRevenue || ""}
+              onChange={(e) =>
+                onChange(
+                  "minRevenue",
+                  e.target.value ? parseInt(e.target.value) : null
+                )
+              }
+              containerClassName="mb-0"
+              className="w-32 h-9"
+            />
+            <span className="text-gray-400">~</span>
+            <Input
+              type="number"
+              placeholder={t("statistics.filters.investment.maxAmount", "最大值")}
+              value={maxRevenue || ""}
+              onChange={(e) =>
+                onChange(
+                  "maxRevenue",
+                  e.target.value ? parseInt(e.target.value) : null
+                )
+              }
+              containerClassName="mb-0"
+              className="w-32 h-9"
+            />
+            <span className="text-xs text-gray-400">
+              {t("common.currency.krw", "₩")}
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* 员工数区间 */}
-      <div className="flex items-center gap-2">
-        <span className="text-[13px] text-gray-500 font-medium min-w-[60px]">
-          {t("statistics.filters.quantitive.employees") ||
-            t("member.employeeCount")}
-        </span>
-        <div className="flex items-center gap-1.5">
-          <Input
-            type="number"
-            placeholder="Min"
-            value={minEmployees || ""}
-            containerClassName="mb-0"
-            className="w-20 h-9"
-            onChange={(e) =>
-              onChange(
-                "minEmployees",
-                e.target.value ? parseInt(e.target.value) : null,
-              )
-            }
-          />
-          <span className="text-gray-400">~</span>
-          <Input
-            type="number"
-            placeholder="Max"
-            value={maxEmployees || ""}
-            containerClassName="mb-0"
-            className="w-20 h-9"
-            onChange={(e) =>
-              onChange(
-                "maxEmployees",
-                e.target.value ? parseInt(e.target.value) : null,
-              )
-            }
-          />
-          <span className="text-xs text-gray-400 ml-1">
-            {t("common.people", "명")}
-          </span>
-        </div>
+      {/* 员工人数区间 */}
+      <div>
+        <Select
+          label={t("statistics.filters.quantitive.employees")}
+          value={employeeRange || "all"}
+          options={EMPLOYEE_RANGE_OPTIONS.map((opt) => ({
+            value: opt.value,
+            label: t(opt.labelKey),
+          }))}
+          onChange={(e) => handleEmployeeRangeChange(e.target.value)}
+          containerClassName="mb-0"
+          className="w-56 h-9"
+        />
+
+        {employeeRange === "custom" && (
+          <div className="flex items-center gap-2 mt-2 ml-4">
+            <Input
+              type="number"
+              placeholder={t("statistics.filters.patent.minCount", "最小值")}
+              value={minEmployees || ""}
+              onChange={(e) =>
+                onChange(
+                  "minEmployees",
+                  e.target.value ? parseInt(e.target.value) : null
+                )
+              }
+              containerClassName="mb-0"
+              className="w-32 h-9"
+            />
+            <span className="text-gray-400">~</span>
+            <Input
+              type="number"
+              placeholder={t("statistics.filters.patent.maxCount", "最大值")}
+              value={maxEmployees || ""}
+              onChange={(e) =>
+                onChange(
+                  "maxEmployees",
+                  e.target.value ? parseInt(e.target.value) : null
+                )
+              }
+              containerClassName="mb-0"
+              className="w-32 h-9"
+            />
+            <span className="text-xs text-gray-400">
+              {t("common.people", "명")}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

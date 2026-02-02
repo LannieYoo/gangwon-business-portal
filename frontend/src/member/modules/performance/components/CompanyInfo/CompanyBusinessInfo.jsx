@@ -16,6 +16,8 @@ import {
   BUSINESS_FIELD_KEYS,
   MAIN_INDUSTRY_KSIC_MAJOR_KEYS,
   getMainIndustryKsicCodesByMajor,
+  GANGWON_FUTURE_INDUSTRIES,
+  FUTURE_TECHNOLOGIES,
   translateOptions,
 } from "../../enum";
 
@@ -62,57 +64,60 @@ const CompanyBusinessInfo = ({
     [t, i18n.language],
   );
 
+  const gangwonIndustryOptions = useMemo(
+    () => translateOptions(GANGWON_FUTURE_INDUSTRIES, t),
+    [t, i18n.language],
+  );
+
+  const futureTechOptions = useMemo(
+    () => translateOptions(FUTURE_TECHNOLOGIES, t),
+    [t, i18n.language],
+  );
+
   const cooperationFieldOptions = [
     {
-      value: "field1",
+      value: "tech",
       label: t(
-        "performance.companyInfo.profile.cooperationFields.field1",
-        "技术合作",
+        "performance.companyInfo.profile.cooperationFields.tech",
+        "기술협력",
       ),
     },
     {
-      value: "field2",
+      value: "market",
       label: t(
-        "performance.companyInfo.profile.cooperationFields.field2",
-        "市场拓展",
+        "performance.companyInfo.profile.cooperationFields.market",
+        "시장확대",
       ),
     },
     {
-      value: "field3",
+      value: "talent",
       label: t(
-        "performance.companyInfo.profile.cooperationFields.field3",
-        "人才培养",
+        "performance.companyInfo.profile.cooperationFields.talent",
+        "인재양성",
       ),
     },
   ];
 
   const participationProgramOptions = [
     {
-      value: "startup_center_university",
+      value: "startup_university",
       label: t(
         "performance.companyInfo.profile.participationPrograms.startupCenterUniversity",
         "창업중심대학",
       ),
     },
     {
-      value: "global_business",
+      value: "global_glocal",
       label: t(
         "performance.companyInfo.profile.participationPrograms.globalBusiness",
-        "全球事业",
+        "글로벌·글로컬 사업",
       ),
     },
     {
-      value: "rise_business",
+      value: "rise",
       label: t(
         "performance.companyInfo.profile.participationPrograms.riseBusiness",
-        "RISE 事业",
-      ),
-    },
-    {
-      value: "none",
-      label: t(
-        "performance.companyInfo.profile.participationPrograms.none",
-        "无",
+        "RISE 사업단",
       ),
     },
   ];
@@ -180,6 +185,26 @@ const CompanyBusinessInfo = ({
             value={data.mainIndustryKsicCodes}
             onChange={(e) => onChange("mainIndustryKsicCodes", e.target.value)}
             options={mainIndustryKsicCodeOptions}
+            disabled={!isEditing}
+          />
+          <Select
+            label={t(
+              "performance.companyInfo.fields.gangwonIndustry",
+              "강원도 7대 미래산업",
+            )}
+            value={data.gangwonIndustry}
+            onChange={(e) => onChange("gangwonIndustry", e.target.value)}
+            options={gangwonIndustryOptions}
+            disabled={!isEditing}
+          />
+          <Select
+            label={t(
+              "performance.companyInfo.fields.futureTech",
+              "미래유망 신기술",
+            )}
+            value={data.futureTech}
+            onChange={(e) => onChange("futureTech", e.target.value)}
+            options={futureTechOptions}
             disabled={!isEditing}
           />
         </div>

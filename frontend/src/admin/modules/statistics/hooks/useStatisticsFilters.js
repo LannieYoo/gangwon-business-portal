@@ -209,32 +209,316 @@ export const useStatisticsFilters = (initialFilters = {}) => {
   }, [getActiveFiltersCount]);
 
   /**
-   * 获取筛选条件摘要 (用于显示)
+   * 获取筛选条件摘要 (用于显示) - 每个筛选条件一个胶囊
+   * 返回格式: [{ label: string, filterKey: string, value: any }]
+   * 注意：此函数需要在组件中使用 t 函数调用，因为 hook 中无法直接使用 useTranslation
    */
-  const getFiltersSummary = useCallback(() => {
-    const summary = [];
+  const getFiltersSummary = useCallback(
+    (t) => {
+      const summary = [];
 
-    if (filters.year) {
-      let timeSummary = `${filters.year}년`;
-      if (filters.quarter) timeSummary += ` Q${filters.quarter}`;
-      if (filters.month) timeSummary += ` ${filters.month}월`;
-      summary.push(timeSummary);
-    }
+      // 时间范围
+      if (filters.year) {
+        let timeSummary = `${t("statistics.filters.time.title")}: ${filters.year}년`;
+        if (filters.quarter) timeSummary += ` Q${filters.quarter}`;
+        if (filters.month) timeSummary += ` ${filters.month}월`;
+        summary.push({
+          label: timeSummary,
+          filterKey: "year",
+          value: filters.year,
+        });
+      }
 
-    if (filters.policyTags?.length > 0) {
-      summary.push(`정책 태그: ${filters.policyTags.length}개`);
-    }
+      // 标准产业（大分类）- 显示名称而不是代码
+      if (filters.majorIndustryCodes?.length > 0) {
+        filters.majorIndustryCodes.forEach((code) => {
+          const labelKey = `industryClassification.ksicMajor.${code}`;
+          const name = t(labelKey, code);
+          summary.push({
+            label: `${t("statistics.filters.industry.major")}: ${name}`,
+            filterKey: "majorIndustryCodes",
+            value: code,
+          });
+        });
+      }
 
-    if (filters.hasInvestment) {
-      summary.push("투자 유치 기업");
-    }
+      // 标准产业（中分类）- 显示名称而不是代码
+      if (filters.subIndustryCodes?.length > 0) {
+        filters.subIndustryCodes.forEach((code) => {
+          const labelKey = `industryClassification.ksicSub.${code}`;
+          const name = t(labelKey, code);
+          summary.push({
+            label: `${t("statistics.filters.industry.medium")}: ${name}`,
+            filterKey: "subIndustryCodes",
+            value: code,
+          });
+        });
+      }
 
-    if (filters.minPatents !== null) {
-      summary.push(`특허 ${filters.minPatents}개 이상`);
-    }
+      // 江原主导产业（大分类）- 显示名称而不是代码
+      if (filters.gangwonIndustryCodes?.length > 0) {
+        filters.gangwonIndustryCodes.forEach((code) => {
+          const labelKey = `industryClassification.mainIndustryKsic.${code}`;
+          const name = t(labelKey, code);
+          summary.push({
+            label: `${t("member.mainIndustryKsicMajor")}: ${name}`,
+            filterKey: "gangwonIndustryCodes",
+            value: code,
+          });
+        });
+      }
 
-    return summary;
-  }, [filters]);
+      // 江原主导产业（中分类）- 显示名称而不是代码
+      if (filters.gangwonIndustrySubCodes?.length > 0) {
+        filters.gangwonIndustrySubCodes.forEach((code) => {
+          const labelKey = `industryClassification.mainIndustryKsicCodes.${code}`;
+          const name = t(labelKey, code);
+          summary.push({
+            label: `${t("member.mainIndustryKsicCodes")}: ${name}`,
+            filterKey: "gangwonIndustrySubCodes",
+            value: code,
+          });
+        });
+      }
+
+      // 江原道7大未来产业 - 单选，只显示一个胶囊
+      if (filters.gangwonFutureIndustries?.length > 0) {
+        const industry = filters.gangwonFutureIndustries[0];
+        const labelKey = `industryClassification.gangwonIndustry.${industry}`;
+        const name = t(labelKey, industry);
+        summary.push({
+          label: `${t("statistics.filters.industry.gangwonFuture", "江原道7大未来产业")}: ${name}`,
+          filterKey: "gangwonFutureIndustries",
+          value: industry,
+        });
+      }
+
+      // 未来有望新技术 - 单选，只显示一个胶囊
+      if (filters.futureTechnologies?.length > 0) {
+        const tech = filters.futureTechnologies[0];
+        const labelKey = `industryClassification.futureTech.${tech}`;
+        const name = t(labelKey, tech);
+        summary.push({
+          label: `${t("statistics.filters.industry.futureTech", "未来有望新技术")}: ${name}`,
+          filterKey: "futureTechnologies",
+          value: tech,
+        });
+      }
+
+      // 创业阶段 - 每个阶段一个胶囊，显示名称
+      if (filters.startupStages?.length > 0) {
+        filters.startupStages.forEach((stage) => {
+          const labelKey = `statistics.filters.stage.${stage === "pre_startup" ? "preStartup" : stage === "re_startup" ? "reStartup" : stage}`;
+          const name = t(labelKey, stage);
+          summary.push({
+            label: `${t("statistics.filters.stage.title")}: ${name}`,
+            filterKey: "startupStages",
+            value: stage,
+          });
+        });
+      }
+
+      // 从业年限
+      if (filters.minWorkYears !== null || filters.maxWorkYears !== null) {
+        let label = "";
+        if (filters.minWorkYears && filters.maxWorkYears) {
+          label = `${t("statistics.filters.workYears.title")}: ${filters.minWorkYears}-${filters.maxWorkYears}년`;
+        } else if (filters.minWorkYears) {
+          label = `${t("statistics.filters.workYears.title")}: ${filters.minWorkYears}년 이상`;
+        } else if (filters.maxWorkYears) {
+          label = `${t("statistics.filters.workYears.title")}: ${filters.maxWorkYears}년 이하`;
+        }
+        summary.push({
+          label,
+          filterKey: "workYears",
+          value: null,
+        });
+      }
+
+      // 所在地区 - 显示名称
+      if (filters.region) {
+        const labelKey = `statistics.filters.location.${filters.region}`;
+        const name = t(labelKey, filters.region);
+        summary.push({
+          label: `${t("statistics.filters.location.title")}: ${name}`,
+          filterKey: "region",
+          value: filters.region,
+        });
+      }
+
+      // 政策标签 - 每个标签一个胶囊，显示名称
+      if (filters.policyTags?.length > 0) {
+        filters.policyTags.forEach((tag) => {
+          const labelKey = `statistics.filters.programs.${
+            tag === "startup_university" ? "startupUniversity" : 
+            tag === "global_glocal" ? "globalGlocal" : 
+            "rise"
+          }`;
+          const name = t(labelKey, tag);
+          summary.push({
+            label: `${t("statistics.filters.programs.title")}: ${name}`,
+            filterKey: "policyTags",
+            value: tag,
+          });
+        });
+      }
+
+      // 投资情况
+      if (filters.hasInvestment !== null) {
+        const status = filters.hasInvestment
+          ? t("statistics.filters.investment.yes")
+          : t("statistics.filters.investment.no");
+        summary.push({
+          label: `${t("statistics.filters.investment.title")}: ${status}`,
+          filterKey: "hasInvestment",
+          value: filters.hasInvestment,
+        });
+      }
+
+      // 投资金额范围
+      if (filters.minInvestment !== null || filters.maxInvestment !== null) {
+        let label = "";
+        if (filters.minInvestment && filters.maxInvestment) {
+          label = `${t("statistics.filters.investment.title")}: ${filters.minInvestment}-${filters.maxInvestment}만원`;
+        } else if (filters.minInvestment) {
+          label = `${t("statistics.filters.investment.title")}: ${filters.minInvestment}만원 이상`;
+        } else if (filters.maxInvestment) {
+          label = `${t("statistics.filters.investment.title")}: ${filters.maxInvestment}만원 이하`;
+        }
+        summary.push({
+          label,
+          filterKey: "investmentAmount",
+          value: null,
+        });
+      }
+
+      // 年营收 - 显示名称
+      if (filters.revenueRange && filters.revenueRange !== "all") {
+        // 转换枚举值到翻译键：under_100m -> under100m, 100m_500m -> 100m500m
+        const translationKey = filters.revenueRange.replace(/_/g, "");
+        const labelKey = `statistics.filters.quantitive.revenueRange.${translationKey}`;
+        const name = t(labelKey, filters.revenueRange);
+        summary.push({
+          label: `${t("statistics.filters.quantitive.revenue")}: ${name}`,
+          filterKey: "revenueRange",
+          value: filters.revenueRange,
+        });
+      }
+
+      // 员工人数 - 显示名称
+      if (filters.employeeRange && filters.employeeRange !== "all") {
+        // 转换枚举值到翻译键：under_5 -> under5, 5_10 -> 5to10
+        let translationKey = filters.employeeRange;
+        if (translationKey.includes("_")) {
+          // under_5 -> under5
+          if (translationKey.startsWith("under_")) {
+            translationKey = translationKey.replace("_", "");
+          }
+          // over_300 -> over300
+          else if (translationKey.startsWith("over_")) {
+            translationKey = translationKey.replace("_", "");
+          }
+          // 5_10 -> 5to10, 10_30 -> 10to30, etc.
+          else {
+            translationKey = translationKey.replace("_", "to");
+          }
+        }
+        const labelKey = `statistics.filters.quantitive.employeeRange.${translationKey}`;
+        const name = t(labelKey, filters.employeeRange);
+        summary.push({
+          label: `${t("statistics.filters.quantitive.employees")}: ${name}`,
+          filterKey: "employeeRange",
+          value: filters.employeeRange,
+        });
+      }
+
+      // 专利
+      if (filters.minPatents !== null || filters.maxPatents !== null) {
+        let label = "";
+        if (filters.minPatents && filters.maxPatents) {
+          label = `${t("statistics.filters.patent.title")}: ${filters.minPatents}-${filters.maxPatents}개`;
+        } else if (filters.minPatents) {
+          label = `${t("statistics.filters.patent.title")}: ${filters.minPatents}개 이상`;
+        } else if (filters.maxPatents) {
+          label = `${t("statistics.filters.patent.title")}: ${filters.maxPatents}개 이하`;
+        }
+        summary.push({
+          label,
+          filterKey: "patents",
+          value: null,
+        });
+      }
+
+      // 性别 - 显示名称
+      if (filters.gender) {
+        const genderName = t(
+          `statistics.filters.representative.${filters.gender === "male" ? "male" : "female"}`,
+        );
+        summary.push({
+          label: `${t("statistics.filters.representative.gender")}: ${genderName}`,
+          filterKey: "gender",
+          value: filters.gender,
+        });
+      }
+
+      // 年龄 - 只显示一个胶囊
+      if (filters.ageRange && filters.ageRange !== "all") {
+        // 如果选择了预设年龄段，显示年龄段名称
+        // 转换枚举值到翻译键：under_20 -> under20, 20_29 -> 20to29
+        let translationKey = filters.ageRange;
+        if (translationKey.includes("_")) {
+          // under_20 -> under20
+          if (translationKey.startsWith("under_")) {
+            translationKey = translationKey.replace("_", "");
+          }
+          // over_60 -> over60
+          else if (translationKey.startsWith("over_")) {
+            translationKey = translationKey.replace("_", "");
+          }
+          // 20_29 -> 20to29, 30_39 -> 30to39, etc.
+          else {
+            translationKey = translationKey.replace("_", "to");
+          }
+        }
+        const labelKey = `statistics.filters.representative.ageRange.${translationKey}`;
+        const name = t(labelKey, filters.ageRange);
+        summary.push({
+          label: `${t("statistics.filters.representative.ageRangeLabel")}: ${name}`,
+          filterKey: "ageRange",
+          value: filters.ageRange,
+        });
+      } else if (!filters.ageRange || filters.ageRange === "all") {
+        // 只有在没有选择预设年龄段时，才检查自定义年龄范围
+        if (filters.minAge !== null || filters.maxAge !== null) {
+          let label = "";
+          if (filters.minAge && filters.maxAge) {
+            label = `${t("statistics.filters.representative.ageRangeLabel")}: ${filters.minAge}-${filters.maxAge}세`;
+          } else if (filters.minAge) {
+            label = `${t("statistics.filters.representative.ageRangeLabel")}: ${filters.minAge}세 이상`;
+          } else if (filters.maxAge) {
+            label = `${t("statistics.filters.representative.ageRangeLabel")}: ${filters.maxAge}세 이하`;
+          }
+          summary.push({
+            label,
+            filterKey: "age",
+            value: null,
+          });
+        }
+      }
+
+      // 关键词搜索
+      if (filters.searchQuery) {
+        summary.push({
+          label: `${t("statistics.filters.keyword.title")}: "${filters.searchQuery}"`,
+          filterKey: "searchQuery",
+          value: filters.searchQuery,
+        });
+      }
+
+      return summary;
+    },
+    [filters],
+  );
 
   return {
     // 筛选条件

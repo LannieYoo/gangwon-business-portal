@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Badge, Loading, Alert, Modal } from "@shared/components";
-import { adminService } from "@shared/services";
+import membersService from "./services/members.service";
 import { useDateFormatter, useMessage } from "@shared/hooks";
 
 export default function MemberDetail() {
@@ -42,7 +42,7 @@ export default function MemberDetail() {
 
   const loadMemberDetail = async () => {
     setLoading(true);
-    const memberData = await adminService.getMemberDetail(id);
+    const memberData = await membersService.getMemberDetail(id);
     if (memberData) {
       setMember(memberData);
     }
@@ -50,9 +50,9 @@ export default function MemberDetail() {
   };
 
   const handleApprove = async () => {
-    await adminService.approveMember(id);
+    await membersService.approveMember(id);
     showSuccess(t('admin.members.approveSuccess', '승인 성공'));
-    const memberData = await adminService.getMemberDetail(id);
+    const memberData = await membersService.getMemberDetail(id);
     if (memberData) {
       setMember(memberData);
     }
@@ -65,11 +65,11 @@ export default function MemberDetail() {
 
   const handleConfirmReject = async () => {
     try {
-      await adminService.rejectMember(id, rejectReason || null);
+      await membersService.rejectMember(id, rejectReason || null);
       setShowRejectModal(false);
       setRejectReason('');
       showSuccess(t('admin.members.rejectSuccess', '거부 성공'));
-      const memberData = await adminService.getMemberDetail(id);
+      const memberData = await membersService.getMemberDetail(id);
       if (memberData) {
         setMember(memberData);
       }
@@ -93,7 +93,7 @@ export default function MemberDetail() {
     setNiceDnbLoading(true);
     setNiceDnbError(null);
 
-    const data = await adminService.searchNiceDnb(member.businessNumber);
+    const data = await membersService.searchNiceDnb(member.businessNumber);
     setNiceDnbData(data);
     setNiceDnbLoading(false);
   };
@@ -422,6 +422,32 @@ export default function MemberDetail() {
                 ? t(
                     `industryClassification.mainIndustryKsicCodes.${member.mainIndustryKsicCodes}`,
                     member.mainIndustryKsicCodes,
+                  )
+                : "-"}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">
+              {t("member.gangwonIndustry", "강원도 7대 미래산업")}
+            </label>
+            <span className="text-base text-gray-900">
+              {member.gangwonIndustry
+                ? t(
+                    `industryClassification.gangwonIndustry.${member.gangwonIndustry}`,
+                    member.gangwonIndustry,
+                  )
+                : "-"}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">
+              {t("member.futureTech", "미래유망 신기술")}
+            </label>
+            <span className="text-base text-gray-900">
+              {member.futureTech
+                ? t(
+                    `industryClassification.futureTech.${member.futureTech}`,
+                    member.futureTech,
                   )
                 : "-"}
             </span>

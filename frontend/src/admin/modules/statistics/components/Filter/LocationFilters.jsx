@@ -5,7 +5,7 @@ import { Select } from "@shared/components";
 import { useTranslation } from "react-i18next";
 import { LOCATION_OPTIONS } from "../../enum";
 
-export const LocationFilters = ({ location, onChange }) => {
+export const LocationFilters = ({ region, onChange }) => {
   const { t } = useTranslation();
 
   const options = LOCATION_OPTIONS.map((o) => ({
@@ -15,12 +15,12 @@ export const LocationFilters = ({ location, onChange }) => {
 
   return (
     <Select
-      value={location || ""}
+      value={region || ""}
       options={options}
       placeholder={t("statistics.filters.location.selectLocation")}
       containerClassName="mb-0"
       className="w-full sm:w-80 h-9"
-      onChange={(e) => onChange("location", e.target.value || null)}
+      onChange={(e) => onChange("region", e.target.value || null)}
     />
   );
 };

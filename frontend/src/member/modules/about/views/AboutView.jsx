@@ -8,15 +8,19 @@
 import { Banner } from "@shared/components";
 import { PageContainer } from "@member/layouts";
 import { BANNER_TYPES } from "@shared/utils/constants";
+import { useBanners } from "@shared/hooks/useBanners";
 import { useSystemInfo } from "../hooks/useSystemInfo";
 import { SystemInfoDisplay } from "../components";
 
 const AboutView = () => {
+  const { banners, loading: bannersLoading } = useBanners(BANNER_TYPES.ABOUT);
   const { htmlContent, loading, error } = useSystemInfo();
 
   return (
     <div className="about-view w-full flex flex-col">
       <Banner
+        banners={banners}
+        loading={bannersLoading}
         bannerType={BANNER_TYPES.ABOUT}
         sectionClassName="mb-16"
         height="400px"

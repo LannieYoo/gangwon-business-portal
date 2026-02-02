@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Button, Input, Select, Textarea, Loading, Alert, FileAttachments } from '@shared/components';
-import { adminService } from '@shared/services';
+import projectsService from './services/projects.service';
 import { useUpload } from '@shared/hooks';
 
 // Helper to format date for form (YYYY-MM-DD)
@@ -49,7 +49,7 @@ export default function ProjectForm() {
   const loadProject = async () => {
     if (!id) return;
     setLoading(true);
-    const data = await adminService.getProject(id);
+    const data = await projectsService.getProject(id);
     if (data) {
       setFormData({
         title: data.title || '',
@@ -102,10 +102,10 @@ export default function ProjectForm() {
 
       let successMessage;
       if (isEditMode) {
-        await adminService.updateProject(id, payload);
+        await projectsService.updateProject(id, payload);
         successMessage = t('admin.projects.form.updateSuccess', '지원사업이 성공적으로 업데이트되었습니다');
       } else {
-        await adminService.createProject(payload);
+        await projectsService.createProject(payload);
         successMessage = t('admin.projects.form.createSuccess', '지원사업이 성공적으로 생성되었습니다');
       }
 

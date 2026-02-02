@@ -12,6 +12,7 @@ import { LoginModal } from "@shared/components";
 import { MenuIcon, XIcon, NotificationBell } from "@shared/components";
 import { useTranslation } from "react-i18next";
 import { LAYOUT_CONFIG } from "./enum";
+import { supportService } from "@member/modules/support/services/support.service";
 
 // Hooks
 import { useHeader } from "./hooks/useHeader";
@@ -93,7 +94,18 @@ function Header() {
         </div>
 
         {isAuthenticated && (
-          <NotificationBell userType="member" variant="light" />
+          <NotificationBell 
+            userType="member" 
+            variant="light"
+            services={{
+              getUnreadCount: supportService.getMemberUnreadCount,
+              getThreads: supportService.getMemberThreads,
+              getMessages: supportService.getMemberMessages,
+              markAsRead: supportService.markMessageAsRead,
+              getThread: supportService.getMemberThread,
+              createMessage: supportService.createMemberThreadMessage,
+            }}
+          />
         )}
 
         {isAuthenticated ? (

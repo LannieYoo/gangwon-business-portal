@@ -39,6 +39,7 @@ export const StandardIndustryFilters = ({
         onChange={(e) => {
           const val = e.target.value;
           // 切换大类时，同时重置中类
+          // 如果选择了值，发送数组；如果是空字符串（全部），发送空数组
           onChange("majorIndustryCodes", val ? [val] : []);
           onChange("subIndustryCodes", []);
         }}
@@ -52,6 +53,7 @@ export const StandardIndustryFilters = ({
         className="w-48 h-9"
         onChange={(e) => {
           const val = e.target.value;
+          // 如果选择了值，发送数组；如果是空字符串（全部），发送空数组
           onChange("subIndustryCodes", val ? [val] : []);
         }}
       />

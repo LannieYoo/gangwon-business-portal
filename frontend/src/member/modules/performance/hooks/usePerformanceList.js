@@ -5,16 +5,15 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { performanceService } from "../services/performance.service";
+import { useApiCache, clearCache } from "@shared/hooks/useApiCache";
 
 export const usePerformanceList = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [performances, setPerformances] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [messageVariant, setMessageVariant] = useState("success");
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
@@ -31,41 +30,42 @@ export const usePerformanceList = () => {
     totalPages: 0,
   });
 
-  const loadPerformances = useCallback(
-    async (page = 1) => {
-      setLoading(true);
-      try {
-        const params = {
-          page,
-          pageSize: pagination.pageSize,
-        };
-        if (filters.year) params.year = filters.year;
-        if (filters.quarter) params.quarter = filters.quarter;
-        if (filters.status) params.status = filters.status;
+  const fetchPerformances = useCallback(async () => {
+    const params = {
+      page: pagination.page,
+      pageSize: pagination.pageSize,
+    };
+    if (filters.year) params.year = filters.year;
+    if (filters.quarter) params.quarter = filters.quarter;
+    if (filters.status) params.status = filters.status;
 
-        const response = await performanceService.listRecords(params);
-        setPerformances(response.items || []);
-        setPagination((prev) => ({
-          ...prev,
-          page: response.page || page,
-          total: response.total || 0,
-          totalPages: response.totalPages || 0,
-        }));
-      } catch (error) {
-        console.error("Load performances error:", error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [filters, pagination.pageSize],
+    const response = await performanceService.listRecords(params);
+    
+    setPagination((prev) => ({
+      ...prev,
+      page: response.page || pagination.page,
+      total: response.total || 0,
+      totalPages: response.totalPages || 0,
+    }));
+    
+    return response.items || [];
+  }, [filters, pagination.page, pagination.pageSize]);
+
+  const { data: performances, loading, error, refresh: loadPerformances } = useApiCache(
+    fetchPerformances,
+    `performance-list-${pagination.page}-${filters.year}-${filters.quarter}-${filters.status}`,
+    {
+      cacheDuration: 1 * 60 * 1000, // 1分钟缓存
+      enabled: true,
+      deps: [pagination.page, filters]
+    }
   );
 
-  useEffect(() => {
-    loadPerformances(1);
-  }, [filters]);
+  // 使用 useMemo 确保返回稳定的数组引用
+  const stablePerformances = useMemo(() => performances ?? [], [performances]);
 
   const handlePageChange = (newPage) => {
-    loadPerformances(newPage);
+    setPagination(prev => ({ ...prev, page: newPage }));
   };
 
   const confirmDelete = async () => {
@@ -74,7 +74,9 @@ export const usePerformanceList = () => {
       setMessageVariant("success");
       setMessage(t("message.deleteSuccess", "删除成功"));
       setDeleteConfirm({ open: false, id: null });
-      loadPerformances(pagination.page);
+      // 清除缓存并刷新
+      clearCache(`performance-list-${pagination.page}-${filters.year}-${filters.quarter}-${filters.status}`);
+      loadPerformances();
     } catch (error) {
       console.error("Delete performance error:", error);
       setMessageVariant("error");
@@ -100,7 +102,7 @@ export const usePerformanceList = () => {
   };
 
   return {
-    performances,
+    performances: stablePerformances,
     loading,
     message,
     setMessage,

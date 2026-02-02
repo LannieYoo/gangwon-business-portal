@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 
 import { Card, Select, Loading, MemberGrowthChart, MixedChart, Button } from '@shared/components';
 import { BuildingIcon, CurrencyDollarIcon, UsersIcon, DocumentIcon } from '@shared/components/Icons';
-import { apiService, adminService } from '@shared/services';
+import { apiService } from '@shared/services';
+import dashboardService from './services/dashboard.service';
 import { API_PREFIX } from '@shared/utils/constants';
 import { formatCurrencyCompact } from '@shared/utils';
 import { useDateFormatter } from '@shared/hooks';
@@ -108,7 +109,7 @@ export default function CompanyStatus() {
     };
     
     // 使用 adminService.exportDashboard，装饰器会自动处理日志记录
-    await adminService.exportDashboard(params);
+    await dashboardService.exportDashboard(params);
     setLoading(false);
   };
 

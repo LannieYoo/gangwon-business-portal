@@ -4,52 +4,40 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import { useState, useEffect } from "react";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { portalService } from "@shared/services";
+import { aboutService } from "../services/about.service";
+import { useApiCache } from "@shared/hooks/useApiCache";
 
 /**
  * 获取系统介绍信息的 Hook
  */
 export function useSystemInfo() {
   const { t, i18n } = useTranslation();
-  const [htmlContent, setHtmlContent] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchAboutContent = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await portalService.getSystemInfo();
+  const fetchSystemInfo = useCallback(async () => {
+    const data = await aboutService.getSystemInfo();
+    if (data && data.contentHtml) {
+      return data.contentHtml;
+    }
+    return "";
+  }, []);
 
-        if (isMounted) {
-          if (data && data.contentHtml) {
-            setHtmlContent(data.contentHtml);
-          } else {
-            setHtmlContent("");
-          }
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error("Failed to fetch system info:", err);
-          setError(t("about.fetchError", "Failed to fetch content"));
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
+  const { data: htmlContent, loading, error: apiError } = useApiCache(
+    fetchSystemInfo,
+    `system-info-${i18n.language}`,
+    {
+      cacheDuration: 10 * 60 * 1000, // 10分钟缓存（系统信息很少更新）
+      enabled: true,
+      deps: [i18n.language]
+    }
+  );
 
-    fetchAboutContent();
+  const error = apiError ? t("about.fetchError", "Failed to fetch content") : null;
 
-    return () => {
-      isMounted = false;
-    };
-  }, [i18n.language, t]);
-
-  return { htmlContent, loading, error };
+  return { 
+    htmlContent: htmlContent || "", 
+    loading, 
+    error 
+  };
 }

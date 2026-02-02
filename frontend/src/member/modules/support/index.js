@@ -10,3 +10,4 @@ export { default as NoticeDetailView } from "./views/NoticeDetailView";
 export { default as FAQView } from "./views/FAQView";
 export { default as InquiryView } from "./views/InquiryView";
 export { default as InquiryHistoryView } from "./views/InquiryHistoryView";
+export { default as NotificationHistoryView } from "./views/NotificationHistoryView";

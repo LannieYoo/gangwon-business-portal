@@ -1,0 +1,30 @@
+{
+  "domain_code": "rl",
+  "category_code": "ai_learning",
+  "keywords": [
+    "reinforcement learning",
+    "rl",
+    "q-learning",
+    "q learning",
+    "bellman",
+    "bellman equation",
+    "mdp",
+    "markov decision process",
+    "policy gradient",
+    "actor-critic",
+    "temporal difference",
+    "td learning",
+    "sarsa",
+    "dqn",
+    "deep q network",
+    "reward",
+    "agent",
+    "environment",
+    "强化学习",
+    "Q学习",
+    "贝尔曼方程",
+    "马尔可夫决策过程",
+    "策略梯度",
+    "时序差分"
+  ]
+}

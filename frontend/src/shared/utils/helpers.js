@@ -987,8 +987,8 @@ const getEnvArray = (key, fallback) => {
 };
 
 export const MAX_IMAGE_SIZE = getEnvNumber('VITE_MAX_IMAGE_SIZE', 5 * 1024 * 1024);
-export const MAX_DOCUMENT_SIZE = getEnvNumber('VITE_MAX_DOCUMENT_SIZE', 10 * 1024 * 1024);
-export const MAX_FILE_SIZE = 10 * 1024 * 1024;
+export const MAX_DOCUMENT_SIZE = getEnvNumber('VITE_MAX_DOCUMENT_SIZE', 20 * 1024 * 1024);
+export const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
 const ALLOWED_IMAGE_EXTENSIONS = getEnvArray('VITE_ALLOWED_IMAGE_EXTENSIONS', ['jpg', 'jpeg', 'png', 'gif', 'webp']);
 const ALLOWED_DOCUMENT_EXTENSIONS = getEnvArray('VITE_ALLOWED_DOCUMENT_EXTENSIONS', ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'hwp']);

@@ -12,7 +12,7 @@ import {
   Modal,
   Alert
 } from '@shared/components';
-import { contentService, homeService } from '@shared/services';
+import { contentService } from '@shared/services';
 
 const CONTENT_TYPES = {
   TERMS_OF_SERVICE: 'terms_of_service',
@@ -42,7 +42,7 @@ export default function LegalContentManagement() {
   const fetchLegalContent = async (contentType) => {
     setLoading(true);
     try {
-      const response = await homeService.getLegalContent(contentType);
+      const response = await contentService.getLegalContent(contentType);
       if (response && response.contentHtml) {
         setFormData(prev => ({
           ...prev,

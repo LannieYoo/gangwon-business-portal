@@ -49,6 +49,7 @@ async def get_messages(
     page_size: Annotated[int, Query(ge=1, le=1000)] = 20,
     is_read: Optional[bool] = Query(None, description="Filter by read status"),
     is_important: Optional[bool] = Query(None, description="Filter by important status"),
+    message_type: Optional[str] = Query(None, description="Filter by message type (direct, thread, broadcast)"),
     current_user = Depends(get_current_admin_user),
 ):
     """
@@ -58,6 +59,7 @@ async def get_messages(
     - **page_size**: Items per page (default: 20, max: 100)
     - **is_read**: Filter by read status (optional)
     - **is_important**: Filter by important status (optional)
+    - **message_type**: Filter by message type (optional)
     """
     messages, total, unread_count = await service.get_messages(
         current_user["id"],
@@ -65,6 +67,7 @@ async def get_messages(
         page_size=page_size,
         is_read=is_read,
         is_important=is_important,
+        message_type=message_type,
         is_admin=True,
     )
     
@@ -209,7 +212,7 @@ async def delete_message(
     current_user = Depends(get_current_admin_user),
 ):
     """Delete a message (admin only)."""
-    await service.delete_message(message_id, current_user["id"])
+    await service.delete_message(message_id, current_user["id"], is_admin=True)
 
 
 # Member Endpoints
@@ -225,15 +228,17 @@ async def get_member_messages(
     page_size: Annotated[int, Query(ge=1, le=1000)] = 20,
     is_read: Optional[bool] = Query(None, description="Filter by read status"),
     is_important: Optional[bool] = Query(None, description="Filter by important status"),
+    message_type: Optional[str] = Query(None, description="Filter by message type (direct, thread, broadcast)"),
     current_user: Member = Depends(get_current_member_user),
 ):
     """
     Get paginated list of messages for member.
     
     - **page**: Page number (default: 1)
-    - **page_size**: Items per page (default: 20, max: 100)
+    - **page_size**: Items per page (default: 20, max: 1000)
     - **is_read**: Filter by read status (optional)
     - **is_important**: Filter by important status (optional)
+    - **message_type**: Filter by message type (optional)
     """
     messages, total, unread_count = await service.get_messages(
         current_user.id,
@@ -241,6 +246,7 @@ async def get_member_messages(
         page_size=page_size,
         is_read=is_read,
         is_important=is_important,
+        message_type=message_type,
     )
     
     return MessageListResponse(

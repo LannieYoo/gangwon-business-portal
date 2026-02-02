@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Card, Button, Badge, Alert, Pagination, Modal, ModalFooter, FileUploadButton } from '@shared/components';
-import { messagesService } from '@shared/services';
+import { messagesService } from './services/messages.service';
 import { formatDateTime } from '@shared/utils';
 import { useUpload } from '@shared/hooks';
 

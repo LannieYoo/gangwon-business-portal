@@ -103,6 +103,10 @@ class Member(Base):
     main_industry_ksic_major = Column(String(50))  # 주력산업 KSIC 코드[대분류]: natural_bio, ceramic, digital_health
     main_industry_ksic_codes = Column(Text)  # 주력산업 KSIC 코드[세부코드]: JSON array of KSIC codes
     
+    # Page 10 requirements - 강원도 산업 분류
+    gangwon_industry = Column(String(50))  # 강원도 7대 미래산업: semiconductor, bio_health, future_energy, etc.
+    future_tech = Column(String(50))  # 미래유망 신기술: it, bt, nt, st, et, ct, knu_tenant
+    
     # New fields for Task 6 - 참여 프로그램, 투자 유치
     participation_programs = Column(Text)  # 참여 프로그램 (JSON array as text)
     investment_status = Column(Text)  # 투자 유치 (JSON object as text)

@@ -74,6 +74,8 @@ export const useCompanyInfo = () => {
     ksicSub: "",
     mainIndustryKsicMajor: "",
     mainIndustryKsicCodes: "",
+    gangwonIndustry: "",
+    futureTech: "",
     participationPrograms: [],
     investmentStatus: { hasInvestment: false, amount: "", institution: "" },
   });
@@ -97,6 +99,12 @@ export const useCompanyInfo = () => {
       const response = await performanceService.getCompanyProfile();
       // 兼容直接返回资料或嵌套在 member 对象中的格式
       const profile = response?.member || response;
+
+      console.log('[useCompanyInfo] API Response:', {
+        gangwonIndustry: profile.gangwonIndustry,
+        futureTech: profile.futureTech,
+        allKeys: Object.keys(profile).filter(k => k.includes('gangwon') || k.includes('future') || k.includes('Gangwon') || k.includes('Future'))
+      });
 
       setCompanyData({
         companyName: profile.companyName || "",
@@ -137,6 +145,8 @@ export const useCompanyInfo = () => {
         ksicSub: profile.ksicSub || "",
         mainIndustryKsicMajor: profile.mainIndustryKsicMajor || "",
         mainIndustryKsicCodes: profile.mainIndustryKsicCodes || "",
+        gangwonIndustry: profile.gangwonIndustry || "",
+        futureTech: profile.futureTech || "",
         participationPrograms: Array.isArray(profile.participationPrograms)
           ? profile.participationPrograms
           : safeJsonParse(profile.participationPrograms, []),
@@ -358,6 +368,9 @@ export const useCompanyInfo = () => {
           companyData.participationPrograms,
         ),
         investmentStatus: JSON.stringify(companyData.investmentStatus),
+        // Page 10 requirements - Industry classification
+        gangwonIndustry: companyData.gangwonIndustry || null,
+        futureTech: companyData.futureTech || null,
       };
 
       await performanceService.updateCompanyProfile(saveData);

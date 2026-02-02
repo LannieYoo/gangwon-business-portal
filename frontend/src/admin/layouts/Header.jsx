@@ -8,6 +8,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@shared/hooks';
 import LanguageSwitcher from '@shared/components/LanguageSwitcher';
+import { messagesService } from '@admin/modules/messages/services/messages.service';
 import {
   MenuIcon,
   BellIcon,
@@ -132,7 +133,17 @@ export default function Header({ onToggleSidebar, onToggleDesktopSidebar }) {
         </Link> */}
 
         {/* 通知中心 */}
-        {isAuthenticated && <NotificationBell userType="admin" />}
+        {isAuthenticated && (
+          <NotificationBell 
+            userType="admin"
+            services={{
+              getUnreadCount: messagesService.getUnreadCount.bind(messagesService),
+              getThreads: messagesService.getThreads.bind(messagesService),
+              getMessages: messagesService.getMessages.bind(messagesService),
+              markAsRead: messagesService.markMessageAsRead.bind(messagesService),
+            }}
+          />
+        )}
 
         {/* 用户菜单或登录按钮 */}
         {isAuthenticated ? (

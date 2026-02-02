@@ -59,6 +59,9 @@ class MemberProfileResponse(BaseModel):
     business_field: Optional[str] = None  # 지역주력산업코드
     main_industry_ksic_major: Optional[str] = None  # 주력산업 KSIC 코드[대분류]
     main_industry_ksic_codes: Optional[str] = None  # 주력산업 KSIC 코드[세부코드] (JSON array as string)
+    # Page 10 requirements - 강원도 산업 분류
+    gangwon_industry: Optional[str] = None  # 강원도 7대 미래산업
+    future_tech: Optional[str] = None  # 미래유망 신기술
     # New fields for Task 6 - 참여 프로그램, 투자 유치
     participation_programs: Optional[str] = None  # 참여 프로그램 (JSON array as string)
     investment_status: Optional[str] = None  # 투자 유치 (JSON object as string)
@@ -106,6 +109,9 @@ class MemberProfileUpdate(BaseModel):
     business_field: Optional[str] = Field(None, max_length=10)  # 지역주력산업코드
     main_industry_ksic_major: Optional[str] = Field(None, max_length=50)  # 주력산업 KSIC 코드[대분류]
     main_industry_ksic_codes: Optional[str] = None  # 주력산업 KSIC 코드[세부코드] (JSON array as string)
+    # Page 10 requirements - 강원도 산업 분류
+    gangwon_industry: Optional[str] = Field(None, max_length=50)  # 강원도 7대 미래산업
+    future_tech: Optional[str] = Field(None, max_length=50)  # 미래유망 신기술
     # New fields for Task 6 - 참여 프로그램, 투자 유치
     participation_programs: Optional[str] = None  # 참여 프로그램 (JSON array as string)
     investment_status: Optional[str] = None  # 투자 유치 (JSON object as string)

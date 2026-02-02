@@ -3,6 +3,10 @@
     "title": "统计报告",
     "subtitle": "企业数据查询与分析",
     "groups": {
+      "quick": "快速筛选",
+      "company": "企业特征",
+      "metrics": "经营指标",
+      "representative": "代表者信息",
       "general": "基本与行政信息",
       "industry": "产业与技术分类",
       "identity": "企业属性与阶段",
@@ -11,9 +15,15 @@
     },
     "filters": {
       "title": "筛选条件",
+      "noFilters": "未选择筛选条件",
       "reset": "重置",
       "apply": "查询",
-      "export": "导出 Excel",
+      "export": "Excel 导出",
+      "selectedConditions": "已选筛选条件",
+      "clearAll": "清除全部",
+      "matchingCompanies": "符合条件的企业",
+      "calculating": "计算中...",
+      "companies": "家",
       "time": {
         "title": "时间范围",
         "year": "年度",
@@ -27,9 +37,11 @@
       },
       "industry": {
         "title": "产业分类",
-        "major": "标准产业 (大分类)",
-        "medium": "标准产业 (中分类)",
-        "gangwon": "江原道主导产业",
+        "major": "标准产业(大分类)",
+        "medium": "标准产业(中分类)",
+        "gangwon": "江原主导产业",
+        "gangwonFuture": "江原道7大未来产业",
+        "futureTech": "未来有望新技术",
         "startupType": "创业类型",
         "businessField": "业务领域"
       },
@@ -74,6 +86,9 @@
         "growth": "成长期",
         "leap": "跳跃期",
         "reStartup": "再创业",
+        "startupUnder3Years": "3年以下",
+        "startup3To7Years": "3-7年",
+        "startupOver7Years": "7年以上",
         "selectStages": "选择创业阶段"
       },
       "representative": {
@@ -82,7 +97,17 @@
         "male": "男",
         "female": "女",
         "other": "其他",
-        "ageRange": "年龄段"
+        "ageRangeLabel": "年龄段",
+        "ageRange": {
+          "all": "全部",
+          "under20": "20岁以下",
+          "20to29": "20 - 29岁",
+          "30to39": "30 - 39岁",
+          "40to49": "40 - 49岁",
+          "50to59": "50 - 59岁",
+          "over60": "60岁以上",
+          "custom": "自定义区间"
+        }
       },
       "workYears": {
         "title": "企业工龄",
@@ -96,13 +121,37 @@
         "chuncheon": "春川",
         "wonju": "原州",
         "gangneung": "江陵",
+        "sokcho": "束草",
+        "goseong": "高城",
+        "hwacheon": "华川",
         "hongcheon": "洪川",
         "hoengseong": "横城"
       },
       "quantitive": {
         "title": "量化指标 (营收/雇佣)",
         "revenue": "年营收",
-        "employees": "员工人数"
+        "employees": "员工人数",
+        "revenueRange": {
+          "all": "全部",
+          "under100m": "1亿以下",
+          "100m500m": "1亿 - 5亿",
+          "500m1b": "5亿 - 10亿",
+          "1b5b": "10亿 - 50亿",
+          "5b10b": "50亿 - 100亿",
+          "over10b": "100亿以上",
+          "custom": "自定义区间"
+        },
+        "employeeRange": {
+          "all": "全部",
+          "under5": "5人以下",
+          "5to10": "5 - 10人",
+          "10to30": "10 - 30人",
+          "30to50": "30 - 50人",
+          "50to100": "50 - 100人",
+          "100to300": "100 - 300人",
+          "over300": "300人以上",
+          "custom": "自定义区间"
+        }
       },
       "industry_extra": {
         "startupType": "创业类型",
@@ -115,11 +164,9 @@
         "talent": "人才培养"
       },
       "participation": {
-        "rise": "RISE 事业团",
-        "global": "全球 事业",
-        "university": "创业中心大学",
         "startup_university": "创业中心大学",
-        "global_glocal": "全球·成长事业"
+        "global_glocal": "全球·成长事业",
+        "rise": "RISE 事业团"
       },
       "all": "全部",
       "keyword": {
@@ -130,20 +177,63 @@
     },
     "table": {
       "title": "统计结果",
-      "businessRegNo": "事业者注册号",
-      "enterpriseName": "企业名称",
-      "industryType": "行业类型",
+      "year": "年度(年)",
+      "quarter": "季度",
+      "month": "月份",
+      "businessRegNo": "企业注册号",
+      "enterpriseName": "公司名",
+      "programs": "政府项目",
+      "ksicMajor": "标准产业(大类)",
+      "ksicSub": "标准产业(中类)",
+      "gangwonIndustry": "江原主导产业(大类)",
+      "gangwonIndustrySub": "江原主导产业(中类)",
+      "gangwonFutureIndustry": "江原7大未来产业",
+      "futureTech": "未来有望新技术",
+      "workYears": "成立年限(年)",
       "startupStage": "创业阶段",
-      "programs": "参与项目",
+      "region": "所在地",
+      "investmentAmount": "融资额(元)",
+      "revenue": "销售额(元)",
+      "exportAmount": "出口额(元)",
+      "employeeCount": "员工数(人)",
+      "patentCount": "专利(件)",
+      "representativeGender": "代表人性别",
+      "representativeAge": "代表人年龄(岁)",
       "investmentStatus": "投资引进",
-      "investmentAmount": "总投资金额",
-      "patentCount": "专利持有数",
-      "revenue": "年营收",
-      "exportAmount": "出口额",
-
       "noData": "暂无查询结果",
       "loading": "数据加载中...",
-      "error": "数据查询失败"
+      "error": "数据查询失败",
+      "columnSettings": "列设置",
+      "quickActions": "快速设置",
+      "showAll": "全部显示",
+      "hideAll": "全部隐藏",
+      "units": {
+        "years": "年",
+        "patents": "个",
+        "employees": "人",
+        "won": "元"
+      },
+      "yearUnit": "年",
+      "quarterUnit": "季度",
+      "monthUnit": "月",
+      "yearsUnit": "年",
+      "countUnit": "件",
+      "peopleUnit": "人",
+      "ageUnit": "岁",
+      "male": "男性",
+      "female": "女性"
+    },
+    "columnGroups": {
+      "basic": "基本信息",
+      "quickFilters": "快速筛选",
+      "companyProfile": "企业特征",
+      "businessMetrics": "经营指标",
+      "representative": "代表者信息"
+    },
+    "columnPresets": {
+      "all": "全部",
+      "core": "核心",
+      "minimum": "最小"
     },
     "sort": {
       "title": "排序",
@@ -167,7 +257,10 @@
       "last": "尾页"
     },
     "export": {
-      "title": "导出 Excel",
+      "title": "Excel 导出",
+      "csv": "CSV 导出",
+      "csvSuccess": "CSV 文件已下载",
+      "csvError": "CSV 导出失败",
       "confirm": "确定要将当前筛选条件的数据导出为 Excel 吗?",
       "success": "Excel 文件已下载",
       "error": "Excel 导出失败",
@@ -197,6 +290,18 @@
       "programsHelp": "参与项目使用 OR 逻辑筛选 (符合任一条件即可)",
       "investmentHelp": "投资金额单位为万元",
       "patentHelp": "专利数量为企业持有的全部专利总数"
+    },
+    "industries": {
+      "software": "软件",
+      "hardware": "硬件",
+      "biotechnology": "生物技术",
+      "healthcare": "医疗保健",
+      "finance": "金融",
+      "education": "教育",
+      "manufacturing": "制造业",
+      "retail": "零售业",
+      "service": "服务业",
+      "other": "其他"
     }
   }
 }

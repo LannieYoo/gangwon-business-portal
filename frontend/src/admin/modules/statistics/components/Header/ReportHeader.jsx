@@ -6,9 +6,9 @@ import { Button } from "@shared/components";
 export const ReportHeader = ({
   loading,
   exporting,
-  onReset,
+  exportingCsv,
   onExport,
-  onApply,
+  onExportCsv,
 }) => {
   const { t } = useTranslation();
 
@@ -26,47 +26,23 @@ export const ReportHeader = ({
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
-          size="sm"
-          onClick={onReset}
-          disabled={loading}
-          className="text-gray-600 border-gray-300"
-        >
-          {t("statistics.filters.reset")}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
+          size="md"
           onClick={onExport}
           disabled={loading || exporting}
-          className="text-gray-600 border-gray-300"
+          className="border-2 border-primary-600 text-primary-600 hover:bg-primary-50 px-4 py-2 min-h-[40px]"
           loading={exporting}
         >
-          {!exporting && (
-            <svg
-              className="-ml-1 mr-1.5 h-3.5 w-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              ></path>
-            </svg>
-          )}
           {t("statistics.filters.export")}
         </Button>
         <Button
-          variant="primary"
-          size="sm"
-          onClick={onApply}
-          disabled={loading}
-          loading={loading}
-          className="px-6 bg-blue-600 hover:bg-blue-700"
+          variant="outline"
+          size="md"
+          onClick={onExportCsv}
+          disabled={loading || exportingCsv}
+          className="border-2 border-primary-600 text-primary-600 hover:bg-primary-50 px-4 py-2 min-h-[40px]"
+          loading={exportingCsv}
         >
-          {t("statistics.filters.apply")}
+          {t("statistics.export.csv", "导出 CSV")}
         </Button>
       </div>
     </div>

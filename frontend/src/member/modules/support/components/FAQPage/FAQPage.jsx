@@ -6,7 +6,7 @@
 
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, CardBody } from "@shared/components";
+import { Card } from "@shared/components";
 import { PageContainer } from "@member/layouts";
 
 import FAQFilter from "./FAQFilter";
@@ -57,6 +57,9 @@ export default function FAQPage(props) {
           <h1 className="text-2xl font-bold text-gray-900">
             {t("support.faq", "FAQ")}
           </h1>
+          <p className="text-gray-600 mt-2 text-sm">
+            {t('support.faq.description', '자주 묻는 질문과 답변')}
+          </p>
         </div>
 
         <FAQFilter
@@ -70,7 +73,7 @@ export default function FAQPage(props) {
         />
 
         <Card>
-          <CardBody>
+          <div className="p-6">
             <p className="text-sm text-gray-600 mb-4">
               {t("common.resultsCount", "총 {{count}}건", {
                 count: filteredFaqs.length,
@@ -98,7 +101,7 @@ export default function FAQPage(props) {
                 ))}
               </div>
             )}
-          </CardBody>
+          </div>
         </Card>
       </div>
     </PageContainer>

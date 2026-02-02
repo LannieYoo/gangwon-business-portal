@@ -4,10 +4,12 @@
     "subtitle": "咨询、FAQ",
     "notices": {
       "title": "公告事项",
-      "description": "查看最新公告和重要通知"
+      "description": "查看最新公告和重要通知",
+      "searchPlaceholder": "搜索公告..."
     },
     "inquiry": "1:1咨询",
     "faq": "常见问题",
+    "faq.description": "常见问题和解答",
     "faqCategory": {
       "registration": "会员注册",
       "general": "一般",
@@ -21,11 +23,17 @@
     "noFaqResults": "没有找到匹配的问题",
     "newInquiry": "新建咨询",
     "inquiryHistory": "咨询历史",
+    "inquiryHistory.description": "1:1咨询记录及回复查看",
+    "notificationHistory": "通知历史",
+    "notificationHistory.description": "系统通知及公告查看",
     "noInquiries": "暂无咨询记录",
     "category": {
       "general": "一般咨询",
       "support": "技术支持",
-      "performance": "业绩咨询"
+      "performance": "业绩咨询",
+      "project": "事业管理",
+      "member": "会员管理",
+      "label": "分类"
     },
     "categoryLabel": "咨询分类",
     "selectCategory": "选择分类",
@@ -53,7 +61,7 @@
     "attachments": "附件",
     "attachmentNumber": "附件 {{number}}",
     "addAttachment": "添加附件",
-    "attachmentHint": "支持 PDF、Word、Excel、图片格式，单个文件最大 10MB",
+    "attachmentHint": "支持 PDF、Word、Excel、图片格式，单个文件最大 {{maxSize}}MB",
     "maxFiles": "最多可上传3个文件",
     "maxFilesLabel": "最多3个",
     "maxAttachmentsReached": "最多只能上传{{max}}个附件",
@@ -102,6 +110,48 @@
     "writeComment": "写评论...",
     "comment": "评论",
     "like": "点赞",
-    "replyToThread": "回复此咨询"
+    "replyToThread": "回复此咨询",
+    "read": "已读",
+    "readStatus": "阅读状态",
+    "searchNotifications": "搜索通知...",
+    "sender": "发送者",
+    "goToPage": "前往页面",
+    "notifications": {
+      "performance": {
+        "review": {
+          "subject": "[实绩管理] {{periodZh}} 实绩审查结果",
+          "content": "{{periodZh}} 实绩已{{statusZh}}。",
+          "contentWithComments": "{{periodZh}} 实绩已{{statusZh}}。\n\n管理员意见: {{comments}}"
+        },
+        "submission": {
+          "subject": "[实绩管理] 新实绩提交",
+          "content": "{{companyName}}提交了{{year}}年第{{quarter}}季度实绩。"
+        }
+      },
+      "member": {
+        "registration": {
+          "subject": "[会员管理] 新会员注册申请",
+          "content": "{{company_name}} (营业执照号: {{business_number}})申请了会员注册。\n邮箱: {{email}}"
+        },
+        "approved": {
+          "subject": "[会员管理] 会员注册批准",
+          "content": "{{company_name}}的会员注册已批准。现在可以使用所有服务。"
+        },
+        "rejected": {
+          "subject": "[会员管理] 会员注册驳回",
+          "content": "{{company_name}}的会员注册已驳回。{{#reason}}\n\n原因: {{reason}}{{/reason}}"
+        }
+      },
+      "project": {
+        "application": {
+          "subject": "[项目管理] 新项目申请",
+          "content": "{{company_name}}的{{applicant_name}}申请了'{{project_title}}'项目。"
+        },
+        "result": {
+          "subject": "[项目管理] 项目申请结果",
+          "content": "'{{project_title}}'项目申请已{{statusZh}}。"
+        }
+      }
+    }
   }
 }

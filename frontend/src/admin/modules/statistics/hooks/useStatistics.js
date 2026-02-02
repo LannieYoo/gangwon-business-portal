@@ -193,6 +193,50 @@ export const useStatistics = (initialParams = {}) => {
   );
 
   /**
+   * 导出 CSV
+   */
+  const exportToCsv = useCallback(
+    async (customFilename = null) => {
+      setExporting(true);
+
+      try {
+        // 1. 验证参数
+        const validation = statisticsService.validateParams(params);
+        if (!validation.valid) {
+          const errorMessages = validation.errors
+            .map((key) => t(key))
+            .join(", ");
+          throw new Error(errorMessages);
+        }
+
+        // 2. 生成默认文件名 (如果未提供)
+        let filename = customFilename;
+        if (!filename) {
+          const year = params.year || new Date().getFullYear();
+          const timestamp = new Date()
+            .toISOString()
+            .slice(0, 10)
+            .replace(/-/g, "");
+          filename = `统计报告_${year}_${timestamp}`;
+        }
+
+        // 3. 执行导出
+        const result = await statisticsService.exportToCsv(params, filename);
+
+        return result;
+      } catch (err) {
+        const errorMessage =
+          err.message || t("statistics.messages.exportError");
+        setError(errorMessage);
+        console.error("[useStatistics] exportToCsv error:", err);
+      } finally {
+        setExporting(false);
+      }
+    },
+    [params, t],
+  );
+
+  /**
    * 初始化时自动查询
    */
   useEffect(() => {
@@ -220,6 +264,7 @@ export const useStatistics = (initialParams = {}) => {
     changePageSize,
     changeSort,
     exportToExcel,
+    exportToCsv,
 
     // 辅助信息
     hasData: data.items.length > 0,

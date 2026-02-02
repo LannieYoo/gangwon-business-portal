@@ -54,7 +54,7 @@
     "people": "명",
     "proofDocument": "증빙서류",
     "proofDocumentsDesc": "매출액, 고용인원, 정부지원 등 관련 증빙서류를 업로드해주세요.",
-    "fileUploadHint": "파일 형식: PDF / 최대 10MB",
+    "fileUploadHint": "파일 형식: PDF / 최대 {{maxSize}}MB",
     "uploadedFiles": "업로드된 파일",
     "notes": "비고",
     "notesPlaceholder": "기타 설명이 필요한 사항을 입력하세요",
@@ -222,6 +222,8 @@
         "mainIndustryKsicMajor": "주력산업 KSIC 코드",
         "mainIndustryKsicCodes": "주력산업 KSIC 세부 코드",
         "startupStage": "창업구분",
+        "gangwonIndustry": "강원도 7대 미래산업",
+        "futureTech": "미래유망 신기술",
         "participationPrograms": "참여 프로그램",
         "hasInvestment": "투자 유치 여부",
         "investmentAmount": "투자 금액 (백만원)",
@@ -243,7 +245,7 @@
       },
       "profile": {
         "noLogo": "로고 없음",
-        "logoHint": "JPG, PNG, GIF 형식 지원, 최대 10MB",
+        "logoHint": "JPG, PNG, GIF 형식 지원, 최대 {{maxSize}}MB",
         "clickToUploadLogo": "로고 업로드하려면 클릭하세요",
         "clickToChangeLogo": "로고 변경하려면 클릭하세요",
         "logoUploadConfirm": "이 로고를 업로드하시겠습니까?",
@@ -288,9 +290,9 @@
           "other": "기타"
         },
         "cooperationFields": {
-          "field1": "기술 협력",
-          "field2": "시장 확대",
-          "field3": "인재 양성"
+          "tech": "기술협력",
+          "market": "시장확대",
+          "talent": "인재양성"
         },
         "participationPrograms": {
           "startupCenterUniversity": "창업중심대학",
@@ -487,6 +489,24 @@
       "28909": "28909 - 그 외 기타 전기장비 제조업",
       "58221": "58221 - 시스템 소프트웨어 개발 및 공급업",
       "58222": "58222 - 응용 소프트웨어 개발 및 공급업"
+    },
+    "gangwonIndustry": {
+      "semiconductor": "반도체",
+      "bio_health": "바이오헬스",
+      "future_energy": "미래에너지",
+      "future_mobility": "미래모빌리티",
+      "food_tech": "푸드테크",
+      "advanced_defense": "첨단방위",
+      "climate_tech": "기후테크"
+    },
+    "futureTech": {
+      "it": "정보기술(IT)",
+      "bt": "생명공학(BT)",
+      "nt": "나노기술(NT)",
+      "st": "우주항공(ST)",
+      "et": "환경공학(ET)",
+      "ct": "문화기술(CT)",
+      "knu_tenant": "KNU 입주기업"
     }
   },
   "message": {

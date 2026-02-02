@@ -1,0 +1,23 @@
+{
+  "name": "PPTX to PDF Conversion",
+  "category": "dev",
+  "tags": ["pptx", "pdf", "conversion", "powerpoint", "presentation", "document"],
+  "keywords": [
+    "pptx",
+    "powerpoint",
+    "pdf",
+    "convert",
+    "presentation",
+    "slides",
+    "ppt to pdf",
+    "pptx to pdf",
+    "presentation conversion",
+    "演示文稿",
+    "转换",
+    "幻灯片",
+    "PPT转PDF"
+  ],
+  "version": "1.0.0",
+  "author": "Kiro Skills",
+  "description": "Convert PowerPoint presentations (PPTX) to PDF format with various options and quality settings"
+}

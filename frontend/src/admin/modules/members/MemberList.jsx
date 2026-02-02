@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, SearchInput, Alert, Modal } from '@shared/components';
-import { adminService } from '@shared/services';
+import membersService from './services/members.service';
 import { formatDate, formatBusinessLicense } from '@shared/utils';
 
 export default function MemberList() {
@@ -42,7 +42,7 @@ export default function MemberList() {
         pageSize: 1000,
         approvalStatus: statusFilter !== 'all' ? statusFilter : undefined
       };
-      const response = await adminService.listMembers(params);
+      const response = await membersService.listMembers(params);
       
       if (response && response.items && Array.isArray(response.items)) {
         setAllMembers(response.items);
@@ -84,7 +84,7 @@ export default function MemberList() {
         approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
         language: i18n.language === 'zh' ? 'zh' : 'ko'
       };
-      await adminService.exportMembers(params);
+      await membersService.exportMembers(params);
       setMessageVariant('success');
       setMessage(t('admin.members.exportSuccess', '내보내기 성공'));
       setTimeout(() => setMessage(null), 3000);
@@ -98,7 +98,7 @@ export default function MemberList() {
   }, [statusFilter, i18n.language, t]);
 
   const handleApprove = useCallback(async (memberId) => {
-    await adminService.approveMember(memberId);
+    await membersService.approveMember(memberId);
     setMessageVariant('success');
     setMessage(t('admin.members.approveSuccess', '승인 성공'));
     setTimeout(() => setMessage(null), 3000);
@@ -113,7 +113,7 @@ export default function MemberList() {
 
   const handleConfirmReject = useCallback(async () => {
     try {
-      await adminService.rejectMember(rejectingMemberId, rejectReason || null);
+      await membersService.rejectMember(rejectingMemberId, rejectReason || null);
       setShowRejectModal(false);
       setRejectingMemberId(null);
       setRejectReason('');
@@ -135,7 +135,7 @@ export default function MemberList() {
   }, []);
 
   const handleResetToPending = useCallback(async (memberId) => {
-    await adminService.resetMemberToPending(memberId);
+    await membersService.resetMemberToPending(memberId);
     setMessageVariant('success');
     setMessage(t('admin.members.resetSuccess', '검토 대기로 재설정되었습니다'));
     setTimeout(() => setMessage(null), 3000);

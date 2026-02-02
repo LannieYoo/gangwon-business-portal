@@ -4,54 +4,51 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supportService } from "../services/support.service";
+import { useApiCache } from "@shared/hooks/useApiCache";
 
 /**
  * FAQ 逻辑控制 Hook
  */
 export function useFAQ() {
   const { t } = useTranslation();
-  const [allFaqs, setAllFaqs] = useState([]);
-  const [filteredFaqs, setFilteredFaqs] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [expandedIds, setExpandedIds] = useState(new Set());
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [filteredFaqs, setFilteredFaqs] = useState([]);
+
+  const fetchFAQs = useCallback(async () => {
+    const response = await supportService.listFAQs({});
+    return response.items || [];
+  }, []);
+
+  const { data: allFaqs, loading, error, refresh: loadFAQs } = useApiCache(
+    fetchFAQs,
+    'faq-list',
+    {
+      cacheDuration: 5 * 60 * 1000, // 5分钟缓存（FAQ 很少更新）
+      enabled: true
+    }
+  );
+
+  // 使用 useMemo 确保返回稳定的数组引用
+  const stableAllFaqs = useMemo(() => allFaqs ?? [], [allFaqs]);
 
   const handleFilterChange = useCallback((filtered) => {
     setFilteredFaqs(filtered);
   }, []);
 
-  const loadFAQs = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await supportService.listFAQs({});
-      setAllFaqs(response.items);
-      setFilteredFaqs(response.items);
-    } catch (error) {
-      console.error("Failed to load FAQs:", error);
-      setAllFaqs([]);
-      setFilteredFaqs([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadFAQs();
-  }, [loadFAQs]);
-
   // 获取所有分类
   const categories = useMemo(() => {
     const categorySet = new Set();
-    allFaqs.forEach((faq) => {
+    stableAllFaqs.forEach((faq) => {
       if (faq.category) {
         categorySet.add(faq.category);
       }
     });
     return Array.from(categorySet);
-  }, [allFaqs]);
+  }, [stableAllFaqs]);
 
   // FAQ 分类翻译映射
   const categoryTranslations = useMemo(
@@ -81,9 +78,9 @@ export function useFAQ() {
 
   // 按分类过滤
   const categoryFilteredFaqs = useMemo(() => {
-    if (!selectedCategory) return allFaqs;
-    return allFaqs.filter((faq) => faq.category === selectedCategory);
-  }, [allFaqs, selectedCategory]);
+    if (!selectedCategory) return stableAllFaqs;
+    return stableAllFaqs.filter((faq) => faq.category === selectedCategory);
+  }, [stableAllFaqs, selectedCategory]);
 
   const toggleExpand = (id) => {
     setExpandedIds((prev) => {
@@ -98,7 +95,7 @@ export function useFAQ() {
   };
 
   return {
-    allFaqs,
+    allFaqs: stableAllFaqs,
     filteredFaqs,
     loading,
     expandedIds,

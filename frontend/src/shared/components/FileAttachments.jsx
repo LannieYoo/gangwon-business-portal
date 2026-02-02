@@ -7,8 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { FileUploadButton } from '@shared/components';
 import { DocumentIcon, TrashIcon } from '@shared/components/Icons';
 import { cn } from '@shared/utils/helpers';
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+import { MAX_FILE_SIZE } from '@shared/utils/constants';
 
 function formatFileSize(bytes) {
   if (bytes === 0) return '0 B';

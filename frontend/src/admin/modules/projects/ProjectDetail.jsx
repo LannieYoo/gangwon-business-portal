@@ -7,7 +7,8 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Badge, Loading, Table, Pagination, Modal, Alert } from '@shared/components';
-import { adminService, uploadService, apiService } from '@shared/services';
+import projectsService from './services/projects.service';
+import { uploadService, apiService } from '@shared/services';
 import { formatDate } from '@shared/utils';
 import { API_PREFIX } from '@shared/utils/constants';
 
@@ -43,7 +44,7 @@ export default function ProjectDetail() {
 
   const loadProjectDetail = async () => {
     setLoading(true);
-    const projectData = await adminService.getProject(id);
+    const projectData = await projectsService.getProject(id);
     if (projectData) {
       setProject(projectData);
     }
@@ -56,7 +57,7 @@ export default function ProjectDetail() {
       page: applicationsPage,
       pageSize: applicationsPageSize,
     };
-    const response = await adminService.getProjectApplications(id, params);
+    const response = await projectsService.getProjectApplications(id, params);
     if (response && response.items) {
       setApplications(response.items);
       setApplicationsTotal(response.total || response.items.length);

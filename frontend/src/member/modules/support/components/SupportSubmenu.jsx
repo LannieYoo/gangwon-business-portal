@@ -38,6 +38,12 @@ export default function SupportSubmenu() {
       label: t("support.inquiryHistory"),
       activePaths: ["/member/support/inquiry-history"],
     },
+    {
+      key: "support-notification-history",
+      path: "/member/support/notifications",
+      label: t("support.notificationHistory"),
+      activePaths: ["/member/support/notifications"],
+    },
   ];
 
   return (

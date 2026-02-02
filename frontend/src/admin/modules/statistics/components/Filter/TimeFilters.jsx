@@ -8,11 +8,16 @@ import { QUARTER_OPTIONS, MONTH_OPTIONS } from "../../enum";
 export const TimeFilters = ({ year, quarter, month, onChange }) => {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 15 }, (_, i) => ({
-    value: currentYear - i,
-    label:
-      String(currentYear - i) + t("statistics.filters.time.yearUnit", "년"),
-  }));
+  
+  // 添加"全部"选项到年份列表
+  const years = [
+    { value: "", label: t("statistics.filters.all", "全部") },
+    ...Array.from({ length: 15 }, (_, i) => ({
+      value: currentYear - i,
+      label:
+        String(currentYear - i) + t("statistics.filters.time.yearUnit", "년"),
+    }))
+  ];
 
   const quarterOptions = QUARTER_OPTIONS.map((o) => ({
     value: o.value,
@@ -29,12 +34,17 @@ export const TimeFilters = ({ year, quarter, month, onChange }) => {
       <Select
         value={year || ""}
         options={years}
-        placeholder={t("statistics.filters.time.year")}
         containerClassName="mb-0"
         className="w-28 h-9"
-        onChange={(e) =>
-          onChange("year", e.target.value ? parseInt(e.target.value) : null)
-        }
+        onChange={(e) => {
+          const val = e.target.value;
+          onChange("year", val ? parseInt(val) : null);
+          // 清空年份时，同时清空季度和月份
+          if (!val) {
+            onChange("quarter", null);
+            onChange("month", null);
+          }
+        }}
       />
       <Select
         value={quarter || ""}
@@ -42,9 +52,15 @@ export const TimeFilters = ({ year, quarter, month, onChange }) => {
         placeholder={t("statistics.filters.time.quarter")}
         containerClassName="mb-0"
         className="w-28 h-9"
-        onChange={(e) =>
-          onChange("quarter", e.target.value ? parseInt(e.target.value) : null)
-        }
+        disabled={!year}
+        onChange={(e) => {
+          const val = e.target.value;
+          onChange("quarter", val ? parseInt(val) : null);
+          // 清空季度时，同时清空月份
+          if (!val) {
+            onChange("month", null);
+          }
+        }}
       />
       <Select
         value={month || ""}
@@ -52,6 +68,7 @@ export const TimeFilters = ({ year, quarter, month, onChange }) => {
         placeholder={t("statistics.filters.time.month")}
         containerClassName="mb-0"
         className="w-28 h-9"
+        disabled={!quarter}
         onChange={(e) =>
           onChange("month", e.target.value ? parseInt(e.target.value) : null)
         }

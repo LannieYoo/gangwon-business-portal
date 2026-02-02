@@ -54,7 +54,7 @@
     "people": "人",
     "proofDocument": "证明文件",
     "proofDocumentsDesc": "请上传销售额、雇佣人数、政府支持等相关证明文件。",
-    "fileUploadHint": "文件格式: PDF / 最大 10MB",
+    "fileUploadHint": "文件格式: PDF / 最大 {{maxSize}}MB",
     "uploadedFiles": "已上传文件",
     "notes": "备注",
     "notesPlaceholder": "请输入其他需要说明的事项",
@@ -222,6 +222,8 @@
         "mainIndustryKsicMajor": "主力产业 KSIC 代码",
         "mainIndustryKsicCodes": "主力产业 KSIC 细分代码",
         "startupStage": "创业阶段",
+        "gangwonIndustry": "江原道7大未来产业",
+        "futureTech": "未来有望新技术",
         "participationPrograms": "参与项目",
         "hasInvestment": "是否有投资",
         "investmentAmount": "投资金额 (百万韩元)",
@@ -243,7 +245,7 @@
       },
       "profile": {
         "noLogo": "无Logo",
-        "logoHint": "支持 JPG, PNG, GIF 格式，最大 10MB",
+        "logoHint": "支持 JPG, PNG, GIF 格式，最大 {{maxSize}}MB",
         "clickToUploadLogo": "点击上传Logo",
         "clickToChangeLogo": "点击更换Logo",
         "logoUploadConfirm": "确认上传此Logo吗？",
@@ -288,9 +290,9 @@
           "other": "其他"
         },
         "cooperationFields": {
-          "field1": "技术合作",
-          "field2": "市场拓展",
-          "field3": "人才培养"
+          "tech": "技术合作",
+          "market": "市场拓展",
+          "talent": "人才培养"
         },
         "participationPrograms": {
           "startupCenterUniversity": "创业中心大学",
@@ -487,6 +489,24 @@
       "28909": "28909 - 其他电气设备制造",
       "58221": "58221 - 系统软件开发及供应",
       "58222": "58222 - 应用软件开发及供应"
+    },
+    "gangwonIndustry": {
+      "semiconductor": "半导体",
+      "bio_health": "生物健康",
+      "future_energy": "未来能源",
+      "future_mobility": "未来移动",
+      "food_tech": "食品科技",
+      "advanced_defense": "尖端防卫",
+      "climate_tech": "气候科技"
+    },
+    "futureTech": {
+      "it": "信息技术(IT)",
+      "bt": "生命工程(BT)",
+      "nt": "纳米技术(NT)",
+      "st": "宇宙航空(ST)",
+      "et": "环境工程(ET)",
+      "ct": "文化技术(CT)",
+      "knu_tenant": "KNU入驻企业"
     }
   },
   "message": {

@@ -327,6 +327,40 @@ export const MAIN_INDUSTRY_KSIC_CODES = {
   ]
 };
 
+// ==================== 江原道产业分类 (Page 10 Requirements) ====================
+
+/**
+ * 江原道 7大未来产业
+ * Gangwon Province 7 Major Future Industries
+ * 
+ * 用于: 企业信息表单、项目申请
+ */
+export const GANGWON_FUTURE_INDUSTRIES = [
+  { value: 'semiconductor', labelKey: 'industryClassification.gangwonIndustry.semiconductor' },
+  { value: 'bio_health', labelKey: 'industryClassification.gangwonIndustry.bio_health' },
+  { value: 'future_energy', labelKey: 'industryClassification.gangwonIndustry.future_energy' },
+  { value: 'future_mobility', labelKey: 'industryClassification.gangwonIndustry.future_mobility' },
+  { value: 'food_tech', labelKey: 'industryClassification.gangwonIndustry.food_tech' },
+  { value: 'advanced_defense', labelKey: 'industryClassification.gangwonIndustry.advanced_defense' },
+  { value: 'climate_tech', labelKey: 'industryClassification.gangwonIndustry.climate_tech' }
+];
+
+/**
+ * 未来有望新技术
+ * Future Promising New Technologies
+ * 
+ * 用于: 企业信息表单、项目申请
+ */
+export const FUTURE_TECHNOLOGIES = [
+  { value: 'it', labelKey: 'industryClassification.futureTech.it' },
+  { value: 'bt', labelKey: 'industryClassification.futureTech.bt' },
+  { value: 'nt', labelKey: 'industryClassification.futureTech.nt' },
+  { value: 'st', labelKey: 'industryClassification.futureTech.st' },
+  { value: 'et', labelKey: 'industryClassification.futureTech.et' },
+  { value: 'ct', labelKey: 'industryClassification.futureTech.ct' },
+  { value: 'knu_tenant', labelKey: 'industryClassification.futureTech.knu_tenant' }
+];
+
 // ==================== 工具函数 ====================
 
 /**

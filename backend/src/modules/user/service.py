@@ -178,6 +178,42 @@ class AuthService:
                 business_number=member["business_number"],
             )
         )
+        
+        # Send notification to all admins about new member registration
+        try:
+            from ...modules.messages.service import service as message_service
+            from ...modules.messages.schemas import MessageCreate
+            from uuid import UUID
+            import json
+            
+            # Get all active admins
+            admins_result = supabase_service.client.table('admins').select('id').eq('is_active', 'true').execute()
+            admin_ids = [admin['id'] for admin in (admins_result.data or [])]
+            
+            # Send notification to each admin
+            for admin_id in admin_ids:
+                try:
+                    notification_data = {
+                        "type": "member_registration",
+                        "company_name": member['company_name'],
+                        "business_number": member['business_number'],
+                        "email": member['email'],
+                    }
+                    await message_service.create_direct_message(
+                        sender_id=UUID(member['id']),
+                        recipient_id=UUID(admin_id),
+                        data=MessageCreate(
+                            subject=json.dumps(notification_data, ensure_ascii=False),
+                            content=json.dumps(notification_data, ensure_ascii=False),
+                            recipient_id=UUID(admin_id),
+                        ),
+                    )
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Failed to send admin notification: {e}")
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to notify admins about new registration: {e}")
 
         return member
 

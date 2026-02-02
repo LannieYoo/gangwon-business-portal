@@ -6,6 +6,7 @@ Business logic for project and application management operations.
 from uuid import UUID, uuid4
 from typing import Optional
 from datetime import datetime
+import json
 
 from ...common.modules.db.models import Project, ProjectApplication  # 保留用于类型提示和文档
 from ...common.modules.supabase.service import supabase_service
@@ -192,7 +193,48 @@ class ProjectService:
             "attachments": data.attachments,
             "status": "submitted",
         }
-        return await supabase_service.create_record('project_applications', application_data)
+        application = await supabase_service.create_record('project_applications', application_data)
+        
+        # Send notification to all admins about new project application
+        try:
+            from ...modules.messages.service import service as message_service
+            from ...modules.messages.schemas import MessageCreate
+            import json
+            
+            # Get member info
+            member = await supabase_service.get_by_id('members', str(member_id))
+            company_name = member.get('company_name', '알 수 없음') if member else '알 수 없음'
+            
+            # Get all active admins
+            admins_result = supabase_service.client.table('admins').select('id').eq('is_active', 'true').execute()
+            admin_ids = [admin['id'] for admin in (admins_result.data or [])]
+            
+            # Send notification to each admin
+            for admin_id in admin_ids:
+                try:
+                    notification_data = {
+                        "type": "project_application",
+                        "company_name": company_name,
+                        "applicant_name": data.applicant_name,
+                        "project_title": project.get('title', '알 수 없음'),
+                    }
+                    await message_service.create_direct_message(
+                        sender_id=member_id,
+                        recipient_id=UUID(admin_id),
+                        data=MessageCreate(
+                            subject=json.dumps(notification_data, ensure_ascii=False),
+                            content=json.dumps(notification_data, ensure_ascii=False),
+                            recipient_id=UUID(admin_id),
+                        ),
+                    )
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Failed to send admin notification: {e}")
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to notify admins about project application: {e}")
+        
+        return application
 
     async def get_my_applications(
         self, member_id: UUID, query: ApplicationListQuery
@@ -491,13 +533,53 @@ class ProjectService:
             update_data["reviewed_at"] = datetime.utcnow().isoformat()
 
         # Use helper method
-        return await supabase_service.update_record('project_applications', str(application_id), update_data)
+        updated = await supabase_service.update_record('project_applications', str(application_id), update_data)
+        
+        # Send notification to member about application result
+        if status in [ApplicationStatus.approved, ApplicationStatus.rejected]:
+            try:
+                from ...modules.messages.service import service as message_service
+                from ...modules.messages.schemas import MessageCreate
+                import json
+                
+                member_id = application.get('member_id')
+                project_id = application.get('project_id')
+                
+                # Get project info
+                project = await supabase_service.get_by_id('projects', str(project_id))
+                project_title = project.get('title', '알 수 없음') if project else '알 수 없음'
+                
+                # Prepare notification data
+                notification_data = {
+                    "type": "project_application_result",
+                    "project_title": project_title,
+                    "status": status.value,
+                }
+                
+                await message_service.create_direct_message(
+                    sender_id=None,
+                    recipient_id=UUID(member_id),
+                    data=MessageCreate(
+                        subject=json.dumps(notification_data, ensure_ascii=False),
+                        content=json.dumps(notification_data, ensure_ascii=False),
+                        recipient_id=UUID(member_id),
+                    ),
+                )
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"Failed to send application result notification: {e}")
+        
+        return updated
 
     async def export_projects_data(
         self, query: ProjectListQuery
     ) -> list[dict]:
         """
         Export projects data for download (admin only).
+        
+        方案A（适度放宽）:
+        - Projects 表所有字段
+        - 移除: image_url, attachments, applications_count (URL、附件、统计字段)
 
         Args:
             query: Filter parameters
@@ -510,18 +592,10 @@ class ProjectService:
             search=query.search,
         )
 
-        # Get application counts for each project - use direct client for complex query
         export_data = []
         for project in projects:
-            # Get application count for this project
-            app_count_result = supabase_service.client.table('project_applications')\
-                .select('*', count='exact')\
-                .eq('project_id', str(project["id"]))\
-                .is_('deleted_at', 'null')\
-                .execute()
-            app_count = app_count_result.count or 0
-
             export_data.append({
+                # Projects 表字段
                 "id": str(project["id"]),
                 "title": project["title"],
                 "description": project["description"],
@@ -529,12 +603,11 @@ class ProjectService:
                 "target_business_number": project["target_business_number"],
                 "start_date": project.get("start_date"),
                 "end_date": project.get("end_date"),
-                "image_url": project.get("image_url"),
                 "status": project["status"],
-                "attachments": project.get("attachments", []),
-                "applications_count": app_count,
                 "created_at": project.get("created_at"),
                 "updated_at": project.get("updated_at"),
+                
+                # 移除: image_url, attachments, applications_count
             })
 
         return export_data
@@ -544,6 +617,11 @@ class ProjectService:
     ) -> list[dict]:
         """
         Export project applications data for download (admin only).
+        
+        方案A（适度放宽）:
+        - Project_applications 表所有字段
+        - 关联标识字段: project_title, member_company_name, member_business_number
+        - 移除: attachments (附件字段)
 
         Args:
             project_id: Optional project ID to filter by
@@ -565,16 +643,28 @@ class ProjectService:
             member = await supabase_service.get_by_id('members', str(application["member_id"]))
 
             export_data.append({
+                # Project_applications 表字段
                 "id": str(application["id"]),
                 "project_id": str(application["project_id"]),
-                "project_title": project["title"] if project else None,
                 "member_id": str(application["member_id"]),
-                "company_name": member["company_name"] if member else None,
-                "business_number": member["business_number"] if member else None,
                 "status": application["status"],
+                "applicant_name": application.get("applicant_name"),
+                "applicant_phone": application.get("applicant_phone"),
                 "application_reason": application.get("application_reason"),
                 "submitted_at": application.get("submitted_at"),
                 "reviewed_at": application.get("reviewed_at"),
+                "review_note": application.get("review_note"),
+                "reviewed_by": str(application["reviewed_by"]) if application.get("reviewed_by") else None,
+                "material_request": application.get("material_request"),
+                "material_response": application.get("material_response"),
+                "created_at": application.get("created_at"),
+                
+                # 关联标识字段（让ID有意义）
+                "project_title": project["title"] if project else None,
+                "member_company_name": member["company_name"] if member else None,
+                "member_business_number": member["business_number"] if member else None,
+                
+                # 移除: attachments (附件字段)
             })
 
         return export_data

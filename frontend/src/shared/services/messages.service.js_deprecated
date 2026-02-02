@@ -1,0 +1,24 @@
+/**
+ * @deprecated This service has been migrated to module-specific services.
+ * 
+ * 此服务已废弃，功能已迁移到各模块内部：
+ * - 管理员消息服务 → @admin/modules/messages/services/messages.service.js
+ * - 会员支持服务 → @member/modules/support/services/support.service.js
+ * 
+ * 请不要在新代码中使用此文件。
+ * 此文件保留仅用于向后兼容，将在未来版本中删除。
+ * 
+ * DO NOT USE THIS FILE IN NEW CODE.
+ * This file is kept for backward compatibility only and will be removed in a future version.
+ */
+
+console.warn(
+  '[DEPRECATED] frontend/src/shared/services/messages.service.js is deprecated. ' +
+  'Use module-specific services instead:\n' +
+  '- Admin: @admin/modules/messages/services/messages.service.js\n' +
+  '- Member: @member/modules/support/services/support.service.js'
+);
+
+// 空导出，防止导入错误
+export const messagesService = {};
+export default messagesService;

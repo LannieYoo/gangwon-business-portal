@@ -5,47 +5,38 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { projectService } from "../services/project.service";
+import { useApiCache } from "@shared/hooks/useApiCache";
 
 export function useProjects() {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
   const fetchProjects = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = {
-        page: 1,
-        pageSize: 100,
-        status: "active",
-      };
+    const params = {
+      page: 1,
+      pageSize: 100,
+      status: "active",
+    };
 
-      const response = await projectService.listProjects(params);
-      if (response && response.items) {
-        setProjects(response.items);
-      } else {
-        setProjects([]);
-      }
-    } catch (err) {
-      console.error("Failed to load projects:", err);
-      setError("Failed to load projects");
-      setProjects([]);
-    } finally {
-      setLoading(false);
-    }
+    const response = await projectService.listProjects(params);
+    return response && response.items ? response.items : [];
   }, []);
 
-  useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
+  const { data: projects, loading, error, refresh } = useApiCache(
+    fetchProjects,
+    'projects-list',
+    {
+      cacheDuration: 1 * 60 * 1000, // 1分钟缓存
+      enabled: true
+    }
+  );
+
+  // 使用 useMemo 确保返回稳定的数组引用
+  const stableProjects = useMemo(() => projects ?? [], [projects]);
 
   return {
-    projects,
+    projects: stableProjects,
     loading,
     error,
-    refresh: fetchProjects,
+    refresh,
   };
 }

@@ -94,6 +94,7 @@ class MessageService:
         category: Optional[str] = None,
         is_important: Optional[bool] = None,
         is_read: Optional[bool] = None,
+        message_type: Optional[str] = None,
         is_admin: bool = False,
     ) -> Tuple[List[dict], int, int]:
         """获取用户的分页消息列表"""
@@ -104,6 +105,7 @@ class MessageService:
             category=category,
             is_important=is_important,
             is_read=is_read,
+            message_type=message_type,
             is_admin=is_admin
         )
 
@@ -174,13 +176,21 @@ class MessageService:
         updated = await self.db.update_message(str(message_id), update_data)
         return updated
 
-    async def delete_message(self, message_id: UUID, user_id: UUID) -> None:
-        """软删除消息"""
-        message = await self.db.get_message_with_access_check(str(message_id), str(user_id))
-        if not message:
-            raise NotFoundError(resource_type="Message")
+    async def delete_message(self, message_id: UUID, user_id: UUID, is_admin: bool = False) -> None:
+        """删除消息（硬删除）"""
+        if is_admin:
+            # 管理员可以删除任何消息，不需要访问检查
+            message = await self.db.get_message_by_id(str(message_id))
+            if not message:
+                raise NotFoundError(resource_type="Message")
+        else:
+            # 普通用户需要访问检查
+            message = await self.db.get_message_with_access_check(str(message_id), str(user_id))
+            if not message:
+                raise NotFoundError(resource_type="Message")
 
-        await self.db.soft_delete_message(str(message_id))
+        # 使用硬删除
+        await self.db.delete_message(str(message_id))
 
     async def get_unread_count_unified(self, user_id: UUID, is_admin: bool = False) -> dict:
         """获取用户未读消息数量"""
@@ -198,11 +208,17 @@ class MessageService:
         data: MessageCreate
     ) -> dict:
         """创建直接消息"""
+        # Determine sender type
+        sender_type = self.SENDER_SYSTEM
+        if sender_id:
+            is_admin = await self._is_admin(str(sender_id))
+            sender_type = self.SENDER_ADMIN if is_admin else self.SENDER_MEMBER
+        
         message_data = {
             "id": str(uuid4()),
             "message_type": self.TYPE_DIRECT,
             "sender_id": str(sender_id) if sender_id else None,
-            "sender_type": self.SENDER_ADMIN if sender_id else self.SENDER_SYSTEM,
+            "sender_type": sender_type,
             "recipient_id": str(recipient_id),
             "subject": data.subject,
             "content": data.content,

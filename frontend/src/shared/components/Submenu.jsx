@@ -135,7 +135,11 @@ export default function Submenu({
             // 处理路由类型的菜单项（使用 React Router 导航）
             if (item.path) {
               let isActive = false;
-              if (item.activePaths && Array.isArray(item.activePaths)) {
+              
+              // 优先使用自定义匹配函数
+              if (item.customMatch && typeof item.customMatch === 'function') {
+                isActive = item.customMatch(location.pathname);
+              } else if (item.activePaths && Array.isArray(item.activePaths)) {
                 // 如果提供了 activePaths 数组，检查当前路径是否匹配其中任何一个
                 isActive = item.activePaths.some(activePath => {
                   if (item.exact) {

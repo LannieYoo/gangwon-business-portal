@@ -7,7 +7,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Badge, Loading, Modal, Textarea, Alert, TabContainer } from '@shared/components';
-import { adminService, uploadService } from '@shared/services';
+import performanceService from './services/performance.service';
+import membersService from '../members/services/members.service';
+import { uploadService } from '@shared/services';
 import { useDateFormatter, useMessage } from '@shared/hooks';
 import { SalesEmploymentTab, GovernmentSupportTab, IntellectualPropertyTab } from './components';
 
@@ -33,12 +35,12 @@ export default function PerformanceDetail() {
 
   const loadPerformanceDetail = async () => {
     setLoading(true);
-    const recordData = await adminService.getPerformanceRecord(id);
+    const recordData = await performanceService.getPerformanceRecord(id);
     if (recordData) {
       setRecord(recordData);
       
       if (recordData.memberId) {
-        const memberData = await adminService.getMemberDetail(recordData.memberId);
+        const memberData = await membersService.getMemberDetail(recordData.memberId);
         setMember(memberData);
       }
     }
@@ -47,7 +49,7 @@ export default function PerformanceDetail() {
 
   const handleApprove = async () => {
     try {
-      await adminService.approvePerformance(id);
+      await performanceService.approvePerformance(id);
       showSuccess(t('admin.performance.approveSuccess', '승인 성공'));
       loadPerformanceDetail();
     } catch (error) {
@@ -63,7 +65,7 @@ export default function PerformanceDetail() {
     }
 
     try {
-      await adminService.requestPerformanceRevision(id, reviewComment);
+      await performanceService.requestPerformanceRevision(id, reviewComment);
       showSuccess(t('admin.performance.revisionSuccess', '수정 요청이 전송되었습니다'));
       setShowReviewModal(false);
       setReviewComment('');
@@ -81,7 +83,7 @@ export default function PerformanceDetail() {
     }
 
     try {
-      await adminService.rejectPerformance(id, rejectComment);
+      await performanceService.rejectPerformance(id, rejectComment);
       showSuccess(t('admin.performance.rejectSuccess', '거부 성공'));
       setShowRejectModal(false);
       setRejectComment('');

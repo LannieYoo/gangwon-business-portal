@@ -4,10 +4,11 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supportService } from "../services/support.service";
+import { useApiCache } from "@shared/hooks/useApiCache";
 
 /**
  * 咨询历史逻辑控制 Hook
@@ -15,38 +16,35 @@ import { supportService } from "../services/support.service";
 export function useInquiryHistory() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [allThreads, setAllThreads] = useState([]);
   const [filteredThreads, setFilteredThreads] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [selectedThreadId, setSelectedThreadId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
+
+  const fetchThreads = useCallback(async () => {
+    const response = await supportService.getMemberThreads({
+      page: 1,
+      pageSize: 1000,
+      status: statusFilter || undefined,
+    });
+    return response.items || [];
+  }, [statusFilter]);
+
+  const { data: allThreads, loading, error, refresh: loadThreads } = useApiCache(
+    fetchThreads,
+    `inquiry-history-${statusFilter}`,
+    {
+      cacheDuration: 30 * 1000, // 30秒缓存（用户自己的数据，更新较频繁）
+      enabled: true,
+      deps: [statusFilter]
+    }
+  );
+
+  // 使用 useMemo 确保返回稳定的数组引用
+  const stableAllThreads = useMemo(() => allThreads ?? [], [allThreads]);
 
   const handleFilterChange = useCallback((filtered) => {
     setFilteredThreads(filtered);
   }, []);
-
-  const loadThreads = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await supportService.getMemberThreads({
-        page: 1,
-        pageSize: 1000,
-        status: statusFilter || undefined,
-      });
-      setAllThreads(response.items || []);
-      setFilteredThreads(response.items || []);
-    } catch (error) {
-      console.error("Failed to load threads:", error);
-      setAllThreads([]);
-      setFilteredThreads([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter]);
-
-  useEffect(() => {
-    loadThreads();
-  }, [loadThreads]);
 
   const openDetailModal = (threadId) => {
     setSelectedThreadId(threadId);
@@ -58,7 +56,7 @@ export function useInquiryHistory() {
   };
 
   return {
-    allThreads,
+    allThreads: stableAllThreads,
     filteredThreads,
     loading,
     selectedThreadId,

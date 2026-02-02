@@ -21,6 +21,9 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
   headers: { "Content-Type": "application/json", Accept: "application/json" },
+  paramsSerializer: {
+    indexes: null, // 不使用索引，将数组序列化为 key=value1&key=value2
+  },
 });
 
 apiClient.interceptors.request.use(

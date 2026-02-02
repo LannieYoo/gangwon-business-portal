@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Button, Select } from '@shared/components';
 import { LineChart, BarChart } from '@shared/components/Charts';
-import { messagesService } from '@shared/services';
+import { messagesService } from './services/messages.service';
 
 export default function MessageAnalytics() {
   const { t } = useTranslation();

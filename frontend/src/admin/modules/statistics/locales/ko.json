@@ -3,6 +3,10 @@
     "title": "통계 리포트",
     "subtitle": "기업 데이터 조회 및 분석",
     "groups": {
+      "quick": "빠른 필터",
+      "company": "기업 특성",
+      "metrics": "경영 지표",
+      "representative": "대표자 정보",
       "general": "기본 및 행정 정보",
       "industry": "산업 및 기술 분류",
       "identity": "기업 성격 및 단계",
@@ -11,9 +15,15 @@
     },
     "filters": {
       "title": "필터",
+      "noFilters": "선택된 필터 없음",
       "reset": "초기화",
       "apply": "조회",
-      "export": "엑셀 내보내기",
+      "export": "Excel 내보내기",
+      "selectedConditions": "선택된 필터 조건",
+      "clearAll": "전체 지우기",
+      "matchingCompanies": "조건에 맞는 기업",
+      "calculating": "계산 중...",
+      "companies": "개",
       "time": {
         "title": "기간",
         "year": "연도별",
@@ -27,9 +37,11 @@
       },
       "industry": {
         "title": "산업 분류",
-        "major": "표준산업 (대분류)",
-        "medium": "표준산업 (중분류)",
+        "major": "표준산업(대분류)",
+        "medium": "표준산업(중분류)",
         "gangwon": "강원 주도 산업",
+        "gangwonFuture": "강원도 7대 미래산업",
+        "futureTech": "미래유망 신기술",
         "startupType": "창업유형",
         "businessField": "지역주력산업코드"
       },
@@ -73,6 +85,9 @@
         "growth": "성장",
         "leap": "도약",
         "reStartup": "재창업",
+        "startupUnder3Years": "3년 이하",
+        "startup3To7Years": "3-7년",
+        "startupOver7Years": "7년 이상",
         "selectStages": "창업 단계 선택"
       },
       "representative": {
@@ -81,7 +96,17 @@
         "male": "남",
         "female": "여",
         "other": "기타",
-        "ageRange": "연령대"
+        "ageRangeLabel": "연령대",
+        "ageRange": {
+          "all": "전체",
+          "under20": "20세 이하",
+          "20to29": "20 - 29세",
+          "30to39": "30 - 39세",
+          "40to49": "40 - 49세",
+          "50to59": "50 - 59세",
+          "over60": "60세 이상",
+          "custom": "사용자 정의"
+        }
       },
       "workYears": {
         "title": "업력",
@@ -95,13 +120,37 @@
         "chuncheon": "춘천",
         "wonju": "원주",
         "gangneung": "강릉",
+        "sokcho": "속초",
+        "goseong": "고성",
+        "hwacheon": "화천",
         "hongcheon": "홍천",
         "hoengseong": "횡성"
       },
       "quantitive": {
         "title": "양적 지표 (매출/고용)",
         "revenue": "연매출",
-        "employees": "직원 수"
+        "employees": "직원 수",
+        "revenueRange": {
+          "all": "전체",
+          "under100m": "1억 이하",
+          "100m500m": "1억 - 5억",
+          "500m1b": "5억 - 10억",
+          "1b5b": "10억 - 50억",
+          "5b10b": "50억 - 100억",
+          "over10b": "100억 이상",
+          "custom": "사용자 정의"
+        },
+        "employeeRange": {
+          "all": "전체",
+          "under5": "5명 이하",
+          "5to10": "5 - 10명",
+          "10to30": "10 - 30명",
+          "30to50": "30 - 50명",
+          "50to100": "50 - 100명",
+          "100to300": "100 - 300명",
+          "over300": "300명 이상",
+          "custom": "사용자 정의"
+        }
       },
       "industry_extra": {
         "startupType": "창업유형",
@@ -114,11 +163,9 @@
         "talent": "인재양성"
       },
       "participation": {
-        "rise": "RISE 사업단",
-        "global": "글로벌 사업",
-        "university": "창업중심대학",
         "startup_university": "창업중심대학",
-        "global_glocal": "글로벌·글로컬 사업"
+        "global_glocal": "글로벌·글로컬 사업",
+        "rise": "RISE 사업단"
       },
       "all": "전체",
       "keyword": {
@@ -128,19 +175,63 @@
     },
     "table": {
       "title": "통계 결과",
-      "businessRegNo": "사업자등록번호",
+      "year": "연도(년)",
+      "quarter": "분기",
+      "month": "월",
+      "businessRegNo": "사업자 등록번호",
       "enterpriseName": "기업명",
-      "industryType": "업종",
+      "programs": "정부사업",
+      "ksicMajor": "표준산업(대분류)",
+      "ksicSub": "표준산업(중분류)",
+      "gangwonIndustry": "강원주도산업(대분류)",
+      "gangwonIndustrySub": "강원주도산업(중분류)",
+      "gangwonFutureIndustry": "강원7대미래산업",
+      "futureTech": "미래유망신기술",
+      "workYears": "업력(년)",
       "startupStage": "창업단계",
-      "programs": "참여 프로젝트",
+      "region": "소재지",
+      "investmentAmount": "투자유치(원)",
+      "revenue": "매출액(원)",
+      "exportAmount": "수출(원)",
+      "employeeCount": "직원수(명)",
+      "patentCount": "특허(건)",
+      "representativeGender": "대표자 성별",
+      "representativeAge": "대표자 나이(세)",
       "investmentStatus": "투자유치",
-      "investmentAmount": "총 투자금액",
-      "patentCount": "특허 보유 수",
-      "revenue": "연매출",
-      "exportAmount": "수출액",
       "noData": "조회된 데이터가 없습니다",
       "loading": "데이터 로딩 중...",
-      "error": "데이터 조회 실패"
+      "error": "데이터 조회 실패",
+      "columnSettings": "열 설정",
+      "quickActions": "빠른 설정",
+      "showAll": "전체 표시",
+      "hideAll": "전체 숨김",
+      "units": {
+        "years": "년",
+        "patents": "개",
+        "employees": "명",
+        "won": "원"
+      },
+      "yearUnit": "년",
+      "quarterUnit": "분기",
+      "monthUnit": "월",
+      "yearsUnit": "년",
+      "countUnit": "건",
+      "peopleUnit": "명",
+      "ageUnit": "세",
+      "male": "남성",
+      "female": "여성"
+    },
+    "columnGroups": {
+      "basic": "기본 정보",
+      "quickFilters": "빠른 필터",
+      "companyProfile": "기업 특성",
+      "businessMetrics": "경영 지표",
+      "representative": "대표자 정보"
+    },
+    "columnPresets": {
+      "all": "전체",
+      "core": "핵심",
+      "minimum": "최소"
     },
     "sort": {
       "title": "정렬",
@@ -164,7 +255,10 @@
       "last": "마지막"
     },
     "export": {
-      "title": "엑셀 내보내기",
+      "title": "Excel 내보내기",
+      "csv": "CSV 내보내기",
+      "csvSuccess": "CSV 파일이 다운로드되었습니다",
+      "csvError": "CSV 내보내기 실패",
       "confirm": "현재 필터 조건의 데이터를 엑셀로 내보내시겠습니까?",
       "success": "엑셀 파일이 다운로드되었습니다",
       "error": "엑셀 내보내기 실패",
@@ -194,6 +288,33 @@
       "programsHelp": "참여 프로젝트는 OR 조건으로 필터링됩니다 (하나라도 해당되면 조회)",
       "investmentHelp": "투자금액 단위는 만원입니다",
       "patentHelp": "특허 수량은 기업이 보유한 전체 특허 개수입니다"
+    },
+    "industries": {
+      "software": "소프트웨어",
+      "hardware": "하드웨어",
+      "biotechnology": "생명공학",
+      "healthcare": "의료",
+      "finance": "금융",
+      "education": "교육",
+      "manufacturing": "제조업",
+      "retail": "소매업",
+      "service": "서비스업",
+      "other": "기타"
+    }
+  },
+  "industryClassification": {
+    "gangwonIndustry": {
+      "semiconductor": "반도체",
+      "bio_health": "바이오헬스",
+      "new_materials": "신소재",
+      "future_energy": "미래에너지",
+      "smart_mobility": "스마트모빌리티",
+      "ai_sw": "AI·SW",
+      "culture_content": "문화콘텐츠",
+      "future_mobility": "미래모빌리티",
+      "food_tech": "푸드테크",
+      "advanced_defense": "첨단방위",
+      "climate_tech": "기후테크"
     }
   }
 }

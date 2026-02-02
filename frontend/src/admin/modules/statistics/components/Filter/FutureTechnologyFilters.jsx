@@ -1,0 +1,35 @@
+/*
+ * FutureTechnologyFilters - 未来有望新技术筛选组件（单选）
+ */
+import { useTranslation } from "react-i18next";
+import { Select } from "@shared/components";
+import { FUTURE_TECHNOLOGY_OPTIONS } from "../../enum";
+
+export const FutureTechnologyFilters = ({ technologies = [], onChange }) => {
+  const { t } = useTranslation();
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    // 单选：如果选择了值，设置为包含该值的数组；如果选择"全部"，设置为空数组
+    onChange("futureTechnologies", value ? [value] : []);
+  };
+
+  // 获取当前选中的值（取数组第一个元素）
+  const selectedValue = technologies.length > 0 ? technologies[0] : "";
+
+  return (
+    <Select
+      value={selectedValue}
+      options={[
+        { value: "", label: t("statistics.filters.all", "全部") },
+        ...FUTURE_TECHNOLOGY_OPTIONS.map((option) => ({
+          value: option.value,
+          label: t(option.labelKey),
+        }))
+      ]}
+      onChange={handleChange}
+      containerClassName="mb-0"
+      className="w-full sm:w-80 h-9"
+    />
+  );
+};

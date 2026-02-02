@@ -344,6 +344,11 @@ const MemberSupportInquiryHistory = lazy(() =>
     default: m.InquiryHistoryView,
   })),
 );
+const MemberSupportNotificationHistory = lazy(() =>
+  import("@member/modules/support").then((m) => ({
+    default: m.NotificationHistoryView,
+  })),
+);
 const NoticesList = lazy(() =>
   import("@member/modules/support").then((m) => ({
     default: m.NoticesView,
@@ -624,6 +629,16 @@ export const router = createBrowserRouter(
                 <ProtectedRoute allowedRoles={["member"]}>
                   <LazyRoute>
                     <MemberSupportInquiryHistory />
+                  </LazyRoute>
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "support/notifications",
+              element: (
+                <ProtectedRoute allowedRoles={["member"]}>
+                  <LazyRoute>
+                    <MemberSupportNotificationHistory />
                   </LazyRoute>
                 </ProtectedRoute>
               ),

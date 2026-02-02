@@ -1,283 +1,526 @@
-# 江原企业门户 - Claude Code 项目配置
+# gangwon-business-portal - Claude Code 项目配置
 
 ## 项目概览
 
-江原企业门户是一个前后端分离的企业服务平台，支持韩语和中文双语，为企业提供项目申请、实绩管理、FAQ 和咨询等功能。
 
-## 技术栈
+- **Frontend**: React 18.3.1 + Vite 6.0.11
 
-### Frontend
-- **Framework**: React 18.3.1
-- **Build Tool**: Vite 6.0.11
-- **Router**: React Router DOM 7.1.3
+
 - **State Management**: Zustand 5.0.3
+
+
 - **i18n**: react-i18next 15.1.5
-- **HTTP Client**: Axios 1.7.9
-- **Styling**: Custom CSS
 
-### Backend
-- **Runtime**: Node.js + Express
-- **Database**: (根据项目配置添加)
 
-### Testing
-- **Unit Testing**: Vitest (待配置)
-- **E2E Testing**: Playwright (待配置)
+- **Languages**: zh, ko
 
-## 项目结构
 
-```
-gangwon-business-portal/
-├── frontend/
-│   ├── src/
-│   │   ├── admin/              # 管理员模块
-│   │   │   └── modules/
-│   │   │       ├── auth/       # 管理员认证
-│   │   │       └── members/    # 会员管理
-│   │   ├── member/             # 会员模块
-│   │   │   ├── layouts/        # 布局组件
-│   │   │   └── modules/        # 功能模块
-│   │   │       ├── about_deprecated/
-│   │   │       ├── auth_deprecated/
-│   │   │       ├── home_deprecated/
-│   │   │       ├── performance_deprecated/
-│   │   │       ├── projects_deprecated/
-│   │   │       └── support_deprecated/
-│   │   ├── features/           # 新功能模块（推荐）
-│   │   ├── shared/             # 共享资源
-│   │   │   ├── components/     # 共享组件
-│   │   │   ├── hooks/          # 自定义 Hooks
-│   │   │   ├── services/       # API 服务
-│   │   │   ├── stores/         # Zustand Stores
-│   │   │   ├── utils/          # 工具函数
-│   │   │   ├── i18n/           # 国际化
-│   │   │   │   └── locales/
-│   │   │   │       ├── ko.json # 韩语翻译
-│   │   │   │       └── zh.json # 中文翻译
-│   │   │   └── styles/         # 全局样式
-│   │   ├── App.jsx             # 根组件
-│   │   └── router.jsx          # 路由配置
-│   ├── vite.config.js
-│   └── package.json
-├── backend/                    # 后端（如有）
-├── .claude/                    # Claude Code 配置
-│   ├── rules/                  # 代码规则
-│   ├── agents/                 # 专门 Agents
-│   ├── commands/               # 快捷命令
-│   ├── skills/                 # 技能和模式
-│   └── hooks.json              # 自动化钩子
-├── docs/                       # 项目文档
-└── CLAUDE.md                   # 本文件
-```
+---
 
-## 开发指南
+# Base Rules / 基础规则
 
-### 命令
+> 所有 AI 编程助手平台的共享基础规则。
+> 适配器会将此文件与其他规则文件合并生成平台配置。
+
+## AI Behavior Guidelines / AI 行为准则
+
+1. **语言**: 使用中文进行解释和说明
+2. **技术术语**: 保留英文原文，如 "PCA"、"API"、"React"
+3. **响应风格**: 简洁、可操作、结构化
+4. **不确定时**: 主动询问而非假设
+5. **修改文件**: 显示变更差异（diff）
+6. **安全优先**: 不硬编码密钥、不引入 XSS/SQL 注入
+
+## Coding Standards / 代码规范
+
+### 命名规范
+
+- 使用描述性的变量和函数名
+- Python: `snake_case`
+- JavaScript/TypeScript: `camelCase`
+- React 组件: `PascalCase`
+- CSS 文件: `kebab-case`
+
+### 注释规范
+
+- 使用双语注释（中文为主，技术术语保留英文）
+- 文件顶部添加块注释说明用途
+- 复杂逻辑需要注释解释
+
+### 格式规范
+
+- Python: 4 空格缩进
+- JavaScript/TypeScript: 2 空格缩进
+- 每行最多 120 字符
+
+## Common Commands / 常用命令
 
 ```bash
-# 安装依赖
-cd frontend && npm install
+# Git 操作
+git pull origin main
+git add . && git commit -m "message" && git push
 
-# 开发服务器
+# Node.js
+npm install
 npm run dev
-
-# 构建生产版本
 npm run build
 
-# 预览生产构建
-npm run preview
-
-# 代码检查
-npm run lint
-
-# 测试（待配置）
-npm run test
-
-# E2E 测试（待配置）
-npm run test:e2e
+# Python 环境
+uv sync
+uv run python script.py
 ```
 
-### 代码规范
+## Platform Config Mapping / 平台配置映射
 
-#### 1. 文件命名
-- 组件文件: `PascalCase.jsx` (例如: `UserCard.jsx`)
-- 工具文件: `camelCase.js` (例如: `formatDate.js`)
-- 样式文件: `kebab-case.css` (例如: `user-card.css`)
+| 平台 | 配置入口 | 适配器 |
+|------|---------|--------|
+| Claude Code | `CLAUDE.md` + `.claude/` | `adapters/claude/` |
+| Cursor | `.cursorrules` | `adapters/cursor/` |
+| Windsurf | `.windsurfrules` | `adapters/windsurf/` |
+| Kiro | `.kiro/steering/` | `adapters/kiro/` |
+| OpenAI Codex | `AGENTS.md` | `adapters/codex/` |
+| Antigravity | `.agent/` | `adapters/antigravity/` |
+| VS Code Copilot | `.github/copilot-instructions.md` | `adapters/copilot/` |
 
-#### 2. 组件模式
-- 使用**命名导出**而不是默认导出
-- Props 使用**解构**
-- 遵循**组合优于继承**原则
 
-```javascript
-// ✅ GOOD
-export const UserCard = ({ name, email }) => {
-  return <div>{name}</div>
-}
+---
 
-// ❌ AVOID
-export default function UserCard(props) {
-  return <div>{props.name}</div>
-}
-```
+# Coding Style / 代码风格
 
-#### 3. 状态管理 (Zustand)
-- Store 更新必须使用**不可变模式**
-- 按功能分割 Store
-- 使用 Selector 优化性能
+## Immutability / 不可变性 (CRITICAL)
+
+始终创建新对象，绝不直接修改：
 
 ```javascript
-// ✅ GOOD: 不可变更新
+// WRONG: Mutation
+function updateUser(user, name) {
+  user.name = name
+  return user
+}
+
+// CORRECT: Immutability
+function updateUser(user, name) {
+  return { ...user, name }
+}
+
+// Zustand Store (CORRECT)
 set((state) => ({
   users: state.users.map(u =>
     u.id === id ? { ...u, name } : u
   )
 }))
 
-// ❌ WRONG: 直接修改
+// Zustand Store (WRONG)
 set((state) => {
   state.users.push(newUser)
   return state
 })
 ```
 
-#### 4. 国际化 (i18n)
-- **所有**用户可见文本必须使用 i18n
-- 保持 `ko.json` 和 `zh.json` 键一致
-- 使用命名空间组织翻译
+## File Organization / 文件组织
+
+遵循基于功能的模块化架构：
+
+```
+src/
+├── features/           # 按功能组织
+│   └── feature-name/
+│       ├── components/
+│       ├── hooks/
+│       ├── services/
+│       ├── stores/
+│       └── locales/
+├── shared/            # 共享资源
+│   ├── components/
+│   ├── hooks/
+│   ├── services/
+│   ├── stores/
+│   └── utils/
+```
+
+原则：
+- 多个小文件 > 少数大文件
+- 单文件 200-400 行，最多 800 行
+- 高内聚、低耦合
+- 按功能/领域组织，而非按类型
+
+## Component Patterns / 组件模式
 
 ```javascript
-// ✅ GOOD
+// PREFER: 命名导出 (tree-shaking 友好)
+export const UserCard = ({ name, email, role }) => {
+  return <div>{name}</div>
+}
+
+// AVOID: 默认导出 (重构困难)
+export default function UserCard(props) {
+  return <div>{props.name}</div>
+}
+```
+
+## i18n Best Practices / 国际化
+
+```javascript
+// ALWAYS: 使用翻译键
 import { useTranslation } from 'react-i18next'
 const { t } = useTranslation()
 <h1>{t('common.welcome')}</h1>
 
-// ❌ WRONG
-<h1>欢迎</h1>
+// NEVER: 硬编码字符串
+<h1>Welcome</h1>
 ```
 
-#### 5. 安全规范
-- **永不**硬编码 API keys、密码或 tokens
-- 使用 `import.meta.env.VITE_*` 环境变量
-- 验证所有用户输入
-- 防止 XSS 和 SQL 注入
+## Error Handling / 错误处理
 
-#### 6. 性能优化
-- 使用 `React.memo` 优化纯组件
-- 使用 `useCallback` 和 `useMemo` 避免不必要的重新渲染
-- 懒加载重型组件
+```javascript
+try {
+  const result = await apiService.fetchData()
+  return result
+} catch (error) {
+  console.error('Failed to fetch data:', error)
+  throw new Error(t('errors.fetchFailed'))
+}
+```
 
-#### 7. 测试要求
-- 单元测试覆盖率 > 80%
-- 关键用户流程必须有 E2E 测试
-- 遵循 TDD 原则（测试先行）
+## Code Quality Checklist / 代码质量清单
 
-### Git 工作流
+- [ ] 代码可读且命名良好
+- [ ] 函数 < 50 行
+- [ ] 文件 < 800 行
+- [ ] 嵌套不超过 4 层
+- [ ] 正确的错误处理
+- [ ] 无 console.log 语句
+- [ ] 无硬编码值
+- [ ] 使用不可变模式
+- [ ] 所有字符串已国际化
 
-#### Commit 消息格式
+
+---
+
+# Security Guidelines / 安全规范
+
+## Mandatory Security Checks / 必检项
+
+每次提交前必须确认：
+- [ ] 无硬编码的密钥（API keys、passwords、tokens）
+- [ ] 所有用户输入已验证
+- [ ] SQL 注入防护（参数化查询）
+- [ ] XSS 防护（HTML 已清理）
+- [ ] CSRF 保护已启用
+- [ ] 认证/授权已验证
+- [ ] API 端点有速率限制
+- [ ] 错误消息不泄露敏感数据
+- [ ] 敏感数据未输出到 console
+
+## Secret Management / 密钥管理
+
+```javascript
+// NEVER: 硬编码密钥
+const apiKey = "your-api-key-here"
+
+// ALWAYS: 使用环境变量
+// Frontend (Vite)
+const apiKey = import.meta.env.VITE_API_KEY
+// Backend (Node.js)
+const dbPassword = process.env.DB_PASSWORD
+
+if (!apiKey) {
+  throw new Error('API key not configured')
+}
+```
+
+## Frontend Security
+
+```javascript
+// NEVER: 直接注入 HTML
+<div dangerouslySetInnerHTML={{__html: userInput}} />
+
+// ALWAYS: 清理用户输入
+import DOMPurify from 'dompurify'
+<div dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(userInput)}} />
+
+// NEVER: 使用 eval
+eval(userCode)
+new Function(userCode)()
+```
+
+## API Security
+
+```javascript
+// ALWAYS: 验证请求数据
+import { z } from 'zod'
+
+const schema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(100)
+})
+
+const validated = schema.parse(requestBody)
+```
+
+## Security Response Protocol
+
+发现安全问题时：
+1. 立即停止当前工作
+2. 修复 CRITICAL 级别问题
+3. 轮换已暴露的密钥
+4. 审查代码库中的类似问题
+
+
+---
+
+# Git Workflow / Git 工作流
+
+## Commit Message Format / 提交消息格式
+
+遵循 Conventional Commits：
+
 ```
 <type>: <description>
 
 <optional body>
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-**Types:**
+Types:
 - `feat`: 新功能
 - `fix`: Bug 修复
-- `refactor`: 重构
-- `docs`: 文档更新
-- `test`: 测试相关
-- `chore`: 构建/工具更改
-- `style`: 代码格式化
+- `refactor`: 代码重构
+- `docs`: 文档变更
+- `test`: 测试变更
+- `chore`: 构建/工具变更
 - `perf`: 性能优化
+- `ci`: CI/CD 变更
+- `style`: 代码格式化
 
-#### 提交前检查清单
-- [ ] 没有 console.log 语句
-- [ ] 没有硬编码的密钥
+## Branch Naming / 分支命名
+
+```
+feature/feature-name
+fix/bug-description
+refactor/component-name
+```
+
+## Pull Request Workflow
+
+创建 PR 时：
+1. 分析完整的 commit 历史（不只是最新 commit）
+2. 使用 `git diff main...HEAD` 查看所有变更
+3. 撰写全面的 PR 摘要
+4. 包含测试计划清单
+5. 新分支用 `-u` 标志推送
+
+PR 模板:
+```markdown
+## Summary
+[简要描述变更内容]
+
+## Changes
+- [变更点 1]
+- [变更点 2]
+
+## Test Plan
+- [ ] 单元测试通过
+- [ ] E2E 测试通过
+- [ ] 手动测试关键流程
+- [ ] i18n 翻译完整
+```
+
+## Pre-commit Checklist / 提交前检查
+
+- [ ] 无 console.log 语句
+- [ ] 无硬编码密钥
 - [ ] 所有测试通过
-- [ ] i18n 键已添加（ko.json 和 zh.json）
+- [ ] i18n 键已添加
 - [ ] 代码已格式化
-- [ ] 没有 TypeScript/ESLint 错误
+- [ ] 无 lint 错误
 
-### Claude Code 使用
-
-#### 可用命令
-- `/code-review` - 代码审查
-- `/build-fix` - 修复构建错误
-- `/e2e` - 生成 E2E 测试
-
-#### 可用 Agents
-- `code-reviewer` - 代码质量和安全审查
-- `build-error-resolver` - 构建错误解决
-- `e2e-runner` - E2E 测试运行器
-
-#### Rules
-- `security.md` - 安全规范
-- `coding-style.md` - 代码风格
-- `git-workflow.md` - Git 工作流
-- `testing.md` - 测试要求
-
-## 关键用户流程（必须测试）
-
-### 会员端
-1. ✅ 用户注册和登录
-2. ✅ 项目列表浏览
-3. ✅ 项目申请提交
-4. ✅ 实绩报告提交
-5. ✅ FAQ 查看和咨询提交
-6. ✅ 语言切换（韩语 ↔ 中文）
-
-### 管理端
-1. ✅ 管理员登录
-2. ✅ 会员管理
-3. ✅ 项目审核
-4. ✅ 实绩审核
-
-## 环境变量
-
-```bash
-# Frontend (.env)
-VITE_API_URL=http://localhost:3000/api
-VITE_APP_TITLE=江原企业门户
-
-# Backend (.env)
-PORT=3000
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=gangwon_portal
-```
-
-## 常见问题
-
-### 如何添加新功能模块？
-1. 在 `frontend/src/features/` 创建功能目录
-2. 按模块结构组织：`components/`, `hooks/`, `services/`, `stores/`, `locales/`
-3. 在 `router.jsx` 中添加路由
-4. 添加 i18n 翻译键到 `ko.json` 和 `zh.json`
-
-### 如何运行 E2E 测试？
-```bash
-npx playwright test
-npx playwright show-report
-```
-
-### 如何修复构建错误？
-```bash
-# 使用 build-fix 命令
-/build-fix
-
-# 或手动
-npm run build
-```
-
-## 联系方式
-
-- 项目管理: [链接]
-- 技术文档: `docs/` 目录
-- API 文档: `docs/api/` 目录
 
 ---
 
-**最后更新**: 2026-01-25
-**Claude Code 版本**: 推荐使用最新版本
+# Testing Requirements / 测试要求
+
+## Coverage Target: 80%+
+
+测试类型（全部需要）：
+1. **Unit Tests** — 单个函数、工具、组件
+2. **Integration Tests** — API 端点、数据库操作
+3. **E2E Tests** — 关键用户流程
+
+## Test-Driven Development (TDD)
+
+新功能必须遵循 TDD 流程：
+1. 先写测试 (RED)
+2. 运行测试 — 应该失败
+3. 写最小实现 (GREEN)
+4. 运行测试 — 应该通过
+5. 重构 (IMPROVE)
+6. 验证覆盖率 (80%+)
+
+## Frontend Testing (Vitest)
+
+```javascript
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { UserCard } from './UserCard'
+
+describe('UserCard', () => {
+  it('renders user information correctly', () => {
+    const user = { name: 'John', email: 'john@example.com' }
+    render(<UserCard user={user} />)
+    expect(screen.getByText('John')).toBeInTheDocument()
+  })
+})
+```
+
+## Store Testing (Zustand)
+
+```javascript
+import { renderHook, act } from '@testing-library/react'
+import { useUserStore } from './userStore'
+
+describe('useUserStore', () => {
+  beforeEach(() => {
+    useUserStore.setState({ users: [] })
+  })
+
+  it('adds user correctly', () => {
+    const { result } = renderHook(() => useUserStore())
+    act(() => {
+      result.current.addUser({ id: 1, name: 'John' })
+    })
+    expect(result.current.users).toHaveLength(1)
+  })
+})
+```
+
+## E2E Testing (Playwright)
+
+```javascript
+import { test, expect } from '@playwright/test'
+
+test('should login successfully', async ({ page }) => {
+  await page.goto('/login')
+  await page.fill('[name="email"]', 'test@example.com')
+  await page.fill('[name="password"]', 'password123')
+  await page.click('button[type="submit"]')
+  await expect(page).toHaveURL('/dashboard')
+})
+```
+
+## Test File Organization
+
+```
+src/features/
+└── feature-name/
+    ├── components/
+    │   ├── Component.jsx
+    │   └── Component.test.jsx
+    ├── hooks/
+    │   ├── useHook.js
+    │   └── useHook.test.js
+    └── services/
+        ├── service.js
+        └── service.test.js
+```
+
+
+---
+
+## 江原企业门户 - 项目特定规则
+
+### i18n 要求
+- **所有**用户可见文本必须使用 i18n
+- 保持 `ko.json` 和 `zh.json` 键一致
+- 使用命名空间组织翻译
+
+```javascript
+import { useTranslation } from 'react-i18next'
+const { t } = useTranslation()
+<h1>{t('common.welcome')}</h1>
+```
+
+### 组件规范
+- 使用**命名导出**，禁止默认导出
+- Props 使用**解构**
+- Zustand Store 必须使用**不可变更新模式**
+
+### 项目结构
+```
+frontend/src/
+├── admin/              # 管理员模块
+├── member/             # 会员模块
+├── features/           # 新功能模块（推荐）
+├── shared/             # 共享资源
+│   ├── components/
+│   ├── hooks/
+│   ├── services/
+│   ├── stores/
+│   ├── utils/
+│   └── i18n/locales/   # ko.json + zh.json
+```
+
+### 环境变量
+```bash
+VITE_API_URL=http://localhost:3000/api
+VITE_APP_TITLE=江原企业门户
+```
+
+
+---
+
+## 可用 Skills
+
+
+- `dev-code_reviewer`
+
+- `dev-code_standards`
+
+- `dev-code_style`
+
+- `dev-communication_standards`
+
+- `dev-data_download`
+
+- `dev-documentation_standards`
+
+- `dev-pptx_to_pdf`
+
+- `dev-product_manager`
+
+- `dev-quality_standards`
+
+- `dev-resource_discovery`
+
+- `dev-security_standards`
+
+- `dev-senior_architect`
+
+- `dev-senior_backend`
+
+- `dev-senior_data_engineer`
+
+- `dev-senior_devops`
+
+- `dev-senior_frontend`
+
+- `dev-senior_fullstack`
+
+- `dev-senior_qa`
+
+- `dev-senior_security`
+
+- `dev-tdd_guide`
+
+- `dev-tech_stack_evaluator`
+
+- `dev-ux_designer`
+
+- `dev-web_scraping`
+
+
+---
+
+**由 ai-dev-config 自动生成，请勿手动编辑。**
+**运行 `ai-dev-config generate` 重新生成。**

@@ -16,7 +16,7 @@ import {
   Card
 } from '@shared/components';
 import { SearchIcon } from '@shared/components/Icons';
-import { supportService } from '@shared/services';
+import faqService from './services/faq.service';
 import { formatDate } from '@shared/utils';
 
 export default function FAQManagement() {
@@ -109,7 +109,7 @@ export default function FAQManagement() {
   const fetchFaqs = async () => {
     setLoading(true);
     try {
-      const response = await supportService.listFAQs({});
+      const response = await faqService.listFAQs({});
       const faqList = response.items;
       
       let filteredFaqs = faqList;
@@ -159,7 +159,7 @@ export default function FAQManagement() {
     const { faqId } = deleteConfirm;
     if (!faqId) return;
     
-    await supportService.deleteFAQ(faqId);
+    await faqService.deleteFAQ(faqId);
     fetchFaqs();
     setDeleteConfirm({ open: false, faqId: null });
   };
@@ -167,9 +167,9 @@ export default function FAQManagement() {
   // 处理表单提交
   const handleSubmit = async (values) => {
     if (editingFaq) {
-      await supportService.updateFAQ(editingFaq.id, values);
+      await faqService.updateFAQ(editingFaq.id, values);
     } else {
-      await supportService.createFAQ(values);
+      await faqService.createFAQ(values);
     }
     
     setModalVisible(false);

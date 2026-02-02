@@ -115,3 +115,7 @@ coverage.xml
 *.bak
 *.orig
 
+
+# AI Dev Config
+.dev-state.yaml
+*.local.yaml

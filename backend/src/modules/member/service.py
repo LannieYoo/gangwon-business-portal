@@ -6,6 +6,7 @@ Business logic for member management operations.
 from typing import Optional
 from uuid import UUID
 from datetime import datetime, date
+import json
 
 from ...common.modules.db.models import Member  # Member table now includes profile fields
 from ...common.modules.exception import NotFoundError, ValidationError, ConflictError, CMessageTemplate
@@ -94,6 +95,9 @@ class MemberService:
             business_field=member.get("business_field"),
             main_industry_ksic_major=member.get("main_industry_ksic_major"),
             main_industry_ksic_codes=member.get("main_industry_ksic_codes"),
+            # Page 10 requirements - 강원도 산업 분류
+            gangwon_industry=member.get("gangwon_industry"),
+            future_tech=member.get("future_tech"),
             # New fields for Task 6
             participation_programs=member.get("participation_programs"),
             investment_status=member.get("investment_status"),
@@ -158,6 +162,9 @@ class MemberService:
             business_field=member.get("business_field"),
             main_industry_ksic_major=member.get("main_industry_ksic_major"),
             main_industry_ksic_codes=member.get("main_industry_ksic_codes"),
+            # Page 10 requirements - 강원도 산업 분류
+            gangwon_industry=member.get("gangwon_industry"),
+            future_tech=member.get("future_tech"),
             # New fields for Task 6
             participation_programs=member.get("participation_programs"),
             investment_status=member.get("investment_status"),
@@ -277,6 +284,11 @@ class MemberService:
             profile_update['category'] = data.category
         if data.business_field is not None:
             profile_update['business_field'] = data.business_field
+        # Page 10 requirements - 강원도 산업 분류
+        if data.gangwon_industry is not None:
+            profile_update['gangwon_industry'] = data.gangwon_industry
+        if data.future_tech is not None:
+            profile_update['future_tech'] = data.future_tech
         # New fields for Task 6
         if data.participation_programs is not None:
             profile_update['participation_programs'] = data.participation_programs
@@ -355,6 +367,29 @@ class MemberService:
                 status="approved",
             )
         )
+        
+        # Send direct message notification to member
+        try:
+            from ...modules.messages.service import service as message_service
+            from ...modules.messages.schemas import MessageCreate
+            import json
+            
+            notification_data = {
+                "type": "member_approved",
+                "company_name": updated_member['company_name'],
+            }
+            await message_service.create_direct_message(
+                sender_id=None,
+                recipient_id=member_id,
+                data=MessageCreate(
+                    subject=json.dumps(notification_data, ensure_ascii=False),
+                    content=json.dumps(notification_data, ensure_ascii=False),
+                    recipient_id=member_id,
+                ),
+            )
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to send approval notification: {e}")
 
         return updated_member
 
@@ -401,6 +436,30 @@ class MemberService:
                 comments=reason,
             )
         )
+        
+        # Send direct message notification to member
+        try:
+            from ...modules.messages.service import service as message_service
+            from ...modules.messages.schemas import MessageCreate
+            import json
+            
+            notification_data = {
+                "type": "member_rejected",
+                "company_name": updated_member['company_name'],
+                "reason": reason,
+            }
+            await message_service.create_direct_message(
+                sender_id=None,
+                recipient_id=member_id,
+                data=MessageCreate(
+                    subject=json.dumps(notification_data, ensure_ascii=False),
+                    content=json.dumps(notification_data, ensure_ascii=False),
+                    recipient_id=member_id,
+                ),
+            )
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to send rejection notification: {e}")
 
         return updated_member
 
@@ -437,6 +496,11 @@ class MemberService:
     ) -> list[dict]:
         """
         Export members data for download (admin only).
+        
+        方案A（适度放宽）:
+        - Members 表所有字段
+        - 关键 profile 字段: industry, region, revenue, employee_count, founding_date, representative, representative_gender
+        - 移除: logo_url, website, address (URL和非关键字段)
 
         Args:
             query: Filter parameters
@@ -453,24 +517,28 @@ class MemberService:
         # Convert to dict format for export
         export_data = []
         for member in members:
-            profile = member.get('profile')
+            # members 表已经包含所有 profile 信息（不是单独的表）
             export_data.append({
+                # Members 表字段
                 "id": str(member.get('id')),
                 "business_number": member.get('business_number'),
                 "company_name": member.get('company_name'),
                 "email": member.get('email'),
                 "status": member.get('status'),
                 "approval_status": member.get('approval_status'),
-                "industry": profile.get('industry') if profile else None,
-                "revenue": float(profile.get('revenue')) if profile and profile.get('revenue') else None,
-                "employee_count": profile.get('employee_count') if profile else None,
-                "founding_date": profile.get('founding_date') if profile and profile.get('founding_date') else None,
-                "region": profile.get('region') if profile else None,
-                "address": profile.get('address') if profile else None,
-                "website": profile.get('website') if profile else None,
-                "logo_url": profile.get('logo_url') if profile else None,
                 "created_at": member.get('created_at') if member.get('created_at') else None,
                 "updated_at": member.get('updated_at') if member.get('updated_at') else None,
+                
+                # 关键 profile 字段（识别企业必需）- 直接从 member 获取
+                "industry": member.get('industry'),
+                "region": member.get('region'),
+                "revenue": float(member.get('revenue')) if member.get('revenue') else None,
+                "employee_count": member.get('employee_count'),
+                "founding_date": member.get('founding_date'),
+                "representative": member.get('representative'),
+                "representative_gender": member.get('representative_gender'),
+                
+                # 移除: logo_url, website, address (URL和非关键字段)
             })
 
         return export_data

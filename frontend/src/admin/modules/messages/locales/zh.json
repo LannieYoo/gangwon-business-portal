@@ -29,6 +29,15 @@
                 "unread": "未读",
                 "read": "已读"
             },
+            "unread": "未读",
+            "read": "已读",
+            "readStatus": "阅读状态",
+            "sender": "发送者",
+            "searchNotifications": "搜索通知...",
+            "noNotifications": "暂无通知",
+            "confirmDelete": "确定要删除这条通知吗？",
+            "deleteWarning": "删除的通知无法恢复。",
+            "deleteFailed": "删除通知失败",
             "unreadCount": "未读",
             "selectMessage": "请选择一条消息查看详情",
             "category": {
@@ -36,7 +45,47 @@
                 "announcement": "公告",
                 "system": "系统通知",
                 "support": "技术支持",
-                "performance": "业绩相关咨询"
+                "performance": "业绩相关咨询",
+                "member": "会员管理",
+                "project": "事业管理",
+                "label": "分类"
+            },
+            "notifications": {
+                "performance": {
+                    "review": {
+                        "subject": "[实绩管理] {{periodZh}} 实绩审查结果",
+                        "content": "{{periodZh}} 实绩已{{statusZh}}。",
+                        "contentWithComments": "{{periodZh}} 实绩已{{statusZh}}。\n\n管理员意见: {{comments}}"
+                    },
+                    "submission": {
+                        "subject": "[实绩管理] 新实绩提交",
+                        "content": "{{companyName}}提交了{{year}}年第{{quarter}}季度实绩。"
+                    }
+                },
+                "member": {
+                    "registration": {
+                        "subject": "[会员管理] 新会员注册申请",
+                        "content": "{{companyName}} (营业执照号: {{businessNumber}})申请了会员注册。\n邮箱: {{email}}"
+                    },
+                    "approved": {
+                        "subject": "[会员管理] 会员注册批准",
+                        "content": "{{companyName}}的会员注册已批准。现在可以使用所有服务。"
+                    },
+                    "rejected": {
+                        "subject": "[会员管理] 会员注册驳回",
+                        "content": "{{companyName}}的会员注册已驳回。{{#reason}}\n\n原因: {{reason}}{{/reason}}"
+                    }
+                },
+                "project": {
+                    "application": {
+                        "subject": "[项目管理] 新项目申请",
+                        "content": "{{companyName}}的{{applicantName}}申请了'{{projectTitle}}'项目。"
+                    },
+                    "result": {
+                        "subject": "[项目管理] 项目申请结果",
+                        "content": "'{{projectTitle}}'项目申请已{{statusZh}}。"
+                    }
+                }
             },
             "thread": {
                 "title": "消息对话",

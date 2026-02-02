@@ -4,7 +4,7 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import React from "react";
+import React, { memo } from "react";
 import { Banner } from "@shared/components";
 import { BANNER_TYPES } from "@shared/utils/constants";
 import { PageContainer } from "@member/layouts";
@@ -14,7 +14,7 @@ import ProjectPreview from "../ProjectPreview";
 /**
  * 首页内容布局组件
  */
-export default function HomePage() {
+const HomePage = memo(function HomePage() {
   return (
     <PageContainer className="pb-8" fullWidth={false}>
       <div className="grid grid-cols-1 md:grid-cols-[repeat(3,minmax(0,425px))] justify-center gap-6 lg:gap-8 auto-rows-[475px]">
@@ -40,4 +40,6 @@ export default function HomePage() {
       </div>
     </PageContainer>
   );
-}
+});
+
+export default HomePage;

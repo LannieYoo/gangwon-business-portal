@@ -6,6 +6,8 @@ import {
   KSIC_MAJOR_CATEGORY_KEYS,
   BUSINESS_FIELD_KEYS,
   MAIN_INDUSTRY_KSIC_MAJOR_KEYS,
+  GANGWON_FUTURE_INDUSTRIES,
+  FUTURE_TECHNOLOGIES,
   getSubCategoryKeysByMajor,
   getMainIndustryKsicCodesByMajor,
   translateOptions,
@@ -51,6 +53,8 @@ export const RegisterStep4Business = ({
     MAIN_INDUSTRY_KSIC_MAJOR_KEYS,
     t
   );
+  const gangwonIndustryOptions = translateOptions(GANGWON_FUTURE_INDUSTRIES, t);
+  const futureTechOptions = translateOptions(FUTURE_TECHNOLOGIES, t);
 
   return (
     <div className="space-y-5">
@@ -191,6 +195,48 @@ export const RegisterStep4Business = ({
                   )}
             </option>
             {mainIndustrySubOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("auth.gangwonIndustry", "강원도 7대 미래산업")}
+          </label>
+          <select
+            name="gangwonIndustry"
+            value={formData.gangwonIndustry || ""}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+          >
+            <option value="">
+              {t("auth.selectGangwonIndustry", "선택하세요")}
+            </option>
+            {gangwonIndustryOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("auth.futureTech", "미래유망 신기술")}
+          </label>
+          <select
+            name="futureTech"
+            value={formData.futureTech || ""}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+          >
+            <option value="">
+              {t("auth.selectFutureTech", "선택하세요")}
+            </option>
+            {futureTechOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>

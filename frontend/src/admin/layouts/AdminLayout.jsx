@@ -47,7 +47,7 @@ export default function AdminLayout() {
         <div className="flex flex-1">
           <Sidebar collapsed={sidebarCollapsed} mobileOpen={mobileMenuOpen} onClose={closeMobileMenu} />
           
-          <main className={`flex-1 flex flex-col bg-gray-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ml-0 ${sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'}`}>
+          <main className={`flex-1 flex flex-col bg-gray-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ml-0 overflow-x-hidden ${sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'}`}>
             <div className="flex-1 p-6 max-w-full w-full mx-auto md:p-4">
               <Outlet />
             </div>

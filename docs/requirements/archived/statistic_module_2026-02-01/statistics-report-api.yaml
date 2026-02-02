@@ -1,0 +1,457 @@
+openapi: 3.0.3
+info:
+  title: Statistics Report API
+  description: 企业统计报告 API - 提供多维度的企业数据筛选和导出功能
+  version: 1.0.0
+  contact:
+    name: Gangwon Business Portal Team
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.gangwon-portal.com
+    description: Production server
+
+tags:
+  - name: Statistics
+    description: 统计报告相关接口
+
+paths:
+  /api/admin/statistics/report:
+    get:
+      tags:
+        - Statistics
+      summary: 获取企业统计列表
+      description: 根据多个筛选条件查询企业统计数据，支持分页和排序
+      operationId: getStatisticsReport
+      security:
+        - BearerAuth: []
+      parameters:
+        # 时间筛选
+        - name: year
+          in: query
+          description: 年度筛选
+          schema:
+            type: integer
+            example: 2024
+        - name: quarter
+          in: query
+          description: 季度筛选 (1-4)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 4
+            example: 1
+        - name: month
+          in: query
+          description: 月份筛选 (1-12)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 3
+        
+        # 产业筛选
+        - name: major_industry_codes
+          in: query
+          description: KSIC 大类代码（可多选）
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^[A-U]$'
+            example: ["C", "J"]
+        - name: gangwon_industry_codes
+          in: query
+          description: 江原道主导产业代码（可多选）
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [natural_bio, ceramic, digital_health]
+            example: ["natural_bio"]
+        
+        # 政策关联筛选
+        - name: policy_tags
+          in: query
+          description: 参与项目标签（可多选，OR 逻辑）
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [STARTUP_UNIVERSITY, GLOBAL_GLOCAL, RISE]
+            example: ["RISE"]
+        
+        # 投资筛选
+        - name: has_investment
+          in: query
+          description: 是否有投资
+          schema:
+            type: boolean
+            example: true
+        - name: min_investment
+          in: query
+          description: 最小投资额（韩元）
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            example: 10000000
+        - name: max_investment
+          in: query
+          description: 最大投资额（韩元）
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            example: 100000000
+        
+        # 专利筛选
+        - name: min_patents
+          in: query
+          description: 最小专利数
+          schema:
+            type: integer
+            minimum: 0
+            example: 1
+        - name: max_patents
+          in: query
+          description: 最大专利数
+          schema:
+            type: integer
+            minimum: 0
+            example: 10
+        
+        # 代表者特征
+        - name: gender
+          in: query
+          description: 代表者性别
+          schema:
+            type: string
+            enum: [MALE, FEMALE]
+            example: MALE
+        - name: min_age
+          in: query
+          description: 最小年龄
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 150
+            example: 30
+        - name: max_age
+          in: query
+          description: 最大年龄
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 150
+            example: 60
+        
+        # 企业属性
+        - name: startup_stages
+          in: query
+          description: 创业阶段（可多选）
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [preliminary, startup_under_3years, growth_over_7years, restart]
+            example: ["growth_over_7years"]
+        - name: min_work_years
+          in: query
+          description: 最小工龄（年）
+          schema:
+            type: integer
+            minimum: 0
+            example: 3
+        - name: max_work_years
+          in: query
+          description: 最大工龄（年）
+          schema:
+            type: integer
+            minimum: 0
+            example: 10
+        
+        # 经营成果
+        - name: min_revenue
+          in: query
+          description: 最小年营收（韩元）
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            example: 100000000
+        - name: max_revenue
+          in: query
+          description: 最大年营收（韩元）
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            example: 1000000000
+        - name: min_employees
+          in: query
+          description: 最小员工数
+          schema:
+            type: integer
+            minimum: 0
+            example: 10
+        - name: max_employees
+          in: query
+          description: 最大员工数
+          schema:
+            type: integer
+            minimum: 0
+            example: 100
+        
+        # 所在地
+        - name: region
+          in: query
+          description: 所在地
+          schema:
+            type: string
+            example: Chuncheon
+        
+        # 搜索与分页
+        - name: search_query
+          in: query
+          description: 关键词搜索（企业名称或事业者编号）
+          schema:
+            type: string
+            example: 강원
+        - name: page
+          in: query
+          description: 页码
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: page_size
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+            example: 10
+        - name: sort_by
+          in: query
+          description: 排序字段
+          schema:
+            type: string
+            enum: [enterprise_name, total_investment, patent_count, annual_revenue]
+            default: enterprise_name
+            example: total_investment
+        - name: sort_order
+          in: query
+          description: 排序方向
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+            example: desc
+      
+      responses:
+        '200':
+          description: 成功返回统计数据
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticsResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: 权限不足（非管理员）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/admin/statistics/export:
+    get:
+      tags:
+        - Statistics
+      summary: 导出企业统计 Excel
+      description: 将筛选后的企业数据导出为 Excel 文件，包含数据脱敏
+      operationId: exportStatistics
+      security:
+        - BearerAuth: []
+      parameters:
+        # 参数与 /report 接口相同，此处省略
+        - $ref: '#/components/parameters/YearParam'
+        - $ref: '#/components/parameters/SearchQueryParam'
+      
+      responses:
+        '200':
+          description: 成功返回 Excel 文件
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: attachment; filename=gangwon_stats_20260201_120000.xlsx
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  parameters:
+    YearParam:
+      name: year
+      in: query
+      description: 年度筛选
+      schema:
+        type: integer
+        example: 2024
+    
+    SearchQueryParam:
+      name: search_query
+      in: query
+      description: 关键词搜索
+      schema:
+        type: string
+        example: 강원
+  
+  schemas:
+    StatisticsItem:
+      type: object
+      required:
+        - business_reg_no
+        - enterprise_name
+      properties:
+        business_reg_no:
+          type: string
+          description: 事业者注册号
+          example: "123-45-67890"
+        enterprise_name:
+          type: string
+          description: 企业名称
+          example: "강원바이오(주)"
+        industry_type:
+          type: string
+          nullable: true
+          description: 所属业种
+          example: "식료품 제조업"
+        startup_stage:
+          type: string
+          nullable: true
+          description: 创业阶段
+          example: "GROWTH"
+        policy_tags:
+          type: array
+          items:
+            type: string
+          description: 参与项目标签
+          example: ["RISE", "STARTUP_UNIVERSITY"]
+        total_investment:
+          type: number
+          format: float
+          description: 投资引进总额（韩元）
+          example: 500000000.0
+        patent_count:
+          type: integer
+          description: 专利持有数量
+          example: 5
+        annual_revenue:
+          type: number
+          format: float
+          description: 年营收（韩元）
+          example: 1200000000.0
+        export_amount:
+          type: number
+          format: float
+          description: 出口额（韩元）
+          example: 300000000.0
+        employee_count:
+          type: integer
+          description: 员工人数
+          example: 25
+        region:
+          type: string
+          nullable: true
+          description: 所在地
+          example: "Chuncheon"
+    
+    StatisticsResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - page_size
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatisticsItem'
+        total:
+          type: integer
+          description: 总记录数
+          example: 125
+        page:
+          type: integer
+          description: 当前页码
+          example: 1
+        page_size:
+          type: integer
+          description: 每页数量
+          example: 10
+    
+    Error:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          description: 错误详情
+          example: "月份必须在 1 到 12 之间"

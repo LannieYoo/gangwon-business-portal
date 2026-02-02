@@ -20,6 +20,8 @@ export {
   KSIC_SUB_CATEGORY_KEYS,
   MAIN_INDUSTRY_KSIC_MAJOR_KEYS,
   MAIN_INDUSTRY_KSIC_CODES,
+  GANGWON_FUTURE_INDUSTRIES,
+  FUTURE_TECHNOLOGIES,
   getSubCategoryKeysByMajor,
   getMainIndustryKsicCodesByMajor,
   translateOptions

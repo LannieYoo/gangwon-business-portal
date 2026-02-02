@@ -111,11 +111,11 @@ export const STARTUP_STAGE_OPTIONS = [
  */
 export const POLICY_TAGS = {
   /** 创业中心大学 (창업중심대학) */
-  STARTUP_UNIVERSITY: "STARTUP_UNIVERSITY",
+  STARTUP_UNIVERSITY: "startup_university",
   /** 全球/成长事业 (글로벌·글로컬 사업) */
-  GLOBAL_GLOCAL: "GLOBAL_GLOCAL",
+  GLOBAL_GLOCAL: "global_glocal",
   /** RISE 事业团 (RISE 사업단) */
-  RISE: "RISE",
+  RISE: "rise",
 };
 
 /**
@@ -132,28 +132,28 @@ export const GANGWON_INDUSTRIES = {
  * 江原道重点产业选项
  * 从统一数据源导入: MAIN_INDUSTRY_KSIC_MAJOR_KEYS
  */
-import { MAIN_INDUSTRY_KSIC_MAJOR_KEYS } from '@/shared/data/industryClassification';
+import { MAIN_INDUSTRY_KSIC_MAJOR_KEYS } from "@/shared/data/industryClassification";
 export const GANGWON_INDUSTRY_OPTIONS = MAIN_INDUSTRY_KSIC_MAJOR_KEYS;
 
 /**
  * 创业类型选项 (与会员模块同步)
  * 从统一数据源导入: STARTUP_TYPE_KEYS
  */
-import { STARTUP_TYPE_KEYS } from '@/shared/data/industryClassification';
+import { STARTUP_TYPE_KEYS } from "@/shared/data/industryClassification";
 export const STARTUP_TYPE_OPTIONS = STARTUP_TYPE_KEYS;
 
 /**
  * 业务领域选项 (Business Field)
  * 从统一数据源导入: BUSINESS_FIELD_KEYS
  */
-import { BUSINESS_FIELD_KEYS } from '@/shared/data/industryClassification';
+import { BUSINESS_FIELD_KEYS } from "@/shared/data/industryClassification";
 export const BUSINESS_FIELD_OPTIONS = BUSINESS_FIELD_KEYS;
 
 /**
  * 标准产业分类 (KSIC-大分类)
  * 从统一数据源导入: KSIC_MAJOR_CATEGORY_KEYS
  */
-import { KSIC_MAJOR_CATEGORY_KEYS } from '@/shared/data/industryClassification';
+import { KSIC_MAJOR_CATEGORY_KEYS } from "@/shared/data/industryClassification";
 export const MAJOR_INDUSTRY_OPTIONS = KSIC_MAJOR_CATEGORY_KEYS;
 
 /**
@@ -232,12 +232,6 @@ export const INVESTMENT_RANGES = {
     max: null,
     labelKey: "statistics.filters.investment.range10000",
   },
-  /** 自定义 (사용자 정의) */
-  CUSTOM: {
-    min: null,
-    max: null,
-    labelKey: "statistics.filters.investment.custom",
-  },
 };
 
 /**
@@ -247,7 +241,6 @@ export const INVESTMENT_RANGES_OPTIONS = [
   { value: "RANGE_1000", ...INVESTMENT_RANGES.RANGE_1000 },
   { value: "RANGE_5000", ...INVESTMENT_RANGES.RANGE_5000 },
   { value: "RANGE_10000", ...INVESTMENT_RANGES.RANGE_10000 },
-  { value: "CUSTOM", ...INVESTMENT_RANGES.CUSTOM },
 ];
 
 // ==================== 专利持有数量 ====================
@@ -271,12 +264,6 @@ export const PATENT_RANGES = {
     max: null,
     labelKey: "statistics.filters.patent.range10",
   },
-  /** 自定义区间 (사용자 정의) */
-  CUSTOM: {
-    min: null,
-    max: null,
-    labelKey: "statistics.filters.patent.custom",
-  },
 };
 
 /**
@@ -287,7 +274,6 @@ export const PATENT_RANGES_OPTIONS = [
   { value: "RANGE_3", ...PATENT_RANGES.RANGE_3 },
   { value: "RANGE_5", ...PATENT_RANGES.RANGE_5 },
   { value: "RANGE_10", ...PATENT_RANGES.RANGE_10 },
-  { value: "CUSTOM", ...PATENT_RANGES.CUSTOM },
 ];
 
 // ==================== 性别 ====================
@@ -300,9 +286,9 @@ export const PATENT_RANGES_OPTIONS = [
  */
 export const GENDER = {
   /** 男 (남성) */
-  MALE: "MALE",
+  MALE: "male",
   /** 女 (여성) */
-  FEMALE: "FEMALE",
+  FEMALE: "female",
 };
 
 /**
@@ -310,7 +296,153 @@ export const GENDER = {
  */
 export const GENDER_OPTIONS = [
   { value: GENDER.MALE, labelKey: "statistics.filters.representative.male" },
-  { value: GENDER.FEMALE, labelKey: "statistics.filters.representative.female" },
+  {
+    value: GENDER.FEMALE,
+    labelKey: "statistics.filters.representative.female",
+  },
+];
+
+// ==================== 年营收区间 ====================
+
+/**
+ * 年营收区间选项
+ * Annual Revenue Range Options
+ *
+ * 单位：韩元 (₩)
+ */
+export const REVENUE_RANGE_OPTIONS = [
+  {
+    value: "under_100m",
+    labelKey: "statistics.filters.quantitive.revenueRange.under100m",
+    min: null,
+    max: 100000000,
+  },
+  {
+    value: "100m_500m",
+    labelKey: "statistics.filters.quantitive.revenueRange.100m500m",
+    min: 100000000,
+    max: 500000000,
+  },
+  {
+    value: "500m_1b",
+    labelKey: "statistics.filters.quantitive.revenueRange.500m1b",
+    min: 500000000,
+    max: 1000000000,
+  },
+  {
+    value: "1b_5b",
+    labelKey: "statistics.filters.quantitive.revenueRange.1b5b",
+    min: 1000000000,
+    max: 5000000000,
+  },
+  {
+    value: "5b_10b",
+    labelKey: "statistics.filters.quantitive.revenueRange.5b10b",
+    min: 5000000000,
+    max: 10000000000,
+  },
+  {
+    value: "over_10b",
+    labelKey: "statistics.filters.quantitive.revenueRange.over10b",
+    min: 10000000000,
+    max: null,
+  },
+];
+
+// ==================== 员工人数区间 ====================
+
+/**
+ * 员工人数区间选项
+ * Employee Count Range Options
+ */
+export const EMPLOYEE_RANGE_OPTIONS = [
+  {
+    value: "under_5",
+    labelKey: "statistics.filters.quantitive.employeeRange.under5",
+    min: null,
+    max: 5,
+  },
+  {
+    value: "5_10",
+    labelKey: "statistics.filters.quantitive.employeeRange.5to10",
+    min: 5,
+    max: 10,
+  },
+  {
+    value: "10_30",
+    labelKey: "statistics.filters.quantitive.employeeRange.10to30",
+    min: 10,
+    max: 30,
+  },
+  {
+    value: "30_50",
+    labelKey: "statistics.filters.quantitive.employeeRange.30to50",
+    min: 30,
+    max: 50,
+  },
+  {
+    value: "50_100",
+    labelKey: "statistics.filters.quantitive.employeeRange.50to100",
+    min: 50,
+    max: 100,
+  },
+  {
+    value: "100_300",
+    labelKey: "statistics.filters.quantitive.employeeRange.100to300",
+    min: 100,
+    max: 300,
+  },
+  {
+    value: "over_300",
+    labelKey: "statistics.filters.quantitive.employeeRange.over300",
+    min: 300,
+    max: null,
+  },
+];
+
+// ==================== 年龄段区间 ====================
+
+/**
+ * 年龄段区间选项
+ * Age Range Options
+ */
+export const AGE_RANGE_OPTIONS = [
+  {
+    value: "under_20",
+    labelKey: "statistics.filters.representative.ageRange.under20",
+    min: null,
+    max: 20,
+  },
+  {
+    value: "20_29",
+    labelKey: "statistics.filters.representative.ageRange.20to29",
+    min: 20,
+    max: 29,
+  },
+  {
+    value: "30_39",
+    labelKey: "statistics.filters.representative.ageRange.30to39",
+    min: 30,
+    max: 39,
+  },
+  {
+    value: "40_49",
+    labelKey: "statistics.filters.representative.ageRange.40to49",
+    min: 40,
+    max: 49,
+  },
+  {
+    value: "50_59",
+    labelKey: "statistics.filters.representative.ageRange.50to59",
+    min: 50,
+    max: 59,
+  },
+  {
+    value: "over_60",
+    labelKey: "statistics.filters.representative.ageRange.over60",
+    min: 60,
+    max: null,
+  },
 ];
 
 // ==================== 工龄范围 ====================
@@ -336,14 +468,49 @@ export const WORK_YEARS = {
 
 /**
  * 江原道地区选项
+ * Gangwon Province Regions (7 cities + 11 counties)
+ * 使用 profile.regions 翻译键以保持一致性
  */
 export const LOCATION_OPTIONS = [
-  { value: "chuncheon", labelKey: "statistics.filters.location.chuncheon" },
-  { value: "wonju", labelKey: "statistics.filters.location.wonju" },
-  { value: "gangneung", labelKey: "statistics.filters.location.gangneung" },
-  { value: "hongcheon", labelKey: "statistics.filters.location.hongcheon" },
-  { value: "hoengseong", labelKey: "statistics.filters.location.hoengseong" },
+  // 市 (Cities)
+  { value: "chuncheon", labelKey: "profile.regions.chuncheon" },
+  { value: "wonju", labelKey: "profile.regions.wonju" },
+  { value: "gangneung", labelKey: "profile.regions.gangneung" },
+  { value: "donghae", labelKey: "profile.regions.donghae" },
+  { value: "taebaek", labelKey: "profile.regions.taebaek" },
+  { value: "sokcho", labelKey: "profile.regions.sokcho" },
+  { value: "samcheok", labelKey: "profile.regions.samcheok" },
+  // 郡 (Counties)
+  { value: "hongcheon", labelKey: "profile.regions.hongcheon" },
+  { value: "hoengseong", labelKey: "profile.regions.hoengseong" },
+  { value: "yeongwol", labelKey: "profile.regions.yeongwol" },
+  { value: "pyeongchang", labelKey: "profile.regions.pyeongchang" },
+  { value: "jeongseon", labelKey: "profile.regions.jeongseon" },
+  { value: "cheorwon", labelKey: "profile.regions.cheorwon" },
+  { value: "hwacheon", labelKey: "profile.regions.hwacheon" },
+  { value: "yanggu", labelKey: "profile.regions.yanggu" },
+  { value: "inje", labelKey: "profile.regions.inje" },
+  { value: "goseong", labelKey: "profile.regions.goseong" },
+  { value: "yangyang", labelKey: "profile.regions.yangyang" },
 ];
+
+/**
+ * 江原道7大未来产业选项
+ * Gangwon 7 Future Industries
+ * 从统一数据源导入: GANGWON_FUTURE_INDUSTRIES
+ */
+import {
+  GANGWON_FUTURE_INDUSTRIES,
+  FUTURE_TECHNOLOGIES,
+} from "@/shared/data/industryClassification";
+export const GANGWON_FUTURE_INDUSTRY_OPTIONS = GANGWON_FUTURE_INDUSTRIES;
+
+/**
+ * 未来有望新技术选项
+ * Future Promising Technologies
+ * 从统一数据源导入: FUTURE_TECHNOLOGIES
+ */
+export const FUTURE_TECHNOLOGY_OPTIONS = FUTURE_TECHNOLOGIES;
 
 /**
  * 工龄范围选项列表
@@ -422,72 +589,191 @@ export const PAGINATION_CONFIG = {
 
 /**
  * 表格列字段映射
+ * 顺序与筛选器保持一致
  */
 export const TABLE_COLUMNS = {
+  // 时间维度
+  YEAR: "year",
+  QUARTER: "quarter",
+  MONTH: "month",
+
+  // 基本信息
   BUSINESS_REG_NO: "businessRegNo",
   ENTERPRISE_NAME: "enterpriseName",
-  INDUSTRY_TYPE: "industryType",
-  STARTUP_STAGE: "startupStage",
+
+  // 快速筛选组
   POLICY_TAGS: "policyTags",
+
+  // 企业特征组
+  KSIC_MAJOR: "ksicMajor",
+  KSIC_SUB: "ksicSub",
+  GANGWON_INDUSTRY: "gangwonIndustry",
+  GANGWON_INDUSTRY_SUB: "gangwonIndustrySub",
+  GANGWON_FUTURE_INDUSTRY: "gangwonFutureIndustry",
+  FUTURE_TECH: "futureTech",
+  WORK_YEARS: "workYears",
+  STARTUP_STAGE: "startupStage",
+  REGION: "region",
+
+  // 经营指标组
   TOTAL_INVESTMENT: "totalInvestment",
-  PATENT_COUNT: "patentCount",
   ANNUAL_REVENUE: "annualRevenue",
   EXPORT_AMOUNT: "exportAmount",
+  EMPLOYEE_COUNT: "employeeCount",
+  PATENT_COUNT: "patentCount",
+
+  // 代表者信息组
+  REPRESENTATIVE_GENDER: "representativeGender",
+  REPRESENTATIVE_AGE: "representativeAge",
 };
 
 /**
  * 表格列配置
+ * 顺序与筛选器保持一致
  */
 export const TABLE_COLUMN_CONFIGS = [
+  // 时间维度
+  {
+    key: TABLE_COLUMNS.YEAR,
+    labelKey: "statistics.table.year",
+    width: 80,
+    align: "center",
+  },
+  {
+    key: TABLE_COLUMNS.QUARTER,
+    labelKey: "statistics.table.quarter",
+    width: 80,
+    align: "center",
+  },
+  {
+    key: TABLE_COLUMNS.MONTH,
+    labelKey: "statistics.table.month",
+    width: 70,
+    align: "center",
+  },
+
+  // 基本信息
   {
     key: TABLE_COLUMNS.BUSINESS_REG_NO,
     labelKey: "statistics.table.businessRegNo",
-    width: 140,
+    width: 130,
+    align: "center",
   },
-
   {
     key: TABLE_COLUMNS.ENTERPRISE_NAME,
     labelKey: "statistics.table.enterpriseName",
-    width: 220,
+    width: 180,
+    align: "center",
+  },
+
+  // 快速筛选组
+  {
+    key: TABLE_COLUMNS.POLICY_TAGS,
+    labelKey: "statistics.table.programs",
+    width: 140,
+    align: "center",
+  },
+
+  // 企业特征组
+  {
+    key: TABLE_COLUMNS.KSIC_MAJOR,
+    labelKey: "statistics.table.ksicMajor",
+    width: 150,
+    align: "center",
   },
   {
-    key: TABLE_COLUMNS.INDUSTRY_TYPE,
-    labelKey: "statistics.table.industryType",
-    width: 180,
+    key: TABLE_COLUMNS.KSIC_SUB,
+    labelKey: "statistics.table.ksicSub",
+    width: 150,
+    align: "center",
+  },
+  {
+    key: TABLE_COLUMNS.GANGWON_INDUSTRY,
+    labelKey: "statistics.table.gangwonIndustry",
+    width: 150,
+    align: "center",
+  },
+  {
+    key: TABLE_COLUMNS.GANGWON_INDUSTRY_SUB,
+    labelKey: "statistics.table.gangwonIndustrySub",
+    width: 150,
+    align: "center",
+  },
+  {
+    key: TABLE_COLUMNS.GANGWON_FUTURE_INDUSTRY,
+    labelKey: "statistics.table.gangwonFutureIndustry",
+    width: 150,
+    align: "center",
+  },
+  {
+    key: TABLE_COLUMNS.FUTURE_TECH,
+    labelKey: "statistics.table.futureTech",
+    width: 150,
+    align: "center",
+  },
+  {
+    key: TABLE_COLUMNS.WORK_YEARS,
+    labelKey: "statistics.table.workYears",
+    width: 90,
+    align: "center",
   },
   {
     key: TABLE_COLUMNS.STARTUP_STAGE,
     labelKey: "statistics.table.startupStage",
-    width: 110,
-  },
-  {
-    key: TABLE_COLUMNS.POLICY_TAGS,
-    labelKey: "statistics.table.programs",
-    width: 180,
-  },
-  {
-    key: TABLE_COLUMNS.TOTAL_INVESTMENT,
-    labelKey: "statistics.table.investmentAmount",
-    width: 150,
-    align: "right",
-  },
-  {
-    key: TABLE_COLUMNS.PATENT_COUNT,
-    labelKey: "statistics.table.patentCount",
     width: 100,
     align: "center",
   },
   {
+    key: TABLE_COLUMNS.REGION,
+    labelKey: "statistics.table.region",
+    width: 120,
+    align: "center",
+  },
+
+  // 经营指标组
+  {
+    key: TABLE_COLUMNS.TOTAL_INVESTMENT,
+    labelKey: "statistics.table.investmentAmount",
+    width: 110,
+    align: "right",
+  },
+  {
     key: TABLE_COLUMNS.ANNUAL_REVENUE,
     labelKey: "statistics.table.revenue",
-    width: 150,
+    width: 110,
     align: "right",
   },
   {
     key: TABLE_COLUMNS.EXPORT_AMOUNT,
     labelKey: "statistics.table.exportAmount",
-    width: 150,
+    width: 110,
     align: "right",
+  },
+  {
+    key: TABLE_COLUMNS.EMPLOYEE_COUNT,
+    labelKey: "statistics.table.employeeCount",
+    width: 80,
+    align: "center",
+  },
+  {
+    key: TABLE_COLUMNS.PATENT_COUNT,
+    labelKey: "statistics.table.patentCount",
+    width: 70,
+    align: "center",
+  },
+
+  // 代表者信息组
+  {
+    key: TABLE_COLUMNS.REPRESENTATIVE_GENDER,
+    labelKey: "statistics.table.representativeGender",
+    width: 80,
+    align: "center",
+  },
+  {
+    key: TABLE_COLUMNS.REPRESENTATIVE_AGE,
+    labelKey: "statistics.table.representativeAge",
+    width: 80,
+    align: "center",
   },
 ];
 
@@ -515,13 +801,28 @@ export const EXPORT_CONFIG = {
  */
 export const DEFAULT_QUERY_PARAMS = {
   // 时间维度
-  year: 2025,
+  year: null,
   quarter: null,
   month: null,
 
-  // 产业筛选 (后端支持)
+  // 产业筛选 - 标准产业分类
   majorIndustryCodes: [], // -> major_industry_codes
+  subIndustryCodes: [], // -> sub_industry_codes
+
+  // 产业筛选 - 江原道主导产业
   gangwonIndustryCodes: [], // -> gangwon_industry_codes
+  gangwonIndustrySubCodes: [], // -> gangwon_industry_sub_codes
+
+  // 产业筛选 - 江原道7大未来产业
+  gangwonFutureIndustries: [], // -> gangwon_future_industries
+
+  // 产业筛选 - 未来有望新技术
+  futureTechnologies: [], // -> future_technologies
+
+  // 企业分类
+  startupTypes: [], // -> startup_types
+  businessFields: [], // -> business_fields
+  cooperationFields: [], // -> cooperation_fields
 
   // 政策关联
   policyTags: [], // -> policy_tags
@@ -536,7 +837,7 @@ export const DEFAULT_QUERY_PARAMS = {
   maxPatents: null, // -> max_patents
 
   // 代表者特征
-  gender: null, // -> gender (MALE/FEMALE)
+  gender: null, // -> gender (male/female)
   minAge: null, // -> min_age
   maxAge: null, // -> max_age
 
@@ -550,6 +851,15 @@ export const DEFAULT_QUERY_PARAMS = {
   minWorkYears: null, // -> min_work_years
   maxWorkYears: null, // -> max_work_years
 
+  // 经营成果 (后端支持)
+  minRevenue: null, // -> min_revenue
+  maxRevenue: null, // -> max_revenue
+  minEmployees: null, // -> min_employees
+  maxEmployees: null, // -> max_employees
+
+  // 所在地 (后端支持)
+  region: null, // -> region
+
   // 排序
   sortBy: SORT_FIELD.ENTERPRISE_NAME, // -> sort_by
   sortOrder: SORT_ORDER.ASC, // -> sort_order
@@ -562,27 +872,124 @@ export const DEFAULT_QUERY_PARAMS = {
 /**
  * UI 扩展字段 (仅前端筛选器使用，不发送到后端)
  *
- * 这些字段在 FilterPanel 中显示，但后端尚未实现对应的查询逻辑
- * 保留以备将来后端扩展
+ * 这些字段作为 UI 便利功能，帮助用户快速选择预设范围
  */
 export const UI_EXTENDED_PARAMS = {
-  // 二级分类 (后端暂不支持)
-  subIndustryCodes: [],
-  gangwonIndustrySubCodes: [],
+  // 量化指标范围选择器 (UI 便利功能，实际使用 min/max 参数)
+  revenueRange: "all", // 年营收区间选择
+  employeeRange: "all", // 员工人数区间选择
 
-  // 额外分类 (后端暂不支持)
-  startupTypes: [],
-  businessFields: [],
-  cooperationFields: [],
+  // 年龄段区间选择器 (UI 便利功能，实际使用 min/max 参数)
+  ageRange: "all",
+};
 
-  // 量化指标范围 (后端暂不支持)
-  minRevenue: null,
-  maxRevenue: null,
-  minEmployees: null,
-  maxEmployees: null,
+/**
+ * 政策标签 -> i18n key 映射
+ * 数据库可能存储多种格式，需要统一映射
+ */
+export const POLICY_TAG_I18N_MAP = {
+  // 小写下划线格式 (标准格式)
+  startup_university: "statistics.filters.participation.startup_university",
+  global_glocal: "statistics.filters.participation.global_glocal",
+  rise: "statistics.filters.participation.rise",
+  // 大写格式 (旧数据兼容)
+  STARTUP_UNIVERSITY: "statistics.filters.participation.startup_university",
+  GLOBAL_GLOCAL: "statistics.filters.participation.global_glocal",
+  RISE: "statistics.filters.participation.rise",
+  // 驼峰格式 (旧数据兼容)
+  startupCenterUniversity:
+    "statistics.filters.participation.startup_university",
+  globalBusiness: "statistics.filters.participation.global_glocal",
+  riseBusiness: "statistics.filters.participation.rise",
+  // 其他变体
+  startup_center_university:
+    "statistics.filters.participation.startup_university",
+  global_business: "statistics.filters.participation.global_glocal",
+  rise_business: "statistics.filters.participation.rise",
+  // 中文文本（旧数据兼容）
+  创业中心大学: "statistics.filters.participation.startup_university",
+  全球事业: "statistics.filters.participation.global_glocal",
+  "全球·글로컬 사업": "statistics.filters.participation.global_glocal",
+  "글로벌 사업": "statistics.filters.participation.global_glocal",
+  "글로벌·글로컬 사업": "statistics.filters.participation.global_glocal",
+  "RISE 사업단": "statistics.filters.participation.rise",
+  "RISE 事业团": "statistics.filters.participation.rise",
+  RISE事业: "statistics.filters.participation.rise",
+  RISE사업: "statistics.filters.participation.rise",
+  // 特殊值
+  无: null, // 不显示
+  없음: null, // 不显示
+  none: null, // 不显示
+  None: null, // 不显示
+  "": null, // 空字符串不显示
+};
 
-  // 所在地 (后端暂不支持)
-  location: null,
+/**
+ * 创业阶段 -> i18n key 映射
+ */
+export const STARTUP_STAGE_I18N_MAP = {
+  pre_startup: "statistics.filters.stage.preStartup",
+  initial: "statistics.filters.stage.initial",
+  growth: "statistics.filters.stage.growth",
+  leap: "statistics.filters.stage.leap",
+  re_startup: "statistics.filters.stage.reStartup",
+  startup_under_3years: "statistics.filters.stage.startupUnder3Years",
+  startup_3_to_7years: "statistics.filters.stage.startup3To7Years",
+  startup_over_7years: "statistics.filters.stage.startupOver7Years",
+  // 其他可能的数据库值
+  village_enterprise: "industryClassification.startupType.village_enterprise",
+  youth_enterprise: "industryClassification.startupType.youth_enterprise",
+  student_startup: "industryClassification.startupType.student_startup",
+  faculty_startup: "industryClassification.startupType.faculty_startup",
+  women_enterprise: "industryClassification.startupType.women_enterprise",
+  venture_company: "industryClassification.startupType.venture_company",
+  social_enterprise: "industryClassification.startupType.social_enterprise",
+};
+
+/**
+ * 字段翻译路径映射
+ * Field Translation Path Mapping
+ *
+ * 用于 StatisticsTable 中快速查找字段对应的翻译路径
+ */
+export const FIELD_TRANSLATION_PATHS = {
+  // KSIC 产业分类
+  ksicMajor: "industryClassification.ksicMajor",
+  ksicSub: "industryClassification.ksicSub",
+
+  // 江原道产业分类
+  gangwonIndustry: "industryClassification.mainIndustryKsic", // 江原主导产业
+  gangwonFutureIndustry: "industryClassification.gangwonIndustry", // 江原7大未来产业
+
+  // 技术和地区
+  futureTech: "industryClassification.futureTech",
+  region: "statistics.filters.location", // 修复：使用正确的翻译路径
+
+  // 创业阶段
+  startupStage: "statistics.filters.stage",
+
+  // 性别
+  representativeGender: "statistics.table",
+};
+
+/**
+ * 获取字段的翻译文本
+ * @param {Function} t - i18n 翻译函数
+ * @param {string} fieldKey - 字段键名
+ * @param {string} value - 字段值
+ * @returns {string} 翻译后的文本，如果找不到翻译则返回原值
+ */
+export const getFieldTranslation = (t, fieldKey, value) => {
+  if (!value) return "-";
+
+  const basePath = FIELD_TRANSLATION_PATHS[fieldKey];
+  if (!basePath) return value;
+
+  const translationKey = `${basePath}.${value}`;
+  const translated = t(translationKey);
+
+  // 如果翻译键不存在，t() 会返回键本身
+  return translated !== translationKey ? translated : value;
 };
 
 /**
@@ -655,18 +1062,12 @@ export const validatePatentRange = (min, max) => {
 
 /**
  * UI 扩展参数的 key 列表 (不发送到后端)
+ * 这些是 UI 便利功能，用于快速选择预设范围
  */
 const UI_EXTENDED_KEYS = new Set([
-  "subIndustryCodes",
-  "gangwonIndustrySubCodes",
-  "startupTypes",
-  "businessFields",
-  "cooperationFields",
-  "minRevenue",
-  "maxRevenue",
-  "minEmployees",
-  "maxEmployees",
-  "location",
+  "revenueRange", // UI 选择器，实际使用 minRevenue/maxRevenue
+  "employeeRange", // UI 选择器，实际使用 minEmployees/maxEmployees
+  "ageRange", // UI 选择器，实际使用 minAge/maxAge
 ]);
 
 /**

@@ -4,12 +4,13 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { homeService } from "../services/home.service";
 import { formatDate } from "@shared/utils";
 import { ROUTES } from "@shared/utils/constants";
+import { useApiCache } from "@shared/hooks/useApiCache";
 
 /**
  * 处理支援事业预览逻辑的 Hook
@@ -17,39 +18,35 @@ import { ROUTES } from "@shared/utils/constants";
 export function useProjectPreview() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  const loadProjects = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await homeService.listProjects({
-        page: 1,
-        pageSize: 4,
-      });
+  const fetchProjects = useCallback(async () => {
+    const response = await homeService.listProjects({
+      page: 1,
+      pageSize: 4,
+    });
 
-      if (response.items) {
-        const formattedProjects = response.items.map((p) => ({
-          id: p.id,
-          title: p.title,
-          date: formatDate(p.createdAt, "yyyy-MM-dd", i18n.language),
-          status: p.status || "active",
-          imageUrl: p.imageUrl,
-          attachments: p.attachments || [],
-        }));
-        setProjects(formattedProjects);
-      }
-    } catch (error) {
-      console.error("Load projects error:", error);
-      setProjects([]);
-    } finally {
-      setLoading(false);
+    if (response.items) {
+      return response.items.map((p) => ({
+        id: p.id,
+        title: p.title,
+        date: formatDate(p.createdAt, "yyyy-MM-dd", i18n.language),
+        status: p.status || "active",
+        imageUrl: p.imageUrl,
+        attachments: p.attachments || [],
+      }));
     }
+    return [];
   }, [i18n.language]);
 
-  useEffect(() => {
-    loadProjects();
-  }, [loadProjects]);
+  const { data: projects, loading, error, refresh } = useApiCache(
+    fetchProjects,
+    'projects-preview',
+    {
+      cacheDuration: 1 * 60 * 1000, // 1分钟缓存
+      enabled: true,
+      deps: [i18n.language]
+    }
+  );
 
   const getBadgeInfo = useCallback(
     (project) => {
@@ -80,7 +77,7 @@ export function useProjectPreview() {
   );
 
   return {
-    projects,
+    projects: projects || [],
     loading,
     getBadgeInfo,
     handleProjectClick,

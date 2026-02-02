@@ -1,9 +1,9 @@
 {
   "projects": {
-    "title": "支援事业管理",
+    "title": "事业公告",
     "subtitle": "查看支持支援事业公告并申请",
     "tabs": {
-      "projectList": "支援事业列表",
+      "projectList": "事业公告",
       "applicationRecords": "申请记录"
     },
     "searchPlaceholder": "按支援事业名称或关键词搜索",
@@ -84,26 +84,30 @@
         "expectedResultsPlaceholder": "请描述量化指标或业务成果",
         "teamMembers": "参与人员",
         "teamMembersPlaceholder": "请输入姓名、职责、经历等",
-        "reason": "申请理由",
-        "reasonPlaceholder": "请详细说明申请此支援事业的原因（至少10个字符）",
+        "reason": "传达事项",
+        "reasonPlaceholder": "请详细说明需要传达的内容（至少10个字符）",
         "applicantName": "负责人姓名",
         "applicantNamePlaceholder": "请输入负责人姓名",
         "applicantPhone": "负责人电话",
         "applicantPhonePlaceholder": "请输入电话号码",
+        "gangwonIndustry": "江原道7大未来产业",
+        "futureTech": "未来有望新技术",
+        "selectIndustry": "请选择",
+        "selectTech": "请选择",
         "attachments": "附件"
       },
       "validationError": "请检查表单必填项并修正后再试。",
-      "reasonMinLength": "申请理由至少需要10个字符",
+      "reasonMinLength": "传达事项至少需要10个字符",
       "applicantNameRequired": "请输入负责人姓名",
       "applicantPhoneRequired": "请输入负责人电话",
       "attachments": {
         "title": "附件文件",
         "description": "请上传营业执照、支援事业计划书等必要文件。",
-        "hint": "文件格式: PDF, DOC, XLS / 最大 10MB",
+        "hint": "文件格式: PDF, DOC, XLS / 最大 {{maxSize}}MB",
         "uploaded": "已上传文件",
         "maxFiles": "最多可上传{{max}}个文件",
         "required": "请至少上传1个文件。",
-        "fileTooLarge": "文件{{fileName}}的大小超过限制。 (最大 10MB)"
+        "fileTooLarge": "文件{{fileName}}的大小超过限制。 (最大 {{maxSize}}MB)"
       },
       "submitSuccess": "申请已提交成功。",
       "submitFailed": "申请提交失败。"
@@ -153,11 +157,11 @@
       "supplementTitle": "提交补充资料",
       "requestedMaterials": "要求的资料",
       "uploadArea": "拖拽文件到此处或点击上传",
-      "uploadHint": "支持 PDF, DOC, XLS 格式，最大 10MB",
+      "uploadHint": "支持 PDF, DOC, XLS 格式，最大 {{maxSize}}MB",
       "submit": "提交",
       "selectedFiles": "已选择的文件",
       "noFilesSelected": "请选择文件。",
-      "fileTooLarge": "文件大小超过限制。(最大 10MB)",
+      "fileTooLarge": "文件大小超过限制。(最大 {{maxSize}}MB)",
       "featureComingSoon": "功能开发中",
       "selectFiles": "选择文件"
     },
@@ -171,6 +175,47 @@
     "canReapplyHint": "您可以重新提交申请",
     "applicationStatus": "申请状态",
     "submittedAt": "提交时间",
-    "applicationDetail": "申请详情"
+    "applicationDetail": "申请详情",
+    "industries": {
+      "gangwonFuture": "江原道7大未来产业",
+      "futureTech": "未来有望新技术",
+      "other": "其他",
+      "semiconductor": "半导体",
+      "bio_health": "生物健康",
+      "future_energy": "未来能源",
+      "future_mobility": "未来移动",
+      "food_tech": "食品科技",
+      "advanced_defense": "尖端防卫",
+      "climate_tech": "气候科技",
+      "it": "信息技术(IT)",
+      "bt": "生命工程(BT)",
+      "nt": "纳米技术(NT)",
+      "st": "宇宙航空(ST)",
+      "et": "环境工程(ET)",
+      "ct": "文化技术(CT)",
+      "knu_tenant": "KNU入驻企业"
+    },
+    "categories": {
+      "gangwonIndustry": {
+        "semiconductor": "半导体",
+        "bio_health": "生物健康",
+        "future_energy": "未来能源",
+        "future_mobility": "未来移动",
+        "food_tech": "食品科技",
+        "advanced_defense": "尖端防卫",
+        "climate_tech": "气候科技"
+      },
+      "futureTech": {
+        "it": "信息技术(IT)",
+        "bt": "生命工程(BT)",
+        "nt": "纳米技术(NT)",
+        "st": "宇宙航空(ST)",
+        "et": "环境工程(ET)",
+        "ct": "文化技术(CT)"
+      },
+      "other": {
+        "knu_tenant": "KNU入驻企业"
+      }
+    }
   }
 }

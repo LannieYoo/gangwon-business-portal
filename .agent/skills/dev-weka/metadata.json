@@ -1,0 +1,17 @@
+{
+  "name": "dev-weka",
+  "displayName": "Weka Data Processing",
+  "description": "Process Weka ARFF files and convert to CSV format",
+  "keywords": [
+    "weka",
+    "arff",
+    "arff to csv",
+    "weka data",
+    "convert arff",
+    "machine learning data",
+    "data conversion",
+    "csv conversion"
+  ],
+  "category": "development",
+  "version": "1.0.0"
+}

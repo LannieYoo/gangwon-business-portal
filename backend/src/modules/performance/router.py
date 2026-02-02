@@ -241,8 +241,9 @@ async def approve_performance_record(
     current_admin: Annotated[Admin, Depends(get_current_admin_user)],
 ):
     """批准业绩记录"""
+    admin_id = current_admin.get("id") if isinstance(current_admin, dict) else current_admin.id
     record = await service.approve_performance(
-        performance_id, None, data.comments
+        performance_id, admin_id, data.comments
     )
     return PerformanceRecordResponse.model_validate(record)
 
@@ -261,8 +262,9 @@ async def request_fix_performance_record(
     current_admin: Annotated[Admin, Depends(get_current_admin_user)],
 ):
     """请求修改业绩记录"""
+    admin_id = current_admin.get("id") if isinstance(current_admin, dict) else current_admin.id
     record = await service.request_fix_performance(
-        performance_id, None, data.comments
+        performance_id, admin_id, data.comments
     )
     return PerformanceRecordResponse.model_validate(record)
 
@@ -281,7 +283,25 @@ async def reject_performance_record(
     current_admin: Annotated[Admin, Depends(get_current_admin_user)],
 ):
     """驳回业绩记录"""
+    admin_id = current_admin.get("id") if isinstance(current_admin, dict) else current_admin.id
     record = await service.reject_performance(
-        performance_id, None, data.comments
+        performance_id, admin_id, data.comments
     )
+    return PerformanceRecordResponse.model_validate(record)
+
+
+@router.post(
+    "/api/admin/performance/{performance_id}/cancel-review",
+    response_model=PerformanceRecordResponse,
+    tags=["admin-performance"],
+    summary="Cancel review and reset to submitted (Admin)",
+)
+@audit_log(action="cancel_review", resource_type="performance")
+async def cancel_review_performance_record(
+    performance_id: UUID,
+    request: Request,
+    current_admin: Annotated[Admin, Depends(get_current_admin_user)],
+):
+    """取消审核，重置为已提交状态"""
+    record = await service.cancel_review_performance(performance_id)
     return PerformanceRecordResponse.model_validate(record)

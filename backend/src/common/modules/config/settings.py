@@ -73,9 +73,9 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:5173"  # Frontend URL for email links
 
     # File Upload Configuration
-    MAX_UPLOAD_SIZE: int = 10485760  # 10MB (default for backward compatibility)
+    MAX_UPLOAD_SIZE: int = 20971520  # 20MB (updated from 10MB)
     MAX_IMAGE_SIZE: int = 5242880  # 5MB for images
-    MAX_DOCUMENT_SIZE: int = 10485760  # 10MB for documents
+    MAX_DOCUMENT_SIZE: int = 20971520  # 20MB for documents (updated from 10MB)
     # Extended MIME types: image, PDF, and common document formats
     # - HWP: application/x-hwp, application/haansofthwp, application/vnd.hancom.hwp
     # - TXT: text/plain

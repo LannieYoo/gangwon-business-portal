@@ -1,0 +1,19 @@
+{
+  "name": "bilingual-content",
+  "displayName": "Bilingual Content Generation",
+  "description": "Generate bilingual learning materials with original text and translation placeholders",
+  "keywords": [
+    "bilingual",
+    "translation",
+    "dual language",
+    "markdown",
+    "study materials",
+    "双语",
+    "翻译",
+    "学习资料"
+  ],
+  "category": "learning",
+  "version": "1.0.0",
+  "author": "AI Skills",
+  "tags": ["translation", "markdown", "study", "i18n"]
+}

@@ -63,6 +63,37 @@ class SupportService {
       payload,
     );
   }
+
+  // --- 直接消息 (Direct Messages / Notifications) ---
+  async getMemberMessages(params) {
+    const queryParams = {
+      page: params.page,
+      page_size: params.pageSize,
+    };
+    if (params.isRead !== undefined) queryParams.is_read = params.isRead;
+    if (params.isImportant !== undefined)
+      queryParams.is_important = params.isImportant;
+    if (params.messageType) queryParams.message_type = params.messageType;
+
+    return await apiService.get(MEMBER_MESSAGES_URL, queryParams);
+  }
+
+  async getMemberMessage(messageId) {
+    return await apiService.get(`${MEMBER_MESSAGES_URL}/${messageId}`);
+  }
+
+  async markMessageAsRead(messageId) {
+    return await apiService.put(`${MEMBER_MESSAGES_URL}/${messageId}`, {
+      is_read: true,
+    });
+  }
+
+  async getMemberUnreadCount() {
+    const response = await apiService.get(
+      `${MEMBER_MESSAGES_URL}/unread-count`,
+    );
+    return response.unreadCount;
+  }
 }
 
 export const supportService = new SupportService();

@@ -6,9 +6,10 @@
 
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, CardBody, Badge } from "@shared/components";
+import { Card, Badge } from "@shared/components";
 import { PageContainer } from "@member/layouts";
 import ThreadDetailModal from "@shared/components/ThreadDetailModal";
+import { supportService } from "../../services/support.service";
 
 import InquiryHistoryFilter from "./InquiryHistoryFilter";
 import InquiryHistoryTable from "./InquiryHistoryTable";
@@ -93,6 +94,9 @@ export default function InquiryHistoryPage(props) {
           <h1 className="text-2xl font-bold text-gray-900">
             {t("support.inquiryHistory")}
           </h1>
+          <p className="text-gray-600 mt-2 text-sm">
+            {t('support.inquiryHistory.description', '1:1 문의 내역 및 답변 확인')}
+          </p>
         </div>
 
         <InquiryHistoryFilter
@@ -105,7 +109,7 @@ export default function InquiryHistoryPage(props) {
         />
 
         <Card>
-          <CardBody>
+          <div className="p-6">
             <InquiryHistoryTable
               loading={loading}
               filteredThreads={filteredThreads}
@@ -115,7 +119,7 @@ export default function InquiryHistoryPage(props) {
               getStatusBadge={getStatusBadge}
               getCategoryBadge={getCategoryBadge}
             />
-          </CardBody>
+          </div>
         </Card>
       </div>
 
@@ -124,6 +128,10 @@ export default function InquiryHistoryPage(props) {
         isOpen={selectedThreadId !== null}
         onClose={closeDetailModal}
         onMessageSent={loadThreads}
+        services={{
+          getThread: supportService.getMemberThread,
+          createMessage: supportService.createMemberThreadMessage,
+        }}
       />
     </PageContainer>
   );

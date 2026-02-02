@@ -4,10 +4,12 @@
     "subtitle": "문의, FAQ",
     "notices": {
       "title": "공지사항",
-      "description": "최신 공지사항 및 중요 알림 확인"
+      "description": "최신 공지사항 및 중요 알림 확인",
+      "searchPlaceholder": "공지사항 검색..."
     },
     "inquiry": "1:1 문의",
-    "faq": "자주 묻는 질문",
+    "faq": "FAQ",
+    "faq.description": "자주 묻는 질문과 답변",
     "faqCategory": {
       "registration": "회원가입",
       "general": "일반",
@@ -21,11 +23,17 @@
     "noFaqResults": "일치하는 질문을 찾을 수 없습니다",
     "newInquiry": "새 문의",
     "inquiryHistory": "문의 내역",
+    "inquiryHistory.description": "1:1 문의 내역 및 답변 확인",
+    "notificationHistory": "알림 내역",
+    "notificationHistory.description": "시스템 알림 및 공지 확인",
     "noInquiries": "문의 내역이 없습니다",
     "category": {
       "general": "일반 문의",
       "support": "기술 지원",
-      "performance": "실적 문의"
+      "performance": "실적 문의",
+      "project": "사업 관리",
+      "member": "회원 관리",
+      "label": "분류"
     },
     "categoryLabel": "문의 분류",
     "selectCategory": "카테고리 선택",
@@ -53,7 +61,7 @@
     "attachments": "첨부파일",
     "attachmentNumber": "첨부파일 {{number}}",
     "addAttachment": "첨부파일 추가",
-    "attachmentHint": "PDF, Word, Excel, 이미지 형식 지원, 파일당 최대 10MB",
+    "attachmentHint": "PDF, Word, Excel, 이미지 형식 지원, 파일당 최대 {{maxSize}}MB",
     "maxFiles": "최대 3개까지 업로드 가능",
     "maxFilesLabel": "최대 3개",
     "maxAttachmentsReached": "최대 {{max}}개의 첨부파일만 업로드할 수 있습니다",
@@ -102,6 +110,84 @@
     "writeComment": "댓글 작성",
     "comment": "댓글",
     "like": "좋아요",
-    "replyToThread": "답변하기"
+    "replyToThread": "답변하기",
+    "read": "읽음",
+    "readStatus": "읽음 상태",
+    "searchNotifications": "알림 검색...",
+    "sender": "발신자",
+    "goToPage": "페이지로 이동",
+    "notifications": {
+      "performance": {
+        "review": {
+          "subject": "[실적 관리] {{period}} 실적 심사 결과",
+          "content": "{{period}} 실적이 {{statusKo}}되었습니다.",
+          "contentWithComments": "{{period}} 실적이 {{statusKo}}되었습니다.\n\n관리자 의견: {{comments}}"
+        },
+        "submission": {
+          "subject": "[실적 관리] 새로운 실적 제출",
+          "content": "{{companyName}}에서 {{year}}년 {{quarter}}분기 실적을 제출했습니다."
+        }
+      },
+      "member": {
+        "registration": {
+          "subject": "[회원 관리] 새로운 회원 가입 신청",
+          "content": "{{company_name}} (사업자번호: {{business_number}})에서 회원 가입을 신청했습니다.\n이메일: {{email}}"
+        },
+        "approved": {
+          "subject": "[회원 관리] 회원 가입 승인",
+          "content": "{{company_name}}의 회원 가입이 승인되었습니다. 이제 모든 서비스를 이용하실 수 있습니다."
+        },
+        "rejected": {
+          "subject": "[회원 관리] 회원 가입 거부",
+          "content": "{{company_name}}의 회원 가입이 거부되었습니다.{{#reason}}\n\n사유: {{reason}}{{/reason}}"
+        }
+      },
+      "project": {
+        "application": {
+          "subject": "[사업 관리] 새로운 사업 신청",
+          "content": "{{company_name}}의 {{applicant_name}}님이 '{{project_title}}' 사업에 신청했습니다."
+        },
+        "result": {
+          "subject": "[사업 관리] 사업 신청 결과",
+          "content": "'{{project_title}}' 사업 신청이 {{statusKo}}되었습니다."
+        }
+      }
+    }
+  },
+  "performance": {
+    "notification": {
+      "subject": "실적 관리 알림",
+      "newSubmission": "새로운 실적 제출",
+      "newSubmissionContent": "{{company_name}}에서 {{period}} 실적을 제출했습니다.",
+      "approved": "실적 승인됨",
+      "approvedContent": "{{period}} 실적이 승인되었습니다.",
+      "revisionRequested": "실적 보완 요청",
+      "revisionRequestedContent": "{{period}} 실적에 대한 보완이 요청되었습니다. 관리자 의견: {{comments}}",
+      "rejected": "실적 거부됨",
+      "rejectedContent": "{{period}} 실적이 거부되었습니다. 사유: {{comments}}",
+      "submitted": "실적 제출됨",
+      "submittedContent": "{{period}} 실적이 제출되었습니다.",
+      "reviewCancelled": "심사가 취소되어 제출 상태로 되돌아갔습니다."
+    }
+  },
+  "project": {
+    "notification": {
+      "subject": "사업 관리 알림",
+      "newApplication": "새로운 사업 신청",
+      "newApplicationContent": "{{company_name}}의 {{applicant_name}}님이 {{project_title}} 사업에 신청했습니다.",
+      "applicationResult": "사업 신청 결과",
+      "applicationResultContent": "{{project_title}} 사업 신청이 {{status}}되었습니다."
+    }
+  },
+  "member": {
+    "notification": {
+      "subject": "회원 관리 알림",
+      "newRegistration": "새로운 회원 가입",
+      "newRegistrationContent": "{{company_name}} (사업자번호: {{business_number}}, 이메일: {{email}})에서 회원 가입을 신청했습니다.",
+      "approved": "회원 가입 승인",
+      "approvedContent": "{{company_name}}의 회원 가입이 승인되었습니다.",
+      "rejected": "회원 가입 거부",
+      "rejectedContent": "{{company_name}}의 회원 가입이 거부되었습니다. 사유: {{reason}}"
+    }
   }
 }

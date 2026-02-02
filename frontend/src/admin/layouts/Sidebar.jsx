@@ -63,13 +63,12 @@ export default function Sidebar({ collapsed, mobileOpen = false, onClose }) {
       icon: EnvelopeIcon,
       label: t("admin.menu.messages"),
     },
-    // Hidden for now - uncomment when ready
-    // {
-    //   key: "statistics",
-    //   path: "/admin/statistics",
-    //   icon: ReportIcon,
-    //   label: t('admin.menu.statistics', '통계 보고서'),
-    // },
+    {
+      key: "statistics",
+      path: "/admin/statistics",
+      icon: ReportIcon,
+      label: t('admin.menu.statistics', '통계 보고서'),
+    },
     // {
     //   key: 'reports',
     //   path: '/admin/reports',
