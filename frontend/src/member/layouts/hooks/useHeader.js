@@ -46,7 +46,7 @@ export function useHeader() {
     },
     {
       key: "projects",
-      path: "/member/programs",
+      path: "/member/projects",
       icon: FolderIcon,
       label: t("member.layout.menu.projects"),
       requiresAuth: true,
@@ -79,10 +79,7 @@ export function useHeader() {
     }
     // 项目菜单特殊处理
     if (item.key === "projects") {
-      return (
-        location.pathname.startsWith("/member/programs") ||
-        location.pathname.startsWith("/member/project")
-      );
+      return location.pathname.startsWith("/member/projects");
     }
     // 支持菜单特殊处理
     if (item.key === "support") {

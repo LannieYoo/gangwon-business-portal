@@ -14,27 +14,32 @@ export function ProjectSubmenu() {
     {
       key: "project-list",
       label: t("member.projects.tabs.projectList", "사업 목록"),
-      path: "/member/programs",
-      activePaths: ["/member/programs"],
+      path: "/member/projects",
+      activePaths: ["/member/projects"],
       isTab: true,
-      exact: false, // 非精确匹配，但会被 activePaths 的逻辑覆盖
-      // 自定义匹配逻辑：匹配 /member/programs 和 /member/programs/:id，但不匹配 /member/programs/applications
+      exact: false,
+      // 自定义匹配逻辑：匹配 /member/projects 和 /member/projects/:id，但不匹配 /member/projects/applications
       customMatch: (pathname) => {
-        if (pathname === "/member/programs") return true;
-        // 匹配 /member/programs/:id 格式（UUID 或数字）
-        if (pathname.startsWith("/member/programs/") && !pathname.includes("/applications")) {
+        // 匹配 /member/projects 精确
+        if (pathname === "/member/projects") return true;
+
+        // 匹配 /member/projects/:id 格式，但不匹配 /member/projects/applications
+        if (
+          pathname.startsWith("/member/projects/") &&
+          !pathname.includes("/applications")
+        ) {
           const parts = pathname.split("/");
-          // 确保是 /member/programs/:id 格式，不是更深的路径
-          return parts.length === 4;
+          if (parts.length === 4) return true;
         }
+
         return false;
       },
     },
     {
       key: "application-records",
       label: t("member.projects.tabs.applicationRecords", "신청 기록"),
-      path: "/member/programs/applications",
-      activePaths: ["/member/programs/applications"],
+      path: "/member/projects/applications",
+      activePaths: ["/member/projects/applications"],
       isTab: true,
       exact: true,
     },

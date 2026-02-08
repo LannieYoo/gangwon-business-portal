@@ -8,10 +8,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils";
+import { usePagination } from "@shared/hooks";
 import { useMyApplications } from "./useMyApplications";
 import { useApplicationStatus } from "./useApplicationStatus";
 
-export function useApplicationRecords() {
+export function useApplicationRecords(pageSize = 10) {
   const { t } = useTranslation();
   const {
     applications: allApplications,
@@ -20,7 +21,8 @@ export function useApplicationRecords() {
     cancelApplication,
   } = useMyApplications();
 
-  const [filteredApplications, setFilteredApplications] = useState(allApplications);
+  const [filteredApplications, setFilteredApplications] =
+    useState(allApplications);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
@@ -34,9 +36,16 @@ export function useApplicationRecords() {
     setFilteredApplications(allApplications);
   }, [allApplications]);
 
-  const handleFilterChange = useCallback((filtered) => {
-    setFilteredApplications(filtered);
-  }, []);
+  // 使用共享的分页 hook
+  const pagination = usePagination({ items: filteredApplications, pageSize });
+
+  const handleFilterChange = useCallback(
+    (filtered) => {
+      setFilteredApplications(filtered);
+      pagination.resetPage();
+    },
+    [pagination],
+  );
 
   const { getStatusInfo } = useApplicationStatus();
 
@@ -93,14 +102,24 @@ export function useApplicationRecords() {
 
   const handleSubmitSupplement = useCallback(async () => {
     if (supplementFiles.length === 0) {
-      alert(t("member.projects.applicationRecords.noFilesSelected", "파일을 선택해주세요."));
+      alert(
+        t(
+          "member.projects.applicationRecords.noFilesSelected",
+          "파일을 선택해주세요.",
+        ),
+      );
       return;
     }
     setSupplementLoading(true);
     // TODO: Implement actual file upload in hook
     setTimeout(() => {
       setSupplementLoading(false);
-      alert(t("member.projects.applicationRecords.featureComingSoon", "기능 준비 중입니다"));
+      alert(
+        t(
+          "member.projects.applicationRecords.featureComingSoon",
+          "기능 준비 중입니다",
+        ),
+      );
       setShowSupplementModal(false);
       setSupplementFiles([]);
     }, 500);
@@ -119,7 +138,10 @@ export function useApplicationRecords() {
     },
     {
       key: "status",
-      label: t("member.projects.applicationRecords.progressStatus", "진행 상태"),
+      label: t(
+        "member.projects.applicationRecords.progressStatus",
+        "진행 상태",
+      ),
       render: (value) => {
         const statusInfo = getStatusInfo(value);
         return statusInfo.label;
@@ -134,7 +156,7 @@ export function useApplicationRecords() {
 
   return {
     allApplications,
-    filteredApplications,
+    filteredApplications: pagination.paginatedItems,
     loading,
     selectedApplication,
     showCancelModal,
@@ -156,5 +178,11 @@ export function useApplicationRecords() {
     setShowCancelModal,
     setShowRejectionModal,
     setShowSupplementModal,
+    // 分页相关
+    total: pagination.total,
+    currentPage: pagination.currentPage,
+    totalPages: pagination.totalPages,
+    pageSize: pagination.pageSize,
+    onPageChange: pagination.onPageChange,
   };
 }

@@ -254,13 +254,16 @@ export const GANGWON_FUTURE_INDUSTRIES = [
  * 未来有望新技术
  * 翻译键: enums.industry.futureTech.*
  */
-export const FUTURE_TECHNOLOGIES = [
-  "it",
-  "bt",
-  "nt",
-  "st",
-  "et",
-  "ct",
+export const FUTURE_TECHNOLOGIES = ["it", "bt", "nt", "st", "et", "ct"];
+
+/**
+ * 参与项目
+ * 翻译键: enums.participationPrograms.*
+ */
+export const PARTICIPATION_PROGRAMS = [
+  "startup_university",
+  "global_glocal",
+  "rise",
   "knu_tenant",
 ];
 

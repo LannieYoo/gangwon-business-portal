@@ -11,6 +11,9 @@ import { DEFAULT_PAGE_SIZE } from "@shared/utils/constants";
 export { useBanners } from "./useBanners";
 export { useApiCache, clearAllCache, clearCache } from "./useApiCache";
 export { useEnumTranslation } from "./useEnumTranslation";
+export { usePagination } from "./usePagination";
+// 保留别名，向后兼容
+export { usePagination as useListPagination } from "./usePagination";
 
 // =============================================================================
 // useAuth - 认证
@@ -183,45 +186,6 @@ export function useLocalStorage(key, initialValue) {
   };
 
   return [storedValue, setValue, removeValue];
-}
-
-// =============================================================================
-// usePagination - 分页
-// =============================================================================
-
-export function usePagination(
-  initialPage = 1,
-  initialPageSize = DEFAULT_PAGE_SIZE,
-) {
-  const [page, setPage] = useState(initialPage);
-  const [pageSize, setPageSize] = useState(initialPageSize);
-
-  const goToPage = useCallback((newPage) => setPage(newPage), []);
-  const nextPage = useCallback(() => setPage((prev) => prev + 1), []);
-  const prevPage = useCallback(
-    () => setPage((prev) => Math.max(1, prev - 1)),
-    [],
-  );
-
-  const changePageSize = useCallback((newPageSize) => {
-    setPageSize(newPageSize);
-    setPage(1);
-  }, []);
-
-  const reset = useCallback(() => {
-    setPage(initialPage);
-    setPageSize(initialPageSize);
-  }, [initialPage, initialPageSize]);
-
-  return {
-    page,
-    pageSize,
-    goToPage,
-    nextPage,
-    prevPage,
-    changePageSize,
-    reset,
-  };
 }
 
 // =============================================================================

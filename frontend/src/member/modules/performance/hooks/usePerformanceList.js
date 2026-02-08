@@ -10,8 +10,9 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { performanceService } from "../services/performance.service";
 import { useApiCache, clearCache } from "@shared/hooks/useApiCache";
+import { DEFAULT_PAGE_SIZE } from "@shared/utils/constants";
 
-export const usePerformanceList = () => {
+export const usePerformanceList = (pageSize = DEFAULT_PAGE_SIZE) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [message, setMessage] = useState(null);
@@ -23,50 +24,53 @@ export const usePerformanceList = () => {
     comments: [],
     status: "",
   });
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 20,
-    total: 0,
-    totalPages: 0,
-  });
+
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // 计算总页数
+  const totalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(totalCount / pageSize));
+  }, [totalCount, pageSize]);
 
   const fetchPerformances = useCallback(async () => {
     const params = {
-      page: pagination.page,
-      pageSize: pagination.pageSize,
+      page: currentPage,
+      pageSize: pageSize,
     };
     if (filters.year) params.year = filters.year;
     if (filters.quarter) params.quarter = filters.quarter;
     if (filters.status) params.status = filters.status;
 
     const response = await performanceService.listRecords(params);
-    
-    setPagination((prev) => ({
-      ...prev,
-      page: response.page || pagination.page,
-      total: response.total || 0,
-      totalPages: response.totalPages || 0,
-    }));
-    
-    return response.items || [];
-  }, [filters, pagination.page, pagination.pageSize]);
 
-  const { data: performances, loading, error, refresh: loadPerformances } = useApiCache(
+    setTotalCount(response.total || 0);
+
+    return response.items || [];
+  }, [filters, currentPage, pageSize]);
+
+  const {
+    data: performances,
+    loading,
+    error,
+    refresh: loadPerformances,
+  } = useApiCache(
     fetchPerformances,
-    `performance-list-${pagination.page}-${filters.year}-${filters.quarter}-${filters.status}`,
+    `performance-list-${currentPage}-${filters.year}-${filters.quarter}-${filters.status}`,
     {
       cacheDuration: 1 * 60 * 1000, // 1分钟缓存
       enabled: true,
-      deps: [pagination.page, filters]
-    }
+      deps: [currentPage, filters],
+    },
   );
 
   // 使用 useMemo 确保返回稳定的数组引用
   const stablePerformances = useMemo(() => performances ?? [], [performances]);
 
-  const handlePageChange = (newPage) => {
-    setPagination(prev => ({ ...prev, page: newPage }));
-  };
+  const handlePageChange = useCallback((newPage) => {
+    setCurrentPage(newPage);
+  }, []);
 
   const confirmDelete = async () => {
     try {
@@ -75,7 +79,9 @@ export const usePerformanceList = () => {
       setMessage(t("message.deleteSuccess", "삭제되었습니다"));
       setDeleteConfirm({ open: false, id: null });
       // 清除缓存并刷新
-      clearCache(`performance-list-${pagination.page}-${filters.year}-${filters.quarter}-${filters.status}`);
+      clearCache(
+        `performance-list-${currentPage}-${filters.year}-${filters.quarter}-${filters.status}`,
+      );
       loadPerformances();
     } catch (error) {
       console.error("Delete performance error:", error);
@@ -86,10 +92,12 @@ export const usePerformanceList = () => {
 
   const getLatestReviewComments = (record) => {
     if (!record.reviewComments) return [];
-    return [{
-      comments: record.reviewComments,
-      reviewedAt: record.reviewedAt
-    }];
+    return [
+      {
+        comments: record.reviewComments,
+        reviewedAt: record.reviewedAt,
+      },
+    ];
   };
 
   const showComments = (record) => {
@@ -99,6 +107,7 @@ export const usePerformanceList = () => {
 
   const setFilterField = (field, value) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
+    setCurrentPage(1); // 筛选改变时重置到第一页
   };
 
   return {
@@ -113,7 +122,18 @@ export const usePerformanceList = () => {
     setFilterField,
     commentModal,
     setCommentModal,
-    pagination,
+    // 分页相关 - 统一接口
+    pagination: {
+      currentPage,
+      page: currentPage,
+      pageSize,
+      total: totalCount,
+      totalPages,
+    },
+    currentPage,
+    totalPages,
+    totalCount,
+    onPageChange: handlePageChange,
     handlePageChange,
     confirmDelete,
     showComments,

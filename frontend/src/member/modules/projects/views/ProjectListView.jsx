@@ -13,6 +13,7 @@ import { ProjectListHeader } from "../components/ProjectList/ProjectListHeader";
 import { ProjectListFilter } from "../components/ProjectList/ProjectListFilter";
 import { ProjectList } from "../components/ProjectList/ProjectList";
 import ApplicationModal from "../components/ApplicationModal/index.jsx";
+import { Pagination } from "@shared/components";
 
 export default function ProjectListView() {
   const {
@@ -27,6 +28,11 @@ export default function ProjectListView() {
     handleDetail,
     handleApplicationSuccess,
     handleCloseModal,
+    // 分页相关
+    total,
+    currentPage,
+    totalPages,
+    onPageChange,
   } = useProjectList();
 
   return (
@@ -42,7 +48,7 @@ export default function ProjectListView() {
             allProjects={allProjects}
             columns={columns}
             onFilterChange={handleFilterChange}
-            resultsCount={filteredProjects.length}
+            resultsCount={total}
           />
 
           <ProjectList
@@ -52,6 +58,17 @@ export default function ProjectListView() {
             onApply={handleApply}
             onDetail={handleDetail}
           />
+
+          {/* Pagination */}
+          {!loading && totalPages > 1 && (
+            <div className="mt-6 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </div>
+          )}
 
           {/* 程序申请弹窗 */}
           <ApplicationModal

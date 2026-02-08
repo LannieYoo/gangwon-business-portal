@@ -135,6 +135,13 @@ const CompanyBusinessInfo = ({
         "RISE 사업단",
       ),
     },
+    {
+      value: "knu_tenant",
+      label: t(
+        "performance.companyInfo.profile.participationPrograms.knuTenant",
+        "KNU 입주기업",
+      ),
+    },
   ];
 
   return (

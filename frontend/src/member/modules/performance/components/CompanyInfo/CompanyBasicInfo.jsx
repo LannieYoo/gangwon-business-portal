@@ -102,7 +102,8 @@ const CompanyBasicInfo = ({
                 <small className="text-xs text-gray-500">
                   {t(
                     "member.performance.companyInfo.profile.logoHint",
-                    "JPG, PNG, GIF 형식 지원, 최대 5MB",
+                    "JPG, PNG, GIF 형식 지원, 최대 {{maxSize}}MB",
+                    { maxSize: 5 },
                   )}
                 </small>
               </>
@@ -134,7 +135,7 @@ const CompanyBasicInfo = ({
         </div>
 
         {/* Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Input
             label={t(
               "member.performance.companyInfo.fields.companyName",
@@ -147,11 +148,16 @@ const CompanyBasicInfo = ({
             error={errors.companyName}
           />
           <Input
-            label={t("member.performance.companyInfo.fields.email", "이메일")}
-            value={data.email}
-            onChange={(e) => onChange("email", e.target.value)}
+            label={t(
+              "member.performance.companyInfo.fields.foundingDate",
+              "설립일",
+            )}
+            type="date"
+            value={data.foundingDate}
+            onChange={(e) => onChange("foundingDate", e.target.value)}
             disabled={!isEditing}
-            error={errors.email}
+            required
+            error={errors.foundingDate}
           />
           <Input
             label={t(
@@ -173,17 +179,36 @@ const CompanyBasicInfo = ({
             disabled={!isEditing}
             error={errors.legalNumber}
           />
-          <Input
+          <Select
             label={t(
-              "member.performance.companyInfo.fields.foundingDate",
-              "설립일",
+              "member.performance.companyInfo.fields.region",
+              "소재지역",
             )}
-            type="date"
-            value={data.foundingDate}
-            onChange={(e) => onChange("foundingDate", e.target.value)}
+            value={data.region}
+            onChange={(e) => onChange("region", e.target.value)}
             disabled={!isEditing}
             required
-            error={errors.foundingDate}
+            error={errors.region}
+            options={regionOptions}
+          />
+        </div>
+        <div className="grid grid-cols-1 gap-6 mt-6 pt-6 border-t border-gray-100">
+          <Input
+            label={t("member.performance.companyInfo.fields.address", "주소")}
+            value={data.address}
+            onChange={(e) => onChange("address", e.target.value)}
+            disabled={!isEditing}
+            required
+            error={errors.address}
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Input
+            label={t("member.performance.companyInfo.fields.email", "이메일")}
+            value={data.email}
+            onChange={(e) => onChange("email", e.target.value)}
+            disabled={!isEditing}
+            error={errors.email}
           />
           <Input
             label={t(
@@ -198,26 +223,6 @@ const CompanyBasicInfo = ({
           />
         </div>
         <div className="grid grid-cols-1 gap-6">
-          <Select
-            label={t(
-              "member.performance.companyInfo.fields.region",
-              "소재지역",
-            )}
-            value={data.region}
-            onChange={(e) => onChange("region", e.target.value)}
-            disabled={!isEditing}
-            required
-            error={errors.region}
-            options={regionOptions}
-          />
-          <Input
-            label={t("member.performance.companyInfo.fields.address", "주소")}
-            value={data.address}
-            onChange={(e) => onChange("address", e.target.value)}
-            disabled={!isEditing}
-            required
-            error={errors.address}
-          />
           <Textarea
             label={t(
               "member.performance.companyInfo.fields.description",

@@ -193,8 +193,7 @@
       "nt": "纳米技术(NT)",
       "st": "宇宙航空(ST)",
       "et": "环境工程(ET)",
-      "ct": "文化技术(CT)",
-      "knu_tenant": "KNU入驻企业"
+      "ct": "文化技术(CT)"
     },
     "categories": {
       "gangwonIndustry": {
@@ -214,8 +213,11 @@
         "et": "环境工程(ET)",
         "ct": "文化技术(CT)"
       },
-      "other": {
-        "knu_tenant": "KNU入驻企业"
+      "participationPrograms": {
+        "startup_university": "创业中心大学",
+        "global_glocal": "全球·成长事业",
+        "rise": "RISE 事业团",
+        "knu_tenant": "江原大学入驻企业"
       }
     }
   }

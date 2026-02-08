@@ -330,6 +330,41 @@ export default function MemberDetail() {
               {member.createdAt ? formatDateTime(member.createdAt) : "-"}
             </span>
           </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">
+              {t("member.email", "이메일")}
+            </label>
+            <span className="text-base text-gray-900">
+              {member.email || "-"}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">
+              {t("member.website", "홈페이지")}
+            </label>
+            <span className="text-base text-gray-900">
+              {member.website ? (
+                <a
+                  href={member.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  {member.website}
+                </a>
+              ) : (
+                "-"
+              )}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2 md:col-span-2 lg:col-span-3">
+            <label className="text-sm text-gray-600 font-medium">
+              {t("member.description", "기업소개")}
+            </label>
+            <p className="text-base text-gray-900 whitespace-pre-wrap">
+              {member.description || "-"}
+            </p>
+          </div>
         </div>
       </Card>
 
@@ -462,25 +497,7 @@ export default function MemberDetail() {
                 : "-"}
             </span>
           </div>
-          <div className="flex flex-col gap-2 md:col-span-2 lg:col-span-3">
-            <label className="text-sm text-gray-600 font-medium">
-              {t("member.website", "웹사이트")}
-            </label>
-            <span className="text-base text-gray-900">
-              {member.website ? (
-                <a
-                  href={member.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  {member.website}
-                </a>
-              ) : (
-                "-"
-              )}
-            </span>
-          </div>
+
           <div className="flex flex-col gap-2 md:col-span-2 lg:col-span-3">
             <label className="text-sm text-gray-600 font-medium">
               {t("member.mainBusiness", "주요 사업")}
@@ -488,14 +505,6 @@ export default function MemberDetail() {
             <span className="text-base text-gray-900">
               {member.mainBusiness || "-"}
             </span>
-          </div>
-          <div className="flex flex-col gap-2 md:col-span-2 lg:col-span-3">
-            <label className="text-sm text-gray-600 font-medium">
-              {t("member.description", "기업소개")}
-            </label>
-            <p className="text-base text-gray-900 whitespace-pre-wrap">
-              {member.description || "-"}
-            </p>
           </div>
         </div>
       </Card>
@@ -509,14 +518,6 @@ export default function MemberDetail() {
         </div>
 
         <div className="space-y-4">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">
-              {t("member.email", "이메일")}
-            </label>
-            <span className="text-base text-gray-900">
-              {member.email || "-"}
-            </span>
-          </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
               {t("member.cooperationFields", "산업협력 희망 분야")}

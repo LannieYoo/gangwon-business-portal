@@ -13,8 +13,9 @@ import { useProjectApplication } from "./useProjectApplication";
 import { useProjectStatus } from "./useProjectStatus";
 import { ProjectStatus } from "../enums";
 import { formatDate } from "@shared/utils";
+import { usePagination } from "@shared/hooks";
 
-export function useProjectList() {
+export function useProjectList(pageSize = 10) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { projects: allProjects, loading, refresh } = useProjects();
@@ -31,9 +32,16 @@ export function useProjectList() {
     setFilteredProjects(allProjects);
   }, [allProjects]);
 
-  const handleFilterChange = useCallback((filtered) => {
-    setFilteredProjects(filtered);
-  }, []);
+  // 使用共享的分页 hook
+  const pagination = usePagination({ items: filteredProjects, pageSize });
+
+  const handleFilterChange = useCallback(
+    (filtered) => {
+      setFilteredProjects(filtered);
+      pagination.resetPage();
+    },
+    [pagination],
+  );
 
   const checkAndOpenModal = useCallback(
     async (project) => {
@@ -74,9 +82,8 @@ export function useProjectList() {
 
   const handleDetail = useCallback(
     (projectId) => {
-      // 导航到详情页，路径可以是 /member/project/:id 或 /member/programs/:id
-      // 这里统一优先使用 /member/project 路径，因为它在 SideBar 中更常用
-      navigate(`/member/project/${projectId}`);
+      // 统一使用 /member/projects/:id 路径
+      navigate(`/member/projects/${projectId}`);
     },
     [navigate],
   );
@@ -129,7 +136,7 @@ export function useProjectList() {
 
   return {
     allProjects,
-    filteredProjects,
+    filteredProjects: pagination.paginatedItems,
     loading,
     showApplicationModal,
     selectedProject,
@@ -139,5 +146,11 @@ export function useProjectList() {
     handleDetail,
     handleApplicationSuccess,
     handleCloseModal,
+    // 分页相关
+    total: pagination.total,
+    currentPage: pagination.currentPage,
+    totalPages: pagination.totalPages,
+    pageSize: pagination.pageSize,
+    onPageChange: pagination.onPageChange,
   };
 }

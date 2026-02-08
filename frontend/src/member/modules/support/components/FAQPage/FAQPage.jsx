@@ -6,7 +6,7 @@
 
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Card } from "@shared/components";
+import { Card, Pagination } from "@shared/components";
 import { PageContainer } from "@member/layouts";
 
 import FAQFilter from "./FAQFilter";
@@ -29,6 +29,11 @@ export default function FAQPage(props) {
     setSelectedCategory,
     handleFilterChange,
     toggleExpand,
+    // 分页相关
+    total,
+    currentPage,
+    totalPages,
+    onPageChange,
   } = props;
 
   // 定义搜索列
@@ -58,7 +63,7 @@ export default function FAQPage(props) {
             {t("member.support.faq", "FAQ")}
           </h1>
           <p className="text-gray-600 mt-2 text-sm">
-            {t('member.support.faq.description', '자주 묻는 질문과 답변')}
+            {t("member.support.faq.description", "자주 묻는 질문과 답변")}
           </p>
         </div>
 
@@ -76,30 +81,46 @@ export default function FAQPage(props) {
           <div className="p-6">
             <p className="text-sm text-gray-600 mb-4">
               {t("common.resultsCount", "총 {{count}}건", {
-                count: filteredFaqs.length,
+                count: total,
               })}
             </p>
 
             {loading ? (
               <div className="text-center py-12 text-gray-500">
-                {t('common.loading', '로딩 중...')}
+                {t("common.loading", "로딩 중...")}
               </div>
             ) : filteredFaqs.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                {t('member.support.noFaqResults', '일치하는 질문을 찾을 수 없습니다')}
+                {t(
+                  "member.support.noFaqResults",
+                  "일치하는 질문을 찾을 수 없습니다",
+                )}
               </div>
             ) : (
-              <div className="flex flex-col gap-3">
-                {filteredFaqs.map((faq) => (
-                  <FAQItem
-                    key={faq.id}
-                    faq={faq}
-                    isExpanded={expandedIds.has(faq.id)}
-                    toggleExpand={toggleExpand}
-                    categoryTranslations={categoryTranslations}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="flex flex-col gap-3">
+                  {filteredFaqs.map((faq) => (
+                    <FAQItem
+                      key={faq.id}
+                      faq={faq}
+                      isExpanded={expandedIds.has(faq.id)}
+                      toggleExpand={toggleExpand}
+                      categoryTranslations={categoryTranslations}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="mt-6 flex justify-center">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={onPageChange}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
         </Card>

@@ -8,6 +8,7 @@ import components from "./components.json";
 import error from "./error.json";
 import terms from "./terms.json";
 import member from "./member.json";
+import project from "./project.json";
 
 // Deep merge all translations
 const deepMerge = (target, source) => {
@@ -31,7 +32,7 @@ const deepMerge = (target, source) => {
   return result;
 };
 
-const ko = [common, enums, components, error, terms, member].reduce(
+const ko = [common, enums, components, error, terms, member, project].reduce(
   (acc, curr) => deepMerge(acc, curr),
   {},
 );

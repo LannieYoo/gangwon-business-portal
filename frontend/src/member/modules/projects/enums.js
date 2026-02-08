@@ -47,7 +47,10 @@ export const FutureTechnologies = {
   CT: "ct",
 };
 
-// 其他分类
-export const OtherCategories = {
-  KNU_TENANT: "knu_tenant", // KNU 入驻企业
+// 参与项目
+export const ParticipationPrograms = {
+  STARTUP_UNIVERSITY: "startup_university",
+  GLOBAL_GLOCAL: "global_glocal",
+  RISE: "rise",
+  KNU_TENANT: "knu_tenant", // 江原大学入驻企业
 };

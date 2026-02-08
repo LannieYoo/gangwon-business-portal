@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "detail": {
+      "basicInfo": "기본 정보",
+      "title": "지원사업",
+      "status": "상태",
+      "createdAt": "생성일",
+      "startDate": "시작일",
+      "endDate": "종료일",
+      "image": "대표 이미지",
+      "noImage": "표지 이미지가 없습니다",
+      "content": "지원사업",
+      "attachments": "첨부파일 목록",
+      "attachmentCount": "개 첨부파일"
+    }
+  }
+}

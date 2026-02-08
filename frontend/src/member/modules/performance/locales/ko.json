@@ -302,6 +302,7 @@
             "startupCenterUniversity": "창업중심대학",
             "globalBusiness": "글로벌 사업",
             "riseBusiness": "RISE 사업",
+            "knuTenant": "KNU 입주기업",
             "none": "없음"
           },
           "investmentStatus": {
@@ -507,7 +508,12 @@
         "nt": "나노기술(NT)",
         "st": "우주항공(ST)",
         "et": "환경공학(ET)",
-        "ct": "문화기술(CT)",
+        "ct": "문화기술(CT)"
+      },
+      "participationPrograms": {
+        "startup_university": "창업중심대학",
+        "global_glocal": "글로벌·글로컨사업",
+        "rise": "RISE 사업단",
         "knu_tenant": "KNU 입주기업"
       },
       "messages": {
@@ -541,7 +547,8 @@
         "participationPrograms": {
           "startupCenterUniversity": "창업중심대학",
           "globalBusiness": "글로벌 사업",
-          "riseBusiness": "RISE 사업"
+          "riseBusiness": "RISE 사업",
+          "knuTenant": "KNU 입주기업"
         },
         "loginRequiredDesc": "기업 정보를 보려면 먼저 로그인해주세요"
       },

@@ -17,6 +17,7 @@ import ApplicationActionButtons from "../components/ApplicationRecords/Applicati
 import CancelApplicationModal from "../components/ApplicationRecords/CancelApplicationModal";
 import RejectionReasonModal from "../components/ApplicationRecords/RejectionReasonModal";
 import SupplementMaterialsModal from "../components/ApplicationRecords/SupplementMaterialsModal";
+import { Pagination } from "@shared/components";
 
 export default function ApplicationRecordsView() {
   const {
@@ -43,6 +44,11 @@ export default function ApplicationRecordsView() {
     setShowCancelModal,
     setShowRejectionModal,
     setShowSupplementModal,
+    // 分页相关
+    total,
+    currentPage,
+    totalPages,
+    onPageChange,
   } = useApplicationRecords();
 
   const renderActionButtons = useCallback(
@@ -70,7 +76,7 @@ export default function ApplicationRecordsView() {
             allApplications={allApplications}
             columns={columns}
             onFilterChange={handleFilterChange}
-            resultsCount={filteredApplications.length}
+            resultsCount={total}
           />
 
           <ApplicationRecordsList
@@ -80,6 +86,17 @@ export default function ApplicationRecordsView() {
             getStatusInfo={getStatusInfo}
             renderActionButtons={renderActionButtons}
           />
+
+          {/* Pagination */}
+          {!loading && totalPages > 1 && (
+            <div className="mt-6 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </div>
+          )}
         </div>
       </ProjectPageContainer>
 

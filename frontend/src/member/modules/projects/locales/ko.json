@@ -193,8 +193,7 @@
         "nt": "나노기술(NT)",
         "st": "우주항공(ST)",
         "et": "환경공학(ET)",
-        "ct": "문화기술(CT)",
-        "knu_tenant": "KNU 입주기업"
+        "ct": "문화기술(CT)"
       },
       "categories": {
         "gangwonIndustry": {
@@ -214,7 +213,10 @@
           "et": "환경공학(ET)",
           "ct": "문화기술(CT)"
         },
-        "other": {
+        "participationPrograms": {
+          "startup_university": "창업중심대학",
+          "global_glocal": "글로벌·글로컨사업",
+          "rise": "RISE 사업단",
           "knu_tenant": "KNU 입주기업"
         }
       }

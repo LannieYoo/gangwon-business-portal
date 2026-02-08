@@ -122,6 +122,8 @@ export const POLICY_TAGS = {
   GLOBAL_GLOCAL: "global_glocal",
   /** RISE 事业团 (RISE 사업단) */
   RISE: "rise",
+  /** KNU 入驻企业 (KNU 입주기업) */
+  KNU_TENANT: "knu_tenant",
 };
 
 /**
@@ -181,6 +183,10 @@ export const POLICY_TAGS_OPTIONS = [
   {
     value: POLICY_TAGS.RISE,
     labelKey: "admin.statistics.filters.programs.rise", // 匹配韩国语原文：RISE 사업단
+  },
+  {
+    value: POLICY_TAGS.KNU_TENANT,
+    labelKey: "enums.participationPrograms.knu_tenant", // 使用共享枚举翻译：KNU 입주기업
   },
 ];
 

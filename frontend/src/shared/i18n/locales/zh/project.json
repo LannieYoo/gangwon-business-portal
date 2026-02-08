@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "detail": {
+      "basicInfo": "基本信息",
+      "title": "支援项目",
+      "status": "状态",
+      "createdAt": "创建日期",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "image": "封面图片",
+      "noImage": "暂无封面图片",
+      "content": "项目详情",
+      "attachments": "附件列表",
+      "attachmentCount": "个附件"
+    }
+  }
+}

@@ -100,18 +100,22 @@ const POLICY_TAG_I18N_MAP = {
   startup_university: "enums.participationPrograms.startup_university",
   global_glocal: "enums.participationPrograms.global_glocal",
   rise: "enums.participationPrograms.rise",
+  knu_tenant: "enums.participationPrograms.knu_tenant",
   // 大写格式 (旧数据兼容)
   STARTUP_UNIVERSITY: "enums.participationPrograms.startup_university",
   GLOBAL_GLOCAL: "enums.participationPrograms.global_glocal",
   RISE: "enums.participationPrograms.rise",
+  KNU_TENANT: "enums.participationPrograms.knu_tenant",
   // 驼峰格式 (旧数据兼容)
   startupCenterUniversity: "enums.participationPrograms.startup_university",
   globalBusiness: "enums.participationPrograms.global_glocal",
   riseBusiness: "enums.participationPrograms.rise",
+  knuTenant: "enums.participationPrograms.knu_tenant",
   // 其他变体
   startup_center_university: "enums.participationPrograms.startup_university",
   global_business: "enums.participationPrograms.global_glocal",
   rise_business: "enums.participationPrograms.rise",
+  knu_tenant_business: "enums.participationPrograms.knu_tenant",
   // 中文文本（旧数据兼容）
   创业中心大学: "enums.participationPrograms.startup_university",
   全球事业: "enums.participationPrograms.global_glocal",

@@ -10,12 +10,12 @@ import { useTranslation } from "react-i18next";
 import { supportService } from "../services/support.service";
 import { ROUTES } from "@shared/utils/constants";
 import { formatDateTime } from "@shared/utils";
-import { useApiCache } from "@shared/hooks/useApiCache";
+import { useApiCache, usePagination } from "@shared/hooks";
 
 /**
  * 获取公告列表的 Hook
  */
-export function useNotices(pageSize = 20) {
+export function useNotices(pageSize = 10) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [filteredNotices, setFilteredNotices] = useState([]);
@@ -38,16 +38,16 @@ export function useNotices(pageSize = 20) {
         important: n.boardType === "notice",
         attachments: n.attachments || [],
       }));
-      
+
       return {
         notices: formattedNotices,
-        total: formattedNotices.length
+        total: formattedNotices.length,
       };
     }
-    
+
     return {
       notices: [],
-      total: 0
+      total: 0,
     };
   }, [i18n.language]);
 
@@ -57,26 +57,46 @@ export function useNotices(pageSize = 20) {
     {
       cacheDuration: 1 * 60 * 1000, // 1分钟缓存（公告更新较频繁）
       enabled: true,
-      deps: []
-    }
+      deps: [],
+    },
   );
 
   // 根据重要性筛选
   const importanceFilteredNotices = useMemo(() => {
     if (!data?.notices) return [];
     if (!importanceFilter) return data.notices;
-    
+
     if (importanceFilter === "important") {
-      return data.notices.filter(n => n.important);
+      return data.notices.filter((n) => n.important);
     } else if (importanceFilter === "normal") {
-      return data.notices.filter(n => !n.important);
+      return data.notices.filter((n) => !n.important);
     }
     return data.notices;
   }, [data?.notices, importanceFilter]);
 
-  const handleFilterChange = useCallback((filtered) => {
-    setFilteredNotices(filtered);
-  }, []);
+  // 最终过滤后的公告：先按重要性筛选，再按搜索筛选
+  const allFilteredNotices =
+    filteredNotices.length > 0 ? filteredNotices : importanceFilteredNotices;
+
+  // 使用共享的分页 hook
+  const pagination = usePagination({ items: allFilteredNotices, pageSize });
+
+  const handleFilterChange = useCallback(
+    (filtered) => {
+      setFilteredNotices(filtered);
+      pagination.resetPage();
+    },
+    [pagination],
+  );
+
+  // 重要性筛选改变时重置页码
+  const handleImportanceFilterChange = useCallback(
+    (value) => {
+      setImportanceFilter(value);
+      pagination.resetPage();
+    },
+    [pagination],
+  );
 
   const handleNoticeClick = (noticeId) => {
     navigate(`${ROUTES.MEMBER_SUPPORT_NOTICES}/${noticeId}`);
@@ -91,17 +111,20 @@ export function useNotices(pageSize = 20) {
     [t],
   );
 
-  // 最终显示的公告：先按重要性筛选，再按搜索筛选
-  const displayNotices = filteredNotices.length > 0 ? filteredNotices : importanceFilteredNotices;
-
   return {
-    notices: displayNotices,
+    notices: pagination.paginatedItems,
     allNotices: importanceFilteredNotices, // 传递给 SearchInput 的数据已经过重要性筛选
     loading,
-    error: error ? t('common.error', '오류') : null,
-    total: displayNotices.length,
+    error: error ? t("common.error", "오류") : null,
+    total: pagination.total,
+    // 分页相关
+    currentPage: pagination.currentPage,
+    totalPages: pagination.totalPages,
+    pageSize: pagination.pageSize,
+    onPageChange: pagination.onPageChange,
+    // 筛选相关
     importanceFilter,
-    setImportanceFilter,
+    setImportanceFilter: handleImportanceFilterChange,
     importanceOptions,
     handleFilterChange,
     handleNoticeClick,

@@ -140,8 +140,7 @@
         "nt": "NT (纳米技术)",
         "st": "ST (航天技术)",
         "et": "ET (环境技术)",
-        "ct": "CT (文化技术)",
-        "knu_tenant": "江原大学入驻企业"
+        "ct": "CT (文化技术)"
       },
       "mainIndustryKsic": {
         "natural_bio": "天然物生物材料",
@@ -245,14 +244,7 @@
       "startup_university": "创业中心大学",
       "global_glocal": "全球·成长事业",
       "rise": "RISE 事业团",
-      "tipa": "TIPA",
-      "kised": "KISED",
-      "kibo": "KIBO",
-      "kosmes": "KOSMES",
-      "kvf": "KVF",
-      "smba": "SMBA",
-      "innopolis": "Innopolis",
-      "gsc": "GSC"
+      "knu_tenant": "江原大学入驻企业"
     },
     "country": {
       "korea": "韩国",

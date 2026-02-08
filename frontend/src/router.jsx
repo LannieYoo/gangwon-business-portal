@@ -160,9 +160,14 @@ function Unauthorized() {
     <div className="error-page">
       <div className="error-page-container">
         <div className="error-code">403</div>
-        <h1 className="error-title">{t('error.page403.title', '접근 권한이 없습니다')}</h1>
+        <h1 className="error-title">
+          {t("error.page403.title", "접근 권한이 없습니다")}
+        </h1>
         <p className="error-message">
-          {t('error.page403.message', '이 페이지에 접근할 수 있는 권한이 없습니다.')}
+          {t(
+            "error.page403.message",
+            "이 페이지에 접근할 수 있는 권한이 없습니다.",
+          )}
         </p>
         <div
           style={{
@@ -174,29 +179,28 @@ function Unauthorized() {
         >
           {isAuthenticated ? (
             <Button onClick={() => handleNavigate(homePath)}>
-              {isAdminPath 
-                ? t('error.page403.adminHomeButton', '관리자 홈으로 돌아가기')
-                : t('error.page403.homeButton', '홈으로 돌아가기')
-              }
+              {isAdminPath
+                ? t("error.page403.adminHomeButton", "관리자 홈으로 돌아가기")
+                : t("error.page403.homeButton", "홈으로 돌아가기")}
             </Button>
           ) : isFromAdmin ? (
             <Button onClick={() => handleNavigate("/admin/login")}>
-              {t('error.page403.adminLoginButton', '관리자 로그인')}
+              {t("error.page403.adminLoginButton", "관리자 로그인")}
             </Button>
           ) : isFromMember ? (
             <Button onClick={() => handleNavigate("/member/home")}>
-              {t('common.login', '로그인')}
+              {t("common.login", "로그인")}
             </Button>
           ) : (
             <>
               <Button onClick={() => handleNavigate("/member/home")}>
-                {t('error.page403.memberLoginButton', '회원 로그인')}
+                {t("error.page403.memberLoginButton", "회원 로그인")}
               </Button>
               <Button
                 onClick={() => handleNavigate("/admin/login")}
                 style={{ backgroundColor: "#6b7280" }}
               >
-                {t('error.page403.adminLoginButton', '관리자 로그인')}
+                {t("error.page403.adminLoginButton", "관리자 로그인")}
               </Button>
             </>
           )}
@@ -236,15 +240,19 @@ function NotFound() {
     <div className="error-page">
       <div className="error-page-container">
         <div className="error-code">404</div>
-        <h1 className="error-title">{t('error.page404.title', '페이지를 찾을 수 없습니다')}</h1>
+        <h1 className="error-title">
+          {t("error.page404.title", "페이지를 찾을 수 없습니다")}
+        </h1>
         <p className="error-message">
-          {t('error.page404.message', '요청하신 페이지가 존재하지 않거나 이동되었습니다.')}
+          {t(
+            "error.page404.message",
+            "요청하신 페이지가 존재하지 않거나 이동되었습니다.",
+          )}
         </p>
         <Button onClick={() => (window.location.href = homePath)}>
-          {isAdminPath 
-            ? t('error.page404.adminHomeButton', '관리자 홈으로 돌아가기')
-            : t('error.page404.homeButton', '홈으로 돌아가기')
-          }
+          {isAdminPath
+            ? t("error.page404.adminHomeButton", "관리자 홈으로 돌아가기")
+            : t("error.page404.homeButton", "홈으로 돌아가기")}
         </Button>
       </div>
     </div>
@@ -514,7 +522,7 @@ export const router = createBrowserRouter(
             },
             // Protected routes - require authentication
             {
-              path: "programs",
+              path: "projects",
               element: (
                 <ProtectedRoute allowedRoles={["member"]}>
                   <LazyRoute>
@@ -524,7 +532,7 @@ export const router = createBrowserRouter(
               ),
             },
             {
-              path: "programs/:id",
+              path: "projects/:id",
               element: (
                 <ProtectedRoute allowedRoles={["member"]}>
                   <LazyRoute>
@@ -534,7 +542,7 @@ export const router = createBrowserRouter(
               ),
             },
             {
-              path: "programs/applications",
+              path: "projects/applications",
               element: (
                 <ProtectedRoute allowedRoles={["member"]}>
                   <LazyRoute>
@@ -663,26 +671,7 @@ export const router = createBrowserRouter(
                 </ProtectedRoute>
               ),
             },
-            {
-              path: "project",
-              element: (
-                <ProtectedRoute allowedRoles={["member"]}>
-                  <LazyRoute>
-                    <ProjectList />
-                  </LazyRoute>
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: "project/:id",
-              element: (
-                <ProtectedRoute allowedRoles={["member"]}>
-                  <LazyRoute>
-                    <ProjectDetail />
-                  </LazyRoute>
-                </ProtectedRoute>
-              ),
-            },
+
             {
               path: "*",
               element: <Navigate to="/member" replace />,
@@ -830,7 +819,3 @@ export const router = createBrowserRouter(
 );
 
 export { ProtectedRoute, PublicRoute };
-
-
-
-

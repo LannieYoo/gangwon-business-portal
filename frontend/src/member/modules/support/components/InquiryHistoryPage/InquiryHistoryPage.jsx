@@ -6,7 +6,7 @@
 
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Badge } from "@shared/components";
+import { Card, Badge, Pagination } from "@shared/components";
 import { PageContainer } from "@member/layouts";
 import { useEnumTranslation } from "@shared/hooks";
 import ThreadDetailModal from "@shared/components/ThreadDetailModal";
@@ -34,6 +34,11 @@ export default function InquiryHistoryPage(props) {
     closeDetailModal,
     loadThreads,
     navigate,
+    // 分页相关
+    total,
+    currentPage,
+    totalPages,
+    onPageChange,
   } = props;
 
   const statusOptions = useMemo(
@@ -111,6 +116,9 @@ export default function InquiryHistoryPage(props) {
 
         <Card>
           <div className="p-6">
+            <p className="text-sm text-gray-600 mb-4">
+              {t("common.resultsCount", "총 {{count}}건", { count: total })}
+            </p>
             <InquiryHistoryTable
               loading={loading}
               filteredThreads={filteredThreads}
@@ -120,6 +128,17 @@ export default function InquiryHistoryPage(props) {
               getStatusBadge={getStatusBadge}
               getCategoryBadge={getCategoryBadge}
             />
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6 flex justify-center">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                />
+              </div>
+            )}
           </div>
         </Card>
       </div>

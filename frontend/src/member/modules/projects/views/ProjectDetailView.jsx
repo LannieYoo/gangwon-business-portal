@@ -33,16 +33,24 @@ export default function ProjectDetailView() {
 
   if (loading) {
     return (
-      <div className="p-4 md:p-6">
-        <ProjectDetailLoading />
+      <div className="project-detail-view w-full flex flex-col">
+        <ProjectBanner sectionClassName="member-banner-section" />
+        <ProjectSubmenu />
+        <div className="p-4 md:p-6">
+          <ProjectDetailLoading />
+        </div>
       </div>
     );
   }
 
   if (error || !project) {
     return (
-      <div className="p-4 md:p-6">
-        <ProjectDetailError error={error} onBack={handleBack} />
+      <div className="project-detail-view w-full flex flex-col">
+        <ProjectBanner sectionClassName="member-banner-section" />
+        <ProjectSubmenu />
+        <div className="p-4 md:p-6">
+          <ProjectDetailError error={error} onBack={handleBack} />
+        </div>
       </div>
     );
   }

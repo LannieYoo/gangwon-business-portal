@@ -44,13 +44,17 @@ async def list_my_performance_records(
     records, total = await service.list_performance_records(
         current_user.id, query
     )
+    
+    page = query.page or 1
+    page_size = query.page_size or 10
+    total_pages = ceil(total / page_size) if total > 0 else 1
 
     return PerformanceListResponsePaginated(
         items=[PerformanceListItem.from_db_dict(r, include_admin_fields=False) for r in records],
         total=total,
-        page=1,
-        page_size=total if total > 0 else 1,
-        total_pages=1,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages,
     )
 
 

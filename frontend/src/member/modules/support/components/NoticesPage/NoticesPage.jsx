@@ -7,7 +7,7 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { PageContainer } from "@member/layouts";
-import { Card, Loading, Badge } from "@shared/components";
+import { Card, Loading, Badge, Pagination } from "@shared/components";
 import {
   Table,
   TableHead,
@@ -34,6 +34,11 @@ export default function NoticesPage({
   importanceFilter,
   setImportanceFilter,
   importanceOptions,
+  // 分页相关
+  currentPage,
+  totalPages,
+  pageSize,
+  onPageChange,
 }) {
   const { t } = useTranslation();
 
@@ -77,6 +82,10 @@ export default function NoticesPage({
 
         <Card>
           <div className="p-6">
+            <p className="text-sm text-gray-600 mb-4">
+              {t("common.resultsCount", "총 {{count}}건", { count: total })}
+            </p>
+
             {loading ? (
               <div className="flex justify-center items-center py-16">
                 <Loading />
@@ -99,9 +108,6 @@ export default function NoticesPage({
               </div>
             ) : (
               <>
-                <p className="text-sm text-gray-600 mb-4">
-                  {t("common.resultsCount", "총 {{count}}건", { count: total })}
-                </p>
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -139,6 +145,17 @@ export default function NoticesPage({
                     })}
                   </TableBody>
                 </Table>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="mt-6 flex justify-center">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={onPageChange}
+                    />
+                  </div>
+                )}
               </>
             )}
           </div>

@@ -4,14 +4,14 @@
  * 遵循 dev-frontend_patterns skill 规范。
  */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supportService } from "../services/support.service";
 
 /**
  * 通知历史逻辑控制 Hook
  */
-export function useNotificationHistory() {
+export function useNotificationHistory(defaultPageSize = 10) {
   const navigate = useNavigate();
   const [allNotifications, setAllNotifications] = useState([]);
   const [filteredNotifications, setFilteredNotifications] = useState([]);
@@ -22,11 +22,16 @@ export function useNotificationHistory() {
 
   // 分页状态
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize] = useState(defaultPageSize);
   const [totalCount, setTotalCount] = useState(0);
 
+  // 计算总页数
+  const totalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(totalCount / pageSize));
+  }, [totalCount, pageSize]);
+
   const fetchNotifications = useCallback(
-    async (page = 1, size = 10) => {
+    async (page = 1, size = defaultPageSize) => {
       setLoading(true);
       setError(null);
       try {
@@ -41,7 +46,6 @@ export function useNotificationHistory() {
         setAllNotifications(items);
         setTotalCount(total);
         setCurrentPage(page);
-        setPageSize(size);
 
         // 应用当前的已读筛选
         let filtered = items;
@@ -61,7 +65,7 @@ export function useNotificationHistory() {
         setLoading(false);
       }
     },
-    [readFilter],
+    [readFilter, defaultPageSize],
   );
 
   // 初始加载
@@ -85,13 +89,6 @@ export function useNotificationHistory() {
       fetchNotifications(page, pageSize);
     },
     [fetchNotifications, pageSize],
-  );
-
-  const handlePageSizeChange = useCallback(
-    (size) => {
-      fetchNotifications(1, size);
-    },
-    [fetchNotifications],
   );
 
   const handleFilterChange = useCallback(
@@ -166,7 +163,7 @@ export function useNotificationHistory() {
     currentPage,
     pageSize,
     totalCount,
-    handlePageChange,
-    handlePageSizeChange,
+    totalPages,
+    onPageChange: handlePageChange,
   };
 }

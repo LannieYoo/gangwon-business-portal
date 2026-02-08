@@ -336,13 +336,12 @@ export const ROUTES = {
   MEMBER_HOME: "/member",
   MEMBER_PROFILE: "/member/profile",
   MEMBER_ABOUT: "/member/about",
-  MEMBER_PROJECTS: "/member/programs",
+  MEMBER_PROJECTS: "/member/projects",
   MEMBER_PERFORMANCE: "/member/performance",
   MEMBER_SUPPORT: "/member/support",
   MEMBER_NOTICES: "/member/notices",
   MEMBER_SUPPORT_NOTICES: "/member/notices",
   MEMBER_NEWS: "/member/news",
-  MEMBER_PROJECT: "/member/project",
 
   // Admin
   ADMIN_HOME: "/admin",
@@ -353,7 +352,3 @@ export const ROUTES = {
   ADMIN_CONTENT: "/admin/content",
   ADMIN_REPORTS: "/admin/reports",
 };
-
-
-
-

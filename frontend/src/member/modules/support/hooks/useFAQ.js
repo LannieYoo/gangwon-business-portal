@@ -7,12 +7,12 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supportService } from "../services/support.service";
-import { useApiCache } from "@shared/hooks/useApiCache";
+import { useApiCache, usePagination } from "@shared/hooks";
 
 /**
  * FAQ 逻辑控制 Hook
  */
-export function useFAQ() {
+export function useFAQ(pageSize = 10) {
   const { t } = useTranslation();
   const [expandedIds, setExpandedIds] = useState(new Set());
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -23,21 +23,18 @@ export function useFAQ() {
     return response.items || [];
   }, []);
 
-  const { data: allFaqs, loading, error, refresh: loadFAQs } = useApiCache(
-    fetchFAQs,
-    'faq-list',
-    {
-      cacheDuration: 5 * 60 * 1000, // 5分钟缓存（FAQ 很少更新）
-      enabled: true
-    }
-  );
+  const {
+    data: allFaqs,
+    loading,
+    error,
+    refresh: loadFAQs,
+  } = useApiCache(fetchFAQs, "faq-list", {
+    cacheDuration: 5 * 60 * 1000, // 5分钟缓存（FAQ 很少更新）
+    enabled: true,
+  });
 
   // 使用 useMemo 确保返回稳定的数组引用
   const stableAllFaqs = useMemo(() => allFaqs ?? [], [allFaqs]);
-
-  const handleFilterChange = useCallback((filtered) => {
-    setFilteredFaqs(filtered);
-  }, []);
 
   // 获取所有分类
   const categories = useMemo(() => {
@@ -67,7 +64,7 @@ export function useFAQ() {
   // 分类选项
   const categoryOptions = useMemo(
     () => [
-      { value: "", label: t('common.all', '전체') },
+      { value: "", label: t("common.all", "전체") },
       ...categories.map((cat) => ({
         value: cat,
         label: categoryTranslations[cat] || cat,
@@ -81,6 +78,30 @@ export function useFAQ() {
     if (!selectedCategory) return stableAllFaqs;
     return stableAllFaqs.filter((faq) => faq.category === selectedCategory);
   }, [stableAllFaqs, selectedCategory]);
+
+  // 最终过滤后的 FAQ
+  const allFilteredFaqs =
+    filteredFaqs.length > 0 ? filteredFaqs : categoryFilteredFaqs;
+
+  // 使用共享的分页 hook
+  const pagination = usePagination({ items: allFilteredFaqs, pageSize });
+
+  const handleFilterChange = useCallback(
+    (filtered) => {
+      setFilteredFaqs(filtered);
+      pagination.resetPage();
+    },
+    [pagination],
+  );
+
+  // 分类筛选改变时重置页码
+  const handleCategoryChange = useCallback(
+    (value) => {
+      setSelectedCategory(value);
+      pagination.resetPage();
+    },
+    [pagination],
+  );
 
   const toggleExpand = (id) => {
     setExpandedIds((prev) => {
@@ -96,7 +117,7 @@ export function useFAQ() {
 
   return {
     allFaqs: stableAllFaqs,
-    filteredFaqs,
+    filteredFaqs: pagination.paginatedItems,
     loading,
     expandedIds,
     selectedCategory,
@@ -104,9 +125,15 @@ export function useFAQ() {
     categoryTranslations,
     categoryOptions,
     categoryFilteredFaqs,
-    setSelectedCategory,
+    setSelectedCategory: handleCategoryChange,
     handleFilterChange,
     toggleExpand,
     loadFAQs,
+    // 分页相关
+    total: pagination.total,
+    currentPage: pagination.currentPage,
+    totalPages: pagination.totalPages,
+    pageSize: pagination.pageSize,
+    onPageChange: pagination.onPageChange,
   };
 }

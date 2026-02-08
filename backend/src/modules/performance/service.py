@@ -36,6 +36,12 @@ class PerformanceService:
         if query.status:
             db_query = db_query.eq('status', query.status)
         
+        # Apply pagination
+        page = query.page or 1
+        page_size = query.page_size or 10
+        offset = (page - 1) * page_size
+        db_query = db_query.range(offset, offset + page_size - 1)
+        
         result = db_query.execute()
         records = result.data or []
         total = result.count or 0

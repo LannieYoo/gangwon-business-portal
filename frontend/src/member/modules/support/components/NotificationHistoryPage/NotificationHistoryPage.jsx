@@ -34,10 +34,9 @@ export default function NotificationHistoryPage(props) {
     closeDetailModal,
     handleNotificationClick,
     currentPage,
-    pageSize,
     totalCount,
-    handlePageChange,
-    handlePageSizeChange,
+    totalPages,
+    onPageChange,
   } = props;
 
   const readOptions = useMemo(
@@ -157,6 +156,11 @@ export default function NotificationHistoryPage(props) {
 
         <Card>
           <div className="p-6">
+            <p className="text-sm text-gray-600 mb-4">
+              {t("common.resultsCount", "총 {{count}}건", {
+                count: totalCount,
+              })}
+            </p>
             <NotificationHistoryTable
               loading={loading}
               filteredNotifications={filteredNotifications}
@@ -165,10 +169,8 @@ export default function NotificationHistoryPage(props) {
               getReadBadge={getReadBadge}
               getCategoryBadge={getCategoryBadge}
               currentPage={currentPage}
-              pageSize={pageSize}
-              totalCount={totalCount}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
             />
           </div>
         </Card>

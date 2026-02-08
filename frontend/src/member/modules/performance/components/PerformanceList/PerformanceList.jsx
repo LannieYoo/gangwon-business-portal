@@ -61,11 +61,14 @@ const PerformanceList = () => {
       rejected: "bg-red-100 text-red-800",
     };
     const labels = {
-      draft: t('member.performance.status.draft', '임시저장'),
-      submitted: t('member.performance.status.submitted', '심사중'),
-      revision_requested: t('member.performance.status.revisionRequested', '수정 필요'),
-      approved: t('member.performance.status.approved', '승인 완료'),
-      rejected: t('member.performance.status.rejected', '거부됨'),
+      draft: t("member.performance.status.draft", "임시저장"),
+      submitted: t("member.performance.status.submitted", "심사중"),
+      revision_requested: t(
+        "member.performance.status.revisionRequested",
+        "수정 필요",
+      ),
+      approved: t("member.performance.status.approved", "승인 완료"),
+      rejected: t("member.performance.status.rejected", "거부됨"),
     };
     return (
       <span
@@ -84,18 +87,18 @@ const PerformanceList = () => {
   };
 
   const yearOptions = [
-    { value: "", label: t('common.all', '전체') },
+    { value: "", label: t("common.all", "전체") },
     ...Array.from({ length: 5 }, (_, i) => {
       const year = new Date().getFullYear() - i;
       return {
         value: year.toString(),
-        label: `${year}${t('common.year', '년')}`,
+        label: `${year}${t("common.year", "년")}`,
       };
     }),
   ];
 
   const quarterOptions = [
-    { value: "", label: t('common.all', '전체') },
+    { value: "", label: t("common.all", "전체") },
     { value: "1", label: quarterLabels[1] },
     { value: "2", label: quarterLabels[2] },
     { value: "3", label: quarterLabels[3] },
@@ -103,15 +106,24 @@ const PerformanceList = () => {
   ];
 
   const statusOptions = [
-    { value: "", label: t('common.all', '전체') },
-    { value: "draft", label: t('member.performance.status.draft', '임시저장') },
-    { value: "submitted", label: t('member.performance.status.submitted', '심사중') },
+    { value: "", label: t("common.all", "전체") },
+    { value: "draft", label: t("member.performance.status.draft", "임시저장") },
+    {
+      value: "submitted",
+      label: t("member.performance.status.submitted", "심사중"),
+    },
     {
       value: "revision_requested",
-      label: t('member.performance.status.revisionRequested', '수정 필요'),
+      label: t("member.performance.status.revisionRequested", "수정 필요"),
     },
-    { value: "approved", label: t('member.performance.status.approved', '승인 완료') },
-    { value: "rejected", label: t('member.performance.status.rejected', '거부됨') },
+    {
+      value: "approved",
+      label: t("member.performance.status.approved", "승인 완료"),
+    },
+    {
+      value: "rejected",
+      label: t("member.performance.status.rejected", "거부됨"),
+    },
   ];
 
   return (
@@ -126,32 +138,32 @@ const PerformanceList = () => {
 
       <div className="mb-6 sm:mb-8 lg:mb-10 min-h-[48px] flex items-center">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 m-0">
-          {t('member.performance.query', '성과 조회')}
+          {t("member.performance.query", "성과 조회")}
         </h1>
       </div>
 
       <Card className="mb-6">
         <CardHeader>
           <h2 className="text-lg font-semibold">
-            {t('common.filter', '필터')}
+            {t("common.filter", "필터")}
           </h2>
         </CardHeader>
         <CardBody>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Select
-              label={t('member.performance.year', '연도')}
+              label={t("member.performance.year", "연도")}
               value={filters.year}
               onChange={(e) => setFilterField("year", e.target.value)}
               options={yearOptions}
             />
             <Select
-              label={t('member.performance.quarter', '분기')}
+              label={t("member.performance.quarter", "분기")}
               value={filters.quarter}
               onChange={(e) => setFilterField("quarter", e.target.value)}
               options={quarterOptions}
             />
             <Select
-              label={t('member.performance.documentStatus', '문서 상태')}
+              label={t("member.performance.documentStatus", "문서 상태")}
               value={filters.status}
               onChange={(e) => setFilterField("status", e.target.value)}
               options={statusOptions}
@@ -168,30 +180,34 @@ const PerformanceList = () => {
             })}
           </p>
 
-          {loading ? (
-            <div className="text-center py-12 text-gray-500">
-              {t('common.loading', '로딩 중...')}
-            </div>
-          ) : performances.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              {t('common.noData', '데이터가 없습니다')}
-            </div>
+          {performances.length === 0 ? (
+            loading ? (
+              <div className="text-center py-12 text-gray-500">
+                {t("common.loading", "로딩 중...")}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                {t("common.noData", "데이터가 없습니다")}
+              </div>
+            )
           ) : (
             <>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableHeader>{t('member.performance.period', '기간')}</TableHeader>
                     <TableHeader>
-                      {t('member.performance.documentStatus', '문서 상태')}
+                      {t("member.performance.period", "기간")}
                     </TableHeader>
                     <TableHeader>
-                      {t('member.performance.submittedAt', '제출시간')}
+                      {t("member.performance.documentStatus", "문서 상태")}
                     </TableHeader>
                     <TableHeader>
-                      {t('member.performance.updatedAt', '수정시간')}
+                      {t("member.performance.submittedAt", "제출시간")}
                     </TableHeader>
-                    <TableHeader>{t('common.actions', '작업')}</TableHeader>
+                    <TableHeader>
+                      {t("member.performance.updatedAt", "수정시간")}
+                    </TableHeader>
+                    <TableHeader>{t("common.actions", "작업")}</TableHeader>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -200,10 +216,10 @@ const PerformanceList = () => {
                       <TableCell>
                         <span className="font-medium">
                           {perf.year}
-                          {t('common.year', '년')} {" "}
+                          {t("common.year", "년")}{" "}
                           {perf.quarter
                             ? quarterLabels[perf.quarter]
-                            : t('member.performance.annual', '연간')}
+                            : t("member.performance.annual", "연간")}
                         </span>
                       </TableCell>
                       <TableCell>{getStatusBadge(perf.status)}</TableCell>
@@ -222,7 +238,10 @@ const PerformanceList = () => {
                                 onClick={() => showComments(perf)}
                                 className="text-yellow-600 hover:text-yellow-900 font-medium text-sm"
                               >
-                                {t('member.performance.viewComments', '검토 의견 보기')}
+                                {t(
+                                  "member.performance.viewComments",
+                                  "검토 의견 보기",
+                                )}
                               </button>
                               <span className="text-gray-300">|</span>
                             </>
@@ -238,7 +257,7 @@ const PerformanceList = () => {
                                 }
                                 className="text-primary-600 hover:text-primary-900 font-medium text-sm"
                               >
-                                {t('common.edit', '수정')}
+                                {t("common.edit", "수정")}
                               </button>
                               <span className="text-gray-300">|</span>
                               <button
@@ -247,7 +266,7 @@ const PerformanceList = () => {
                                 }
                                 className="text-red-600 hover:text-red-900 font-medium text-sm"
                               >
-                                {t('common.delete', '삭제')}
+                                {t("common.delete", "삭제")}
                               </button>
                             </>
                           )}
@@ -259,7 +278,7 @@ const PerformanceList = () => {
               </Table>
 
               {pagination.totalPages > 1 && (
-                <div className="mt-6">
+                <div className="mt-6 flex justify-center">
                   <Pagination
                     currentPage={pagination.page}
                     totalPages={pagination.totalPages}
@@ -276,21 +295,21 @@ const PerformanceList = () => {
       <Modal
         isOpen={deleteConfirm.open}
         onClose={() => setDeleteConfirm({ open: false, id: null })}
-        title={t('common.confirmDeleteTitle', '삭제 확인')}
+        title={t("common.confirmDeleteTitle", "삭제 확인")}
         size="sm"
       >
         <p className="py-4 text-gray-700">
-          {t('common.confirmDelete', '이 기록을 삭제하시겠습니까?')}
+          {t("common.confirmDelete", "이 기록을 삭제하시겠습니까?")}
         </p>
         <ModalFooter>
           <Button
             variant="outline"
             onClick={() => setDeleteConfirm({ open: false, id: null })}
           >
-            {t('common.cancel', '취소')}
+            {t("common.cancel", "취소")}
           </Button>
           <Button variant="primary" onClick={confirmDelete}>
-            {t('common.delete', '삭제')}
+            {t("common.delete", "삭제")}
           </Button>
         </ModalFooter>
       </Modal>
@@ -300,7 +319,7 @@ const PerformanceList = () => {
         onClose={() =>
           setCommentModal({ open: false, comments: [], status: "" })
         }
-        title={t('member.performance.reviewComments', '검토 의견')}
+        title={t("member.performance.reviewComments", "검토 의견")}
         size="md"
       >
         <div className="py-4">
@@ -322,7 +341,7 @@ const PerformanceList = () => {
             </div>
           ) : (
             <p className="text-gray-500">
-              {t('member.performance.noComments', '검토 의견이 없습니다')}
+              {t("member.performance.noComments", "검토 의견이 없습니다")}
             </p>
           )}
         </div>
@@ -333,7 +352,7 @@ const PerformanceList = () => {
               setCommentModal({ open: false, comments: [], status: "" })
             }
           >
-            {t('common.close', '닫기')}
+            {t("common.close", "닫기")}
           </Button>
         </ModalFooter>
       </Modal>

@@ -9,10 +9,10 @@ import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from "date-fns";
 import { ko, zhCN } from "date-fns/locale";
 import { Pagination } from "@shared/components";
-import { 
-  parseNotification, 
+import {
+  parseNotification,
   getNotificationTranslationKey,
-  formatNotificationParams 
+  formatNotificationParams,
 } from "@shared/utils/notificationParser";
 
 /**
@@ -27,10 +27,8 @@ export default function NotificationHistoryTable({
   getCategoryBadge,
   // 分页相关
   currentPage,
-  pageSize,
-  totalCount,
+  totalPages,
   onPageChange,
-  onPageSizeChange,
 }) {
   const { t, i18n } = useTranslation();
 
@@ -53,34 +51,33 @@ export default function NotificationHistoryTable({
   // 翻译通知内容
   const translateNotification = (notification) => {
     const data = parseNotification(notification.subject, notification.content);
-    
+
     if (data) {
-      const subjectKey = getNotificationTranslationKey(data, 'subject');
-      const contentKey = getNotificationTranslationKey(data, 'content');
+      const subjectKey = getNotificationTranslationKey(data, "subject");
+      const contentKey = getNotificationTranslationKey(data, "content");
       const params = formatNotificationParams(data);
-      
+
       return {
         subject: subjectKey ? t(subjectKey, params) : notification.subject,
         content: contentKey ? t(contentKey, params) : notification.content,
       };
     }
-    
+
     return {
       subject: notification.subject,
       content: notification.content,
     };
   };
 
-  if (loading) {
-    return (
-      <div className="text-center py-8">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-        <p className="mt-2 text-sm text-gray-500">{t("common.loading")}</p>
-      </div>
-    );
-  }
-
   if (!allNotifications || allNotifications.length === 0) {
+    if (loading) {
+      return (
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <p className="mt-2 text-sm text-gray-500">{t("common.loading")}</p>
+        </div>
+      );
+    }
     return (
       <div className="text-center py-8">
         <p className="text-sm text-gray-500">{t("notifications.empty")}</p>
@@ -122,7 +119,7 @@ export default function NotificationHistoryTable({
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredNotifications.map((notification) => {
               const translated = translateNotification(notification);
-              
+
               return (
                 <tr
                   key={notification.id}
@@ -131,7 +128,10 @@ export default function NotificationHistoryTable({
                   }`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getCategoryBadge(notification.subject, notification.content)}
+                    {getCategoryBadge(
+                      notification.subject,
+                      notification.content,
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">
@@ -161,15 +161,14 @@ export default function NotificationHistoryTable({
           </tbody>
         </table>
       </div>
-      
-      {totalCount > 0 && (
-        <div className="mt-4">
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center">
           <Pagination
             currentPage={currentPage}
-            pageSize={pageSize}
-            totalCount={totalCount}
+            totalPages={totalPages}
             onPageChange={onPageChange}
-            onPageSizeChange={onPageSizeChange}
           />
         </div>
       )}

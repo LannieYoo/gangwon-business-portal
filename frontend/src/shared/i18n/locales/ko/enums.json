@@ -140,8 +140,7 @@
         "nt": "NT (나노기술)",
         "st": "ST (우주항공기술)",
         "et": "ET (환경기술)",
-        "ct": "CT (문화기술)",
-        "knu_tenant": "강원대 입주기업"
+        "ct": "CT (문화기술)"
       },
       "mainIndustryKsic": {
         "natural_bio": "천연물바이오소재",
@@ -245,14 +244,7 @@
       "startup_university": "창업중심대학",
       "global_glocal": "글로벌·글로컬사업",
       "rise": "RISE 사업단",
-      "tipa": "TIPA",
-      "kised": "KISED",
-      "kibo": "KIBO",
-      "kosmes": "KOSMES",
-      "kvf": "KVF",
-      "smba": "SMBA",
-      "innopolis": "Innopolis",
-      "gsc": "GSC"
+      "knu_tenant": "KNU 입주기업"
     },
     "country": {
       "korea": "대한민국",
