@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 项目详情加载态
  *
  * 遵循 dev-frontend_patterns skill 规范。

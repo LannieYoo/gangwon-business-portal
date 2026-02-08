@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 申请记录操作按钮组组件
  *
  * 根据申请状态渲染相应的操作按钮（取消、查看原因、提交资料）。
@@ -29,7 +29,7 @@ export default function ApplicationActionButtons({
           onCancel(application);
         }}
       >
-        {t('projects.applicationRecords.cancelApplication', '신청 취소')}
+        {t('member.projects.applicationRecords.cancelApplication', '신청 취소')}
       </button>,
     );
   }
@@ -44,7 +44,7 @@ export default function ApplicationActionButtons({
           onViewReason(application);
         }}
       >
-        {t('projects.applicationRecords.viewReason', '사유 확인')}
+        {t('member.projects.applicationRecords.viewReason', '사유 확인')}
       </button>,
     );
   }
@@ -59,7 +59,7 @@ export default function ApplicationActionButtons({
           onSupplement(application);
         }}
       >
-        {t('projects.applicationRecords.submitMaterials', '자료 제출')}
+        {t('member.projects.applicationRecords.submitMaterials', '자료 제출')}
       </button>,
     );
   }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 项目模块子菜单
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -13,7 +13,7 @@ export function ProjectSubmenu() {
   const submenuItems = [
     {
       key: "project-list",
-      label: t("projects.tabs.projectList", "사업 목록"),
+      label: t("member.projects.tabs.projectList", "사업 목록"),
       path: "/member/programs",
       activePaths: ["/member/programs"],
       isTab: true,
@@ -32,7 +32,7 @@ export function ProjectSubmenu() {
     },
     {
       key: "application-records",
-      label: t("projects.tabs.applicationRecords", "신청 기록"),
+      label: t("member.projects.tabs.applicationRecords", "신청 기록"),
       path: "/member/programs/applications",
       activePaths: ["/member/programs/applications"],
       isTab: true,

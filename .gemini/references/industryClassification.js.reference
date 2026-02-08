@@ -1,0 +1,479 @@
+﻿/**
+ * 韩国标准产业分类 (KSIC) 第10次修订版
+ * Korean Standard Industry Classification (KSIC) 10th Revision
+ *
+ * 参考: https://kssc.mods.go.kr:8443/ksscNew_web/kssc/common/ClassificationContent.do
+ *
+ * 数据管理规范:
+ * - 此文件是所有行业分类数据的唯一数据源 (Single Source of Truth)
+ * - 其他模块应从此文件导入，不应重复定义
+ * - 数据格式: { value: string, labelKey: string }
+ * - labelKey 指向 i18n 翻译键
+ */
+
+// ==================== 创业类型 ====================
+
+/**
+ * 创业类型选项 (업종 -> 창업유형)
+ * Startup Type Options
+ *
+ * 用于: 注册页面、会员信息、统计筛选
+ */
+export const STARTUP_TYPE_KEYS = [
+  {
+    value: "student_startup",
+    labelKey: "enums.industry.startupType.student_startup",
+  },
+  {
+    value: "faculty_startup",
+    labelKey: "enums.industry.startupType.faculty_startup",
+  },
+  {
+    value: "women_enterprise",
+    labelKey: "enums.industry.startupType.women_enterprise",
+  },
+  {
+    value: "research_institute",
+    labelKey: "enums.industry.startupType.research_institute",
+  },
+  {
+    value: "venture_company",
+    labelKey: "enums.industry.startupType.venture_company",
+  },
+  { value: "non_venture", labelKey: "enums.industry.startupType.non_venture" },
+  {
+    value: "preliminary_social_enterprise",
+    labelKey: "enums.industry.startupType.preliminary_social_enterprise",
+  },
+  {
+    value: "social_enterprise",
+    labelKey: "enums.industry.startupType.social_enterprise",
+  },
+  {
+    value: "youth_enterprise",
+    labelKey: "enums.industry.startupType.youth_enterprise",
+  },
+  { value: "cooperative", labelKey: "enums.industry.startupType.cooperative" },
+  {
+    value: "village_enterprise",
+    labelKey: "enums.industry.startupType.village_enterprise",
+  },
+  { value: "other", labelKey: "enums.industry.startupType.other" },
+];
+
+/**
+ * 创业阶段选项 (旧版，保留用于兼容)
+ * Startup Stage Options (Legacy)
+ *
+ * 注意: 此分类已被 STARTUP_TYPE_KEYS 替代，保留用于数据迁移
+ */
+export const STARTUP_STAGE_KEYS = [
+  { value: "preliminary", labelKey: "enums.industry.startupStage.preliminary" },
+  {
+    value: "startup_under_3years",
+    labelKey: "enums.industry.startupStage.startup_under_3years",
+  },
+  {
+    value: "growth_over_7years",
+    labelKey: "enums.industry.startupStage.growth_over_7years",
+  },
+  { value: "restart", labelKey: "enums.industry.startupStage.restart" },
+];
+
+// ==================== 地区选项 ====================
+
+/**
+ * 江原道地区选项 (Gangwon Province Regions)
+ *
+ * 用于: 注册页面、会员信息、统计筛选
+ */
+export const REGION_KEYS = [
+  { value: "chuncheon", labelKey: "enums.industry.region.chuncheon" },
+  { value: "wonju", labelKey: "enums.industry.region.wonju" },
+  { value: "gangneung", labelKey: "enums.industry.region.gangneung" },
+  { value: "donghae", labelKey: "enums.industry.region.donghae" },
+  { value: "taebaek", labelKey: "enums.industry.region.taebaek" },
+  { value: "sokcho", labelKey: "enums.industry.region.sokcho" },
+  { value: "samcheok", labelKey: "enums.industry.region.samcheok" },
+  { value: "hongcheon", labelKey: "enums.industry.region.hongcheon" },
+  { value: "hoengseong", labelKey: "enums.industry.region.hoengseong" },
+  { value: "yeongwol", labelKey: "enums.industry.region.yeongwol" },
+  { value: "pyeongchang", labelKey: "enums.industry.region.pyeongchang" },
+  { value: "jeongseon", labelKey: "enums.industry.region.jeongseon" },
+  { value: "cheorwon", labelKey: "enums.industry.region.cheorwon" },
+  { value: "hwacheon", labelKey: "enums.industry.region.hwacheon" },
+  { value: "yanggu", labelKey: "enums.industry.region.yanggu" },
+  { value: "inje", labelKey: "enums.industry.region.inje" },
+  { value: "goseong", labelKey: "enums.industry.region.goseong" },
+  { value: "yangyang", labelKey: "enums.industry.region.yangyang" },
+  { value: "other", labelKey: "enums.industry.region.other" },
+];
+
+// ==================== 业务领域 ====================
+
+/**
+ * 사업분야 (Business Field) - 制造业重点分类
+ * Manufacturing-focused Industry Classification
+ *
+ * 用于: 注册页面、会员信息、统计筛选
+ */
+export const BUSINESS_FIELD_KEYS = [
+  { value: "13", labelKey: "enums.industry.businessField.13" },
+  { value: "20", labelKey: "enums.industry.businessField.20" },
+  { value: "21", labelKey: "enums.industry.businessField.21" },
+  { value: "22", labelKey: "enums.industry.businessField.22" },
+  { value: "23", labelKey: "enums.industry.businessField.23" },
+  { value: "24", labelKey: "enums.industry.businessField.24" },
+  { value: "25", labelKey: "enums.industry.businessField.25" },
+  { value: "26", labelKey: "enums.industry.businessField.26" },
+  { value: "27", labelKey: "enums.industry.businessField.27" },
+  { value: "28", labelKey: "enums.industry.businessField.28" },
+  { value: "29", labelKey: "enums.industry.businessField.29" },
+  { value: "30", labelKey: "enums.industry.businessField.30" },
+  { value: "31", labelKey: "enums.industry.businessField.31" },
+];
+
+// ==================== KSIC 标准产业分类 ====================
+
+/**
+ * 产业大分类 (A-U)
+ * KSIC Major Category (A-U)
+ *
+ * 用于: 注册页面、会员信息、统计筛选
+ */
+export const KSIC_MAJOR_CATEGORY_KEYS = [
+  { value: "A", labelKey: "enums.industry.ksicMajor.A" },
+  { value: "B", labelKey: "enums.industry.ksicMajor.B" },
+  { value: "C", labelKey: "enums.industry.ksicMajor.C" },
+  { value: "D", labelKey: "enums.industry.ksicMajor.D" },
+  { value: "E", labelKey: "enums.industry.ksicMajor.E" },
+  { value: "F", labelKey: "enums.industry.ksicMajor.F" },
+  { value: "G", labelKey: "enums.industry.ksicMajor.G" },
+  { value: "H", labelKey: "enums.industry.ksicMajor.H" },
+  { value: "I", labelKey: "enums.industry.ksicMajor.I" },
+  { value: "J", labelKey: "enums.industry.ksicMajor.J" },
+  { value: "K", labelKey: "enums.industry.ksicMajor.K" },
+  { value: "L", labelKey: "enums.industry.ksicMajor.L" },
+  { value: "M", labelKey: "enums.industry.ksicMajor.M" },
+  { value: "N", labelKey: "enums.industry.ksicMajor.N" },
+  { value: "O", labelKey: "enums.industry.ksicMajor.O" },
+  { value: "P", labelKey: "enums.industry.ksicMajor.P" },
+  { value: "Q", labelKey: "enums.industry.ksicMajor.Q" },
+  { value: "R", labelKey: "enums.industry.ksicMajor.R" },
+  { value: "S", labelKey: "enums.industry.ksicMajor.S" },
+  { value: "T", labelKey: "enums.industry.ksicMajor.T" },
+  { value: "U", labelKey: "enums.industry.ksicMajor.U" },
+];
+
+/**
+ * 产业中分类 (按大分类分组)
+ * KSIC Sub Category (Grouped by Major Category)
+ *
+ * 结构: { [majorCode]: [{ value, labelKey }] }
+ * 用于: 级联选择器 (大分类 -> 中分类)
+ */
+export const KSIC_SUB_CATEGORY_KEYS = {
+  A: [
+    { value: "01", labelKey: "enums.industry.ksicSub.01" },
+    { value: "02", labelKey: "enums.industry.ksicSub.02" },
+    { value: "03", labelKey: "enums.industry.ksicSub.03" },
+  ],
+  B: [
+    { value: "05", labelKey: "enums.industry.ksicSub.05" },
+    { value: "06", labelKey: "enums.industry.ksicSub.06" },
+    { value: "07", labelKey: "enums.industry.ksicSub.07" },
+    { value: "08", labelKey: "enums.industry.ksicSub.08" },
+  ],
+  C: [
+    { value: "10", labelKey: "enums.industry.ksicSub.10" },
+    { value: "11", labelKey: "enums.industry.ksicSub.11" },
+    { value: "12", labelKey: "enums.industry.ksicSub.12" },
+    { value: "13", labelKey: "enums.industry.ksicSub.13" },
+    { value: "14", labelKey: "enums.industry.ksicSub.14" },
+    { value: "15", labelKey: "enums.industry.ksicSub.15" },
+    { value: "16", labelKey: "enums.industry.ksicSub.16" },
+    { value: "17", labelKey: "enums.industry.ksicSub.17" },
+    { value: "18", labelKey: "enums.industry.ksicSub.18" },
+    { value: "19", labelKey: "enums.industry.ksicSub.19" },
+    { value: "20", labelKey: "enums.industry.ksicSub.20" },
+    { value: "21", labelKey: "enums.industry.ksicSub.21" },
+    { value: "22", labelKey: "enums.industry.ksicSub.22" },
+    { value: "23", labelKey: "enums.industry.ksicSub.23" },
+    { value: "24", labelKey: "enums.industry.ksicSub.24" },
+    { value: "25", labelKey: "enums.industry.ksicSub.25" },
+    { value: "26", labelKey: "enums.industry.ksicSub.26" },
+    { value: "27", labelKey: "enums.industry.ksicSub.27" },
+    { value: "28", labelKey: "enums.industry.ksicSub.28" },
+    { value: "29", labelKey: "enums.industry.ksicSub.29" },
+    { value: "30", labelKey: "enums.industry.ksicSub.30" },
+    { value: "31", labelKey: "enums.industry.ksicSub.31" },
+    { value: "32", labelKey: "enums.industry.ksicSub.32" },
+    { value: "33", labelKey: "enums.industry.ksicSub.33" },
+    { value: "34", labelKey: "enums.industry.ksicSub.34" },
+  ],
+  D: [{ value: "35", labelKey: "enums.industry.ksicSub.35" }],
+  E: [
+    { value: "36", labelKey: "enums.industry.ksicSub.36" },
+    { value: "37", labelKey: "enums.industry.ksicSub.37" },
+    { value: "38", labelKey: "enums.industry.ksicSub.38" },
+    { value: "39", labelKey: "enums.industry.ksicSub.39" },
+  ],
+  F: [
+    { value: "41", labelKey: "enums.industry.ksicSub.41" },
+    { value: "42", labelKey: "enums.industry.ksicSub.42" },
+  ],
+  G: [
+    { value: "45", labelKey: "enums.industry.ksicSub.45" },
+    { value: "46", labelKey: "enums.industry.ksicSub.46" },
+    { value: "47", labelKey: "enums.industry.ksicSub.47" },
+  ],
+  H: [
+    { value: "49", labelKey: "enums.industry.ksicSub.49" },
+    { value: "50", labelKey: "enums.industry.ksicSub.50" },
+    { value: "51", labelKey: "enums.industry.ksicSub.51" },
+    { value: "52", labelKey: "enums.industry.ksicSub.52" },
+  ],
+  I: [
+    { value: "55", labelKey: "enums.industry.ksicSub.55" },
+    { value: "56", labelKey: "enums.industry.ksicSub.56" },
+  ],
+  J: [
+    { value: "58", labelKey: "enums.industry.ksicSub.58" },
+    { value: "59", labelKey: "enums.industry.ksicSub.59" },
+    { value: "60", labelKey: "enums.industry.ksicSub.60" },
+    { value: "61", labelKey: "enums.industry.ksicSub.61" },
+    { value: "62", labelKey: "enums.industry.ksicSub.62" },
+    { value: "63", labelKey: "enums.industry.ksicSub.63" },
+  ],
+  K: [
+    { value: "64", labelKey: "enums.industry.ksicSub.64" },
+    { value: "65", labelKey: "enums.industry.ksicSub.65" },
+    { value: "66", labelKey: "enums.industry.ksicSub.66" },
+  ],
+  L: [{ value: "68", labelKey: "enums.industry.ksicSub.68" }],
+  M: [
+    { value: "70", labelKey: "enums.industry.ksicSub.70" },
+    { value: "71", labelKey: "enums.industry.ksicSub.71" },
+    { value: "72", labelKey: "enums.industry.ksicSub.72" },
+    { value: "73", labelKey: "enums.industry.ksicSub.73" },
+  ],
+  N: [
+    { value: "74", labelKey: "enums.industry.ksicSub.74" },
+    { value: "75", labelKey: "enums.industry.ksicSub.75" },
+    { value: "76", labelKey: "enums.industry.ksicSub.76" },
+  ],
+  O: [{ value: "84", labelKey: "enums.industry.ksicSub.84" }],
+  P: [{ value: "85", labelKey: "enums.industry.ksicSub.85" }],
+  Q: [
+    { value: "86", labelKey: "enums.industry.ksicSub.86" },
+    { value: "87", labelKey: "enums.industry.ksicSub.87" },
+  ],
+  R: [
+    { value: "90", labelKey: "enums.industry.ksicSub.90" },
+    { value: "91", labelKey: "enums.industry.ksicSub.91" },
+  ],
+  S: [
+    { value: "94", labelKey: "enums.industry.ksicSub.94" },
+    { value: "95", labelKey: "enums.industry.ksicSub.95" },
+    { value: "96", labelKey: "enums.industry.ksicSub.96" },
+  ],
+  T: [
+    { value: "97", labelKey: "enums.industry.ksicSub.97" },
+    { value: "98", labelKey: "enums.industry.ksicSub.98" },
+  ],
+  U: [{ value: "99", labelKey: "enums.industry.ksicSub.99" }],
+};
+
+// ==================== 主力产业 KSIC 代码 ====================
+
+/**
+ * 主力产业 KSIC 代码 - 第1层级（大分类）
+ * Main Industry KSIC Code - Level 1 (Major Category)
+ *
+ * 江原道重点产业分类
+ * 用于: 注册页面、会员信息、统计筛选
+ */
+export const MAIN_INDUSTRY_KSIC_MAJOR_KEYS = [
+  {
+    value: "natural_bio",
+    labelKey: "enums.industry.mainIndustryKsic.natural_bio",
+  },
+  { value: "ceramic", labelKey: "enums.industry.mainIndustryKsic.ceramic" },
+  {
+    value: "digital_health",
+    labelKey: "enums.industry.mainIndustryKsic.digital_health",
+  },
+];
+
+/**
+ * 主力产业 KSIC 代码 - 第2层级（具体代码）
+ * Main Industry KSIC Code - Level 2 (Detailed Codes)
+ *
+ * 结构: { [majorCode]: [{ value, labelKey }] }
+ * 用于: 级联选择器 (主力产业大分类 -> 详细代码)
+ */
+export const MAIN_INDUSTRY_KSIC_CODES = {
+  natural_bio: [
+    { value: "10501", labelKey: "enums.industry.mainIndustryKsicCodes.10501" },
+    { value: "10795", labelKey: "enums.industry.mainIndustryKsicCodes.10795" },
+    { value: "10797", labelKey: "enums.industry.mainIndustryKsicCodes.10797" },
+    { value: "11209", labelKey: "enums.industry.mainIndustryKsicCodes.11209" },
+    { value: "20422", labelKey: "enums.industry.mainIndustryKsicCodes.20422" },
+    { value: "20423", labelKey: "enums.industry.mainIndustryKsicCodes.20423" },
+    { value: "20499", labelKey: "enums.industry.mainIndustryKsicCodes.20499" },
+    { value: "21101", labelKey: "enums.industry.mainIndustryKsicCodes.21101" },
+    { value: "21102", labelKey: "enums.industry.mainIndustryKsicCodes.21102" },
+    { value: "21210", labelKey: "enums.industry.mainIndustryKsicCodes.21210" },
+    { value: "21220", labelKey: "enums.industry.mainIndustryKsicCodes.21220" },
+  ],
+  ceramic: [
+    { value: "20129", labelKey: "enums.industry.mainIndustryKsicCodes.20129" },
+    { value: "20412", labelKey: "enums.industry.mainIndustryKsicCodes.20412" },
+    {
+      value: "20499_ceramic",
+      labelKey: "enums.industry.mainIndustryKsicCodes.20499",
+    },
+    { value: "23129", labelKey: "enums.industry.mainIndustryKsicCodes.23129" },
+    { value: "23222", labelKey: "enums.industry.mainIndustryKsicCodes.23222" },
+    { value: "23311", labelKey: "enums.industry.mainIndustryKsicCodes.23311" },
+    { value: "23312", labelKey: "enums.industry.mainIndustryKsicCodes.23312" },
+    { value: "23993", labelKey: "enums.industry.mainIndustryKsicCodes.23993" },
+    { value: "23999", labelKey: "enums.industry.mainIndustryKsicCodes.23999" },
+    { value: "24113", labelKey: "enums.industry.mainIndustryKsicCodes.24113" },
+    { value: "26299", labelKey: "enums.industry.mainIndustryKsicCodes.26299" },
+    { value: "26429", labelKey: "enums.industry.mainIndustryKsicCodes.26429" },
+    { value: "29174", labelKey: "enums.industry.mainIndustryKsicCodes.29174" },
+    { value: "29271", labelKey: "enums.industry.mainIndustryKsicCodes.29271" },
+  ],
+  digital_health: [
+    { value: "21300", labelKey: "enums.industry.mainIndustryKsicCodes.21300" },
+    {
+      value: "26299_health",
+      labelKey: "enums.industry.mainIndustryKsicCodes.26299",
+    },
+    { value: "27111", labelKey: "enums.industry.mainIndustryKsicCodes.27111" },
+    { value: "27112", labelKey: "enums.industry.mainIndustryKsicCodes.27112" },
+    { value: "27192", labelKey: "enums.industry.mainIndustryKsicCodes.27192" },
+    { value: "27199", labelKey: "enums.industry.mainIndustryKsicCodes.27199" },
+    { value: "28519", labelKey: "enums.industry.mainIndustryKsicCodes.28519" },
+    { value: "28909", labelKey: "enums.industry.mainIndustryKsicCodes.28909" },
+    { value: "58221", labelKey: "enums.industry.mainIndustryKsicCodes.58221" },
+    { value: "58222", labelKey: "enums.industry.mainIndustryKsicCodes.58222" },
+  ],
+};
+
+// ==================== 江原道产业分类 (Page 10 Requirements) ====================
+
+/**
+ * 江原道 7大未来产业
+ * Gangwon Province 7 Major Future Industries
+ *
+ * 用于: 企业信息表单、项目申请
+ */
+export const GANGWON_FUTURE_INDUSTRIES = [
+  {
+    value: "semiconductor",
+    labelKey: "enums.industry.gangwonIndustry.semiconductor",
+  },
+  {
+    value: "bio_health",
+    labelKey: "enums.industry.gangwonIndustry.bio_health",
+  },
+  {
+    value: "future_energy",
+    labelKey: "enums.industry.gangwonIndustry.future_energy",
+  },
+  {
+    value: "future_mobility",
+    labelKey: "enums.industry.gangwonIndustry.future_mobility",
+  },
+  { value: "food_tech", labelKey: "enums.industry.gangwonIndustry.food_tech" },
+  {
+    value: "advanced_defense",
+    labelKey: "enums.industry.gangwonIndustry.advanced_defense",
+  },
+  {
+    value: "climate_tech",
+    labelKey: "enums.industry.gangwonIndustry.climate_tech",
+  },
+];
+
+/**
+ * 未来有望新技术
+ * Future Promising New Technologies
+ *
+ * 用于: 企业信息表单、项目申请
+ */
+export const FUTURE_TECHNOLOGIES = [
+  { value: "it", labelKey: "enums.industry.futureTech.it" },
+  { value: "bt", labelKey: "enums.industry.futureTech.bt" },
+  { value: "nt", labelKey: "enums.industry.futureTech.nt" },
+  { value: "st", labelKey: "enums.industry.futureTech.st" },
+  { value: "et", labelKey: "enums.industry.futureTech.et" },
+  { value: "ct", labelKey: "enums.industry.futureTech.ct" },
+  { value: "knu_tenant", labelKey: "enums.industry.futureTech.knu_tenant" },
+];
+
+// ==================== 工具函数 ====================
+
+/**
+ * 根据大分类获取中分类
+ * Get sub-categories by major category
+ *
+ * @param {string} majorCategory - 大分类代码 (A-U)
+ * @returns {Array} 中分类选项数组
+ */
+export function getSubCategoryKeysByMajor(majorCategory) {
+  return KSIC_SUB_CATEGORY_KEYS[majorCategory] || [];
+}
+
+/**
+ * 根据主力产业大分类获取具体代码
+ * Get detailed codes by main industry major category
+ *
+ * @param {string} majorCategory - 主力产业大分类 (natural_bio, ceramic, digital_health)
+ * @returns {Array} 详细代码选项数组
+ */
+export function getMainIndustryKsicCodesByMajor(majorCategory) {
+  return MAIN_INDUSTRY_KSIC_CODES[majorCategory] || [];
+}
+
+/**
+ * 翻译选项（使用 i18n t 函数）
+ * Translate options using i18n t function
+ *
+ * @param {Array} options - 选项数组 [{ value, labelKey }]
+ * @param {Function} t - i18n 翻译函数
+ * @returns {Array} 翻译后的选项数组 [{ value, label }]
+ */
+export function translateOptions(options, t) {
+  return options.map((opt) => ({
+    value: opt.value,
+    label: t(opt.labelKey, opt.labelKey.split(".").pop()),
+  }));
+}
+
+/**
+ * 根据 value 查找选项的 labelKey
+ * Find labelKey by value
+ *
+ * @param {Array} options - 选项数组
+ * @param {string} value - 要查找的值
+ * @returns {string|null} labelKey 或 null
+ */
+export function getLabelKeyByValue(options, value) {
+  const option = options.find((opt) => opt.value === value);
+  return option?.labelKey || null;
+}
+
+/**
+ * 验证值是否在选项中
+ * Validate if value exists in options
+ *
+ * @param {Array} options - 选项数组
+ * @param {string} value - 要验证的值
+ * @returns {boolean}
+ */
+export function isValidOption(options, value) {
+  return options.some((opt) => opt.value === value);
+}

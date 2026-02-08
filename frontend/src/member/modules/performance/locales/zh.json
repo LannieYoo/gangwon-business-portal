@@ -1,5 +1,6 @@
 {
-  "performance": {
+  "member": {
+    "performance": {
     "type": "成果类型",
     "types": {
       "sales": "销售业绩",
@@ -467,7 +468,6 @@
       "21220": "21220 - 韩医药品制造",
       "20129": "20129 - 其他基础无机化学物质制造",
       "20412": "20412 - 陶瓷用涂料及相关产品制造",
-      "20499": "20499 - 其他未分类化学产品制造",
       "23129": "23129 - 其他工业用玻璃制品制造",
       "23222": "23222 - 卫生用及工业用陶瓷制造",
       "23311": "23311 - 水泥制造",
@@ -480,7 +480,6 @@
       "29174": "29174 - 气体过滤器制造",
       "29271": "29271 - 半导体制造用设备制造",
       "21300": "21300 - 医疗用品及其他医药相关产品制造",
-      "26299": "26299 - 其他电子部件制造",
       "27111": "27111 - 放射线装置制造",
       "27112": "27112 - 电气式诊断及疗法器械制造",
       "27192": "27192 - 矫形外科用及身体矫正用器械制造",
@@ -507,13 +506,124 @@
       "et": "环境工程(ET)",
       "ct": "文化技术(CT)",
       "knu_tenant": "KNU入驻企业"
+    },
+    "messages": {
+      "saveSuccess": "保存成功",
+      "saveFailed": "保存失败",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "confirmDelete": "确定要删除吗？"
     }
+  }
   },
-  "message": {
-    "saveSuccess": "保存成功",
-    "saveFailed": "保存失败",
-    "deleteSuccess": "删除成功",
-    "deleteFailed": "删除失败",
-    "confirmDelete": "确定要删除吗？"
+  "performance": {
+    "companyInfo": {
+      "sections": {
+        "basicInfo": "基本信息",
+        "logo": "企业Logo",
+        "addressInfo": "地址信息",
+        "businessInfo": "业务信息",
+        "additionalInfo": "附加信息"
+      },
+      "profile": {
+        "noLogo": "无Logo",
+        "clickToChangeLogo": "点击更换Logo",
+        "clickToUploadLogo": "点击上传Logo",
+        "logoHint": "支持 JPG, PNG, GIF 格式，最大 5MB",
+        "cooperationFields": {
+          "tech": "技术合作",
+          "market": "市场开拓",
+          "talent": "人才交流"
+        },
+        "participationPrograms": {
+          "startupCenterUniversity": "创业中心大学",
+          "globalBusiness": "全球事业",
+          "riseBusiness": "RISE事业"
+        },
+        "loginRequiredDesc": "请先登录以查看企业信息"
+      },
+      "fields": {
+        "businessNumber": "营业执照号",
+        "corporationNumber": "法人注册号",
+        "businessField": "业务领域",
+        "mainIndustryKsicMajor": "主力产业 KSIC 代码",
+        "mainIndustryKsicCodes": "主力产业 KSIC 细分代码",
+        "gangwonIndustry": "江原道7大未来产业",
+        "futureTech": "未来有望新技术",
+        "startupStage": "创业阶段",
+        "employeeCount": "员工人数",
+        "cooperationFields": "产业合作意向领域",
+        "participationPrograms": "参与项目",
+        "contactPersonName": "负责人姓名",
+        "contactPersonDepartment": "负责人部门",
+        "contactPersonPosition": "负责人职位",
+        "contactPersonPhone": "负责人电话",
+        "hasInvestment": "是否有投资",
+        "investmentAmount": "投资金额（百万韩元）",
+        "investmentInstitution": "投资机构",
+        "representative": "代表人姓名",
+        "representativeBirthDate": "代表人出生日期",
+        "representativeGender": "代表人性别",
+        "representativePhone": "代表人电话"
+      },
+      "validation": {
+        "invalidPhone": "请输入有效的电话号码",
+        "invalidWebsite": "请输入有效的网站地址",
+        "invalidEmail": "请输入有效的邮箱地址"
+      }
+    },
+    "governmentSupportFields": {
+      "projectName": "执行支援事业名",
+      "startupProjectName": "创业支援事业名",
+      "supportOrganization": "支持机构名",
+      "supportAmount": "支持金额",
+      "startDate": "开始日",
+      "endDate": "结束日",
+      "proofDocument": "证明文件"
+    },
+    "noData": "暂无数据",
+    "salesEmploymentFields": {
+      "sales": "销售额",
+      "unit": {
+        "won": "元",
+        "people": "人"
+      },
+      "previousYear": "前一年度",
+      "reportingDate": "编写基准日",
+      "export": "出口额",
+      "hskCode": "HSK代码",
+      "exportCountry1": "出口国家1",
+      "exportCountry2": "出口国家2",
+      "employment": "雇佣创造",
+      "currentEmployees": "现有员工数",
+      "newEmployees": "新雇佣人数",
+      "totalEmployees": "总人数",
+      "attachments": "证明文件"
+    },
+    "year": "年",
+    "status": {
+      "approved": "已批准",
+      "submitted": "审核中",
+      "revisionRequested": "需修改",
+      "draft": "草稿",
+      "rejected": "已驳回"
+    },
+    "tabs": {
+      "salesEmployment": "销售额雇佣",
+      "governmentSupport": "政府支持受惠历史",
+      "intellectualProperty": "知识产权"
+    },
+    "annual": "年度",
+    "intellectualPropertyFields": {
+      "types": {
+        "trademark": "商标权",
+        "utility": "实用新型"
+      },
+      "name": "知识产权名",
+      "number": "知识产权号",
+      "registrationDate": "注册日期",
+      "proofDocument": "证明材料附件"
+    },
+    "confirmSubmitMessage": "确定要提交吗？提交后将无法修改。"
   }
 }

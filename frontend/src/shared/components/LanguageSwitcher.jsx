@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Language Switcher Component
  * Only visible in development environment
  */
@@ -74,3 +74,7 @@ export default function LanguageSwitcher({ variant = "dark" }) {
     </button>
   );
 }
+
+
+
+

@@ -1,4 +1,4 @@
-// Upload Service - 文件上传服务
+﻿// Upload Service - 文件上传服务
 
 import apiService from "./api.service";
 import { API_PREFIX } from "@shared/utils/constants";
@@ -113,3 +113,7 @@ class UploadService {
 }
 
 export default createService(UploadService);
+
+
+
+

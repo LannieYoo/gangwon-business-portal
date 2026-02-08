@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HomePreview Component
  * 首页预览组件 - 用于首页展示公告、项目等内容列表
  */
@@ -126,7 +126,7 @@ function HomePreview({
                 selectedItem.attachments.length > 0 && (
                   <div className="border-t pt-4 mt-4">
                     <h4 className="text-sm font-medium text-gray-700 mb-3">
-                      {t('fileAttachments.attachments', '첨부파일')} (
+                      {t('components.fileUpload.attachments', '첨부파일')} (
                       {selectedItem.attachments.length})
                     </h4>
                     <div className="space-y-2">
@@ -205,3 +205,7 @@ function HomePreview({
 }
 
 export default HomePreview;
+
+
+
+

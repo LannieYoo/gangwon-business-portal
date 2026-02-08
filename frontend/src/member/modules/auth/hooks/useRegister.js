@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@shared/hooks";
@@ -234,47 +234,61 @@ export const useRegister = () => {
           !formData.businessNumber ||
           formData.businessNumber.replace(/\D/g, "").length !== 10
         )
-          return t("auth.validation.required", { field: t("auth.businessLicense") });
+          return t("member.auth.validation.required", {
+            field: t("member.auth.businessLicense"),
+          });
         if (!formData.password || formData.password.length < 8)
-          return t("auth.validation.passwordMinLength");
+          return t("member.auth.validation.passwordMinLength");
         if (formData.password !== formData.passwordConfirm)
-          return t("auth.validation.passwordMismatch");
+          return t("member.auth.validation.passwordMismatch");
         if (!formData.companyName)
-          return t("auth.validation.required", { field: t("auth.companyName") });
+          return t("member.auth.validation.required", {
+            field: t("member.auth.companyName"),
+          });
         if (!formData.region || formData.region === "")
-          return t("auth.validation.required", { field: t("auth.region") });
+          return t("member.auth.validation.required", {
+            field: t("member.auth.region"),
+          });
         if (!formData.category || formData.category === "")
-          return t("auth.validation.required", { field: t("auth.category") });
+          return t("member.auth.validation.required", {
+            field: t("member.auth.category"),
+          });
         return null;
       },
       2: () => {
         if (!formData.address)
-          return t("auth.validation.required", { field: t("auth.address") });
+          return t("member.auth.validation.required", {
+            field: t("member.auth.address"),
+          });
         if (!formData.representative)
-          return t("auth.validation.required", {
-            field: t("auth.representative"),
+          return t("member.auth.validation.required", {
+            field: t("member.auth.representative"),
           });
         return null;
       },
       3: () => {
         if (!formData.email)
-          return t("auth.validation.required", { field: t("auth.email") });
+          return t("member.auth.validation.required", {
+            field: t("member.auth.email"),
+          });
         if (!formData.phone)
-          return t("auth.validation.required", { field: t("auth.phone") });
+          return t("member.auth.validation.required", {
+            field: t("member.auth.phone"),
+          });
         const phoneRegex =
           /^(01[0-9]-\d{3,4}-\d{4}|02-\d{3,4}-\d{4}|0[3-9]\d-\d{3,4}-\d{4})$/;
         if (!phoneRegex.test(formData.phone))
-          return t("auth.validation.invalidPhoneFormat");
+          return t("member.auth.validation.invalidPhoneFormat");
         if (
           formData.representativePhone &&
           !phoneRegex.test(formData.representativePhone)
         )
-          return t("auth.validation.invalidPhoneFormat");
+          return t("member.auth.validation.invalidPhoneFormat");
         if (
           formData.contactPersonPhone &&
           !phoneRegex.test(formData.contactPersonPhone)
         )
-          return t("auth.validation.invalidPhoneFormat");
+          return t("member.auth.validation.invalidPhoneFormat");
         return null;
       },
       4: () => null,
@@ -284,7 +298,7 @@ export const useRegister = () => {
           !formData.privacyPolicy ||
           !formData.thirdPartySharing
         )
-          return t("auth.termsRequired");
+          return t("member.auth.termsRequired");
         return null;
       },
     };
@@ -306,7 +320,7 @@ export const useRegister = () => {
           formData.businessNumber,
         );
         if (!result.available) {
-          setError(t("auth.businessNumberAlreadyRegistered"));
+          setError(t("member.auth.businessNumberAlreadyRegistered"));
           setIsValidating(false);
           return;
         }
@@ -321,7 +335,7 @@ export const useRegister = () => {
       try {
         const result = await authService.checkEmail(formData.email);
         if (!result.available) {
-          setError(t("auth.emailAlreadyRegistered"));
+          setError(t("member.auth.emailAlreadyRegistered"));
           setIsValidating(false);
           return;
         }
@@ -378,6 +392,16 @@ export const useRegister = () => {
       "business_number",
       formData.businessNumber?.replace(/-/g, "") || "",
     );
+    // 添加 terms 同意状态
+    submitData.set(
+      "termsOfService",
+      formData.termsOfService ? "true" : "false",
+    );
+    submitData.set("privacyPolicy", formData.privacyPolicy ? "true" : "false");
+    submitData.set(
+      "thirdPartySharing",
+      formData.thirdPartySharing ? "true" : "false",
+    );
 
     try {
       await register(submitData);
@@ -386,16 +410,16 @@ export const useRegister = () => {
       setSuccess(true);
     } catch (err) {
       setIsSubmitting(false);
-      let message = err?.message || t("auth.registerFailed");
+      let message = err?.message || t("member.auth.registerFailed");
       const backendError =
         err?.response?.data?.error?.message || err?.response?.data?.message;
       if (backendError) message = backendError;
 
       if (message.includes("Business number already registered")) {
-        message = t("auth.businessNumberAlreadyRegistered");
+        message = t("member.auth.businessNumberAlreadyRegistered");
         setCurrentStep(1);
       } else if (message.includes("Email already registered")) {
-        message = t("auth.emailAlreadyRegistered");
+        message = t("member.auth.emailAlreadyRegistered");
         setCurrentStep(3);
       }
 

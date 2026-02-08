@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 申请记录筛选组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -24,7 +24,7 @@ export function ApplicationRecordsFilter({
           onFilter={onFilterChange}
           placeholder={t(
             "projects.applicationRecords.searchPlaceholder",
-            "按项目名称搜索",
+            "사업명으로 검색",
           )}
           className="flex-1 min-w-[200px] max-w-md"
         />

@@ -2,7 +2,11 @@
   "admin": {
     "members": {
       "title": "企业会员管理",
-      "export": "导出 Excel",
+      "export": {
+        "button": "导出 Excel",
+        "filename": "会员列表",
+        "sheetName": "会员数据"
+      },
       "exportExcel": "导出 Excel",
       "exportCsv": "导出 CSV",
       "exportSuccess": "导出成功",
@@ -38,7 +42,9 @@
         "representative": "代表人",
         "businessNumber": "营业执照号",
         "address": "地址",
-        "industry": "创业类型",
+        "industry": "行业",
+        "startupType": "创业类型",
+        "startupStage": "创业阶段",
         "createdAt": "注册时间",
         "status": "状态",
         "actions": "操作",
@@ -52,7 +58,7 @@
         "representative": "代表人",
         "legalNumber": "法人号码",
         "address": "地址",
-        "industry": "创业类型",
+        "industry": "行业",
         "phone": "电话",
         "email": "邮箱",
         "contactPersonName": "负责人姓名",
@@ -98,12 +104,11 @@
         "nicednbButReturned": "，但 Nice D&B API 返回的营业执照号为",
         "nicednbMismatch": "查询使用的营业执照号为",
         "nicednbWarning": "提示：",
-        "nicednbNoBusinessNumber": "营业执照号码不可用"
+        "nicednbNoBusinessNumber": "营业执照号码不可用",
+        "currentFinancialIndicators": "当前财务指标",
+        "thousandKRW": "千韩元"
       },
       "resetSuccess": "已重置为待审核"
     }
-  },
-  "member": {
-    "industry": "创业类型"
   }
 }

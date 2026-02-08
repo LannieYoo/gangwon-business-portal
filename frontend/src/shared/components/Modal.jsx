@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Modal Component
  */
 
@@ -172,3 +172,7 @@ export function ModalFooter({ children, className }) {
   );
 }
 export default Modal;
+
+
+
+

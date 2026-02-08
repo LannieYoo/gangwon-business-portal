@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 项目状态 Hook
  *
  * 提供项目状态的翻译和样式映射。
@@ -16,27 +16,27 @@ export function useProjectStatus() {
     (status) => {
       const statusMap = {
         [ProjectStatus.ACTIVE]: {
-          label: t("projects.status.active", "进行中"),
+          label: t("member.projects.status.active", "진행중"),
           variant: "success",
         },
         [ProjectStatus.INACTIVE]: {
-          label: t("projects.status.inactive", "未激活"),
+          label: t("member.projects.status.inactive", "비활성"),
           variant: "gray",
         },
         [ProjectStatus.ARCHIVED]: {
-          label: t("projects.status.archived", "已归档"),
+          label: t("member.projects.status.archived", "보관됨"),
           variant: "gray",
         },
         [ProjectStatus.RECRUITING]: {
-          label: t("projects.status.recruiting", "招募中"),
+          label: t("member.projects.status.recruiting", "모집중"),
           variant: "success",
         },
         [ProjectStatus.ONGOING]: {
-          label: t("projects.status.ongoing", "进行中"),
+          label: t("member.projects.status.ongoing", "진행중"),
           variant: "primary",
         },
         [ProjectStatus.CLOSED]: {
-          label: t("projects.status.closed", "已截止"),
+          label: t("member.projects.status.closed", "마감"),
           variant: "gray",
         },
       };

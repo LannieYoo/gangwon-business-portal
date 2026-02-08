@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 认证服务
  *
  * 处理用户登录、注册、密码管理等 API 调用。
@@ -114,9 +114,9 @@ class AuthService {
         logo_file_id: logoFileId,
         certificate_file_id: certificateFileId,
         terms_agreed: !!(
-          data.termsOfService &&
-          data.privacyPolicy &&
-          data.thirdPartySharing
+          (data.termsOfService === "true" || data.termsOfService === true) &&
+          (data.privacyPolicy === "true" || data.privacyPolicy === true) &&
+          (data.thirdPartySharing === "true" || data.thirdPartySharing === true)
         ),
       };
     } else {

@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+﻿import { useTranslation } from "react-i18next";
 
 export const RegisterStepIndicator = ({ currentStep, totalSteps = 5 }) => {
   const { t } = useTranslation();
@@ -28,7 +28,13 @@ export const RegisterStepIndicator = ({ currentStep, totalSteps = 5 }) => {
                     : "text-gray-500"
                 }`}
               >
-                {t(`auth.registerStep${step}`)}
+                {{
+                  1: t("member.auth.registerStep1"),
+                  2: t("member.auth.registerStep2"),
+                  3: t("member.auth.registerStep3"),
+                  4: t("member.auth.registerStep4"),
+                  5: t("member.auth.registerStep5"),
+                }[step] || `Step ${step}`}
               </span>
             </div>
             {idx < totalSteps - 1 && (

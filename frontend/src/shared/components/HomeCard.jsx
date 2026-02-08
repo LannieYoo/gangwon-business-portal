@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HomeCard Component
  * 首页内容卡片组件 - 用于公告、项目等内容展示
  */
@@ -121,10 +121,11 @@ export function HomeCard({
               type="button"
               onClick={toggleAttachmentsMenu}
               className="flex items-center gap-1 text-[11px] text-gray-500 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 px-1.5 py-0.5 rounded transition-colors"
-              title={`${attachments.length} ${t('fileAttachments.attachments', '첨부파일')}`}
+              title={`${attachments.length} ${t("components.fileUpload.attachments", "첨부파일")}`}
             >
               <span className="text-[11px]">
-                {t('fileAttachments.attachments', '첨부파일')} ({attachments.length})
+                {t("components.fileUpload.attachments", "첨부파일")} (
+                {attachments.length})
               </span>
             </button>
 
@@ -132,7 +133,7 @@ export function HomeCard({
             {showAttachmentsMenu && (
               <div className="absolute bottom-full right-0 mb-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[200px] max-w-[280px] z-50">
                 <div className="px-3 py-1.5 text-xs font-medium text-gray-500 border-b border-gray-100">
-                  {t('fileAttachments.attachments', '첨부파일')} (
+                  {t("components.fileUpload.attachments", "첨부파일")} (
                   {attachments.length})
                 </div>
                 <div className="max-h-[240px] overflow-y-auto scrollbar-thin">
@@ -180,3 +181,7 @@ export function HomeCard({
     </Card>
   );
 }
+
+
+
+

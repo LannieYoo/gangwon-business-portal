@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FAQ 项目组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -59,7 +59,7 @@ export default function FAQItem({
             <div className="flex items-center gap-2 mt-3 pt-3 text-sm text-gray-500 border-t border-gray-100">
               <EyeIcon className="w-4 h-4 text-gray-400" />
               <span>
-                {faq.views} {t('support.viewsLabel', '회 조회')}
+                {faq.views} {t('member.support.viewsLabel', '회 조회')}
               </span>
             </div>
           )}

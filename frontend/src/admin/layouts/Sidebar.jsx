@@ -1,6 +1,6 @@
 /**
  * Sidebar Component - Admin Portal
- * 管理员端侧边导航 - Windster Style
+ * 管理端侧边栏组件 - Windster Style
  */
 
 import { useTranslation } from "react-i18next";
@@ -30,56 +30,56 @@ export default function Sidebar({ collapsed, mobileOpen = false, onClose }) {
       key: "dashboard",
       path: "/admin",
       icon: DashboardIcon,
-      label: t("admin.menu.dashboard"),
+      label: t("admin.layouts.menu.dashboard"),
       exact: true,
     },
     {
       key: "members",
       path: "/admin/members",
       icon: UsersIcon,
-      label: t("admin.menu.members"),
+      label: t("admin.layouts.menu.members"),
     },
     {
       key: "performance",
       path: "/admin/performance",
       icon: ChartIcon,
-      label: t("admin.menu.performance"),
+      label: t("admin.layouts.menu.performance"),
     },
     {
       key: "projects",
       path: "/admin/projects",
       icon: FolderIcon,
-      label: t("admin.menu.projects"),
+      label: t("admin.layouts.menu.projects"),
     },
     {
       key: "content",
       path: "/admin/content",
       icon: DocumentIcon,
-      label: t("admin.menu.content"),
+      label: t("admin.layouts.menu.content"),
     },
     {
       key: "messages",
       path: "/admin/messages",
       icon: EnvelopeIcon,
-      label: t("admin.menu.messages"),
+      label: t("admin.layouts.menu.messages"),
     },
     {
       key: "statistics",
       path: "/admin/statistics",
       icon: ReportIcon,
-      label: t('admin.menu.statistics', '통계 보고서'),
+      label: t("admin.layouts.menu.statistics", "통계 보고서"),
     },
     // {
     //   key: 'reports',
     //   path: '/admin/reports',
     //   icon: ReportIcon,
-    //   label: t('admin.menu.reports')
+    //   label: t('admin.layouts.menu.reports')
     // },
     // {
     //   key: 'system-logs',
     //   path: '/admin/system-logs',
     //   icon: ServerIcon,
-    //   label: t('admin.menu.systemLogs')
+    //   label: t('admin.layouts.menu.systemLogs')
     // },
   ];
 

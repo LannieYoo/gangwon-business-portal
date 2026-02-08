@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+﻿import { useTranslation } from "react-i18next";
 import { Card, Badge } from "@shared/components";
 import { formatDate } from "@shared/utils";
 
@@ -16,19 +16,19 @@ export default function ApplicationRecordsTable({
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                {t('projects.applicationRecords.projectName', '사업명')}
+                {t('member.projects.applicationRecords.projectName', '사업명')}
               </th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                {t('projects.applicationRecords.applicationDate', '신청일')}
+                {t('member.projects.applicationRecords.applicationDate', '신청일')}
               </th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                {t('projects.applicationRecords.progressStatus', '진행 상태')}
+                {t('member.projects.applicationRecords.progressStatus', '진행 상태')}
               </th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                {t('projects.applicationRecords.processedDate', '처리일')}
+                {t('member.projects.applicationRecords.processedDate', '처리일')}
               </th>
               <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
-                {t('projects.applicationRecords.action', '작업')}
+                {t('member.projects.applicationRecords.action', '작업')}
               </th>
             </tr>
           </thead>

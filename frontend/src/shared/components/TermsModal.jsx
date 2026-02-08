@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Terms Modal Component
  * 条款模态框组件 - 显示使用条款、隐私政策等
  */
@@ -143,3 +143,7 @@ export function TermsModal({ isOpen, termType, onClose }) {
 }
 
 export { TERM_TYPES };
+
+
+
+

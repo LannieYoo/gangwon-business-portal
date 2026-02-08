@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 申请记录业务逻辑 Hook
  *
  * 处理申请记录获取、筛选、搜索、取消申请、补充资料及弹窗状态。
@@ -75,7 +75,7 @@ export function useApplicationRecords() {
           alert(
             t(
               "projects.applicationRecords.fileTooLarge",
-              "文件过大 (最大 10MB)",
+              "파일 크기가 너무 큽니다.",
             ),
           );
           return false;
@@ -93,14 +93,14 @@ export function useApplicationRecords() {
 
   const handleSubmitSupplement = useCallback(async () => {
     if (supplementFiles.length === 0) {
-      alert(t("projects.applicationRecords.noFilesSelected", "请选择文件"));
+      alert(t("member.projects.applicationRecords.noFilesSelected", "파일을 선택해주세요."));
       return;
     }
     setSupplementLoading(true);
     // TODO: Implement actual file upload in hook
     setTimeout(() => {
       setSupplementLoading(false);
-      alert(t("projects.applicationRecords.featureComingSoon", "功能开发中"));
+      alert(t("member.projects.applicationRecords.featureComingSoon", "기능 준비 중입니다"));
       setShowSupplementModal(false);
       setSupplementFiles([]);
     }, 500);
@@ -109,17 +109,17 @@ export function useApplicationRecords() {
   const columns = [
     {
       key: "projectTitle",
-      label: t("projects.applicationRecords.projectName", "项目名称"),
+      label: t("member.projects.applicationRecords.projectName", "사업명"),
       render: (value) => value || "-",
     },
     {
       key: "submittedAt",
-      label: t("projects.applicationRecords.applicationDate", "申请日期"),
+      label: t("member.projects.applicationRecords.applicationDate", "신청일"),
       render: (value) => (value ? formatDate(value) : "-"),
     },
     {
       key: "status",
-      label: t("projects.applicationRecords.progressStatus", "进度状态"),
+      label: t("member.projects.applicationRecords.progressStatus", "진행 상태"),
       render: (value) => {
         const statusInfo = getStatusInfo(value);
         return statusInfo.label;
@@ -127,7 +127,7 @@ export function useApplicationRecords() {
     },
     {
       key: "reviewedAt",
-      label: t("projects.applicationRecords.processedDate", "处理日期"),
+      label: t("member.projects.applicationRecords.processedDate", "처리일"),
       render: (value) => (value ? formatDate(value) : "-"),
     },
   ];

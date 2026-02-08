@@ -1,30 +1,46 @@
-/**
+﻿/**
  * Member List Component - Admin Portal
  * 企业会员列表
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Table, Button, Badge, Pagination, SearchInput, Alert, Modal } from '@shared/components';
-import membersService from './services/members.service';
-import { formatDate, formatBusinessLicense } from '@shared/utils';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import {
+  Table,
+  Button,
+  Badge,
+  Pagination,
+  SearchInput,
+  Alert,
+  Modal,
+} from "@shared/components";
+import { useEnumTranslation } from "@shared/hooks";
+import membersService from "./services/members.service";
+import {
+  formatDate,
+  formatBusinessLicense,
+  exportToExcel,
+  exportToCsv,
+  generateExportFilename,
+} from "@shared/utils";
 
 export default function MemberList() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const currentLanguage = i18n.language === 'zh' ? 'zh' : 'ko';
+  const { translateStartupType, translateStartupStage } = useEnumTranslation();
+  const currentLanguage = i18n.language === "zh" ? "zh" : "ko";
   const [loading, setLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [allMembers, setAllMembers] = useState([]);
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [message, setMessage] = useState(null);
-  const [messageVariant, setMessageVariant] = useState('success');
+  const [messageVariant, setMessageVariant] = useState("success");
   const [showRejectModal, setShowRejectModal] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
+  const [rejectReason, setRejectReason] = useState("");
   const [rejectingMemberId, setRejectingMemberId] = useState(null);
 
   // 使用 useCallback 包装 setFilteredMembers 避免无限循环
@@ -40,10 +56,10 @@ export default function MemberList() {
       const params = {
         page: 1,
         pageSize: 1000,
-        approvalStatus: statusFilter !== 'all' ? statusFilter : undefined
+        approvalStatus: statusFilter !== "all" ? statusFilter : undefined,
       };
       const response = await membersService.listMembers(params);
-      
+
       if (response && response.items && Array.isArray(response.items)) {
         setAllMembers(response.items);
         setFilteredMembers(response.items);
@@ -52,7 +68,7 @@ export default function MemberList() {
         setFilteredMembers([]);
       }
     } catch (error) {
-      console.error('Failed to load members:', error);
+      console.error("Failed to load members:", error);
       setAllMembers([]);
       setFilteredMembers([]);
     } finally {
@@ -76,180 +92,273 @@ export default function MemberList() {
     setTotalCount(filteredMembers.length);
   }, [filteredMembers]);
 
-  const handleExport = useCallback(async (format = 'excel') => {
-    setLoading(true);
-    try {
-      const params = {
-        format,
-        approvalStatus: statusFilter !== 'all' ? statusFilter : undefined,
-        language: i18n.language === 'zh' ? 'zh' : 'ko'
-      };
-      await membersService.exportMembers(params);
-      setMessageVariant('success');
-      setMessage(t('admin.members.exportSuccess', '내보내기 성공'));
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      setMessageVariant('error');
-      setMessage(t('admin.members.exportFailed', '내보내기 실패'));
-      setTimeout(() => setMessage(null), 3000);
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter, i18n.language, t]);
+  // 导出列配置（排除 actions 列）
+  const exportColumns = useMemo(
+    () => [
+      { key: "companyName", label: t("admin.members.table.companyName") },
+      { key: "representative", label: t("admin.members.table.representative") },
+      {
+        key: "businessNumber",
+        label: t("admin.members.table.businessNumber"),
+        exportRender: (value) => (value ? formatBusinessLicense(value) : "-"),
+      },
+      { key: "address", label: t("admin.members.table.address") },
+      { key: "industry", label: t("admin.members.table.industry") },
+      { key: "email", label: t("admin.members.table.email", "이메일") },
+      {
+        key: "createdAt",
+        label: t("admin.members.table.createdAt"),
+        exportRender: (value) =>
+          value ? formatDate(value, "yyyy-MM-dd HH:mm", currentLanguage) : "-",
+      },
+      {
+        key: "approvalStatus",
+        label: t("admin.members.table.status"),
+        exportRender: (value) =>
+          ({
+            approved: t("admin.members.status.approved"),
+            pending: t("admin.members.status.pending"),
+            rejected: t("admin.members.status.rejected"),
+          })[value] || value,
+      },
+    ],
+    [t, currentLanguage],
+  );
 
-  const handleApprove = useCallback(async (memberId) => {
-    await membersService.approveMember(memberId);
-    setMessageVariant('success');
-    setMessage(t('admin.members.approveSuccess', '승인 성공'));
-    setTimeout(() => setMessage(null), 3000);
-    loadAllMembers();
-  }, [loadAllMembers, t]);
+  const handleExport = useCallback(
+    async (format = "excel") => {
+      setLoading(true);
+      try {
+        const filename = generateExportFilename(
+          t("admin.members.export.filename"),
+        );
+        const sheetName = t("admin.members.export.sheetName");
+
+        if (format === "csv") {
+          await exportToCsv({
+            data: allMembers,
+            columns: exportColumns,
+            t,
+            filename,
+            sheetName,
+          });
+        } else {
+          await exportToExcel({
+            data: allMembers,
+            columns: exportColumns,
+            t,
+            filename,
+            sheetName,
+          });
+        }
+
+        setMessageVariant("success");
+        setMessage(t("admin.members.exportSuccess", "내보내기 성공"));
+        setTimeout(() => setMessage(null), 3000);
+      } catch (error) {
+        console.error("Export failed:", error);
+        setMessageVariant("error");
+        setMessage(t("admin.members.exportFailed", "내보내기 실패"));
+        setTimeout(() => setMessage(null), 3000);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [allMembers, exportColumns, t],
+  );
+
+  const handleApprove = useCallback(
+    async (memberId) => {
+      await membersService.approveMember(memberId);
+      setMessageVariant("success");
+      setMessage(t("admin.members.approveSuccess", "승인 성공"));
+      setTimeout(() => setMessage(null), 3000);
+      loadAllMembers();
+    },
+    [loadAllMembers, t],
+  );
 
   const handleReject = useCallback((memberId) => {
     setRejectingMemberId(memberId);
-    setRejectReason('');
+    setRejectReason("");
     setShowRejectModal(true);
   }, []);
 
   const handleConfirmReject = useCallback(async () => {
     try {
-      await membersService.rejectMember(rejectingMemberId, rejectReason || null);
+      await membersService.rejectMember(
+        rejectingMemberId,
+        rejectReason || null,
+      );
       setShowRejectModal(false);
       setRejectingMemberId(null);
-      setRejectReason('');
-      setMessageVariant('success');
-      setMessage(t('admin.members.rejectSuccess', '거부 성공'));
+      setRejectReason("");
+      setMessageVariant("success");
+      setMessage(t("admin.members.rejectSuccess", "거부 성공"));
       setTimeout(() => setMessage(null), 3000);
       loadAllMembers();
     } catch (error) {
-      console.error('Failed to reject member:', error);
-      setMessageVariant('error');
-      setMessage(t('admin.members.rejectFailed', '거부 실패'));
+      console.error("Failed to reject member:", error);
+      setMessageVariant("error");
+      setMessage(t("admin.members.rejectFailed", "거부 실패"));
     }
   }, [rejectingMemberId, rejectReason, loadAllMembers, t]);
 
   const handleCancelReject = useCallback(() => {
     setShowRejectModal(false);
     setRejectingMemberId(null);
-    setRejectReason('');
+    setRejectReason("");
   }, []);
 
-  const handleResetToPending = useCallback(async (memberId) => {
-    await membersService.resetMemberToPending(memberId);
-    setMessageVariant('success');
-    setMessage(t('admin.members.resetSuccess', '검토 대기로 재설정되었습니다'));
-    setTimeout(() => setMessage(null), 3000);
-    loadAllMembers();
-  }, [loadAllMembers, t]);
+  const handleResetToPending = useCallback(
+    async (memberId) => {
+      await membersService.resetMemberToPending(memberId);
+      setMessageVariant("success");
+      setMessage(
+        t("admin.members.resetSuccess", "검토 대기로 재설정되었습니다"),
+      );
+      setTimeout(() => setMessage(null), 3000);
+      loadAllMembers();
+    },
+    [loadAllMembers, t],
+  );
 
-  const handleViewDetail = useCallback((memberId) => {
-    navigate(`/admin/members/${memberId}`);
-  }, [navigate]);
-
-
+  const handleViewDetail = useCallback(
+    (memberId) => {
+      navigate(`/admin/members/${memberId}`);
+    },
+    [navigate],
+  );
 
   // 定义搜索列 - 简化版本用于搜索
-  const searchColumns = useMemo(() => [
-    {
-      key: 'companyName',
-      label: t('admin.members.table.companyName'),
-      render: (value) => value || ''
-    },
-    {
-      key: 'representative',
-      label: t('admin.members.table.representative'),
-      render: (value) => value || ''
-    },
-    {
-      key: 'businessNumber',
-      label: t('admin.members.table.businessNumber'),
-      render: (value) => value ? formatBusinessLicense(value) : ''
-    },
-    {
-      key: 'address',
-      label: t('admin.members.table.address'),
-      render: (value) => value || ''
-    },
-    {
-      key: 'industry',
-      label: t('admin.members.table.industry'),
-      render: (value) => value || ''
-    },
-    {
-      key: 'email',
-      label: t('admin.members.table.email', '이메일'),
-      render: (value) => value || ''
-    },
-    {
-      key: 'approvalStatus',
-      label: t('admin.members.table.status'),
-      render: (value) => t(`admin.members.status.${value}`, value)
-    }
-  ], [t]);
+  const searchColumns = useMemo(
+    () => [
+      {
+        key: "companyName",
+        label: t("admin.members.table.companyName"),
+        render: (value) => value || "",
+      },
+      {
+        key: "representative",
+        label: t("admin.members.table.representative"),
+        render: (value) => value || "",
+      },
+      {
+        key: "businessNumber",
+        label: t("admin.members.table.businessNumber"),
+        render: (value) => (value ? formatBusinessLicense(value) : ""),
+      },
+      {
+        key: "address",
+        label: t("admin.members.table.address"),
+        render: (value) => value || "",
+      },
+      {
+        key: "industry",
+        label: t("admin.members.table.industry"),
+        render: (value) => value || "",
+      },
+      {
+        key: "email",
+        label: t("admin.members.table.email", "이메일"),
+        render: (value) => value || "",
+      },
+      {
+        key: "approvalStatus",
+        label: t("admin.members.table.status"),
+        render: (value) =>
+          ({
+            approved: t("admin.members.status.approved"),
+            pending: t("admin.members.status.pending"),
+            rejected: t("admin.members.status.rejected"),
+          })[value] || value,
+      },
+    ],
+    [t],
+  );
 
   // 使用 useMemo 缓存表格 columns 配置，避免每次渲染都重新创建
   const tableColumns = useMemo(() => {
     return [
       {
-        key: 'companyName',
-        label: t('admin.members.table.companyName'),
+        key: "companyName",
+        label: t("admin.members.table.companyName"),
         sortable: true,
-        width: '200px',
-        align: 'left',
-        cellClassName: 'text-left'
+        width: "200px",
+        align: "left",
+        cellClassName: "text-left",
       },
       {
-        key: 'representative',
-        label: t('admin.members.table.representative'),
+        key: "representative",
+        label: t("admin.members.table.representative"),
         sortable: true,
-        width: '120px'
+        width: "120px",
       },
       {
-        key: 'businessNumber',
-        label: t('admin.members.table.businessNumber'),
+        key: "businessNumber",
+        label: t("admin.members.table.businessNumber"),
         sortable: true,
-        width: '150px',
-        render: (value) => value ? formatBusinessLicense(value) : '-'
+        width: "150px",
+        render: (value) => (value ? formatBusinessLicense(value) : "-"),
       },
       {
-        key: 'address',
-        label: t('admin.members.table.address'),
+        key: "address",
+        label: t("admin.members.table.address"),
         wrap: true,
-        width: '250px',
+        width: "250px",
         render: (value) => (
-          <div className="max-w-xs truncate" title={value || ''}>
-            {value || '-'}
+          <div className="max-w-xs truncate" title={value || ""}>
+            {value || "-"}
           </div>
-        )
+        ),
       },
       {
-        key: 'industry',
-        label: t('admin.members.table.industry'),
-        width: '120px'
+        key: "startupType",
+        label: t("admin.members.table.startupType", "창업유형"),
+        width: "100px",
+        render: (value) => translateStartupType(value),
       },
       {
-        key: 'created_at_display',
-        label: t('admin.members.table.createdAt'),
+        key: "startupStage",
+        label: t("admin.members.table.startupStage", "창업단계"),
+        width: "100px",
+        render: (value) => translateStartupStage(value),
+      },
+      {
+        key: "created_at_display",
+        label: t("admin.members.table.createdAt"),
         sortable: true,
-        width: '160px',
-        render: (value, row) => value || formatDate(row.createdAt, 'yyyy-MM-dd HH:mm', currentLanguage)
+        width: "160px",
+        render: (value, row) =>
+          value ||
+          formatDate(row.createdAt, "yyyy-MM-dd HH:mm", currentLanguage),
       },
       {
-        key: 'approvalStatus',
-        label: t('admin.members.table.status'),
-        width: '100px',
+        key: "approvalStatus",
+        label: t("admin.members.table.status"),
+        width: "100px",
         render: (value) => (
-          <Badge 
-            variant={value === 'approved' ? 'success' : value === 'pending' ? 'warning' : 'danger'}
+          <Badge
+            variant={
+              value === "approved"
+                ? "success"
+                : value === "pending"
+                  ? "warning"
+                  : "danger"
+            }
           >
-            {t(`admin.members.status.${value}`)}
+            {{
+              approved: t("admin.members.status.approved"),
+              pending: t("admin.members.status.pending"),
+              rejected: t("admin.members.status.rejected"),
+            }[value] || value}
           </Badge>
-        )
+        ),
       },
       {
-        key: 'actions',
-        label: '',
-        width: '120px',
+        key: "actions",
+        label: "",
+        width: "120px",
         render: (_, row) => (
           <div className="flex items-center space-x-2">
             <button
@@ -259,9 +368,9 @@ export default function MemberList() {
               }}
               className="text-primary-600 hover:text-primary-900 font-medium text-sm"
             >
-              {t('common.view')}
+              {t("common.view")}
             </button>
-            {row.approvalStatus === 'pending' && (
+            {row.approvalStatus === "pending" && (
               <>
                 <span className="text-gray-300">|</span>
                 <button
@@ -271,7 +380,7 @@ export default function MemberList() {
                   }}
                   className="text-green-600 hover:text-green-900 font-medium text-sm"
                 >
-                  {t('admin.members.approve')}
+                  {t("admin.members.approve")}
                 </button>
                 <span className="text-gray-300">|</span>
                 <button
@@ -281,11 +390,12 @@ export default function MemberList() {
                   }}
                   className="text-red-600 hover:text-red-900 font-medium text-sm"
                 >
-                  {t('admin.members.reject', '거부')}
+                  {t("admin.members.reject", "거부")}
                 </button>
               </>
             )}
-            {(row.approvalStatus === 'approved' || row.approvalStatus === 'rejected') && (
+            {(row.approvalStatus === "approved" ||
+              row.approvalStatus === "rejected") && (
               <>
                 <span className="text-gray-300">|</span>
                 <button
@@ -295,48 +405,50 @@ export default function MemberList() {
                   }}
                   className="text-orange-600 hover:text-orange-900 font-medium text-sm"
                 >
-                  {t('admin.members.resetPending', '취소')}
+                  {t("admin.members.resetPending", "취소")}
                 </button>
               </>
             )}
           </div>
-        )
-      }
+        ),
+      },
     ];
   }, [t, handleViewDetail, handleApprove, handleReject, handleResetToPending]);
 
   return (
     <div className="w-full">
       {message && (
-        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+        <Alert
+          variant={messageVariant}
+          className="mb-4"
+          onClose={() => setMessage(null)}
+        >
           {message}
         </Alert>
       )}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-4">{t('admin.members.title')}</h1>
-        
+        <h1 className="text-2xl font-semibold text-gray-900 mb-4">
+          {t("admin.members.title")}
+        </h1>
+
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <SearchInput
             data={allMembers}
             columns={searchColumns}
             onFilter={handleFilterChange}
-            placeholder={t('admin.members.search.placeholder', '기업명, 대표자, 사업자등록번호, 주소, 업종 등 검색')}
+            placeholder={t(
+              "admin.members.search.placeholder",
+              "기업명, 대표자, 사업자등록번호, 주소, 업종 등 검색",
+            )}
             className="flex-1 min-w-[200px] max-w-md"
           />
           <div className="flex items-center space-x-2 md:ml-4 w-full md:w-auto">
-            <Button 
-              onClick={() => handleExport('excel')} 
+            <Button
+              onClick={() => handleExport("excel")}
               variant="outline"
               disabled={loading}
             >
-              {t('admin.members.exportExcel', 'Excel 내보내기')}
-            </Button>
-            <Button 
-              onClick={() => handleExport('csv')} 
-              variant="outline"
-              disabled={loading}
-            >
-              {t('admin.members.exportCsv', 'CSV 내보내기')}
+              {t("admin.members.exportExcel", "Excel 내보내기")}
             </Button>
           </div>
         </div>
@@ -345,16 +457,28 @@ export default function MemberList() {
       <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
         {(() => {
           if (loading) {
-            return <div className="p-12 text-center text-gray-500">{t('common.loading')}</div>;
+            return (
+              <div className="p-12 text-center text-gray-500">
+                {t("common.loading")}
+              </div>
+            );
           }
           if (members.length === 0) {
             return (
               <div className="p-12 text-center text-gray-500">
-                <p className="text-lg mb-2">{t('admin.members.noMembers', '회원 데이터가 없습니다')}</p>
+                <p className="text-lg mb-2">
+                  {t("admin.members.noMembers", "회원 데이터가 없습니다")}
+                </p>
                 <p className="text-sm text-gray-400">
-                  {totalCount === 0 
-                    ? t('admin.members.noMembersHint', '페이지를 새로고침하세요')
-                    : t('admin.members.noMatchingMembers', '현재 필터 조건에 맞는 회원이 없습니다')}
+                  {totalCount === 0
+                    ? t(
+                        "admin.members.noMembersHint",
+                        "페이지를 새로고침하세요",
+                      )
+                    : t(
+                        "admin.members.noMatchingMembers",
+                        "현재 필터 조건에 맞는 회원이 없습니다",
+                      )}
                 </p>
               </div>
             );
@@ -362,19 +486,16 @@ export default function MemberList() {
           return (
             <>
               <div className="overflow-x-auto -mx-4 px-4">
-                <Table 
-                  columns={tableColumns} 
-                  data={members}
-                />
+                <Table columns={tableColumns} data={members} />
               </div>
               {totalCount > pageSize && (
                 <div className="px-6 py-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
                   <div className="flex items-center text-sm text-gray-700">
                     <span>
-                      {t('common.pagination.showing', { 
-                        start: ((currentPage - 1) * pageSize) + 1, 
-                        end: Math.min(currentPage * pageSize, totalCount), 
-                        total: totalCount 
+                      {t("common.pagination.showing", {
+                        start: (currentPage - 1) * pageSize + 1,
+                        end: Math.min(currentPage * pageSize, totalCount),
+                        total: totalCount,
                       })}
                     </span>
                   </div>
@@ -396,28 +517,31 @@ export default function MemberList() {
         <Modal
           isOpen={showRejectModal}
           onClose={handleCancelReject}
-          title={t('admin.members.rejectReasonTitle', '거부 사유 입력')}
+          title={t("admin.members.rejectReasonTitle", "거부 사유 입력")}
           size="md"
         >
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.members.rejectReasonLabel', '거부 사유 (선택사항)')}
+                {t("admin.members.rejectReasonLabel", "거부 사유 (선택사항)")}
               </label>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                placeholder={t('admin.members.rejectReasonPlaceholder', '거부 사유를 입력하세요...')}
+                placeholder={t(
+                  "admin.members.rejectReasonPlaceholder",
+                  "거부 사유를 입력하세요...",
+                )}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 rows={4}
               />
             </div>
             <div className="flex justify-end space-x-3">
               <Button variant="outline" onClick={handleCancelReject}>
-                {t('common.cancel', '취소')}
+                {t("common.cancel", "취소")}
               </Button>
               <Button variant="danger" onClick={handleConfirmReject}>
-                {t('common.confirm', '확인')}
+                {t("common.confirm", "확인")}
               </Button>
             </div>
           </div>
@@ -426,4 +550,3 @@ export default function MemberList() {
     </div>
   );
 }
-

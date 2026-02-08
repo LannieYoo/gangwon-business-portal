@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Company Contact Person Info
  *
  * 企业负责人信息部分。
@@ -16,7 +16,7 @@ const CompanyContactPersonInfo = ({ data, isEditing, onChange, errors }) => {
     <Card className="shadow-sm p-0">
       <div className="flex items-center gap-3 border-b border-gray-100 p-6 sm:p-8">
         <h2 className="text-xl font-semibold text-gray-900 m-0">
-          {t('performance.companyInfo.sections.contactPerson', '담당자 정보')}
+          {t('member.performance.companyInfo.sections.contactPerson', '담당자 정보')}
         </h2>
       </div>
       <div className="p-6 sm:p-8">
@@ -24,7 +24,7 @@ const CompanyContactPersonInfo = ({ data, isEditing, onChange, errors }) => {
           <Input
             label={t(
               "performance.companyInfo.fields.contactPersonName",
-              "负责人姓名",
+              "담당자명",
             )}
             value={data.contactPersonName}
             onChange={(e) => onChange("contactPersonName", e.target.value)}
@@ -33,7 +33,7 @@ const CompanyContactPersonInfo = ({ data, isEditing, onChange, errors }) => {
           <Input
             label={t(
               "performance.companyInfo.fields.contactPersonDepartment",
-              "部门",
+              "담당자 부서",
             )}
             value={data.contactPersonDepartment}
             onChange={(e) =>
@@ -44,7 +44,7 @@ const CompanyContactPersonInfo = ({ data, isEditing, onChange, errors }) => {
           <Input
             label={t(
               "performance.companyInfo.fields.contactPersonPosition",
-              "职位",
+              "담당자 직책",
             )}
             value={data.contactPersonPosition}
             onChange={(e) => onChange("contactPersonPosition", e.target.value)}
@@ -53,7 +53,7 @@ const CompanyContactPersonInfo = ({ data, isEditing, onChange, errors }) => {
           <Input
             label={t(
               "performance.companyInfo.fields.contactPersonPhone",
-              "联系电话",
+              "담당자 전화번호",
             )}
             value={data.contactPersonPhone}
             onChange={(e) => onChange("contactPersonPhone", e.target.value)}

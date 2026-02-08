@@ -1,17 +1,17 @@
-import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
+﻿import { useTranslation } from "react-i18next";
+import { useState, useEffect, useMemo } from "react";
+import { useEnumTranslation } from "@shared/hooks";
 import {
-  STARTUP_TYPE_KEYS,
-  STARTUP_STAGE_KEYS,
-  KSIC_MAJOR_CATEGORY_KEYS,
-  BUSINESS_FIELD_KEYS,
-  MAIN_INDUSTRY_KSIC_MAJOR_KEYS,
+  STARTUP_TYPES,
+  STARTUP_STAGES,
+  KSIC_MAJOR_CATEGORIES,
+  BUSINESS_FIELDS,
+  MAIN_INDUSTRY_KSIC_MAJORS,
   GANGWON_FUTURE_INDUSTRIES,
   FUTURE_TECHNOLOGIES,
-  getSubCategoryKeysByMajor,
-  getMainIndustryKsicCodesByMajor,
-  translateOptions,
-} from "@/shared/data/industryClassification";
+  getSubCategoriesByMajor,
+  getMainIndustryCodesByMajor,
+} from "@/shared/enums";
 
 export const RegisterStep4Business = ({
   formData,
@@ -19,48 +19,86 @@ export const RegisterStep4Business = ({
   setFormData,
 }) => {
   const { t } = useTranslation();
+  const {
+    getStartupTypeOptions,
+    getStartupStageOptions,
+    getKsicMajorOptions,
+    getKsicSubOptions,
+    getBusinessFieldOptions,
+    getMainIndustryKsicOptions,
+    getMainIndustryKsicCodesOptions,
+    getGangwonIndustryOptions,
+    getFutureTechOptions,
+  } = useEnumTranslation();
 
-  const [ksicSubOptions, setKsicSubOptions] = useState([]);
-  const [mainIndustrySubOptions, setMainIndustrySubOptions] = useState([]);
+  const [ksicSubKeys, setKsicSubKeys] = useState([]);
+  const [mainIndustrySubKeys, setMainIndustrySubKeys] = useState([]);
 
   useEffect(() => {
     if (formData.ksicMajor) {
-      const subOptions = getSubCategoryKeysByMajor(formData.ksicMajor);
-      setKsicSubOptions(translateOptions(subOptions, t));
+      const subKeys = getSubCategoriesByMajor(formData.ksicMajor);
+      setKsicSubKeys(subKeys);
     } else {
-      setKsicSubOptions([]);
+      setKsicSubKeys([]);
       setFormData((prev) => ({ ...prev, ksicSub: "" }));
     }
-  }, [formData.ksicMajor, t, setFormData]);
+  }, [formData.ksicMajor, setFormData]);
 
   useEffect(() => {
     if (formData.mainIndustryKsicMajor) {
-      const subOptions = getMainIndustryKsicCodesByMajor(
-        formData.mainIndustryKsicMajor
+      const subKeys = getMainIndustryCodesByMajor(
+        formData.mainIndustryKsicMajor,
       );
-      setMainIndustrySubOptions(translateOptions(subOptions, t));
+      setMainIndustrySubKeys(subKeys);
     } else {
-      setMainIndustrySubOptions([]);
+      setMainIndustrySubKeys([]);
       setFormData((prev) => ({ ...prev, mainIndustryKsicCodes: "" }));
     }
-  }, [formData.mainIndustryKsicMajor, t, setFormData]);
+  }, [formData.mainIndustryKsicMajor, setFormData]);
 
-  const startupTypeOptions = translateOptions(STARTUP_TYPE_KEYS, t);
-  const startupStageOptions = translateOptions(STARTUP_STAGE_KEYS, t);
-  const ksicMajorOptions = translateOptions(KSIC_MAJOR_CATEGORY_KEYS, t);
-  const businessFieldOptions = translateOptions(BUSINESS_FIELD_KEYS, t);
-  const mainIndustryMajorOptions = translateOptions(
-    MAIN_INDUSTRY_KSIC_MAJOR_KEYS,
-    t
+  // 使用 hook 获取翻译后的选项
+  const startupTypeOptions = useMemo(
+    () => getStartupTypeOptions(STARTUP_TYPES, false),
+    [getStartupTypeOptions],
   );
-  const gangwonIndustryOptions = translateOptions(GANGWON_FUTURE_INDUSTRIES, t);
-  const futureTechOptions = translateOptions(FUTURE_TECHNOLOGIES, t);
+  const startupStageOptions = useMemo(
+    () => getStartupStageOptions(STARTUP_STAGES, false),
+    [getStartupStageOptions],
+  );
+  const ksicMajorOptions = useMemo(
+    () => getKsicMajorOptions(KSIC_MAJOR_CATEGORIES, false),
+    [getKsicMajorOptions],
+  );
+  const ksicSubOptions = useMemo(
+    () => getKsicSubOptions(ksicSubKeys, false),
+    [getKsicSubOptions, ksicSubKeys],
+  );
+  const businessFieldOptions = useMemo(
+    () => getBusinessFieldOptions(BUSINESS_FIELDS, false),
+    [getBusinessFieldOptions],
+  );
+  const mainIndustryMajorOptions = useMemo(
+    () => getMainIndustryKsicOptions(MAIN_INDUSTRY_KSIC_MAJORS, false),
+    [getMainIndustryKsicOptions],
+  );
+  const mainIndustrySubOptions = useMemo(
+    () => getMainIndustryKsicCodesOptions(mainIndustrySubKeys, false),
+    [getMainIndustryKsicCodesOptions, mainIndustrySubKeys],
+  );
+  const gangwonIndustryOptions = useMemo(
+    () => getGangwonIndustryOptions(GANGWON_FUTURE_INDUSTRIES, false),
+    [getGangwonIndustryOptions],
+  );
+  const futureTechOptions = useMemo(
+    () => getFutureTechOptions(FUTURE_TECHNOLOGIES, false),
+    [getFutureTechOptions],
+  );
 
   return (
     <div className="space-y-5">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.startupType", "창업유형")}
+          {t("member.auth.startupType", "창업유형")}
         </label>
         <select
           name="startupType"
@@ -69,7 +107,7 @@ export const RegisterStep4Business = ({
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
         >
           <option value="">
-            {t("auth.selectStartupType", "창업유형을 선택하세요")}
+            {t("member.auth.selectStartupType", "창업유형을 선택하세요")}
           </option>
           {startupTypeOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -81,7 +119,7 @@ export const RegisterStep4Business = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.businessField", "사업 분야")}
+          {t("member.auth.businessField", "사업 분야")}
         </label>
         <select
           name="businessField"
@@ -90,7 +128,7 @@ export const RegisterStep4Business = ({
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
         >
           <option value="">
-            {t("auth.selectBusinessField", "사업 분야를 선택하세요")}
+            {t("member.auth.selectBusinessField", "사업 분야를 선택하세요")}
           </option>
           {businessFieldOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -103,7 +141,7 @@ export const RegisterStep4Business = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("auth.ksicMajor", "한국표준산업분류코드[대분류]")}
+            {t("member.auth.ksicMajor", "한국표준산업분류코드[대분류]")}
           </label>
           <select
             name="ksicMajor"
@@ -112,7 +150,7 @@ export const RegisterStep4Business = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
           >
             <option value="">
-              {t("auth.selectKsicMajor", "대분류를 선택하세요")}
+              {t("member.auth.selectKsicMajor", "대분류를 선택하세요")}
             </option>
             {ksicMajorOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -124,7 +162,7 @@ export const RegisterStep4Business = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("auth.ksicSub", "한국표준산업분류코드[중분류]")}
+            {t("member.auth.ksicSub", "한국표준산업분류코드[중분류]")}
           </label>
           <select
             name="ksicSub"
@@ -135,8 +173,11 @@ export const RegisterStep4Business = ({
           >
             <option value="">
               {formData.ksicMajor
-                ? t("auth.selectKsicSub", "중분류를 선택하세요")
-                : t("auth.selectKsicMajorFirst", "먼저 대분류를 선택하세요")}
+                ? t("member.auth.selectKsicSub", "중분류를 선택하세요")
+                : t(
+                    "member.auth.selectKsicMajorFirst",
+                    "먼저 대분류를 선택하세요",
+                  )}
             </option>
             {ksicSubOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -150,7 +191,7 @@ export const RegisterStep4Business = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("auth.mainIndustryKsicMajor", "주력산업 KSIC 코드")}
+            {t("member.auth.mainIndustryKsicMajor", "주력산업 KSIC 코드")}
           </label>
           <select
             name="mainIndustryKsicMajor"
@@ -159,10 +200,7 @@ export const RegisterStep4Business = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
           >
             <option value="">
-              {t(
-                "auth.selectMainIndustryKsicMajor",
-                "주력산업을 선택하세요"
-              )}
+              {t("auth.selectMainIndustryKsicMajor", "주력산업을 선택하세요")}
             </option>
             {mainIndustryMajorOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -174,7 +212,7 @@ export const RegisterStep4Business = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("auth.mainIndustryKsicCodes", "주력산업 KSIC 세부 코드")}
+            {t("member.auth.mainIndustryKsicCodes", "주력산업 KSIC 세부 코드")}
           </label>
           <select
             name="mainIndustryKsicCodes"
@@ -187,11 +225,11 @@ export const RegisterStep4Business = ({
               {formData.mainIndustryKsicMajor
                 ? t(
                     "auth.selectMainIndustryKsicCodes",
-                    "세부 코드를 선택하세요"
+                    "세부 코드를 선택하세요",
                   )
                 : t(
                     "auth.selectMainIndustryKsicMajorFirst",
-                    "먼저 주력산업을 선택하세요"
+                    "먼저 주력산업을 선택하세요",
                   )}
             </option>
             {mainIndustrySubOptions.map((opt) => (
@@ -204,7 +242,7 @@ export const RegisterStep4Business = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("auth.gangwonIndustry", "강원도 7대 미래산업")}
+            {t("member.auth.gangwonIndustry", "강원도 7대 미래산업")}
           </label>
           <select
             name="gangwonIndustry"
@@ -213,7 +251,7 @@ export const RegisterStep4Business = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
           >
             <option value="">
-              {t("auth.selectGangwonIndustry", "선택하세요")}
+              {t("member.auth.selectGangwonIndustry", "선택하세요")}
             </option>
             {gangwonIndustryOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -225,7 +263,7 @@ export const RegisterStep4Business = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("auth.futureTech", "미래유망 신기술")}
+            {t("member.auth.futureTech", "미래유망 신기술")}
           </label>
           <select
             name="futureTech"
@@ -234,7 +272,7 @@ export const RegisterStep4Business = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
           >
             <option value="">
-              {t("auth.selectFutureTech", "선택하세요")}
+              {t("member.auth.selectFutureTech", "선택하세요")}
             </option>
             {futureTechOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -247,7 +285,8 @@ export const RegisterStep4Business = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.startupStage", "창업구분")} <span className="text-red-500">*</span>
+          {t("member.auth.startupStage", "창업구분")}{" "}
+          <span className="text-red-500">*</span>
         </label>
         <select
           name="startupStage"
@@ -257,7 +296,7 @@ export const RegisterStep4Business = ({
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
         >
           <option value="">
-            {t("auth.selectStartupStage", "창업구분을 선택하세요")}
+            {t("member.auth.selectStartupStage", "창업구분을 선택하세요")}
           </option>
           {startupStageOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -269,7 +308,7 @@ export const RegisterStep4Business = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.sales")}
+          {t("member.auth.sales")}
         </label>
         <input
           type="text"
@@ -283,7 +322,7 @@ export const RegisterStep4Business = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.employeeCount")}
+          {t("member.auth.employeeCount")}
         </label>
         <input
           type="text"
@@ -297,7 +336,7 @@ export const RegisterStep4Business = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.websiteUrl")}
+          {t("member.auth.websiteUrl")}
         </label>
         <input
           type="url"
@@ -311,7 +350,7 @@ export const RegisterStep4Business = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.mainBusiness")}
+          {t("member.auth.mainBusiness")}
         </label>
         <textarea
           name="mainBusiness"
@@ -324,7 +363,7 @@ export const RegisterStep4Business = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.cooperationFields")}
+          {t("member.auth.cooperationFields")}
         </label>
         <input
           type="text"

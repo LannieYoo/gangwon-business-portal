@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 申请表单组件
  *
  * 包含申请人信息、申请理由和附件上传。
@@ -56,7 +56,7 @@ export default function ApplicationForm({
         <div className="p-3 rounded-lg border bg-blue-50 border-blue-200">
           <div className="flex items-center justify-between">
             <span className="text-sm text-blue-900">
-              {t('projects.applicationStatus', '신청 상태')}:
+              {t('member.projects.applicationStatus', '신청 상태')}:
             </span>
             <span className="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800">
               {t(
@@ -67,7 +67,7 @@ export default function ApplicationForm({
           </div>
           {existingApplication.submittedAt && (
             <div className="mt-2 text-xs text-blue-700">
-              {t('projects.submittedAt', '제출 시간')}:{" "}
+              {t('member.projects.submittedAt', '제출 시간')}:{" "}
               {new Date(existingApplication.submittedAt).toLocaleString()}
             </div>
           )}
@@ -79,7 +79,7 @@ export default function ApplicationForm({
         <div className="grid grid-cols-2 gap-4 p-3 bg-gray-50 rounded-lg text-sm">
           <div>
             <span className="text-gray-500">
-              {t('projects.companyId', '기업 ID')}:{" "}
+              {t('member.projects.companyId', '기업 ID')}:{" "}
             </span>
             <span className="font-medium">
               {user.businessNumber || user.id}
@@ -87,7 +87,7 @@ export default function ApplicationForm({
           </div>
           <div>
             <span className="text-gray-500">
-              {t('projects.companyName', '기업명')}:{" "}
+              {t('member.projects.companyName', '기업명')}:{" "}
             </span>
             <span className="font-medium">{user.companyName || "-"}</span>
           </div>
@@ -101,7 +101,7 @@ export default function ApplicationForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t('projects.application.form.applicantName', '담당자 이름')}
+            {t('member.projects.application.form.applicantName', '담당자 이름')}
             {!actualViewMode && <span className="text-red-500 ml-1">*</span>}
           </label>
           <input
@@ -110,7 +110,7 @@ export default function ApplicationForm({
             onChange={(e) => onUpdateField("applicantName", e.target.value)}
             placeholder={t(
               "projects.application.form.applicantNamePlaceholder",
-              "请输入申请人姓名",
+              "담당자 이름을 입력하세요",
             )}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
             disabled={actualViewMode}
@@ -119,7 +119,7 @@ export default function ApplicationForm({
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t('projects.application.form.applicantPhone', '담당자 전화번호')}
+            {t('member.projects.application.form.applicantPhone', '담당자 전화번호')}
             {!actualViewMode && <span className="text-red-500 ml-1">*</span>}
           </label>
           <input
@@ -128,7 +128,7 @@ export default function ApplicationForm({
             onChange={handlePhoneChange}
             placeholder={t(
               "projects.application.form.applicantPhonePlaceholder",
-              "请输入电话号码",
+              "전화번호를 입력하세요",
             )}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
             disabled={actualViewMode}
@@ -140,12 +140,12 @@ export default function ApplicationForm({
 
       {/* Application Reason */}
       <Textarea
-        label={t('projects.application.form.reason', '신청 사유')}
+        label={t('member.projects.application.form.reason', '신청 사유')}
         value={applicationReason}
         onChange={(e) => onUpdateField("applicationReason", e.target.value)}
         placeholder={t(
           "projects.application.form.reasonPlaceholder",
-          "请详细说明申请此项目的原因（至少10个字符）",
+          "전달하실 내용을 자세히 설명해주세요 (최소 10자 이상)",
         )}
         rows={6}
         required={!actualViewMode}
@@ -160,7 +160,7 @@ export default function ApplicationForm({
 
       {/* Attachments */}
       <FileAttachments
-        label={t('projects.application.form.attachments', '첨부파일')}
+        label={t('member.projects.application.form.attachments', '첨부파일')}
         attachments={attachments}
         onChange={onAttachmentsChange}
         maxFiles={5}

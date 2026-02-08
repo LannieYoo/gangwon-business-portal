@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 咨询历史业务逻辑 Hook
  *
  * 遵循 dev-frontend_patterns skill 规范。

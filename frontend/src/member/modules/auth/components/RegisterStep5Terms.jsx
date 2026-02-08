@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+﻿import { useTranslation } from "react-i18next";
 import { TERM_TYPES } from "@shared/components";
 
 export const RegisterStep5Terms = ({
@@ -18,7 +18,9 @@ export const RegisterStep5Terms = ({
           onChange={handleChange}
           className="w-5 h-5 text-blue-600 rounded"
         />
-        <span className="font-medium text-gray-900">{t("auth.agreeAll")}</span>
+        <span className="font-medium text-gray-900">
+          {t("member.auth.agreeAll")}
+        </span>
       </label>
 
       <div className="border-t border-gray-200 pt-4 space-y-4">
@@ -56,10 +58,15 @@ export const RegisterStep5Terms = ({
               <span className="text-sm text-gray-700">
                 <span className={required ? "text-red-500" : "text-gray-400"}>
                   {required
-                    ? t("auth.termsRequiredLabel")
-                    : t("auth.termsOptionalLabel")}
+                    ? t("member.auth.termsRequiredLabel")
+                    : t("member.auth.termsOptionalLabel")}
                 </span>{" "}
-                {t(`auth.${name}`)}
+                {{
+                  termsOfService: t("member.auth.termsOfService"),
+                  privacyPolicy: t("member.auth.privacyPolicy"),
+                  thirdPartySharing: t("member.auth.thirdPartySharing"),
+                  marketingConsent: t("member.auth.marketingConsent"),
+                }[name] || name}
               </span>
             </label>
             <button
@@ -67,7 +74,7 @@ export const RegisterStep5Terms = ({
               onClick={() => handleViewTerms(type)}
               className="text-sm text-blue-600 hover:underline"
             >
-              {t("auth.viewTerms")}
+              {t("member.auth.viewTerms")}
             </button>
           </div>
         ))}

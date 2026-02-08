@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 通知历史筛选组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -25,7 +25,7 @@ export default function NotificationHistoryFilter({
           data={allNotifications}
           columns={columns}
           onFilter={handleFilterChange}
-          placeholder={t("support.searchNotifications")}
+          placeholder={t("member.support.searchNotifications")}
           className="flex-1 min-w-[200px] max-w-md"
         />
         <div className="w-full sm:w-48 sm:flex-shrink-0">

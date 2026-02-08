@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+﻿import { useTranslation } from "react-i18next";
 import { AddressSearch, FileUploadButton } from "@shared/components";
 
 export const RegisterStep2Info = ({
@@ -17,7 +17,7 @@ export const RegisterStep2Info = ({
     <div className="space-y-5">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.corporationNumber")}
+          {t("member.auth.corporationNumber")}
         </label>
         <input
           type="text"
@@ -31,7 +31,7 @@ export const RegisterStep2Info = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.address")} <span className="text-red-500">*</span>
+          {t("member.auth.address")} <span className="text-red-500">*</span>
         </label>
         <AddressSearch
           value={formData.address}
@@ -42,7 +42,7 @@ export const RegisterStep2Info = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.addressDetail")}
+          {t("member.auth.addressDetail")}
         </label>
         <input
           type="text"
@@ -55,7 +55,7 @@ export const RegisterStep2Info = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.representative")} <span className="text-red-500">*</span>
+          {t("member.auth.representative")} <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -69,7 +69,7 @@ export const RegisterStep2Info = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.establishedDate")}
+          {t("member.auth.establishedDate")}
         </label>
         <input
           type="date"
@@ -79,13 +79,13 @@ export const RegisterStep2Info = ({
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
         />
         <p className="mt-1 text-xs text-gray-500">
-          {t("auth.establishedDateHelp")}
+          {t("member.auth.establishedDateHelp")}
         </p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.logoUpload")}
+          {t("member.auth.logoUpload")}
         </label>
         <div className="flex items-center gap-3">
           <FileUploadButton
@@ -103,7 +103,7 @@ export const RegisterStep2Info = ({
                 onClick={() => removeFile("logo")}
                 className="text-red-500 hover:text-red-700"
               >
-                {t("auth.removeFile")}
+                {t("member.auth.removeFile")}
               </button>
             </div>
           )}
@@ -115,7 +115,7 @@ export const RegisterStep2Info = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.businessLicenseFile")}
+          {t("member.auth.businessLicenseFile")}
         </label>
         <div className="flex items-center gap-3">
           <FileUploadButton
@@ -134,7 +134,7 @@ export const RegisterStep2Info = ({
                 onClick={() => removeFile("businessLicenseFile")}
                 className="text-red-500 hover:text-red-700"
               >
-                {t("auth.removeFile")}
+                {t("member.auth.removeFile")}
               </button>
             </div>
           )}
@@ -148,3 +148,7 @@ export const RegisterStep2Info = ({
     </div>
   );
 };
+
+
+
+

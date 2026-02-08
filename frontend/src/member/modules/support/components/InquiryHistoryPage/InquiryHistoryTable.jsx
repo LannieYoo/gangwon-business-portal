@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 咨询历史表格组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -42,15 +42,15 @@ export default function InquiryHistoryTable({
       <div className="text-center py-12 px-4">
         <p className="text-base text-gray-500 m-0 mb-4">
           {allThreads.length === 0
-            ? t('support.noInquiries', '문의 내역이 없습니다')
-            : t('support.noMatchingInquiries', '일치하는 문의 기록이 없습니다')}
+            ? t('member.support.noInquiries', '문의 내역이 없습니다')
+            : t('member.support.noMatchingInquiries', '일치하는 문의 기록이 없습니다')}
         </p>
         {allThreads.length === 0 && (
           <Button
             variant="primary"
             onClick={() => navigate("/member/support/inquiry")}
           >
-            {t("support.createFirstInquiry")}
+            {t("member.support.createFirstInquiry")}
           </Button>
         )}
       </div>
@@ -61,12 +61,12 @@ export default function InquiryHistoryTable({
     <Table>
       <TableHead>
         <TableRow>
-          <TableHeader>{t("support.subject")}</TableHeader>
-          <TableHeader>{t("support.categoryLabel")}</TableHeader>
-          <TableHeader>{t("support.statusLabel")}</TableHeader>
-          <TableHeader>{t("support.createdDate")}</TableHeader>
-          <TableHeader>{t("support.lastReply")}</TableHeader>
-          <TableHeader>{t("support.messageCount")}</TableHeader>
+          <TableHeader>{t("member.support.subject")}</TableHeader>
+          <TableHeader>{t("member.support.categoryLabel")}</TableHeader>
+          <TableHeader>{t("member.support.statusLabel")}</TableHeader>
+          <TableHeader>{t("member.support.createdDate")}</TableHeader>
+          <TableHeader>{t("member.support.lastReply")}</TableHeader>
+          <TableHeader>{t("member.support.messageCount")}</TableHeader>
           <TableHeader>{t("common.actions")}</TableHeader>
         </TableRow>
       </TableHead>

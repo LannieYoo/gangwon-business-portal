@@ -1,0 +1,48 @@
+{
+  "components": {
+    "editor": {
+      "addLink": "添加链接",
+      "linkText": "链接文本",
+      "linkUrl": "链接地址",
+      "bold": "加粗",
+      "italic": "斜体",
+      "underline": "下划线",
+      "heading1": "标题 1",
+      "heading2": "标题 2",
+      "heading3": "标题 3",
+      "bulletList": "无序列表",
+      "orderedList": "有序列表",
+      "link": "链接",
+      "image": "图片",
+      "table": "表格",
+      "deleteTable": "删除表格",
+      "undo": "撤销",
+      "redo": "重做",
+      "uploading": "上传中...",
+      "placeholder": "请输入内容..."
+    },
+    "fileUpload": {
+      "addFiles": "添加附件",
+      "uploading": "上传中...",
+      "remaining": "可上传 {{count}}/{{max}} 个文件",
+      "hint": "单个文件最大 {{max}}",
+      "fileTooLarge": "文件 {{name}} 超过最大大小 {{max}}",
+      "attachments": "附件",
+      "viewAll": "{{count}} 个附件",
+      "uploadError": "文件上传失败，请重试"
+    },
+    "notification": {
+      "unread": "未读",
+      "viewAll": "查看全部",
+      "viewAllInquiries": "查看所有咨询",
+      "viewAllNotifications": "查看所有通知",
+      "empty": "暂无通知",
+      "important": "重要",
+      "fromMember": "来自{{name}}",
+      "adminReplied": "管理员已回复",
+      "memberInquiries": "会员咨询",
+      "adminReplies": "管理员回复",
+      "systemNotifications": "系统通知"
+    }
+  }
+}

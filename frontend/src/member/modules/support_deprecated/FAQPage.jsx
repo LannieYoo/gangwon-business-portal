@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FAQ Page - Member Portal
  * 자주묻는 질문 페이지
  */
@@ -50,4 +50,8 @@ export default function FAQPage() {
     </div>
   );
 }
+
+
+
+
 

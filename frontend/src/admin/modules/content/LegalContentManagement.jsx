@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Legal Content Management Component - Admin Portal
  * 法律内容管理组件（利用约款/个人信息处理方针）
  */
@@ -264,3 +264,7 @@ export default function LegalContentManagement() {
     </div>
   );
 }
+
+
+
+

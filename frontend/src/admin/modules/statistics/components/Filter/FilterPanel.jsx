@@ -86,19 +86,19 @@ const FilterPanelComponent = ({
       {/* 标题栏 */}
       <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
         <h2 className="text-base font-semibold text-gray-900">
-          {t("statistics.filters.title", "筛选条件")}
+          {t("admin.statistics.filters.title", "필터")}
         </h2>
       </div>
 
       {/* 筛选条件内容 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-3.5">
         {/* 1. 快速筛选 - Quick Filters */}
-        <GroupTitle titleKey="statistics.groups.quick" groupKey="quick" />
+        <GroupTitle titleKey="admin.statistics.groups.quick" groupKey="quick" />
 
         {expandedGroups.quick && (
           <>
             <FormRow
-              label={t("statistics.filters.time.title")}
+              label={t("admin.statistics.filters.time.title")}
               labelWidthClassName={labelWidth}
             >
               <TimeFilters
@@ -110,7 +110,7 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t("statistics.filters.programs.title")}
+              label={t("admin.statistics.filters.programs.title")}
               labelWidthClassName={labelWidth}
             >
               <ProgramFilters
@@ -120,11 +120,11 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t("statistics.filters.keyword.title")}
+              label={t("admin.statistics.filters.keyword.title")}
               labelWidthClassName={labelWidth}
             >
               <Input
-                placeholder={t("statistics.filters.keyword.placeholder")}
+                placeholder={t("admin.statistics.filters.keyword.placeholder")}
                 value={filters.searchQuery || ""}
                 onChange={(e) => onFilterChange("searchQuery", e.target.value)}
                 className="w-full sm:w-80 h-9 bg-white border-gray-300"
@@ -135,13 +135,16 @@ const FilterPanelComponent = ({
         )}
 
         {/* 2. 企业特征 - Company Profile */}
-        <GroupTitle titleKey="statistics.groups.company" groupKey="company" />
+        <GroupTitle
+          titleKey="admin.statistics.groups.company"
+          groupKey="company"
+        />
 
         {expandedGroups.company && (
           <>
             <div className="col-span-1 lg:col-span-2">
               <FormRow
-                label={t("statistics.filters.industry.major")}
+                label={t("admin.statistics.filters.industry.major")}
                 labelWidthClassName={labelWidth}
               >
                 <StandardIndustryFilters
@@ -154,7 +157,7 @@ const FilterPanelComponent = ({
 
             <div className="col-span-1 lg:col-span-2">
               <FormRow
-                label={t("statistics.filters.industry.gangwon")}
+                label={t("admin.statistics.filters.industry.gangwon")}
                 labelWidthClassName={labelWidth}
               >
                 <IndustryFilters
@@ -166,10 +169,7 @@ const FilterPanelComponent = ({
             </div>
 
             <FormRow
-              label={t(
-                "statistics.filters.industry.gangwonFuture",
-                "江原道7大未来产业",
-              )}
+              label={t("admin.statistics.filters.industry.gangwonFuture")}
               labelWidthClassName={labelWidth}
             >
               <GangwonFutureIndustryFilters
@@ -179,10 +179,7 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t(
-                "statistics.filters.industry.futureTech",
-                "未来有望新技术",
-              )}
+              label={t("admin.statistics.filters.industry.futureTech")}
               labelWidthClassName={labelWidth}
             >
               <FutureTechnologyFilters
@@ -192,7 +189,7 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t("statistics.filters.workYears.title")}
+              label={t("admin.statistics.filters.workYears.title")}
               labelWidthClassName={labelWidth}
             >
               <WorkYearsFilters
@@ -203,7 +200,7 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t("statistics.filters.stage.title")}
+              label={t("admin.statistics.filters.stage.title")}
               labelWidthClassName={labelWidth}
             >
               <StageFilters
@@ -213,7 +210,7 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t("statistics.filters.location.title")}
+              label={t("admin.statistics.filters.location.title")}
               labelWidthClassName={labelWidth}
             >
               <LocationFilters
@@ -225,12 +222,15 @@ const FilterPanelComponent = ({
         )}
 
         {/* 3. 经营指标 - Business Metrics */}
-        <GroupTitle titleKey="statistics.groups.metrics" groupKey="metrics" />
+        <GroupTitle
+          titleKey="admin.statistics.groups.metrics"
+          groupKey="metrics"
+        />
 
         {expandedGroups.metrics && (
           <>
             <FormRow
-              label={t("statistics.filters.investment.title")}
+              label={t("admin.statistics.filters.investment.title")}
               labelWidthClassName={labelWidth}
             >
               <InvestmentFilters
@@ -242,7 +242,7 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t("statistics.filters.quantitive.revenue")}
+              label={t("admin.statistics.filters.quantitive.revenue")}
               labelWidthClassName={labelWidth}
             >
               <RevenueFilters
@@ -254,7 +254,7 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t("statistics.filters.quantitive.employees")}
+              label={t("admin.statistics.filters.quantitive.employees")}
               labelWidthClassName={labelWidth}
             >
               <EmployeeFilters
@@ -266,7 +266,7 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t("statistics.filters.patent.title")}
+              label={t("admin.statistics.filters.patent.title")}
               labelWidthClassName={labelWidth}
             >
               <PatentFilters
@@ -280,14 +280,14 @@ const FilterPanelComponent = ({
 
         {/* 4. 代表者信息 - Representative */}
         <GroupTitle
-          titleKey="statistics.groups.representative"
+          titleKey="admin.statistics.groups.representative"
           groupKey="representative"
         />
 
         {expandedGroups.representative && (
           <>
             <FormRow
-              label={t("statistics.filters.representative.gender")}
+              label={t("admin.statistics.filters.representative.gender")}
               labelWidthClassName={labelWidth}
             >
               <GenderFilters
@@ -297,7 +297,7 @@ const FilterPanelComponent = ({
             </FormRow>
 
             <FormRow
-              label={t("statistics.filters.representative.ageRangeLabel")}
+              label={t("admin.statistics.filters.representative.ageRangeLabel")}
               labelWidthClassName={labelWidth}
             >
               <AgeFilters
@@ -319,7 +319,7 @@ const FilterPanelComponent = ({
           disabled={loading}
           className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {t("statistics.filters.reset", "重置")}
+          {t("admin.statistics.filters.reset", "초기화")}
         </button>
         <button
           type="button"
@@ -327,7 +327,7 @@ const FilterPanelComponent = ({
           disabled={loading}
           className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border-2 border-primary-600 rounded-lg hover:bg-primary-700 hover:border-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {t("statistics.filters.apply", "查询")}
+          {t("admin.statistics.filters.apply", "조회")}
         </button>
       </div>
     </Card>

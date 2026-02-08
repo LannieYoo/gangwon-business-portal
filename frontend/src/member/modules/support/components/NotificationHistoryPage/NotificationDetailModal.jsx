@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 通知详情模态框组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -74,7 +74,7 @@ export default function NotificationDetailModal({
           </h2>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span>
-              {t("support.sender")}: {notification.senderName || "System"}
+              {t("member.support.sender")}: {notification.senderName || "System"}
             </span>
             <span>{formatDate(notification.createdAt)}</span>
           </div>

@@ -45,7 +45,10 @@ export const EmployeeFilters = ({
           value: opt.value,
           label: t(opt.labelKey),
         }))}
-        placeholder={t("statistics.filters.quantitive.employeeRange.all", "全部")}
+        placeholder={t(
+          "admin.statistics.filters.quantitive.employeeRange.all",
+          "전체",
+        )}
         onChange={(e) => handleEmployeeRangeChange(e.target.value)}
         containerClassName="mb-0"
         className="w-56 h-9"
@@ -55,12 +58,15 @@ export const EmployeeFilters = ({
         <div className="flex items-center gap-2 ml-4">
           <Input
             type="number"
-            placeholder={t("statistics.filters.patent.minCount", "最小值")}
+            placeholder={t(
+              "admin.statistics.filters.patent.minCount",
+              "최소 수량",
+            )}
             value={minEmployees || ""}
             onChange={(e) =>
               onChange(
                 "minEmployees",
-                e.target.value ? parseInt(e.target.value) : null
+                e.target.value ? parseInt(e.target.value) : null,
               )
             }
             containerClassName="mb-0"
@@ -69,12 +75,15 @@ export const EmployeeFilters = ({
           <span className="text-gray-400">~</span>
           <Input
             type="number"
-            placeholder={t("statistics.filters.patent.maxCount", "最大值")}
+            placeholder={t(
+              "admin.statistics.filters.patent.maxCount",
+              "최대 수량",
+            )}
             value={maxEmployees || ""}
             onChange={(e) =>
               onChange(
                 "maxEmployees",
-                e.target.value ? parseInt(e.target.value) : null
+                e.target.value ? parseInt(e.target.value) : null,
               )
             }
             containerClassName="mb-0"

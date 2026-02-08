@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Login Modal Component
  * 登录弹窗组件
  */
@@ -229,3 +229,7 @@ export function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegister }) {
 }
 
 export default LoginModal;
+
+
+
+

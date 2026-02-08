@@ -1,155 +1,184 @@
 {
-  "support": {
-    "title": "一站式支持",
-    "subtitle": "咨询、FAQ",
-    "notices": {
-      "title": "公告事项",
-      "description": "查看最新公告和重要通知",
-      "searchPlaceholder": "搜索公告..."
-    },
-    "inquiry": "1:1咨询",
-    "faq": "常见问题",
-    "faq.description": "常见问题和解答",
-    "faqCategory": {
-      "registration": "会员注册",
-      "general": "一般",
-      "performance": "业绩管理",
-      "project": "支援事业",
-      "profile": "企业资料",
-      "support": "咨询/支持",
-      "other": "其他"
-    },
-    "faqSearchPlaceholder": "搜索问题 or 答案...",
-    "noFaqResults": "没有找到匹配的问题",
-    "newInquiry": "新建咨询",
-    "inquiryHistory": "咨询历史",
-    "inquiryHistory.description": "1:1咨询记录及回复查看",
-    "notificationHistory": "通知历史",
-    "notificationHistory.description": "系统通知及公告查看",
-    "noInquiries": "暂无咨询记录",
-    "category": {
-      "general": "一般咨询",
-      "support": "技术支持",
-      "performance": "业绩咨询",
-      "project": "事业管理",
-      "member": "会员管理",
-      "label": "分类"
-    },
-    "categoryLabel": "咨询分类",
-    "selectCategory": "选择分类",
-    "categories": {
-      "project": "支援事业管理",
-      "performance": "业绩管理",
-      "account": "账户管理",
-      "technical": "技术支持",
-      "other": "其他"
-    },
-    "subject": "标题",
-    "subjectLabel": "咨询标题",
-    "subjectPlaceholder": "请输入咨询标题",
-    "content": "内容",
-    "contentLabel": "咨询内容",
-    "contentPlaceholder": "请输入详细内容",
-    "name": "姓名",
-    "namePlaceholder": "请输入姓名",
-    "email": "邮箱",
-    "emailPlaceholder": "请输入邮箱",
-    "phone": "手机号",
-    "phonePlaceholder": "请输入手机号",
-    "user": "用户",
-    "admin": "管理员",
-    "attachments": "附件",
-    "attachmentNumber": "附件 {{number}}",
-    "addAttachment": "添加附件",
-    "attachmentHint": "支持 PDF、Word、Excel、图片格式，单个文件最大 {{maxSize}}MB",
-    "maxFiles": "最多可上传3个文件",
-    "maxFilesLabel": "最多3个",
-    "maxAttachmentsReached": "最多只能上传{{max}}个附件",
-    "uploadFailed": "文件上传失败，请重试",
-    "submitFailed": "提交失败，请重试",
-    "noContent": "无内容",
-    "status": {
-      "pending": "待回复",
-      "answered": "已回复",
-      "replied": "已回复",
-      "open": "进行中",
-      "resolved": "已解决",
-      "closed": "已关闭"
-    },
-    "createdDate": "创建时间",
-    "lastReply": "最近回复",
-    "answeredDate": "回复时间",
-    "views": "浏览量",
-    "viewsLabel": "次浏览",
-    "fillAllFields": "请填写所有必填字段",
-    "inquiryIdMissing": "咨询ID缺失",
-    "consultationIdMissing": "咨询ID缺失",
-    "notFound": "咨询记录不存在",
-    "loadFailed": "加载咨询详情失败",
-    "pendingNotice": "您的咨询正在处理中，我们会尽快回复。",
-    "backToHistory": "返回列表",
-    "companyName": "企业名称",
-    "searchPlaceholder": "搜索咨询标题...",
-    "noMatchingInquiries": "没有匹配的咨询记录",
-    "statusLabel": "状态",
-    "createFirstInquiry": "创建第一个咨询",
-    "inquiryDetail": "咨询详情",
-    "hasAttachments": "有附件",
-    "fileCount": "{{count}}个文件",
-    "threadDescription": "查看咨询详情和管理员回复",
-    "lastMessage": "最后消息",
-    "messageCount": "消息数",
-    "noMessages": "暂无消息",
-    "reply": "回复",
-    "replyContent": "回复内容",
-    "replyPlaceholder": "请输入您的回复...",
-    "sendReply": "发送回复",
-    "replyFailed": "回复失败，请重试",
-    "attachFile": "附加文件",
-    "submitSuccess": "咨询提交成功",
-    "writeComment": "写评论...",
-    "comment": "评论",
-    "like": "点赞",
-    "replyToThread": "回复此咨询",
-    "read": "已读",
-    "readStatus": "阅读状态",
-    "searchNotifications": "搜索通知...",
-    "sender": "发送者",
-    "goToPage": "前往页面",
-    "notifications": {
-      "performance": {
-        "review": {
-          "subject": "[实绩管理] {{periodZh}} 实绩审查结果",
-          "content": "{{periodZh}} 实绩已{{statusZh}}。",
-          "contentWithComments": "{{periodZh}} 实绩已{{statusZh}}。\n\n管理员意见: {{comments}}"
-        },
-        "submission": {
-          "subject": "[实绩管理] 新实绩提交",
-          "content": "{{companyName}}提交了{{year}}年第{{quarter}}季度实绩。"
-        }
+  "member": {
+    "support": {
+      "title": "一站式支持",
+      "subtitle": "咨询、FAQ",
+      "notices": {
+        "title": "公告事项",
+        "description": "查看最新公告和重要通知",
+        "searchPlaceholder": "搜索公告..."
       },
-      "member": {
-        "registration": {
-          "subject": "[会员管理] 新会员注册申请",
-          "content": "{{company_name}} (营业执照号: {{business_number}})申请了会员注册。\n邮箱: {{email}}"
-        },
-        "approved": {
-          "subject": "[会员管理] 会员注册批准",
-          "content": "{{company_name}}的会员注册已批准。现在可以使用所有服务。"
-        },
-        "rejected": {
-          "subject": "[会员管理] 会员注册驳回",
-          "content": "{{company_name}}的会员注册已驳回。{{#reason}}\n\n原因: {{reason}}{{/reason}}"
-        }
+      "inquiry": "1:1咨询",
+      "inquiryDescription": "创建1:1咨询并查看回复",
+      "faq": "常见问题",
+      "faqDescription": "常见问题和解答",
+      "faqCategory": {
+        "registration": "会员注册",
+        "general": "一般",
+        "performance": "业绩管理",
+        "project": "支援事业",
+        "profile": "企业资料",
+        "support": "咨询/支持",
+        "other": "其他"
       },
-      "project": {
-        "application": {
-          "subject": "[项目管理] 新项目申请",
-          "content": "{{company_name}}的{{applicant_name}}申请了'{{project_title}}'项目。"
+      "faqSearchPlaceholder": "搜索问题 or 答案...",
+      "noFaqResults": "没有找到匹配的问题",
+      "newInquiry": "新建咨询",
+      "inquiryHistory": "咨询历史",
+      "inquiryHistoryDetails": {
+        "title": "咨询历史",
+        "description": "1:1咨询记录及回复查看"
+      },
+      "notificationHistory": "通知历史",
+      "notificationHistoryDetails": {
+        "title": "通知历史",
+        "description": "系统通知及公告查看"
+      },
+      "notificationHistoryDescription": "系统通知及公告查看",
+      "noInquiries": "暂无咨询记录",
+      "category": {
+        "general": "一般咨询",
+        "support": "技术支持",
+        "technical": "技术支持",
+        "performance": "业绩咨询",
+        "project": "事业管理",
+        "member": "会员管理",
+        "account": "账户管理",
+        "other": "其他",
+        "label": "分类"
+      },
+      "categoryLabel": "咨询分类",
+      "selectCategory": "选择分类",
+      "categories": {
+        "project": "支援事业管理",
+        "performance": "业绩管理",
+        "account": "账户管理",
+        "technical": "技术支持",
+        "other": "其他"
+      },
+      "subject": "标题",
+      "subjectLabel": "咨询标题",
+      "subjectPlaceholder": "请输入咨询标题",
+      "content": "内容",
+      "contentLabel": "咨询内容",
+      "contentPlaceholder": "请输入详细内容",
+      "name": "姓名",
+      "namePlaceholder": "请输入姓名",
+      "email": "邮箱",
+      "emailPlaceholder": "请输入邮箱",
+      "phone": "手机号",
+      "phonePlaceholder": "请输入手机号",
+      "user": "用户",
+      "admin": "管理员",
+      "attachments": "附件",
+      "attachmentNumber": "附件 {{number}}",
+      "addAttachment": "添加附件",
+      "attachmentHint": "支持 PDF、Word、Excel、图片格式，单个文件最大 {{maxSize}}MB",
+      "maxFiles": "最多可上传3个文件",
+      "maxFilesLabel": "最多3个",
+      "maxAttachmentsReached": "最多只能上传{{max}}个附件",
+      "uploadFailed": "文件上传失败，请重试",
+      "submitFailed": "提交失败，请重试",
+      "noContent": "无内容",
+      "status": {
+        "pending": "待回复",
+        "answered": "已回复",
+        "replied": "已回复",
+        "open": "进行中",
+        "resolved": "已解决",
+        "closed": "已关闭"
+      },
+      "createdDate": "创建时间",
+      "lastReply": "最近回复",
+      "answeredDate": "回复时间",
+      "views": "浏览量",
+      "viewsLabel": "次浏览",
+      "fillAllFields": "请填写所有必填字段",
+      "inquiryIdMissing": "咨询ID缺失",
+      "consultationIdMissing": "咨询ID缺失",
+      "notFound": "咨询记录不存在",
+      "loadFailed": "加载咨询详情失败",
+      "pendingNotice": "您的咨询正在处理中，我们会尽快回复。",
+      "backToHistory": "返回列表",
+      "companyName": "企业名称",
+      "searchPlaceholder": "搜索咨询标题...",
+      "noMatchingInquiries": "没有匹配的咨询记录",
+      "statusLabel": "状态",
+      "createFirstInquiry": "创建第一个咨询",
+      "inquiryDetail": "咨询详情",
+      "hasAttachments": "有附件",
+      "fileCount": "{{count}}个文件",
+      "threadDescription": "查看咨询详情和管理员回复",
+      "lastMessage": "最后消息",
+      "messageCount": "消息数",
+      "noMessages": "暂无消息",
+      "reply": "回复",
+      "replyContent": "回复内容",
+      "replyPlaceholder": "请输入您的回复...",
+      "sendReply": "发送回复",
+      "replyFailed": "回复失败，请重试",
+      "attachFile": "附加文件",
+      "submitSuccess": "咨询提交成功",
+      "writeComment": "写评论...",
+      "comment": "评论",
+      "like": "点赞",
+      "replyToThread": "回复此咨询",
+      "read": "已读",
+      "readStatus": "阅读状态",
+      "searchNotifications": "搜索通知...",
+      "sender": "发送者",
+      "goToPage": "前往页面",
+      "notifications": {
+        "performance": {
+          "subject": "实绩管理通知",
+          "newSubmission": "新实绩提交",
+          "newSubmissionContent": "{{companyName}}提交了{{period}}实绩。",
+          "approved": "实绩已批准",
+          "approvedContent": "{{period}}实绩已批准。",
+          "revisionRequested": "实绩需补充",
+          "revisionRequestedContent": "{{period}}实绩需要补充。管理员意见: {{commentsZh}}",
+          "rejected": "实绩已拒绝",
+          "rejectedContent": "{{period}}实绩已被拒绝。原因: {{commentsZh}}",
+          "submitted": "实绩已提交",
+          "submittedContent": "{{period}}实绩已提交。",
+          "reviewCancelled": "审查已取消，回到提交状态。",
+          "review": {
+            "subject": "[实绩管理] {{periodZh}} 实绩审查结果",
+            "content": "{{periodZh}} 实绩已{{statusZh}}。",
+            "contentWithComments": "{{periodZh}} 实绩已{{statusZh}}。\n\n管理员意见: {{commentsZh}}"
+          },
+          "submission": {
+            "subject": "[实绩管理] 新实绩提交",
+            "content": "{{companyName}}提交了{{year}}年第{{quarter}}季度实绩。"
+          }
         },
-        "result": {
-          "subject": "[项目管理] 项目申请结果",
-          "content": "'{{project_title}}'项目申请已{{statusZh}}。"
+        "member": {
+          "subject": "会员管理通知",
+          "newRegistration": "新会员注册",
+          "newRegistrationContent": "{{companyName}} (营业执照号: {{businessNumber}}, 邮箱: {{email}}) 申请了会员注册。",
+          "approved": "会员注册批准",
+          "approvedContent": "{{companyName}}的会员注册已批准。",
+          "rejected": "会员注册拒绝",
+          "rejectedContent": "{{companyName}}的会员注册已拒绝。原因: {{reason}}",
+          "registration": {
+            "subject": "[会员管理] 新会员注册申请",
+            "content": "{{companyName}} (营业执照号: {{businessNumber}})申请了会员注册。\n邮箱: {{email}}"
+          }
+        },
+        "project": {
+          "subject": "项目管理通知",
+          "newApplication": "新项目申请",
+          "newApplicationContent": "{{companyName}}的{{applicantName}}申请了{{projectTitle}}项目。",
+          "applicationResult": "项目申请结果",
+          "applicationResultContent": "{{projectTitle}}项目申请已{{status}}。",
+          "application": {
+            "subject": "[项目管理] 新项目申请",
+            "content": "{{companyName}}的{{applicantName}}申请了'{{projectTitle}}'项目。"
+          },
+          "result": {
+            "subject": "[项目管理] 项目申请结果",
+            "content": "'{{projectTitle}}'项目申请已{{statusZh}}。"
+          }
         }
       }
     }

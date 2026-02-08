@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Messages 模块服务 (管理员端)
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -217,3 +217,7 @@ class MessagesService {
 
 export const messagesService = new MessagesService();
 export default messagesService;
+
+
+
+

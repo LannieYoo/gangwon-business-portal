@@ -18,6 +18,10 @@
             "cancelReviewConfirm": "确定要取消吗？记录将返回待审核状态。",
             "cancelReviewSuccess": "取消成功",
             "cancelReviewFailed": "取消失败",
+            "export": {
+                "filename": "业绩报告",
+                "sheetName": "业绩数据"
+            },
             "exportExcel": "导出 Excel",
             "exportCsv": "导出 CSV",
             "exportSuccess": "导出成功",

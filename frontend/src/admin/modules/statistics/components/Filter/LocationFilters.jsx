@@ -17,7 +17,7 @@ export const LocationFilters = ({ region, onChange }) => {
     <Select
       value={region || ""}
       options={options}
-      placeholder={t("statistics.filters.location.selectLocation")}
+      placeholder={t("admin.statistics.filters.location.selectLocation")}
       containerClassName="mb-0"
       className="w-full sm:w-80 h-9"
       onChange={(e) => onChange("region", e.target.value || null)}

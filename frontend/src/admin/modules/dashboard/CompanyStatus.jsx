@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CompanyStatus Component - 企业现状
  * 显示总企业会员数、销售合计、雇佣合计、知识产权合计等统计信息
  */
@@ -154,19 +154,12 @@ export default function CompanyStatus() {
             </div>
           </div>
           <div className="flex items-center space-x-2 ml-4">
-            <Button 
-              onClick={() => handleExport('excel')} 
+            <Button
+              onClick={() => handleExport('excel')}
               variant="outline"
               disabled={loading}
             >
               {t('admin.dashboard.companyStatus.export', 'Excel 내보내기')}
-            </Button>
-            <Button 
-              onClick={() => handleExport('csv')} 
-              variant="outline"
-              disabled={loading}
-            >
-              {t('admin.dashboard.exportCsv', 'CSV 내보내기')}
             </Button>
           </div>
         </div>
@@ -303,4 +296,8 @@ export default function CompanyStatus() {
     </div>
   );
 }
+
+
+
+
 

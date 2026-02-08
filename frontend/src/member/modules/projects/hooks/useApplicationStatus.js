@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 申请状态 Hook
  *
  * 提供申请状态的翻译和样式映射。
@@ -16,47 +16,47 @@ export function useApplicationStatus() {
     (status) => {
       const statusMap = {
         [ApplicationStatus.PENDING]: {
-          label: t("projects.applicationRecords.status.pending", "等待受理"),
+          label: t("member.projects.applicationRecords.status.pending", "접수 대기"),
           variant: "warning",
           canCancel: true,
         },
         [ApplicationStatus.SUBMITTED]: {
-          label: t("projects.applicationRecords.status.submitted", "已受理"),
+          label: t("member.projects.applicationRecords.status.submitted", "접수 완료"),
           variant: "info",
           canCancel: true,
         },
         [ApplicationStatus.UNDER_REVIEW]: {
-          label: t("projects.applicationRecords.status.under_review", "审核中"),
+          label: t("member.projects.applicationRecords.status.under_review", "심사중"),
           variant: "primary",
           canCancel: true,
         },
         [ApplicationStatus.REVIEWING]: {
-          label: t("projects.applicationRecords.status.reviewing", "审核中"),
+          label: t("member.projects.applicationRecords.status.reviewing", "심사중"),
           variant: "primary",
           canCancel: true,
         },
         [ApplicationStatus.NEEDS_SUPPLEMENT]: {
           label: t(
             "projects.applicationRecords.status.needs_supplement",
-            "需补充资料",
+            "보완 필요",
           ),
           variant: "warning",
           needsSupplement: true,
           canCancel: false,
         },
         [ApplicationStatus.APPROVED]: {
-          label: t("projects.applicationRecords.status.approved", "已通过"),
+          label: t("member.projects.applicationRecords.status.approved", "승인"),
           variant: "success",
           canCancel: false,
         },
         [ApplicationStatus.REJECTED]: {
-          label: t("projects.applicationRecords.status.rejected", "已驳回"),
+          label: t("member.projects.applicationRecords.status.rejected", "거절"),
           variant: "danger",
           canCancel: false,
           showRejectionReason: true,
         },
         [ApplicationStatus.CANCELLED]: {
-          label: t("projects.applicationRecords.status.cancelled", "已取消"),
+          label: t("member.projects.applicationRecords.status.cancelled", "취소"),
           variant: "gray",
           canCancel: false,
         },

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 项目列表项组件
  *
  * 显示单个项目的概览信息，包括标题、描述、状态、关联企业（如有）和操作按钮。
@@ -76,8 +76,8 @@ export default function ProjectListItem({ project, onApply, onDetail }) {
           disabled={project.status !== ProjectStatus.ACTIVE}
         >
           {project.status === ProjectStatus.ACTIVE
-            ? t('projects.apply', '프로그램 신청')
-            : t('projects.notAvailable', '신청 불가')}
+            ? t('member.projects.apply', '프로그램 신청')
+            : t('member.projects.notAvailable', '신청 불가')}
         </Button>
       </div>
     </Card>

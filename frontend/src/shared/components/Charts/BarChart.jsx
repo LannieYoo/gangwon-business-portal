@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Bar Chart Component
  * 柱状图组件 - 用于显示分类数据对比
  */
@@ -140,4 +140,8 @@ export default function BarChart({
     />
   );
 }
+
+
+
+
 

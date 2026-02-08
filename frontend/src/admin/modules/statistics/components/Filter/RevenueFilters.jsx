@@ -45,7 +45,10 @@ export const RevenueFilters = ({
           value: opt.value,
           label: t(opt.labelKey),
         }))}
-        placeholder={t("statistics.filters.quantitive.revenueRange.all", "全部")}
+        placeholder={t(
+          "admin.statistics.filters.quantitive.revenueRange.all",
+          "전체",
+        )}
         onChange={(e) => handleRevenueRangeChange(e.target.value)}
         containerClassName="mb-0"
         className="w-56 h-9"
@@ -55,12 +58,15 @@ export const RevenueFilters = ({
         <div className="flex items-center gap-2 ml-4">
           <Input
             type="number"
-            placeholder={t("statistics.filters.investment.minAmount", "最小值")}
+            placeholder={t(
+              "admin.statistics.filters.investment.minAmount",
+              "최소 금액",
+            )}
             value={minRevenue || ""}
             onChange={(e) =>
               onChange(
                 "minRevenue",
-                e.target.value ? parseInt(e.target.value) : null
+                e.target.value ? parseInt(e.target.value) : null,
               )
             }
             containerClassName="mb-0"
@@ -69,12 +75,15 @@ export const RevenueFilters = ({
           <span className="text-gray-400">~</span>
           <Input
             type="number"
-            placeholder={t("statistics.filters.investment.maxAmount", "最大值")}
+            placeholder={t(
+              "admin.statistics.filters.investment.maxAmount",
+              "최대 금액",
+            )}
             value={maxRevenue || ""}
             onChange={(e) =>
               onChange(
                 "maxRevenue",
-                e.target.value ? parseInt(e.target.value) : null
+                e.target.value ? parseInt(e.target.value) : null,
               )
             }
             containerClassName="mb-0"

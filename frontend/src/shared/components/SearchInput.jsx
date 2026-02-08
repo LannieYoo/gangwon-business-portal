@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SearchInput Component
  * 统一的搜索输入框组件 - 支持防抖、全字段模糊搜索、国际化、统一样式
  */
@@ -239,3 +239,7 @@ export default function SearchInput({
 
 // 导出搜索函数供外部使用
 export { searchAllFields };
+
+
+
+

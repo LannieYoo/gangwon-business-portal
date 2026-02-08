@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+﻿import { useTranslation } from "react-i18next";
 
 export const RegisterStep3Contact = ({
   formData,
@@ -11,7 +11,7 @@ export const RegisterStep3Contact = ({
     <div className="space-y-5">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.email")} <span className="text-red-500">*</span>
+          {t("member.auth.email")} <span className="text-red-500">*</span>
         </label>
         <input
           type="email"
@@ -19,14 +19,14 @@ export const RegisterStep3Contact = ({
           value={formData.email}
           onChange={handleChange}
           autoComplete="email"
-          placeholder={t("auth.emailPlaceholder")}
+          placeholder={t("member.auth.emailPlaceholder")}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.phone")} <span className="text-red-500">*</span>
+          {t("member.auth.phone")} <span className="text-red-500">*</span>
         </label>
         <input
           type="tel"
@@ -37,12 +37,12 @@ export const RegisterStep3Contact = ({
           placeholder="010-1234-5678"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
         />
-        <p className="mt-1 text-xs text-gray-500">{t("auth.phoneHelp")}</p>
+        <p className="mt-1 text-xs text-gray-500">{t("member.auth.phoneHelp")}</p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.representativePhone")}
+          {t("member.auth.representativePhone")}
         </label>
         <input
           type="tel"
@@ -57,7 +57,7 @@ export const RegisterStep3Contact = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.contactPersonName")}
+          {t("member.auth.contactPersonName")}
         </label>
         <input
           type="text"
@@ -70,7 +70,7 @@ export const RegisterStep3Contact = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.contactPersonPhone")}
+          {t("member.auth.contactPersonPhone")}
         </label>
         <input
           type="tel"
@@ -85,7 +85,7 @@ export const RegisterStep3Contact = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.contactPersonDepartment")}
+          {t("member.auth.contactPersonDepartment")}
         </label>
         <input
           type="text"
@@ -98,7 +98,7 @@ export const RegisterStep3Contact = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("auth.contactPersonPosition")}
+          {t("member.auth.contactPersonPosition")}
         </label>
         <input
           type="text"
@@ -111,3 +111,7 @@ export const RegisterStep3Contact = ({
     </div>
   );
 };
+
+
+
+

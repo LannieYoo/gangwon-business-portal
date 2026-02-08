@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Government Support Form
  *
  * 政府支援记录表单部分。
@@ -45,11 +45,11 @@ const GovernmentSupportForm = ({
     <div className="space-y-4">
       <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg">
         <h3 className="text-md font-semibold m-0">
-          {t("performance.governmentSupport", "정부지원")}
+          {t("member.performance.governmentSupport", "정부지원")}
         </h3>
         <Button variant="secondary" size="small" onClick={handleAddField}>
           <PlusIcon className="w-4 h-4 mr-1" />
-          {t('performance.governmentSupportFields.add', '추가')}
+          {t('member.performance.governmentSupportFields.add', '추가')}
         </Button>
       </div>
 
@@ -104,7 +104,7 @@ const GovernmentSupportForm = ({
               }
             />
             <Input
-              label={`${t("performance.governmentSupportFields.supportAmount", "지원 금액")} (${t("performance.governmentSupportFields.supportAmountUnit", "천원")})`}
+              label={`${t("member.performance.governmentSupportFields.supportAmount", "지원 금액")} (${t("member.performance.governmentSupportFields.supportAmountUnit", "천원")})`}
               value={item.supportAmount}
               onChange={(e) =>
                 handleItemChange(index, "supportAmount", e.target.value)
@@ -123,7 +123,7 @@ const GovernmentSupportForm = ({
               }
             />
             <Input
-              label={t("performance.governmentSupportFields.endDate", "종료일")}
+              label={t("member.performance.governmentSupportFields.endDate", "종료일")}
               type="date"
               value={item.endDate}
               onChange={(e) =>

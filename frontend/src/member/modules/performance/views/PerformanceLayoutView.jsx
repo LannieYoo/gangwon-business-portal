@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Performance Layout View
  *
  * 成果管理模块布局容器。
@@ -18,19 +18,19 @@ const PerformanceLayoutView = () => {
   const submenuItems = [
     {
       key: "company-info",
-      label: t('performance.companyInfo.title', '기업 정보'),
+      label: t('member.performance.companyInfo.title', '기업 정보'),
       path: "/member/performance/company-info",
       isTab: true,
     },
     {
       key: "performance-input",
-      label: t('performance.input', '성과 입력'),
+      label: t('member.performance.input', '성과 입력'),
       path: "/member/performance/edit",
       isTab: true,
     },
     {
       key: "performance-query",
-      label: t('performance.query', '성과 조회'),
+      label: t('member.performance.query', '성과 조회'),
       path: "/member/performance/list",
       isTab: true,
     },

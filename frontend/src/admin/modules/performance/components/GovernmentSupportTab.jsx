@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Government Support Tab Component
  * 政府支持受惠历史标签页内容
  */
@@ -106,3 +106,7 @@ export default function GovernmentSupportTab({ record, currentLanguage, onDownlo
     </div>
   );
 }
+
+
+
+

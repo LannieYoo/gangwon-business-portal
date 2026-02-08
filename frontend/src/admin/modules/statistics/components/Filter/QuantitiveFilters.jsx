@@ -60,7 +60,7 @@ export const QuantitiveFilters = ({
       {/* 年营收区间 */}
       <div>
         <Select
-          label={t("statistics.filters.quantitive.revenue")}
+          label={t("admin.statistics.filters.quantitive.revenue")}
           value={revenueRange || "all"}
           options={REVENUE_RANGE_OPTIONS.map((opt) => ({
             value: opt.value,
@@ -75,12 +75,15 @@ export const QuantitiveFilters = ({
           <div className="flex items-center gap-2 mt-2 ml-4">
             <Input
               type="number"
-              placeholder={t("statistics.filters.investment.minAmount", "最小值")}
+              placeholder={t(
+                "admin.statistics.filters.investment.minAmount",
+                "최소 금액",
+              )}
               value={minRevenue || ""}
               onChange={(e) =>
                 onChange(
                   "minRevenue",
-                  e.target.value ? parseInt(e.target.value) : null
+                  e.target.value ? parseInt(e.target.value) : null,
                 )
               }
               containerClassName="mb-0"
@@ -89,12 +92,15 @@ export const QuantitiveFilters = ({
             <span className="text-gray-400">~</span>
             <Input
               type="number"
-              placeholder={t("statistics.filters.investment.maxAmount", "最大值")}
+              placeholder={t(
+                "admin.statistics.filters.investment.maxAmount",
+                "최대 금액",
+              )}
               value={maxRevenue || ""}
               onChange={(e) =>
                 onChange(
                   "maxRevenue",
-                  e.target.value ? parseInt(e.target.value) : null
+                  e.target.value ? parseInt(e.target.value) : null,
                 )
               }
               containerClassName="mb-0"
@@ -110,7 +116,7 @@ export const QuantitiveFilters = ({
       {/* 员工人数区间 */}
       <div>
         <Select
-          label={t("statistics.filters.quantitive.employees")}
+          label={t("admin.statistics.filters.quantitive.employees")}
           value={employeeRange || "all"}
           options={EMPLOYEE_RANGE_OPTIONS.map((opt) => ({
             value: opt.value,
@@ -125,12 +131,15 @@ export const QuantitiveFilters = ({
           <div className="flex items-center gap-2 mt-2 ml-4">
             <Input
               type="number"
-              placeholder={t("statistics.filters.patent.minCount", "最小值")}
+              placeholder={t(
+                "admin.statistics.filters.patent.minCount",
+                "최소 수량",
+              )}
               value={minEmployees || ""}
               onChange={(e) =>
                 onChange(
                   "minEmployees",
-                  e.target.value ? parseInt(e.target.value) : null
+                  e.target.value ? parseInt(e.target.value) : null,
                 )
               }
               containerClassName="mb-0"
@@ -139,12 +148,15 @@ export const QuantitiveFilters = ({
             <span className="text-gray-400">~</span>
             <Input
               type="number"
-              placeholder={t("statistics.filters.patent.maxCount", "最大值")}
+              placeholder={t(
+                "admin.statistics.filters.patent.maxCount",
+                "최대 수량",
+              )}
               value={maxEmployees || ""}
               onChange={(e) =>
                 onChange(
                   "maxEmployees",
-                  e.target.value ? parseInt(e.target.value) : null
+                  e.target.value ? parseInt(e.target.value) : null,
                 )
               }
               containerClassName="mb-0"

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Password Strength Component
  * 密码强度验证组件
  */
@@ -95,4 +95,8 @@ export function PasswordStrength({ password, showStrength = true }) {
 }
 
 export default PasswordStrength;
+
+
+
+
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Application Modal Component
  * 程序申请弹窗组件 - 可在列表和详情页面复用
  */
@@ -157,7 +157,7 @@ export default function ApplicationModal({
       setAttachments([...attachments, ...uploadedFiles]);
     } catch (error) {
       console.error('Upload error:', error);
-      const errorMsg = error?.message || t('fileAttachments.uploadError', '文件上传失败，请重试');
+      const errorMsg = error?.message || t('components.fileUpload.uploadError', '文件上传失败，请重试');
       setFormMessage(errorMsg);
     } finally {
       setUploading(false);
@@ -398,5 +398,9 @@ export default function ApplicationModal({
     </Modal>
   );
 }
+
+
+
+
 
 

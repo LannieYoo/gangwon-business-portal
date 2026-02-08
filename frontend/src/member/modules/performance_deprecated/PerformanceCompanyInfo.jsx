@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Performance Company Info - Member Portal
  */
 
@@ -480,28 +480,28 @@ export default function PerformanceCompanyInfo() {
 
   const regionOptions = useMemo(
     () => [
-      { value: "chuncheon", label: t("profile.regions.chuncheon", "춘천시") },
-      { value: "wonju", label: t("profile.regions.wonju", "원주시") },
-      { value: "gangneung", label: t("profile.regions.gangneung", "강릉시") },
-      { value: "donghae", label: t("profile.regions.donghae", "동해시") },
-      { value: "taebaek", label: t("profile.regions.taebaek", "태백시") },
-      { value: "sokcho", label: t("profile.regions.sokcho", "속초시") },
-      { value: "samcheok", label: t("profile.regions.samcheok", "삼척시") },
-      { value: "hongcheon", label: t("profile.regions.hongcheon", "홍천군") },
-      { value: "hoengseong", label: t("profile.regions.hoengseong", "횡성군") },
-      { value: "yeongwol", label: t("profile.regions.yeongwol", "영월군") },
+      { value: "chuncheon", label: t("enums.regions.chuncheon", "춘천시") },
+      { value: "wonju", label: t("enums.regions.wonju", "원주시") },
+      { value: "gangneung", label: t("enums.regions.gangneung", "강릉시") },
+      { value: "donghae", label: t("enums.regions.donghae", "동해시") },
+      { value: "taebaek", label: t("enums.regions.taebaek", "태백시") },
+      { value: "sokcho", label: t("enums.regions.sokcho", "속초시") },
+      { value: "samcheok", label: t("enums.regions.samcheok", "삼척시") },
+      { value: "hongcheon", label: t("enums.regions.hongcheon", "홍천군") },
+      { value: "hoengseong", label: t("enums.regions.hoengseong", "횡성군") },
+      { value: "yeongwol", label: t("enums.regions.yeongwol", "영월군") },
       {
         value: "pyeongchang",
-        label: t("profile.regions.pyeongchang", "평창군"),
+        label: t("enums.regions.pyeongchang", "평창군"),
       },
-      { value: "jeongseon", label: t("profile.regions.jeongseon", "정선군") },
-      { value: "cheorwon", label: t("profile.regions.cheorwon", "철원군") },
-      { value: "hwacheon", label: t("profile.regions.hwacheon", "화천군") },
-      { value: "yanggu", label: t("profile.regions.yanggu", "양구군") },
-      { value: "inje", label: t("profile.regions.inje", "인제군") },
-      { value: "goseong", label: t("profile.regions.goseong", "고성군") },
-      { value: "yangyang", label: t("profile.regions.yangyang", "양양군") },
-      { value: "other", label: t("profile.regions.other", "기타 지역") },
+      { value: "jeongseon", label: t("enums.regions.jeongseon", "정선군") },
+      { value: "cheorwon", label: t("enums.regions.cheorwon", "철원군") },
+      { value: "hwacheon", label: t("enums.regions.hwacheon", "화천군") },
+      { value: "yanggu", label: t("enums.regions.yanggu", "양구군") },
+      { value: "inje", label: t("enums.regions.inje", "인제군") },
+      { value: "goseong", label: t("enums.regions.goseong", "고성군") },
+      { value: "yangyang", label: t("enums.regions.yangyang", "양양군") },
+      { value: "other", label: t("enums.regions.other", "기타 지역") },
     ],
     [t, i18n.language],
   );
@@ -1482,3 +1482,7 @@ export default function PerformanceCompanyInfo() {
     </div>
   );
 }
+
+
+
+

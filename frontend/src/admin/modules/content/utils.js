@@ -1,8 +1,7 @@
-/**
+﻿/**
  * Content Management Utilities
  * 内容管理工具函数
  */
-
 
 /**
  * Create empty banner form
@@ -10,11 +9,11 @@
 export function createEmptyBannerForm() {
   return {
     id: null,
-    bannerType: '',
-    imageUrl: '',
-    linkUrl: '',
+    bannerType: "",
+    imageUrl: "",
+    linkUrl: "",
     isActive: true,
-    displayOrder: 0
+    displayOrder: 0,
   };
 }
 
@@ -24,10 +23,14 @@ export function createEmptyBannerForm() {
 export function validateBannerForm(form, t) {
   const errors = {};
   if (!form.bannerType?.trim()) {
-    errors.bannerType = t('validation.required', { field: t('admin.content.banners.form.fields.bannerType', '横幅类型') });
+    errors.bannerType = t("error.validation.required", {
+      field: t("admin.content.banners.form.fields.bannerType", "배너 유형"),
+    });
   }
   if (!form.imageUrl?.trim()) {
-    errors.imageUrl = t('validation.required', { field: t('admin.content.banners.form.fields.imageUrl', '图片URL') });
+    errors.imageUrl = t("error.validation.required", {
+      field: t("admin.content.banners.form.fields.imageUrl", "이미지 URL"),
+    });
   }
   return errors;
 }
@@ -38,9 +41,9 @@ export function validateBannerForm(form, t) {
 export function createEmptyNoticeForm() {
   return {
     id: null,
-    title: '',
-    contentHtml: '',
-    boardType: 'notice'
+    title: "",
+    contentHtml: "",
+    boardType: "notice",
   };
 }
 
@@ -50,10 +53,14 @@ export function createEmptyNoticeForm() {
 export function validateNoticeForm(form, t) {
   const errors = {};
   if (!form.title?.trim()) {
-    errors.title = t('validation.required', { field: t('admin.content.notices.form.fields.title', '标题') });
+    errors.title = t("error.validation.required", {
+      field: t("admin.content.notices.form.fields.title", "제목"),
+    });
   }
   if (!form.contentHtml?.trim()) {
-    errors.contentHtml = t('validation.required', { field: t('admin.content.notices.form.fields.contentHtml', '内容') });
+    errors.contentHtml = t("error.validation.required", {
+      field: t("admin.content.notices.form.fields.contentHtml", "내용"),
+    });
   }
   return errors;
 }
@@ -64,8 +71,8 @@ export function validateNoticeForm(form, t) {
 export function createEmptyNewsForm() {
   return {
     id: null,
-    title: '',
-    imageUrl: ''
+    title: "",
+    imageUrl: "",
   };
 }
 
@@ -75,11 +82,14 @@ export function createEmptyNewsForm() {
 export function validateNewsForm(form, t) {
   const errors = {};
   if (!form.title?.trim()) {
-    errors.title = t('validation.required', { field: t('admin.content.news.form.fields.title', '标题') });
+    errors.title = t("error.validation.required", {
+      field: t("admin.content.news.form.fields.title", "제목"),
+    });
   }
   if (!form.imageUrl?.trim()) {
-    errors.imageUrl = t('validation.required', { field: t('admin.content.news.form.fields.imageUrl', '图片URL') });
+    errors.imageUrl = t("error.validation.required", {
+      field: t("admin.content.news.form.fields.imageUrl", "이미지 URL"),
+    });
   }
   return errors;
 }
-

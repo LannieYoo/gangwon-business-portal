@@ -8,8 +8,13 @@ from typing import Optional
 from datetime import datetime, date
 from uuid import UUID
 
-# Region options - Gangwon Province cities and counties (supports Chinese and Korean)
+# Region options - Gangwon Province cities and counties
+# Supports English keys (for database storage) and translated values (Korean/Chinese)
 VALID_REGIONS = [
+    # English keys (standardized for database)
+    "chuncheon", "wonju", "gangneung", "donghae", "taebaek", "sokcho", "samcheok",
+    "hongcheon", "hoengseong", "yeongwol", "pyeongchang", "jeongseon", "cheorwon", "hwacheon",
+    "yanggu", "inje", "goseong", "yangyang", "other",
     # Korean
     "춘천시", "원주시", "강릉시", "동해시", "태백시", "속초시", "삼척시",
     "홍천군", "횡성군", "영월군", "평창군", "정선군", "철원군", "화천군",

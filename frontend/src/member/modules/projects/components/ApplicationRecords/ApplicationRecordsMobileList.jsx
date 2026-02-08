@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 申请记录移动端列表组件
  *
  * 负责在移动端视图下渲染申请记录列表，包含状态展示和操作按钮。
@@ -30,7 +30,7 @@ export default function ApplicationRecordsMobileList({
             <div className="space-y-2 text-sm text-gray-600 mb-4">
               <div className="flex justify-between">
                 <span>
-                  {t('projects.applicationRecords.applicationDate', '신청일')}
+                  {t('member.projects.applicationRecords.applicationDate', '신청일')}
                   :
                 </span>
                 <span>
@@ -41,7 +41,7 @@ export default function ApplicationRecordsMobileList({
               </div>
               <div className="flex justify-between">
                 <span>
-                  {t('projects.applicationRecords.processedDate', '처리일')}:
+                  {t('member.projects.applicationRecords.processedDate', '처리일')}:
                 </span>
                 <span>
                   {application.reviewedAt

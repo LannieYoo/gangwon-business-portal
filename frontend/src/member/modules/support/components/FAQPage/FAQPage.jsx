@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FAQ 页面组件 (内容组件)
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -55,10 +55,10 @@ export default function FAQPage(props) {
       <div className="w-full">
         <div className="mb-6 border-b border-gray-100 pb-4">
           <h1 className="text-2xl font-bold text-gray-900">
-            {t("support.faq", "FAQ")}
+            {t("member.support.faq", "FAQ")}
           </h1>
           <p className="text-gray-600 mt-2 text-sm">
-            {t('support.faq.description', '자주 묻는 질문과 답변')}
+            {t('member.support.faq.description', '자주 묻는 질문과 답변')}
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export default function FAQPage(props) {
               </div>
             ) : filteredFaqs.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                {t('support.noFaqResults', '일치하는 질문을 찾을 수 없습니다')}
+                {t('member.support.noFaqResults', '일치하는 질문을 찾을 수 없습니다')}
               </div>
             ) : (
               <div className="flex flex-col gap-3">

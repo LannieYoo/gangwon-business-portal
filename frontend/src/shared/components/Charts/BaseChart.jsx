@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Base Chart Component
  * 基础图表组件 - 封装 ECharts React 组件，提供统一的配置和样式
  */
@@ -90,4 +90,8 @@ export default function BaseChart({
     </div>
   );
 }
+
+
+
+
 

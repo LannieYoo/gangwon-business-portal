@@ -1,0 +1,58 @@
+{
+  "error": {
+    "network": {
+      "title": "네트워크 오류",
+      "message": "네트워크 연결에 문제가 발생했습니다."
+    },
+    "generic": {
+      "title": "오류 발생",
+      "message": "작업 중 오류가 발생했습니다."
+    },
+    "validation": {
+      "contentRequired": "상세 내용은 필수 입력 항목입니다",
+      "passwordMismatch": "비밀번호가 일치하지 않습니다",
+      "required": "{{field}}은(는) 필수 입력 항목입니다",
+      "passwordMinLength": "비밀번호는 최소 8자 이상이어야 합니다",
+      "invalidDateFormat": "날짜 형식이 올바르지 않습니다 (yyyy-mm-dd)",
+      "invalidPhoneFormat": "전화번호 형식이 올바르지 않습니다",
+      "phoneMinLength": "전화번호는 최소 10자 이상이어야 합니다",
+      "minLength": "최소 {{min}}자 이상 입력해주세요",
+      "maxLength": "최대 {{max}}자까지 입력 가능합니다",
+      "invalidFormat": "형식이 올바르지 않습니다"
+    },
+    "record": {
+      "notFound": "기록 ID가 존재하지 않아 상세 정보를 볼 수 없습니다",
+      "noData": "데이터가 없습니다",
+      "noDataHint": "데이터베이스에 테스트 데이터가 생성되었는지 확인하거나 페이지를 새로고침해 주세요",
+      "noMatchingRecords": "현재 필터 조건과 일치하는 기록이 없습니다"
+    },
+    "boundary": {
+      "title": "오류가 발생했습니다",
+      "message": "죄송합니다. 애플리케이션에 예기치 않은 오류가 발생했습니다. 다시 시도하거나 페이지를 새로고침해 주세요.",
+      "detailsTitle": "오류 상세 (개발 환경 전용)",
+      "retryButton": "다시 시도",
+      "retryWithCount": "다시 시도 ({{count}}/{{max}})",
+      "maxRetriesReached": "최대 재시도 횟수 도달",
+      "reloadButton": "페이지 새로고침",
+      "retryCount": "{{count}}회 재시도함"
+    },
+    "page403": {
+      "title": "접근 권한이 없습니다",
+      "message": "이 페이지에 접근할 수 있는 권한이 없습니다.",
+      "homeButton": "홈으로 돌아가기",
+      "adminHomeButton": "관리자 홈으로 돌아가기",
+      "adminLoginButton": "관리자 로그인",
+      "memberLoginButton": "회원 로그인"
+    },
+    "page404": {
+      "title": "페이지를 찾을 수 없습니다",
+      "message": "요청하신 페이지가 존재하지 않거나 이동되었습니다.",
+      "homeButton": "홈으로 돌아가기",
+      "adminHomeButton": "관리자 홈으로 돌아가기"
+    },
+    "appInit": {
+      "title": "응용 프로그램 초기화 실패",
+      "message": "페이지를 새로 고치고 다시 시도하십시오."
+    }
+  }
+}

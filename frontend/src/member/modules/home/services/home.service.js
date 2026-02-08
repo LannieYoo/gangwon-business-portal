@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Home 模块 API 服务
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -41,3 +41,7 @@ export const homeService = {
 };
 
 export default homeService;
+
+
+
+

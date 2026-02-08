@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 咨询附件列表组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -28,7 +28,7 @@ export default function InquiryAttachmentList({
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-2">
-        {t("support.attachments")}
+        {t("member.support.attachments")}
         <span className="font-normal text-gray-500 ml-2">
           ({attachments.length}/{MAX_ATTACHMENTS})
         </span>
@@ -72,11 +72,11 @@ export default function InquiryAttachmentList({
             onFilesSelected={handleFilesSelected}
             multiple
             loading={isUploading}
-            label={t("support.addAttachment")}
+            label={t("member.support.addAttachment")}
             loadingLabel={t("common.uploading")}
           />
           <p className="text-xs text-gray-500 mt-2">
-            {t("support.attachmentHint")}
+            {t("member.support.attachmentHint")}
           </p>
         </div>
       )}

@@ -11,7 +11,7 @@ export const FilterSummary = ({ summary, onRemove }) => {
     return (
       <div className="flex flex-wrap items-center gap-2 px-1">
         <span className="text-xs text-gray-400">
-          {t("statistics.filters.noFilters", "未选择筛选条件")}
+          {t("admin.statistics.filters.noFilters", "선택된 필터 없음")}
         </span>
       </div>
     );
@@ -20,7 +20,7 @@ export const FilterSummary = ({ summary, onRemove }) => {
   return (
     <div className="flex flex-wrap items-center gap-2 px-1">
       <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mr-1 flex-shrink-0">
-        {t("statistics.filters.title")}:
+        {t("admin.statistics.filters.title")}:
       </span>
       {summary.map((item, index) => (
         <span
@@ -33,7 +33,10 @@ export const FilterSummary = ({ summary, onRemove }) => {
               type="button"
               onClick={() => onRemove(item.filterKey, item.value)}
               className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full hover:bg-blue-200 transition-colors"
-              aria-label="删除筛选条件"
+              aria-label={t(
+                "admin.statistics.filters.removeFilter",
+                "필터 삭제",
+              )}
             >
               <svg
                 className="w-2.5 h-2.5"

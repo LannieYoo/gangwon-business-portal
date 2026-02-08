@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 项目详情错误态
  *
  * 遵循 dev-frontend_patterns skill 规范。

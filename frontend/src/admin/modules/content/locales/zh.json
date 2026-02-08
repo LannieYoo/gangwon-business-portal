@@ -29,7 +29,9 @@
             "mobileImage": "移动端图片",
             "mobileImageHint": "推荐: 1080 x 1350 (4:5), 最小: 750 x 938",
             "url": "链接URL",
-            "urlPlaceholder": "https://example.com"
+            "urlPlaceholder": "https://example.com",
+            "bannerType": "横幅类型",
+            "imageUrl": "图片URL"
           }
         },
         "actions": {
@@ -247,16 +249,5 @@
         }
       }
     }
-  },
-  "validation": {
-    "required": "请输入{{field}}",
-    "passwordMismatch": "密码不匹配",
-    "passwordMinLength": "密码至少需要8个字符",
-    "invalidDateFormat": "日期格式不正确",
-    "invalidPhoneFormat": "电话号码格式不正确",
-    "phoneMinLength": "电话号码至少需要10个字符",
-    "minLength": "至少需要{{min}}个字符",
-    "maxLength": "最多允许{{max}}个字符",
-    "invalidFormat": "格式不正确"
   }
 }

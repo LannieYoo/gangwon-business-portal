@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Support Page - Member Portal
  * 支持页面容器组件（默认重定向到 FAQ 页面）
  */
@@ -16,3 +16,7 @@ export default function Support() {
 
   return null;
 }
+
+
+
+

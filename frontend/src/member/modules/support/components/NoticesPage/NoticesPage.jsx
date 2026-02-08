@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 公告事项列表页面组件 (内容组件)
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -8,7 +8,14 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { PageContainer } from "@member/layouts";
 import { Card, Loading, Badge } from "@shared/components";
-import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from "@shared/components/Table";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableCell,
+} from "@shared/components/Table";
 
 import NoticesFilter from "./NoticesFilter";
 
@@ -34,15 +41,13 @@ export default function NoticesPage({
     return {
       variant: notice.important ? "danger" : "gray",
       text: notice.important
-        ? t('home.notices.important', '중요')
-        : t('home.notices.normal', '일반'),
+        ? t("member.support.notices.important", "중요")
+        : t("member.support.notices.normal", "일반"),
     };
   };
 
   const filterColumns = useMemo(
-    () => [
-      { key: "title", render: (value) => value || "" },
-    ],
+    () => [{ key: "title", render: (value) => value || "" }],
     [],
   );
 
@@ -51,10 +56,13 @@ export default function NoticesPage({
       <div className="w-full">
         <div className="mb-6 border-b border-gray-100 pb-4">
           <h1 className="text-2xl font-bold text-gray-900">
-            {t("home.notices.title")}
+            {t("member.support.notices.title")}
           </h1>
           <p className="text-gray-600 mt-2 text-sm">
-            {t('support.notices.description', '최신 공지사항 및 중요 알림 확인')}
+            {t(
+              "member.support.notices.description",
+              "최신 공지사항 및 중요 알림 확인",
+            )}
           </p>
         </div>
 
@@ -80,12 +88,14 @@ export default function NoticesPage({
                   onClick={loadNotices}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
-                  {t('common.retry', '다시 시도')}
+                  {t("common.retry", "다시 시도")}
                 </button>
               </div>
             ) : notices.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                <p className="m-0">{t('home.notices.empty', '공고가 없습니다')}</p>
+                <p className="m-0">
+                  {t("member.support.notices.empty", "공고가 없습니다")}
+                </p>
               </div>
             ) : (
               <>
@@ -95,9 +105,13 @@ export default function NoticesPage({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableHeader className="w-24">{t('common.type', '구분')}</TableHeader>
-                      <TableHeader>{t('common.title', '제목')}</TableHeader>
-                      <TableHeader className="w-40">{t('common.date', '날짜')}</TableHeader>
+                      <TableHeader className="w-24">
+                        {t("common.type", "구분")}
+                      </TableHeader>
+                      <TableHeader>{t("common.title", "제목")}</TableHeader>
+                      <TableHeader className="w-40">
+                        {t("common.date", "날짜")}
+                      </TableHeader>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -110,10 +124,16 @@ export default function NoticesPage({
                           className="cursor-pointer hover:bg-gray-50"
                         >
                           <TableCell>
-                            <Badge variant={badgeInfo.variant}>{badgeInfo.text}</Badge>
+                            <Badge variant={badgeInfo.variant}>
+                              {badgeInfo.text}
+                            </Badge>
                           </TableCell>
-                          <TableCell className="font-medium">{notice.title}</TableCell>
-                          <TableCell className="text-gray-500">{notice.date}</TableCell>
+                          <TableCell className="font-medium">
+                            {notice.title}
+                          </TableCell>
+                          <TableCell className="text-gray-500">
+                            {notice.date}
+                          </TableCell>
                         </TableRow>
                       );
                     })}

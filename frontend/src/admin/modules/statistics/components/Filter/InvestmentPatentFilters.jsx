@@ -15,10 +15,10 @@ export const InvestmentPatentFilters = ({
       <Select
         value={hasInvestment === null ? "" : hasInvestment ? "yes" : "no"}
         options={[
-          { value: "yes", label: t("statistics.filters.investment.yes") },
-          { value: "no", label: t("statistics.filters.investment.no") },
+          { value: "yes", label: t("admin.statistics.filters.investment.yes") },
+          { value: "no", label: t("admin.statistics.filters.investment.no") },
         ]}
-        placeholder={t("statistics.filters.investment.status")}
+        placeholder={t("admin.statistics.filters.investment.status")}
         containerClassName="mb-0"
         className="h-9"
         onChange={(e) => {
@@ -27,7 +27,7 @@ export const InvestmentPatentFilters = ({
         }}
       />
       <Select
-        placeholder={t("statistics.filters.patent.countRange")}
+        placeholder={t("admin.statistics.filters.patent.countRange")}
         options={PATENT_RANGES_OPTIONS.map((r) => ({
           value: r.value,
           label: t(r.labelKey),

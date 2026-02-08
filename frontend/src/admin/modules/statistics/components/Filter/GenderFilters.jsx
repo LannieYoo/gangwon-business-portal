@@ -8,9 +8,15 @@ export const GenderFilters = ({ gender, onChange }) => {
   const { t } = useTranslation();
 
   const options = [
-    { value: "", label: t("statistics.filters.all", "全部") },
-    { value: "male", label: t("statistics.filters.representative.male", "男") },
-    { value: "female", label: t("statistics.filters.representative.female", "女") },
+    { value: "", label: t("admin.statistics.filters.all", "전체") },
+    {
+      value: "male",
+      label: t("admin.statistics.filters.representative.male", "남"),
+    },
+    {
+      value: "female",
+      label: t("admin.statistics.filters.representative.female", "여"),
+    },
   ];
 
   return (

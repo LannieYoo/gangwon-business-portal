@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Company Investment Status
  *
  * 企业投资状态部分。
@@ -27,7 +27,7 @@ const CompanyInvestmentStatus = ({ data, isEditing, onChange }) => {
     <Card className="shadow-sm p-0">
       <div className="flex items-center gap-3 border-b border-gray-100 p-6 sm:p-8">
         <h2 className="text-xl font-semibold text-gray-900 m-0">
-          {t('performance.companyInfo.sections.investmentStatus', '투자 정보')}
+          {t('member.performance.companyInfo.sections.investmentStatus', '투자 정보')}
         </h2>
       </div>
       <div className="p-6 sm:p-8 space-y-6">
@@ -35,7 +35,7 @@ const CompanyInvestmentStatus = ({ data, isEditing, onChange }) => {
           <Select
             label={t(
               "performance.companyInfo.fields.hasInvestment",
-              "是否有投资",
+              "투자 유치 여부",
             )}
             value={status.hasInvestment}
             onChange={(e) =>
@@ -49,7 +49,7 @@ const CompanyInvestmentStatus = ({ data, isEditing, onChange }) => {
               <Input
                 label={t(
                   "performance.companyInfo.fields.investmentAmount",
-                  "投资金额",
+                  "투자 금액 (백만원)",
                 )}
                 value={status.amount}
                 onChange={(e) => onChange("amount", e.target.value)}
@@ -59,7 +59,7 @@ const CompanyInvestmentStatus = ({ data, isEditing, onChange }) => {
               <Input
                 label={t(
                   "performance.companyInfo.fields.investmentInstitution",
-                  "投资机构",
+                  "투자 기관",
                 )}
                 value={status.institution}
                 onChange={(e) => onChange("institution", e.target.value)}

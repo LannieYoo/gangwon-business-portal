@@ -1,5 +1,6 @@
 {
-  "projects": {
+  "member": {
+    "projects": {
     "title": "事业公告",
     "subtitle": "查看支持支援事业公告并申请",
     "tabs": {
@@ -216,6 +217,32 @@
       "other": {
         "knu_tenant": "KNU入驻企业"
       }
+    }
+  }
+  },
+  "projects": {
+    "application": {
+      "form": {
+        "applicantNamePlaceholder": "请输入负责人姓名",
+        "applicantPhonePlaceholder": "请输入电话号码",
+        "reasonPlaceholder": "请详细说明需要传达的内容（至少10个字符）"
+      }
+    },
+    "applicationRecords": {
+      "searchPlaceholder": "按支援事业名称搜索",
+      "cancelConfirm": {
+        "title": "撤销申请",
+        "message": "确定要撤销此申请吗？",
+        "warning": "撤销后无法恢复。",
+        "confirm": "确认撤销",
+        "cancel": "返回"
+      },
+      "rejectionReason": {
+        "title": "拒绝原因",
+        "noReason": "未提供拒绝原因。",
+        "close": "关闭"
+      },
+      "uploadHint": "支持 PDF, DOC, XLS 格式，最大 {{maxSize}}MB"
     }
   }
 }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 系统介绍 Hook
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -23,21 +23,23 @@ export function useSystemInfo() {
     return "";
   }, []);
 
-  const { data: htmlContent, loading, error: apiError } = useApiCache(
-    fetchSystemInfo,
-    `system-info-${i18n.language}`,
-    {
-      cacheDuration: 10 * 60 * 1000, // 10分钟缓存（系统信息很少更新）
-      enabled: true,
-      deps: [i18n.language]
-    }
-  );
+  const {
+    data: htmlContent,
+    loading,
+    error: apiError,
+  } = useApiCache(fetchSystemInfo, `system-info-${i18n.language}`, {
+    cacheDuration: 10 * 60 * 1000, // 10分钟缓存（系统信息很少更新）
+    enabled: true,
+    deps: [i18n.language],
+  });
 
-  const error = apiError ? t("about.fetchError", "Failed to fetch content") : null;
+  const error = apiError
+    ? t("member.about.fetchError", "Failed to fetch content")
+    : null;
 
-  return { 
-    htmlContent: htmlContent || "", 
-    loading, 
-    error 
+  return {
+    htmlContent: htmlContent || "",
+    loading,
+    error,
   };
 }

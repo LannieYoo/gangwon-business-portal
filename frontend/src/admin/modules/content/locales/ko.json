@@ -29,7 +29,9 @@
             "mobileImage": "모바일 이미지",
             "mobileImageHint": "권장: 1080 x 1350 (4:5), 최소: 750 x 938",
             "url": "링크 URL",
-            "urlPlaceholder": "https://example.com"
+            "urlPlaceholder": "https://example.com",
+            "bannerType": "배너 유형",
+            "imageUrl": "이미지 URL"
           }
         },
         "actions": {
@@ -116,7 +118,7 @@
           "newTitle": "새 공지사항",
           "fields": {
             "title": "제목",
-            "contentHtml": "내容",
+            "contentHtml": "내용",
             "contentHtmlPlaceholder": "공지사항 내용을 입력하세요...",
             "attachments": "첨부파일",
             "boardType": "공지 유형",
@@ -247,16 +249,5 @@
         }
       }
     }
-  },
-  "validation": {
-    "required": "{{field}}은(는) 필수 입력 항목입니다",
-    "passwordMismatch": "비밀번호가 일치하지 않습니다",
-    "passwordMinLength": "비밀번호는 최소 8자 이상이어야 합니다",
-    "invalidDateFormat": "날짜 형식이 올바르지 않습니다 (yyyy-mm-dd)",
-    "invalidPhoneFormat": "전화번호 형식이 올바르지 않습니다",
-    "phoneMinLength": "전화번호는 최소 10자 이상이어야 합니다",
-    "minLength": "최소 {{min}}자 이상 입력해주세요",
-    "maxLength": "최대 {{max}}자까지 입력 가능합니다",
-    "invalidFormat": "형식이 올바르지 않습니다"
   }
 }

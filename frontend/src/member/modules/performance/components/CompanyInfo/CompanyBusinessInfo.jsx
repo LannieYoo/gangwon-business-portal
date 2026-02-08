@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Company Business Info
  *
  * 企业经营信息部分。
@@ -8,6 +8,7 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Input, Select, Badge } from "@shared/components";
+import { useEnumTranslation } from "@shared/hooks";
 import {
   STARTUP_TYPE_KEYS,
   STARTUP_STAGE_KEYS,
@@ -18,7 +19,6 @@ import {
   getMainIndustryKsicCodesByMajor,
   GANGWON_FUTURE_INDUSTRIES,
   FUTURE_TECHNOLOGIES,
-  translateOptions,
 } from "../../enum";
 
 const CompanyBusinessInfo = ({
@@ -29,49 +29,64 @@ const CompanyBusinessInfo = ({
   onParticipationChange,
 }) => {
   const { t, i18n } = useTranslation();
+  const {
+    getStartupTypeOptions,
+    getStartupStageOptions,
+    getKsicMajorOptions,
+    getKsicSubOptions,
+    getBusinessFieldOptions,
+    getMainIndustryKsicOptions,
+    getMainIndustryKsicCodesOptions,
+    getGangwonIndustryOptions,
+    getFutureTechOptions,
+  } = useEnumTranslation();
 
-  // Options
+  // Options using useEnumTranslation hook
   const startupTypeOptions = useMemo(
-    () => translateOptions(STARTUP_TYPE_KEYS, t),
-    [t, i18n.language],
+    () => getStartupTypeOptions(STARTUP_TYPE_KEYS),
+    [getStartupTypeOptions, i18n.language],
   );
   const startupStageOptions = useMemo(
-    () => translateOptions(STARTUP_STAGE_KEYS, t),
-    [t, i18n.language],
+    () => getStartupStageOptions(STARTUP_STAGE_KEYS),
+    [getStartupStageOptions, i18n.language],
   );
   const ksicMajorOptions = useMemo(
-    () => translateOptions(KSIC_MAJOR_CATEGORY_KEYS, t),
-    [t, i18n.language],
+    () => getKsicMajorOptions(KSIC_MAJOR_CATEGORY_KEYS),
+    [getKsicMajorOptions, i18n.language],
   );
   const ksicSubOptions = useMemo(() => {
     const subKeys = getSubCategoryKeysByMajor(data.ksicMajor);
-    return translateOptions(subKeys, t);
-  }, [data.ksicMajor, t, i18n.language]);
+    return getKsicSubOptions(subKeys);
+  }, [data.ksicMajor, getKsicSubOptions, i18n.language]);
 
   const mainIndustryKsicMajorOptions = useMemo(
-    () => translateOptions(MAIN_INDUSTRY_KSIC_MAJOR_KEYS, t),
-    [t, i18n.language],
+    () => getMainIndustryKsicOptions(MAIN_INDUSTRY_KSIC_MAJOR_KEYS),
+    [getMainIndustryKsicOptions, i18n.language],
   );
   const mainIndustryKsicCodeOptions = useMemo(() => {
     const codeKeys = getMainIndustryKsicCodesByMajor(
       data.mainIndustryKsicMajor,
     );
-    return translateOptions(codeKeys, t);
-  }, [data.mainIndustryKsicMajor, t, i18n.language]);
+    return getMainIndustryKsicCodesOptions(codeKeys);
+  }, [
+    data.mainIndustryKsicMajor,
+    getMainIndustryKsicCodesOptions,
+    i18n.language,
+  ]);
 
   const businessFieldOptions = useMemo(
-    () => translateOptions(BUSINESS_FIELD_KEYS, t),
-    [t, i18n.language],
+    () => getBusinessFieldOptions(BUSINESS_FIELD_KEYS),
+    [getBusinessFieldOptions, i18n.language],
   );
 
   const gangwonIndustryOptions = useMemo(
-    () => translateOptions(GANGWON_FUTURE_INDUSTRIES, t),
-    [t, i18n.language],
+    () => getGangwonIndustryOptions(GANGWON_FUTURE_INDUSTRIES),
+    [getGangwonIndustryOptions, i18n.language],
   );
 
   const futureTechOptions = useMemo(
-    () => translateOptions(FUTURE_TECHNOLOGIES, t),
-    [t, i18n.language],
+    () => getFutureTechOptions(FUTURE_TECHNOLOGIES),
+    [getFutureTechOptions, i18n.language],
   );
 
   const cooperationFieldOptions = [
@@ -126,14 +141,20 @@ const CompanyBusinessInfo = ({
     <Card className="shadow-sm p-0">
       <div className="flex items-center gap-3 border-b border-gray-100 p-6 sm:p-8">
         <h2 className="text-xl font-semibold text-gray-900 m-0">
-          {t('performance.companyInfo.sections.businessInfo', '사업 정보')}
+          {t(
+            "member.performance.companyInfo.sections.businessInfo",
+            "사업 정보",
+          )}
         </h2>
       </div>
       <div className="p-6 sm:p-8 space-y-8">
         {/* Industry Classification */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Select
-            label={t('performance.companyInfo.fields.startupType', '창업유형')}
+            label={t(
+              "member.performance.companyInfo.fields.startupType",
+              "창업유형",
+            )}
             value={data.startupType}
             onChange={(e) => onChange("startupType", e.target.value)}
             options={startupTypeOptions}
@@ -142,7 +163,7 @@ const CompanyBusinessInfo = ({
           <Select
             label={t(
               "performance.companyInfo.fields.businessField",
-              "业务领域",
+              "사업 분야",
             )}
             value={data.businessField}
             onChange={(e) => onChange("businessField", e.target.value)}
@@ -150,14 +171,20 @@ const CompanyBusinessInfo = ({
             disabled={!isEditing}
           />
           <Select
-            label={t('performance.companyInfo.fields.ksicMajor', '한국표준산업분류코드[대분류]')}
+            label={t(
+              "member.performance.companyInfo.fields.ksicMajor",
+              "한국표준산업분류코드[대분류]",
+            )}
             value={data.ksicMajor}
             onChange={(e) => onChange("ksicMajor", e.target.value)}
             options={ksicMajorOptions}
             disabled={!isEditing}
           />
           <Select
-            label={t('performance.companyInfo.fields.ksicSub', '한국표준사업분류코드[중분류]')}
+            label={t(
+              "member.performance.companyInfo.fields.ksicSub",
+              "한국표준사업분류코드[중분류]",
+            )}
             value={data.ksicSub}
             onChange={(e) => onChange("ksicSub", e.target.value)}
             options={ksicSubOptions}
@@ -170,7 +197,7 @@ const CompanyBusinessInfo = ({
           <Select
             label={t(
               "performance.companyInfo.fields.mainIndustryKsicMajor",
-              "主要行业 KSIC 大类",
+              "주력산업 KSIC 코드",
             )}
             value={data.mainIndustryKsicMajor}
             onChange={(e) => onChange("mainIndustryKsicMajor", e.target.value)}
@@ -180,7 +207,7 @@ const CompanyBusinessInfo = ({
           <Select
             label={t(
               "performance.companyInfo.fields.mainIndustryKsicCodes",
-              "主要行业 KSIC 代码",
+              "주력산업 KSIC 세부 코드",
             )}
             value={data.mainIndustryKsicCodes}
             onChange={(e) => onChange("mainIndustryKsicCodes", e.target.value)}
@@ -212,10 +239,7 @@ const CompanyBusinessInfo = ({
         {/* Startup Stage */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Select
-            label={t(
-              "performance.companyInfo.fields.startupStage",
-              "创业阶段",
-            )}
+            label={t("performance.companyInfo.fields.startupStage", "창업구분")}
             value={data.startupStage}
             onChange={(e) => onChange("startupStage", e.target.value)}
             options={startupStageOptions}
@@ -226,17 +250,17 @@ const CompanyBusinessInfo = ({
         {/* Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            label={t('performance.companyInfo.fields.revenue', '연간 매출액 (원)')}
+            label={t(
+              "member.performance.companyInfo.fields.revenue",
+              "연간 매출액 (원)",
+            )}
             value={data.revenue}
             onChange={(e) => onChange("revenue", e.target.value)}
             disabled={!isEditing}
             placeholder="0"
           />
           <Input
-            label={t(
-              "performance.companyInfo.fields.employeeCount",
-              "员工人数",
-            )}
+            label={t("performance.companyInfo.fields.employeeCount", "직원 수")}
             value={data.employeeCount}
             onChange={(e) => onChange("employeeCount", e.target.value)}
             disabled={!isEditing}
@@ -249,7 +273,7 @@ const CompanyBusinessInfo = ({
           <label className="block text-sm font-medium text-gray-700 mb-3">
             {t(
               "performance.companyInfo.fields.cooperationFields",
-              "合作需求领域",
+              "산업협력 희망 분야",
             )}
           </label>
           <div className="flex flex-wrap gap-3">
@@ -286,7 +310,7 @@ const CompanyBusinessInfo = ({
               })
             ) : (
               <span className="text-sm text-gray-400">
-                {t('common.notSet', '설정되지 않음')}
+                {t("common.notSet", "설정되지 않음")}
               </span>
             )}
           </div>
@@ -297,7 +321,7 @@ const CompanyBusinessInfo = ({
           <label className="block text-sm font-medium text-gray-700 mb-3">
             {t(
               "performance.companyInfo.fields.participationPrograms",
-              "参与项目",
+              "참여 프로그램",
             )}
           </label>
           <div className="flex flex-wrap gap-3">
@@ -334,7 +358,7 @@ const CompanyBusinessInfo = ({
               })
             ) : (
               <span className="text-sm text-gray-400">
-                {t('common.notSet', '설정되지 않음')}
+                {t("common.notSet", "설정되지 않음")}
               </span>
             )}
           </div>

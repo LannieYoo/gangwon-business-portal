@@ -22,7 +22,7 @@ export const ResultCounter = ({ filters, isLoading, count }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
         </svg>
         <span className="text-sm font-medium text-gray-700">
-          {t('statistics.filters.matchingCompanies', '符合条件的企业')}:
+          {t('statistics.filters.matchingCompanies', '일치하는 기업')}:
         </span>
       </div>
       
@@ -30,7 +30,7 @@ export const ResultCounter = ({ filters, isLoading, count }) => {
         <div className="flex items-center gap-2">
           <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-600 border-t-transparent"></div>
           <span className="text-sm text-gray-500">
-            {t('statistics.filters.calculating', '计算中...')}
+            {t('statistics.filters.calculating', '계산 중...')}
           </span>
         </div>
       ) : (
@@ -39,7 +39,7 @@ export const ResultCounter = ({ filters, isLoading, count }) => {
             {displayCount?.toLocaleString() || 0}
           </span>
           <span className="text-sm font-medium text-gray-600">
-            {t('statistics.filters.companies', '家')}
+            {t('statistics.filters.companies', '개 기업')}
           </span>
         </div>
       )}

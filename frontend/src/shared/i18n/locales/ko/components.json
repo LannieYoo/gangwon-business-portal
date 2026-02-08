@@ -1,0 +1,48 @@
+{
+  "components": {
+    "editor": {
+      "addLink": "링크 추가",
+      "linkText": "링크 텍스트",
+      "linkUrl": "링크 주소",
+      "bold": "굵게",
+      "italic": "기울임",
+      "underline": "밑줄",
+      "heading1": "제목 1",
+      "heading2": "제목 2",
+      "heading3": "제목 3",
+      "bulletList": "글머리 기호 목록",
+      "orderedList": "번호 매기기 목록",
+      "link": "링크",
+      "image": "이미지",
+      "table": "표",
+      "deleteTable": "표 삭제",
+      "undo": "실행 취소",
+      "redo": "다시 실행",
+      "uploading": "업로드 중...",
+      "placeholder": "내용을 입력하세요..."
+    },
+    "fileUpload": {
+      "addFiles": "첨부파일 추가",
+      "uploading": "업로드 중...",
+      "remaining": "{{count}}/{{max}} 개 파일 업로드 가능",
+      "hint": "파일당 최대 {{max}}",
+      "fileTooLarge": "파일 {{name}}이(가) 최대 크기 {{max}}를 초과했습니다",
+      "attachments": "첨부파일",
+      "viewAll": "{{count}}개 첨부파일",
+      "uploadError": "파일 업로드 실패, 다시 시도해주세요"
+    },
+    "notification": {
+      "unread": "읽지 않음",
+      "viewAll": "전체 보기",
+      "viewAllInquiries": "모든 문의 보기",
+      "viewAllNotifications": "모든 알림 보기",
+      "empty": "알림이 없습니다",
+      "important": "중요",
+      "fromMember": "{{name}}님으로부터",
+      "adminReplied": "관리자가 답변했습니다",
+      "memberInquiries": "회원 문의",
+      "adminReplies": "관리자 답변",
+      "systemNotifications": "시스템 알림"
+    }
+  }
+}

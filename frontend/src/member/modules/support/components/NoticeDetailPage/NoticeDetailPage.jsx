@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 公告详情页面组件 (内容组件)
  *
  * 遵循 dev-frontend_patterns skill 规范。

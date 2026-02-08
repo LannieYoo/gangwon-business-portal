@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 获取项目详情 Hook
  *
  * 封装获取单个项目详情的业务逻辑。
@@ -18,7 +18,7 @@ export function useProjectDetail(id) {
     
     const detail = await projectService.getProject(id);
     if (!detail) {
-      throw new Error(t("common.notFound", "未找到该公告"));
+      throw new Error(t("common.notFound", "해당 공지사항을 찾을 수 없습니다"));
     }
     return detail;
   }, [id, t]);

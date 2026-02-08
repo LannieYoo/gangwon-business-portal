@@ -1,20 +1,20 @@
-/**
+﻿/**
  * File Attachments Component
  * 文件附件管理组件 - 支持上传、预览、删除附件
  */
 
-import { useTranslation } from 'react-i18next';
-import { FileUploadButton } from '@shared/components';
-import { DocumentIcon, TrashIcon } from '@shared/components/Icons';
-import { cn } from '@shared/utils/helpers';
-import { MAX_FILE_SIZE } from '@shared/utils/constants';
+import { useTranslation } from "react-i18next";
+import { FileUploadButton } from "@shared/components";
+import { DocumentIcon, TrashIcon } from "@shared/components/Icons";
+import { cn } from "@shared/utils/helpers";
+import { MAX_FILE_SIZE } from "@shared/utils/constants";
 
 function formatFileSize(bytes) {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
 }
 
 export function FileAttachments({
@@ -22,7 +22,7 @@ export function FileAttachments({
   onChange,
   maxFiles = 5,
   maxFileSize = MAX_FILE_SIZE,
-  accept = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.jpg,.jpeg,.png,.gif,.txt',
+  accept = ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.jpg,.jpeg,.png,.gif,.txt",
   uploading = false,
   disabled = false,
   label,
@@ -39,14 +39,19 @@ export function FileAttachments({
 
     for (const file of files) {
       if (file.size > maxFileSize) {
-        errors.push(t('fileAttachments.fileTooLarge', { name: file.name, max: formatFileSize(maxFileSize) }));
+        errors.push(
+          t("components.fileUpload.fileTooLarge", {
+            name: file.name,
+            max: formatFileSize(maxFileSize),
+          }),
+        );
         continue;
       }
       validFiles.push(file);
     }
 
     if (errors.length > 0) {
-      alert(errors.join('\n'));
+      alert(errors.join("\n"));
     }
 
     if (validFiles.length > 0) {
@@ -57,31 +62,35 @@ export function FileAttachments({
   const handleRemove = (index) => {
     if (!onChange || disabled) return;
     const newAttachments = attachments.filter((_, i) => i !== index);
-    onChange(newAttachments, 'remove', index);
+    onChange(newAttachments, "remove", index);
   };
 
   const handleDownload = async (attachment) => {
     const url = attachment.fileUrl || attachment.url;
-    const fileName = attachment.originalName || attachment.fileName || attachment.name || 'download';
-    
+    const fileName =
+      attachment.originalName ||
+      attachment.fileName ||
+      attachment.name ||
+      "download";
+
     if (!url) return;
 
     try {
       const response = await fetch(url);
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
+
+      const link = document.createElement("a");
       link.href = blobUrl;
       link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error('Download failed:', error);
-      window.open(url, '_blank');
+      console.error("Download failed:", error);
+      window.open(url, "_blank");
     }
   };
 
@@ -89,7 +98,7 @@ export function FileAttachments({
   const canUpload = remainingSlots > 0 && !disabled;
 
   return (
-    <div className={cn('file-attachments', className)}>
+    <div className={cn("file-attachments", className)}>
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {label}
@@ -100,9 +109,13 @@ export function FileAttachments({
       {attachments.length > 0 && (
         <div className="space-y-2 mb-3">
           {attachments.map((attachment, index) => {
-            const fileName = attachment.fileName || attachment.originalName || attachment.name || 'Unknown';
+            const fileName =
+              attachment.fileName ||
+              attachment.originalName ||
+              attachment.name ||
+              "Unknown";
             const fileSize = attachment.fileSize || attachment.size;
-            
+
             return (
               <div
                 key={index}
@@ -123,22 +136,22 @@ export function FileAttachments({
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-2 ml-3">
                   <button
                     type="button"
                     onClick={() => handleDownload(attachment)}
                     className="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50 transition-colors"
-                    title={t('common.download', '다운로드')}
+                    title={t("common.download", "다운로드")}
                   >
-                    {t('common.download', '다운로드')}
+                    {t("common.download", "다운로드")}
                   </button>
                   {!disabled && (
                     <button
                       type="button"
                       onClick={() => handleRemove(index)}
                       className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors"
-                      title={t('common.remove', '제거')}
+                      title={t("common.remove", "제거")}
                     >
                       <TrashIcon className="w-4 h-4" />
                     </button>
@@ -159,27 +172,32 @@ export function FileAttachments({
             accept={accept}
             disabled={disabled}
             loading={uploading}
-            label={t('fileAttachments.addFiles', '첨부파일 추가')}
-            loadingLabel={t('fileAttachments.uploading', '업로드 중...')}
+            label={t("components.fileUpload.addFiles", "첨부파일 추가")}
+            loadingLabel={t("components.fileUpload.uploading", "업로드 중...")}
             variant="outline"
             size="small"
           />
           <span className="text-sm text-gray-500">
-            {t('fileAttachments.remaining', { count: remainingSlots, max: maxFiles })}
+            {t("components.fileUpload.remaining", {
+              count: remainingSlots,
+              max: maxFiles,
+            })}
           </span>
         </div>
       )}
 
-      {error && (
-        <p className="mt-2 text-sm text-red-600">{error}</p>
-      )}
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
       {/* 提示信息 */}
       <p className="mt-2 text-xs text-gray-500">
-        {t('fileAttachments.hint', { max: formatFileSize(maxFileSize) })}
+        {t("components.fileUpload.hint", { max: formatFileSize(maxFileSize) })}
       </p>
     </div>
   );
 }
 
 export default FileAttachments;
+
+
+
+

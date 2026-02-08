@@ -1,17 +1,17 @@
 /**
  * useColumnVisibility Hook - 表格列可见性管理
- * 
+ *
  * 功能：
  * - 管理表格列的显示/隐藏状态
  * - 持久化到 localStorage
  * - 提供预设配置（全部、核心、最小）
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { TABLE_COLUMNS } from '../enum';
+import { useState, useEffect, useCallback } from "react";
+import { TABLE_COLUMNS } from "../enum";
 
 // 存储键
-const STORAGE_KEY = 'statistics_column_visibility';
+const STORAGE_KEY = "statistics_column_visibility";
 
 /**
  * 默认可见列（核心列）
@@ -40,8 +40,8 @@ const MINIMUM_VISIBLE_COLUMNS = [
  */
 export const COLUMN_GROUPS = {
   BASIC: {
-    key: 'basic',
-    labelKey: 'statistics.columnGroups.basic',
+    key: "basic",
+    labelKey: "admin.statistics.columnGroups.basic",
     columns: [
       TABLE_COLUMNS.YEAR,
       TABLE_COLUMNS.QUARTER,
@@ -51,15 +51,13 @@ export const COLUMN_GROUPS = {
     ],
   },
   QUICK_FILTERS: {
-    key: 'quickFilters',
-    labelKey: 'statistics.columnGroups.quickFilters',
-    columns: [
-      TABLE_COLUMNS.POLICY_TAGS,
-    ],
+    key: "quickFilters",
+    labelKey: "admin.statistics.columnGroups.quickFilters",
+    columns: [TABLE_COLUMNS.POLICY_TAGS],
   },
   COMPANY_PROFILE: {
-    key: 'companyProfile',
-    labelKey: 'statistics.columnGroups.companyProfile',
+    key: "companyProfile",
+    labelKey: "admin.statistics.columnGroups.companyProfile",
     columns: [
       TABLE_COLUMNS.KSIC_MAJOR,
       TABLE_COLUMNS.KSIC_SUB,
@@ -73,8 +71,8 @@ export const COLUMN_GROUPS = {
     ],
   },
   BUSINESS_METRICS: {
-    key: 'businessMetrics',
-    labelKey: 'statistics.columnGroups.businessMetrics',
+    key: "businessMetrics",
+    labelKey: "admin.statistics.columnGroups.businessMetrics",
     columns: [
       TABLE_COLUMNS.TOTAL_INVESTMENT,
       TABLE_COLUMNS.ANNUAL_REVENUE,
@@ -84,8 +82,8 @@ export const COLUMN_GROUPS = {
     ],
   },
   REPRESENTATIVE: {
-    key: 'representative',
-    labelKey: 'statistics.columnGroups.representative',
+    key: "representative",
+    labelKey: "admin.statistics.columnGroups.representative",
     columns: [
       TABLE_COLUMNS.REPRESENTATIVE_GENDER,
       TABLE_COLUMNS.REPRESENTATIVE_AGE,
@@ -98,18 +96,18 @@ export const COLUMN_GROUPS = {
  */
 export const COLUMN_PRESETS = {
   ALL: {
-    key: 'all',
-    labelKey: 'statistics.columnPresets.all',
+    key: "all",
+    labelKey: "admin.statistics.columnPresets.all",
     columns: Object.values(TABLE_COLUMNS),
   },
   CORE: {
-    key: 'core',
-    labelKey: 'statistics.columnPresets.core',
+    key: "core",
+    labelKey: "admin.statistics.columnPresets.core",
     columns: DEFAULT_VISIBLE_COLUMNS,
   },
   MINIMUM: {
-    key: 'minimum',
-    labelKey: 'statistics.columnPresets.minimum',
+    key: "minimum",
+    labelKey: "admin.statistics.columnPresets.minimum",
     columns: MINIMUM_VISIBLE_COLUMNS,
   },
 };
@@ -127,7 +125,7 @@ const loadColumnVisibility = () => {
       return Array.from(columns);
     }
   } catch (error) {
-    console.warn('Failed to load column visibility:', error);
+    console.warn("Failed to load column visibility:", error);
   }
   return DEFAULT_VISIBLE_COLUMNS;
 };
@@ -139,7 +137,7 @@ const saveColumnVisibility = (visibleColumns) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(visibleColumns));
   } catch (error) {
-    console.warn('Failed to save column visibility:', error);
+    console.warn("Failed to save column visibility:", error);
   }
 };
 
@@ -186,7 +184,9 @@ export const useColumnVisibility = () => {
       if (allVisible) {
         // 隐藏整个分组（保留最小可见列）
         return prev.filter(
-          (col) => !groupColumns.includes(col) || MINIMUM_VISIBLE_COLUMNS.includes(col)
+          (col) =>
+            !groupColumns.includes(col) ||
+            MINIMUM_VISIBLE_COLUMNS.includes(col),
         );
       } else {
         // 显示整个分组
@@ -200,7 +200,9 @@ export const useColumnVisibility = () => {
    * 应用预设配置
    */
   const applyPreset = useCallback((presetKey) => {
-    const preset = Object.values(COLUMN_PRESETS).find((p) => p.key === presetKey);
+    const preset = Object.values(COLUMN_PRESETS).find(
+      (p) => p.key === presetKey,
+    );
     if (preset) {
       setVisibleColumns(preset.columns);
     }
@@ -232,7 +234,7 @@ export const useColumnVisibility = () => {
    */
   const isColumnVisible = useCallback(
     (columnKey) => visibleColumns.includes(columnKey),
-    [visibleColumns]
+    [visibleColumns],
   );
 
   /**
@@ -240,7 +242,7 @@ export const useColumnVisibility = () => {
    */
   const isColumnToggleable = useCallback(
     (columnKey) => !MINIMUM_VISIBLE_COLUMNS.includes(columnKey),
-    []
+    [],
   );
 
   /**
@@ -248,11 +250,13 @@ export const useColumnVisibility = () => {
    */
   const isGroupVisible = useCallback(
     (groupKey) => {
-      const group = Object.values(COLUMN_GROUPS).find((g) => g.key === groupKey);
+      const group = Object.values(COLUMN_GROUPS).find(
+        (g) => g.key === groupKey,
+      );
       if (!group) return false;
       return group.columns.every((col) => visibleColumns.includes(col));
     },
-    [visibleColumns]
+    [visibleColumns],
   );
 
   /**
@@ -260,12 +264,16 @@ export const useColumnVisibility = () => {
    */
   const isGroupPartiallyVisible = useCallback(
     (groupKey) => {
-      const group = Object.values(COLUMN_GROUPS).find((g) => g.key === groupKey);
+      const group = Object.values(COLUMN_GROUPS).find(
+        (g) => g.key === groupKey,
+      );
       if (!group) return false;
-      const visibleCount = group.columns.filter((col) => visibleColumns.includes(col)).length;
+      const visibleCount = group.columns.filter((col) =>
+        visibleColumns.includes(col),
+      ).length;
       return visibleCount > 0 && visibleCount < group.columns.length;
     },
-    [visibleColumns]
+    [visibleColumns],
   );
 
   return {

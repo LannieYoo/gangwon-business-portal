@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 公告列表项组件
  *
  * 遵循 dev-frontend_patterns skill 规范。

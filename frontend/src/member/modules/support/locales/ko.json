@@ -1,193 +1,184 @@
 {
-  "support": {
-    "title": "원스톱 지원",
-    "subtitle": "문의, FAQ",
-    "notices": {
-      "title": "공지사항",
-      "description": "최신 공지사항 및 중요 알림 확인",
-      "searchPlaceholder": "공지사항 검색..."
-    },
-    "inquiry": "1:1 문의",
-    "faq": "FAQ",
-    "faq.description": "자주 묻는 질문과 답변",
-    "faqCategory": {
-      "registration": "회원가입",
-      "general": "일반",
-      "performance": "성과관리",
-      "project": "지원사업",
-      "profile": "기업프로필",
-      "support": "문의/지원",
-      "other": "기타"
-    },
-    "faqSearchPlaceholder": "질문 또는 답변 검색...",
-    "noFaqResults": "일치하는 질문을 찾을 수 없습니다",
-    "newInquiry": "새 문의",
-    "inquiryHistory": "문의 내역",
-    "inquiryHistory.description": "1:1 문의 내역 및 답변 확인",
-    "notificationHistory": "알림 내역",
-    "notificationHistory.description": "시스템 알림 및 공지 확인",
-    "noInquiries": "문의 내역이 없습니다",
-    "category": {
-      "general": "일반 문의",
-      "support": "기술 지원",
-      "performance": "실적 문의",
-      "project": "사업 관리",
-      "member": "회원 관리",
-      "label": "분류"
-    },
-    "categoryLabel": "문의 분류",
-    "selectCategory": "카테고리 선택",
-    "categories": {
-      "project": "사업 관리",
-      "performance": "실적 관리",
-      "account": "계정 관리",
-      "technical": "기술 지원",
-      "other": "기타"
-    },
-    "subject": "제목",
-    "subjectLabel": "문의 제목",
-    "subjectPlaceholder": "문의 제목을 입력하세요",
-    "content": "내용",
-    "contentLabel": "문의 내용",
-    "contentPlaceholder": "상세 내용을 입력하세요",
-    "name": "이름",
-    "namePlaceholder": "이름을 입력하세요",
-    "email": "이메일",
-    "emailPlaceholder": "이메일을 입력하세요",
-    "phone": "전화번호",
-    "phonePlaceholder": "전화번호를 입력하세요",
-    "user": "사용자",
-    "admin": "관리자",
-    "attachments": "첨부파일",
-    "attachmentNumber": "첨부파일 {{number}}",
-    "addAttachment": "첨부파일 추가",
-    "attachmentHint": "PDF, Word, Excel, 이미지 형식 지원, 파일당 최대 {{maxSize}}MB",
-    "maxFiles": "최대 3개까지 업로드 가능",
-    "maxFilesLabel": "최대 3개",
-    "maxAttachmentsReached": "최대 {{max}}개의 첨부파일만 업로드할 수 있습니다",
-    "uploadFailed": "파일 업로드에 실패했습니다. 다시 시도해주세요",
-    "submitFailed": "제출에 실패했습니다. 다시 시도해주세요",
-    "noContent": "내용 없음",
-    "status": {
-      "pending": "답변 대기",
-      "answered": "답변 완료",
-      "replied": "답변 완료",
-      "open": "진행 중",
-      "resolved": "해결됨",
-      "closed": "종료됨"
-    },
-    "createdDate": "작성 시간",
-    "lastReply": "최근 답변",
-    "answeredDate": "답변 시간",
-    "views": "조회수",
-    "viewsLabel": "회 조회",
-    "fillAllFields": "모든 필수 항목을 입력해주세요",
-    "inquiryIdMissing": "문의 ID가 없습니다",
-    "consultationIdMissing": "문의 ID가 없습니다",
-    "notFound": "문의 기록이 존재하지 않습니다",
-    "loadFailed": "문의 상세 정보를 불러오는데 실패했습니다",
-    "pendingNotice": "문의가 처리 중입니다. 빠른 시일 내에 답변드리겠습니다.",
-    "backToHistory": "목록으로 돌아가기",
-    "companyName": "기업명",
-    "searchPlaceholder": "문의 제목 검색...",
-    "noMatchingInquiries": "일치하는 문의 기록이 없습니다",
-    "statusLabel": "상태",
-    "createFirstInquiry": "첫 번째 문의 작성",
-    "inquiryDetail": "문의 상세",
-    "hasAttachments": "첨부파일 있음",
-    "fileCount": "{{count}}개 파일",
-    "threadDescription": "문의 상세 및 관리자 답변 보기",
-    "lastMessage": "마지막 메시지",
-    "messageCount": "메시지 수",
-    "noMessages": "메시지 없음",
-    "reply": "답변",
-    "replyContent": "답변 내용",
-    "replyPlaceholder": "답변 내용을 입력하세요...",
-    "sendReply": "답변 보내기",
-    "replyFailed": "답변 전송에 실패했습니다. 다시 시도해주세요",
-    "attachFile": "파일 첨부",
-    "submitSuccess": "문의가 성공적으로 제출되었습니다",
-    "writeComment": "댓글 작성",
-    "comment": "댓글",
-    "like": "좋아요",
-    "replyToThread": "답변하기",
-    "read": "읽음",
-    "readStatus": "읽음 상태",
-    "searchNotifications": "알림 검색...",
-    "sender": "발신자",
-    "goToPage": "페이지로 이동",
-    "notifications": {
-      "performance": {
-        "review": {
-          "subject": "[실적 관리] {{period}} 실적 심사 결과",
-          "content": "{{period}} 실적이 {{statusKo}}되었습니다.",
-          "contentWithComments": "{{period}} 실적이 {{statusKo}}되었습니다.\n\n관리자 의견: {{comments}}"
-        },
-        "submission": {
-          "subject": "[실적 관리] 새로운 실적 제출",
-          "content": "{{companyName}}에서 {{year}}년 {{quarter}}분기 실적을 제출했습니다."
-        }
+  "member": {
+    "support": {
+      "title": "원스톱 지원",
+      "subtitle": "문의, FAQ",
+      "notices": {
+        "title": "공지사항",
+        "description": "최신 공지사항 및 중요 알림 확인",
+        "searchPlaceholder": "공지사항 검색..."
       },
-      "member": {
-        "registration": {
-          "subject": "[회원 관리] 새로운 회원 가입 신청",
-          "content": "{{company_name}} (사업자번호: {{business_number}})에서 회원 가입을 신청했습니다.\n이메일: {{email}}"
-        },
-        "approved": {
-          "subject": "[회원 관리] 회원 가입 승인",
-          "content": "{{company_name}}의 회원 가입이 승인되었습니다. 이제 모든 서비스를 이용하실 수 있습니다."
-        },
-        "rejected": {
-          "subject": "[회원 관리] 회원 가입 거부",
-          "content": "{{company_name}}의 회원 가입이 거부되었습니다.{{#reason}}\n\n사유: {{reason}}{{/reason}}"
-        }
+      "inquiry": "1:1 문의",
+      "faq": "FAQ",
+      "faqDescription": "자주 묻는 질문과 답변",
+      "faqCategory": {
+        "registration": "회원가입",
+        "general": "일반",
+        "performance": "성과관리",
+        "project": "지원사업",
+        "profile": "기업프로필",
+        "support": "문의/지원",
+        "other": "기타"
       },
-      "project": {
-        "application": {
-          "subject": "[사업 관리] 새로운 사업 신청",
-          "content": "{{company_name}}의 {{applicant_name}}님이 '{{project_title}}' 사업에 신청했습니다."
+      "faqSearchPlaceholder": "질문 또는 답변 검색...",
+      "noFaqResults": "일치하는 질문을 찾을 수 없습니다",
+      "newInquiry": "새 문의",
+      "inquiryHistory": "문의 내역",
+      "inquiryHistoryDetails": {
+        "title": "문의 내역",
+        "description": "1:1 문의 내역 및 답변 확인"
+      },
+      "notificationHistory": "알림 내역",
+      "notificationHistoryDetails": {
+        "title": "알림 내역",
+        "description": "시스템 알림 및 공지 확인"
+      },
+      "noInquiries": "문의 내역이 없습니다",
+      "category": {
+        "general": "일반 문의",
+        "support": "기술 지원",
+        "technical": "기술 지원",
+        "performance": "실적 문의",
+        "project": "사업 관리",
+        "member": "회원 관리",
+        "account": "계정 관리",
+        "other": "기타",
+        "label": "분류"
+      },
+      "categoryLabel": "문의 분류",
+      "selectCategory": "카테고리 선택",
+      "categories": {
+        "project": "사업 관리",
+        "performance": "실적 관리",
+        "account": "계정 관리",
+        "technical": "기술 지원",
+        "other": "기타"
+      },
+      "subject": "제목",
+      "subjectLabel": "문의 제목",
+      "subjectPlaceholder": "문의 제목을 입력하세요",
+      "content": "내용",
+      "contentLabel": "문의 내용",
+      "contentPlaceholder": "상세 내용을 입력하세요",
+      "name": "이름",
+      "namePlaceholder": "이름을 입력하세요",
+      "email": "이메일",
+      "emailPlaceholder": "이메일을 입력하세요",
+      "phone": "전화번호",
+      "phonePlaceholder": "전화번호를 입력하세요",
+      "user": "사용자",
+      "admin": "관리자",
+      "attachments": "첨부파일",
+      "attachmentNumber": "첨부파일 {{number}}",
+      "addAttachment": "첨부파일 추가",
+      "attachmentHint": "PDF, Word, Excel, 이미지 형식 지원, 파일당 최대 {{maxSize}}MB",
+      "maxFiles": "최대 3개까지 업로드 가능",
+      "maxFilesLabel": "최대 3개",
+      "maxAttachmentsReached": "최대 {{max}}개의 첨부파일만 업로드할 수 있습니다",
+      "uploadFailed": "파일 업로드에 실패했습니다. 다시 시도해주세요",
+      "submitFailed": "제출에 실패했습니다. 다시 시도해주세요",
+      "noContent": "내용 없음",
+      "status": {
+        "pending": "답변 대기",
+        "answered": "답변 완료",
+        "replied": "답변 완료",
+        "open": "진행 중",
+        "resolved": "해결됨",
+        "closed": "종료됨"
+      },
+      "createdDate": "작성 시간",
+      "lastReply": "최근 답변",
+      "answeredDate": "답변 시간",
+      "views": "조회수",
+      "viewsLabel": "회 조회",
+      "fillAllFields": "모든 필수 항목을 입력해주세요",
+      "inquiryIdMissing": "문의 ID가 없습니다",
+      "consultationIdMissing": "문의 ID가 없습니다",
+      "notFound": "문의 기록이 존재하지 않습니다",
+      "loadFailed": "문의 상세 정보를 불러오는데 실패했습니다",
+      "pendingNotice": "문의가 처리 중입니다. 빠른 시일 내에 답변드리겠습니다.",
+      "backToHistory": "목록으로 돌아가기",
+      "companyName": "기업명",
+      "searchPlaceholder": "문의 제목 검색...",
+      "noMatchingInquiries": "일치하는 문의 기록이 없습니다",
+      "statusLabel": "상태",
+      "createFirstInquiry": "첫 번째 문의 작성",
+      "inquiryDetail": "문의 상세",
+      "hasAttachments": "첨부파일 있음",
+      "fileCount": "{{count}}개 파일",
+      "threadDescription": "문의 상세 및 관리자 답변 보기",
+      "lastMessage": "마지막 메시지",
+      "messageCount": "메시지 수",
+      "noMessages": "메시지 없음",
+      "reply": "답변",
+      "replyContent": "답변 내용",
+      "replyPlaceholder": "답변 내용을 입력하세요...",
+      "sendReply": "답변 보내기",
+      "replyFailed": "답변 전송에 실패했습니다. 다시 시도해주세요",
+      "attachFile": "파일 첨부",
+      "submitSuccess": "문의가 성공적으로 제출되었습니다",
+      "writeComment": "댓글 작성",
+      "comment": "댓글",
+      "like": "좋아요",
+      "replyToThread": "답변하기",
+      "read": "읽음",
+      "readStatus": "읽음 상태",
+      "searchNotifications": "알림 검색...",
+      "sender": "발신자",
+      "goToPage": "페이지로 이동",
+      "notifications": {
+        "performance": {
+          "subject": "실적 관리 알림",
+          "newSubmission": "새로운 실적 제출",
+          "newSubmissionContent": "{{companyName}}에서 {{period}} 실적을 제출했습니다.",
+          "approved": "실적 승인됨",
+          "approvedContent": "{{period}} 실적이 승인되었습니다.",
+          "revisionRequested": "실적 보완 요청",
+          "revisionRequestedContent": "{{period}} 실적에 대한 보완이 요청되었습니다. 관리자 의견: {{commentsKo}}",
+          "rejected": "실적 거부됨",
+          "rejectedContent": "{{period}} 실적이 거부되었습니다. 사유: {{commentsKo}}",
+          "submitted": "실적 제출됨",
+          "submittedContent": "{{period}} 실적이 제출되었습니다.",
+          "reviewCancelled": "심사가 취소되어 제출 상태로 되돌아갔습니다.",
+          "review": {
+            "subject": "[실적 관리] {{period}} 실적 심사 결과",
+            "content": "{{period}} 실적이 {{statusKo}}되었습니다.",
+            "contentWithComments": "{{period}} 실적이 {{statusKo}}되었습니다.\n\n관리자 의견: {{commentsKo}}"
+          },
+          "submission": {
+            "subject": "[실적 관리] 새로운 실적 제출",
+            "content": "{{companyName}}에서 {{year}}년 {{quarter}}분기 실적을 제출했습니다."
+          }
         },
-        "result": {
-          "subject": "[사업 관리] 사업 신청 결과",
-          "content": "'{{project_title}}' 사업 신청이 {{statusKo}}되었습니다."
+        "member": {
+          "subject": "회원 관리 알림",
+          "newRegistration": "새로운 회원 가입",
+          "newRegistrationContent": "{{companyName}} (사업자번호: {{businessNumber}}, 이메일: {{email}})에서 회원 가입을 신청했습니다.",
+          "approved": "회원 가입 승인",
+          "approvedContent": "{{companyName}}의 회원 가입이 승인되었습니다.",
+          "rejected": "회원 가입 거부",
+          "rejectedContent": "{{companyName}}의 회원 가입이 거부되었습니다. 사유: {{reason}}",
+          "registration": {
+            "subject": "[회원 관리] 새로운 회원 가입 신청",
+            "content": "{{companyName}} (사업자번호: {{businessNumber}})에서 회원 가입을 신청했습니다.\n이메일: {{email}}"
+          }
+        },
+        "project": {
+          "subject": "사업 관리 알림",
+          "newApplication": "새로운 사업 신청",
+          "newApplicationContent": "{{companyName}}의 {{applicantName}}님이 {{projectTitle}} 사업에 신청했습니다.",
+          "applicationResult": "사업 신청 결과",
+          "applicationResultContent": "{{projectTitle}} 사업 신청이 {{status}}되었습니다.",
+          "application": {
+            "subject": "[사업 관리] 새로운 사업 신청",
+            "content": "{{companyName}}의 {{applicantName}}님이 '{{projectTitle}}' 사업에 신청했습니다."
+          },
+          "result": {
+            "subject": "[사업 관리] 사업 신청 결과",
+            "content": "'{{projectTitle}}' 사업 신청이 {{statusKo}}되었습니다."
+          }
         }
       }
-    }
-  },
-  "performance": {
-    "notification": {
-      "subject": "실적 관리 알림",
-      "newSubmission": "새로운 실적 제출",
-      "newSubmissionContent": "{{company_name}}에서 {{period}} 실적을 제출했습니다.",
-      "approved": "실적 승인됨",
-      "approvedContent": "{{period}} 실적이 승인되었습니다.",
-      "revisionRequested": "실적 보완 요청",
-      "revisionRequestedContent": "{{period}} 실적에 대한 보완이 요청되었습니다. 관리자 의견: {{comments}}",
-      "rejected": "실적 거부됨",
-      "rejectedContent": "{{period}} 실적이 거부되었습니다. 사유: {{comments}}",
-      "submitted": "실적 제출됨",
-      "submittedContent": "{{period}} 실적이 제출되었습니다.",
-      "reviewCancelled": "심사가 취소되어 제출 상태로 되돌아갔습니다."
-    }
-  },
-  "project": {
-    "notification": {
-      "subject": "사업 관리 알림",
-      "newApplication": "새로운 사업 신청",
-      "newApplicationContent": "{{company_name}}의 {{applicant_name}}님이 {{project_title}} 사업에 신청했습니다.",
-      "applicationResult": "사업 신청 결과",
-      "applicationResultContent": "{{project_title}} 사업 신청이 {{status}}되었습니다."
-    }
-  },
-  "member": {
-    "notification": {
-      "subject": "회원 관리 알림",
-      "newRegistration": "새로운 회원 가입",
-      "newRegistrationContent": "{{company_name}} (사업자번호: {{business_number}}, 이메일: {{email}})에서 회원 가입을 신청했습니다.",
-      "approved": "회원 가입 승인",
-      "approvedContent": "{{company_name}}의 회원 가입이 승인되었습니다.",
-      "rejected": "회원 가입 거부",
-      "rejectedContent": "{{company_name}}의 회원 가입이 거부되었습니다. 사유: {{reason}}"
     }
   }
 }

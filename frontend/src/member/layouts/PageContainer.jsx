@@ -1,8 +1,8 @@
 /**
  * PageContainer Component
- * 页面容器组件 - 统一控制页面的边距和最大宽度
+ * 页面容器组件 - 提供统一的内容区域宽度和边距
  *
- * 遵循 dev-frontend_patterns skill 规范。
+ * 参考 dev-frontend_patterns skill 构建
  */
 
 import { cn } from "@shared/utils/helpers";
@@ -20,9 +20,9 @@ const sizeClasses = {
  * PageContainer Component
  * @param {Object} props
  * @param {React.ReactNode} props.children - 子元素
- * @param {string} [props.className] - 额外的CSS类名
- * @param {'default' | 'large' | 'small'} [props.size='default'] - 容器大小
- * @param {boolean} [props.fullWidth=false] - 是否全宽度（不限制最大宽度）
+ * @param {string} [props.className] - 自定义CSS类
+ * @param {'default' | 'large' | 'small'} [props.size='default'] - 容器尺寸
+ * @param {boolean} [props.fullWidth=false] - 是否全宽(取消最大宽度限制)
  * @param {Object} [props.props] - 其他传递给div的属性
  */
 export function PageContainer({

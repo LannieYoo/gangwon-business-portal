@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 项目列表筛选组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -22,7 +22,7 @@ export function ProjectListFilter({
           data={allProjects}
           columns={columns}
           onFilter={onFilterChange}
-          placeholder={t('projects.searchPlaceholder', '사업명 또는 키워드로 검색')}
+          placeholder={t('member.projects.searchPlaceholder', '사업명 또는 키워드로 검색')}
           className="flex-1 min-w-[200px] max-w-md"
           debounceMs={300}
         />

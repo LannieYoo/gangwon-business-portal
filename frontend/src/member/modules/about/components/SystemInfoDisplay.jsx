@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SystemInfoDisplay Component
  * 用于展示系统介绍的富文本内容，包含加载和错误状态处理
  *
@@ -21,7 +21,7 @@ export function SystemInfoDisplay({ content, loading, error }) {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <Loading text={t('about.loading', '로딩 중...')} />
+        <Loading text={t("member.about.loading", "로딩 중...")} />
       </div>
     );
   }
@@ -30,7 +30,7 @@ export function SystemInfoDisplay({ content, loading, error }) {
     return (
       <div className="text-center py-12 px-8">
         <div className="text-lg text-red-600 mb-2">
-          {t('about.error', '로딩 실패')}
+          {t("member.about.error", "로딩 실패")}
         </div>
         <p className="text-gray-500">{error}</p>
       </div>
@@ -41,7 +41,7 @@ export function SystemInfoDisplay({ content, loading, error }) {
     return (
       <div className="text-center py-20 bg-gray-50 rounded-lg border border-gray-100">
         <p className="text-gray-500 text-lg">
-          {t('about.noContent', '콘텐츠가 없습니다')}
+          {t("member.about.noContent", "콘텐츠가 없습니다")}
         </p>
       </div>
     );

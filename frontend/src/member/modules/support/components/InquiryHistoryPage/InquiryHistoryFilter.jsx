@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 咨询历史筛选组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -25,7 +25,7 @@ export default function InquiryHistoryFilter({
           data={allThreads}
           columns={columns}
           onFilter={handleFilterChange}
-          placeholder={t('support.searchPlaceholder', '문의 제목 검색...')}
+          placeholder={t('member.support.searchPlaceholder', '문의 제목 검색...')}
           className="flex-1 min-w-[200px] max-w-md"
         />
         <div className="w-full sm:w-48 sm:flex-shrink-0">

@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+﻿import { useTranslation } from "react-i18next";
 
 export const RegisterSuccessModal = ({ success, handleSuccessClose }) => {
   const { t } = useTranslation();
@@ -24,10 +24,10 @@ export const RegisterSuccessModal = ({ success, handleSuccessClose }) => {
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-3">
-          {t("auth.registerSuccess")}
+          {t("member.auth.registerSuccess")}
         </h2>
         <p className="text-gray-600 mb-6 leading-relaxed">
-          {t("auth.registerPendingApproval")}
+          {t("member.auth.registerPendingApproval")}
         </p>
         <button
           onClick={handleSuccessClose}
@@ -39,3 +39,7 @@ export const RegisterSuccessModal = ({ success, handleSuccessClose }) => {
     </div>
   );
 };
+
+
+
+

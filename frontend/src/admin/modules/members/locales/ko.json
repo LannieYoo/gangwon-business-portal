@@ -2,7 +2,11 @@
   "admin": {
     "members": {
       "title": "기업 회원 관리",
-      "export": "Excel 내보내기",
+      "export": {
+        "button": "Excel 내보내기",
+        "filename": "회원_목록",
+        "sheetName": "회원데이터"
+      },
       "exportExcel": "Excel 내보내기",
       "exportCsv": "CSV 내보내기",
       "exportSuccess": "내보내기 성공",
@@ -38,7 +42,9 @@
         "representative": "대표자",
         "businessNumber": "사업자번호",
         "address": "주소",
-        "industry": "창업유형",
+        "industry": "업종",
+        "startupType": "창업유형",
+        "startupStage": "창업단계",
         "createdAt": "가입일",
         "status": "상태",
         "actions": "작업",
@@ -52,7 +58,7 @@
         "representative": "대표자",
         "legalNumber": "법인번호",
         "address": "주소",
-        "industry": "창업유형",
+        "industry": "업종",
         "phone": "전화번호",
         "email": "이메일",
         "contactPersonName": "담당자명",
@@ -98,12 +104,11 @@
         "nicednbButReturned": ", 하지만 Nice D&B API가 반환한 사업자등록번호는",
         "nicednbMismatch": "조회에 사용된 사업자등록번호는",
         "nicednbWarning": "알림:",
-        "nicednbNoBusinessNumber": "사업자등록번호를 사용할 수 없습니다"
+        "nicednbNoBusinessNumber": "사업자등록번호를 사용할 수 없습니다",
+        "currentFinancialIndicators": "현재 재무 지표",
+        "thousandKRW": "천원"
       },
-      "resetSuccess": "检토 대기로 재설정되었습니다"
+      "resetSuccess": "검토 대기로 재설정되었습니다"
     }
-  },
-  "member": {
-    "industry": "창업유형"
   }
 }

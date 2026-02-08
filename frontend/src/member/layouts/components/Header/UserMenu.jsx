@@ -2,7 +2,7 @@
  * User Dropdown Menu
  * 用户下拉菜单组件
  *
- * 遵循 dev-frontend_patterns skill 规范。
+ * 参考 dev-frontend_patterns skill 构建
  */
 
 import { Link } from "react-router-dom";
@@ -21,8 +21,8 @@ import { UserAvatar } from "./UserAvatar";
 /**
  * UserMenu Component
  * @param {Object} props
- * @param {Object} props.user - 用户信息对象
- * @param {Function} props.onLogout - 登出回调
+ * @param {Object} props.user - 当前用户信息
+ * @param {Function} props.onLogout - 退出回调
  */
 export function UserMenu({ user, onLogout }) {
   const { t } = useTranslation();
@@ -93,7 +93,7 @@ export function UserMenu({ user, onLogout }) {
             onClick={() => setIsOpen(false)}
           >
             <UserIcon className="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
-            <span>{t('header.profile', '기업 정보')}</span>
+            <span>{t("member.layout.profile", "기업 정보")}</span>
           </Link>
 
           <Link
@@ -102,7 +102,7 @@ export function UserMenu({ user, onLogout }) {
             onClick={() => setIsOpen(false)}
           >
             <SupportIcon className="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
-            <span>{t('header.support', '고객 지원')}</span>
+            <span>{t("member.layout.support", "고객 지원")}</span>
           </Link>
 
           <div className="h-px my-2 mx-5 bg-gray-100" />
@@ -113,7 +113,7 @@ export function UserMenu({ user, onLogout }) {
             onClick={handleLogoutClick}
           >
             <LogoutIcon className="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
-            <span>{t('header.logout', '로그아웃')}</span>
+            <span>{t("member.layout.logout", "로그아웃")}</span>
           </button>
         </div>
       )}

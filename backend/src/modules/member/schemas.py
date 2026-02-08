@@ -130,6 +130,8 @@ class MemberListItem(BaseModel):
     status: str
     approval_status: str
     industry: Optional[str]
+    startup_type: Optional[str] = None  # 창업유형
+    startup_stage: Optional[str] = None  # 창업단계
     representative: Optional[str]
     address: Optional[str]
     created_at: datetime
@@ -166,6 +168,8 @@ class MemberListItem(BaseModel):
             "status": data["status"],
             "approval_status": data["approval_status"],
             "industry": data.get("industry", ""),  # 可以为空，提供默认值
+            "startup_type": data.get("startup_type"),  # 창업유형
+            "startup_stage": data.get("startup_stage"),  # 창업단계
             "representative": data.get("representative", ""),  # 可以为空，提供默认值
             "address": data.get("address", ""),  # 可以为空，提供默认值
             "created_at": cls._parse_datetime(data["created_at"]),

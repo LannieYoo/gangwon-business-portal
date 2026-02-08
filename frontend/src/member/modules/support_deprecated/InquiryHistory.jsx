@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Inquiry History Component - Member Portal
  * 咨询历史记录组件 - 表格布局，与其他模块保持一致
  */
@@ -243,4 +243,8 @@ export default function InquiryHistory() {
     </div>
   );
 }
+
+
+
+
 

@@ -92,12 +92,17 @@
         "targetBusinessNumber": "사업자등록번호",
         "targetBusinessNumberPlaceholder": "예: 123-45-67890 (선택사항)",
         "noImage": "이미지가 없습니다",
-        "attachmentUploadError": "첨부파일 업로드 실패, 다시 시도해주세요"
+        "attachmentUploadError": "첨부파일 업로드 실패, 다시 시도해주세요",
+        "attachmentUploadSuccess": "첨부파일이 업로드되었습니다"
       },
       "confirmDelete": "이 지원사업을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
       "deleteConfirmTitle": "지원사업 삭제",
       "deleteSuccess": "삭제되었습니다",
       "deleteFailed": "삭제 실패",
+      "export": {
+        "filename": "지원사업_목록",
+        "sheetName": "지원사업데이터"
+      },
       "exportExcel": "Excel 내보내기",
       "exportCsv": "CSV 내보내기",
       "exportSuccess": "내보내기 성공",
@@ -140,7 +145,10 @@
       "rejectReasonTitle": "거부 사유 입력",
       "rejectReasonLabel": "거부 사유",
       "rejectReasonPlaceholder": "거부 사유를 입력하세요...",
-      "rejectSuccess": "거부 성공"
+      "rejectSuccess": "거부 성공",
+      "contactPersonName": "담당자명",
+      "contactPhone": "담당자 전화번호",
+      "attachments": "첨부파일"
     }
   }
 }

@@ -8,15 +8,16 @@ import { QUARTER_OPTIONS, MONTH_OPTIONS } from "../../enum";
 export const TimeFilters = ({ year, quarter, month, onChange }) => {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
-  
+
   // 添加"全部"选项到年份列表
   const years = [
-    { value: "", label: t("statistics.filters.all", "全部") },
+    { value: "", label: t("admin.statistics.filters.all", "전체") },
     ...Array.from({ length: 15 }, (_, i) => ({
       value: currentYear - i,
       label:
-        String(currentYear - i) + t("statistics.filters.time.yearUnit", "년"),
-    }))
+        String(currentYear - i) +
+        t("admin.statistics.filters.time.yearUnit", "년"),
+    })),
   ];
 
   const quarterOptions = QUARTER_OPTIONS.map((o) => ({
@@ -26,7 +27,7 @@ export const TimeFilters = ({ year, quarter, month, onChange }) => {
 
   const monthOptions = MONTH_OPTIONS.map((o) => ({
     value: o.value,
-    label: o.label + t("statistics.filters.time.monthUnit", "월"),
+    label: o.label + t("admin.statistics.filters.time.monthUnit", "월"),
   }));
 
   return (
@@ -49,7 +50,7 @@ export const TimeFilters = ({ year, quarter, month, onChange }) => {
       <Select
         value={quarter || ""}
         options={quarterOptions}
-        placeholder={t("statistics.filters.time.quarter")}
+        placeholder={t("admin.statistics.filters.time.quarter")}
         containerClassName="mb-0"
         className="w-28 h-9"
         disabled={!year}
@@ -65,7 +66,7 @@ export const TimeFilters = ({ year, quarter, month, onChange }) => {
       <Select
         value={month || ""}
         options={monthOptions}
-        placeholder={t("statistics.filters.time.month")}
+        placeholder={t("admin.statistics.filters.time.month")}
         containerClassName="mb-0"
         className="w-28 h-9"
         disabled={!quarter}

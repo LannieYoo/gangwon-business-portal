@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 咨询提交页面组件 (内容组件)
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -15,6 +15,7 @@ import {
   Textarea,
   Button,
 } from "@shared/components";
+import { useEnumTranslation } from "@shared/hooks";
 import { PageContainer } from "@member/layouts";
 
 import InquiryAttachmentList from "./InquiryAttachmentList";
@@ -30,6 +31,7 @@ const INQUIRY_CATEGORY_OPTIONS = [
  */
 export default function InquiryPage(props) {
   const { t } = useTranslation();
+  const { translateInquiryCategory } = useEnumTranslation();
   const {
     formData,
     isSubmitting,
@@ -47,7 +49,7 @@ export default function InquiryPage(props) {
 
   const categoryOptions = INQUIRY_CATEGORY_OPTIONS.map((opt) => ({
     value: opt.value,
-    label: t(`support.category.${opt.value}`, opt.value),
+    label: translateInquiryCategory(opt.value),
   }));
 
   return (
@@ -55,7 +57,7 @@ export default function InquiryPage(props) {
       <div className="w-full">
         <div className="mb-6 border-b border-gray-100 pb-4">
           <h1 className="text-2xl font-bold text-gray-900">
-            {t("support.newInquiry")}
+            {t("member.support.newInquiry")}
           </h1>
         </div>
 
@@ -74,7 +76,7 @@ export default function InquiryPage(props) {
               )}
 
               <Select
-                label={t("support.categoryLabel")}
+                label={t("member.support.categoryLabel")}
                 value={formData.category}
                 onChange={(e) => handleChange("category", e.target.value)}
                 options={categoryOptions}
@@ -82,19 +84,19 @@ export default function InquiryPage(props) {
               />
 
               <Input
-                label={t("support.subjectLabel")}
+                label={t("member.support.subjectLabel")}
                 value={formData.subject}
                 onChange={(e) => handleChange("subject", e.target.value)}
-                placeholder={t("support.subjectPlaceholder")}
+                placeholder={t("member.support.subjectPlaceholder")}
                 required
               />
 
               <Textarea
-                label={t("support.contentLabel")}
+                label={t("member.support.contentLabel")}
                 value={formData.content}
                 onChange={(e) => handleChange("content", e.target.value)}
                 rows={8}
-                placeholder={t("support.contentPlaceholder")}
+                placeholder={t("member.support.contentPlaceholder")}
                 required
               />
 

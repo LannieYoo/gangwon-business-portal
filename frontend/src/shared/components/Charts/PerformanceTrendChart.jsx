@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Performance Trend Chart Component
  * 绩效数据趋势图组件 - 用于显示绩效数据的时间趋势
  */
@@ -117,4 +117,8 @@ export default function PerformanceTrendChart({
     />
   );
 }
+
+
+
+
 

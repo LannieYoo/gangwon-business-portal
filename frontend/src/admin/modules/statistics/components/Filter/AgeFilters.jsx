@@ -38,11 +38,17 @@ export const AgeFilters = ({ ageRange, minAge, maxAge, onChange }) => {
       <Select
         value={ageRange && ageRange !== "all" ? ageRange : ""}
         options={[
-          { value: "", label: t("statistics.filters.representative.ageRange.all", "全部") },
+          {
+            value: "",
+            label: t(
+              "admin.statistics.filters.representative.ageRange.all",
+              "전체",
+            ),
+          },
           ...AGE_RANGE_OPTIONS.map((opt) => ({
             value: opt.value,
             label: t(opt.labelKey),
-          }))
+          })),
         ]}
         onChange={(e) => handleAgeRangeChange(e.target.value || "all")}
         containerClassName="mb-0"
@@ -53,10 +59,16 @@ export const AgeFilters = ({ ageRange, minAge, maxAge, onChange }) => {
         <div className="flex items-center gap-2 ml-4">
           <Input
             type="number"
-            placeholder={t("statistics.filters.patent.minCount", "最小值")}
+            placeholder={t(
+              "admin.statistics.filters.patent.minCount",
+              "최소 수량",
+            )}
             value={minAge || ""}
             onChange={(e) =>
-              onChange("minAge", e.target.value ? parseInt(e.target.value) : null)
+              onChange(
+                "minAge",
+                e.target.value ? parseInt(e.target.value) : null,
+              )
             }
             containerClassName="mb-0"
             className="w-32 h-9"
@@ -64,16 +76,22 @@ export const AgeFilters = ({ ageRange, minAge, maxAge, onChange }) => {
           <span className="text-gray-400">~</span>
           <Input
             type="number"
-            placeholder={t("statistics.filters.patent.maxCount", "最大值")}
+            placeholder={t(
+              "admin.statistics.filters.patent.maxCount",
+              "최대 수량",
+            )}
             value={maxAge || ""}
             onChange={(e) =>
-              onChange("maxAge", e.target.value ? parseInt(e.target.value) : null)
+              onChange(
+                "maxAge",
+                e.target.value ? parseInt(e.target.value) : null,
+              )
             }
             containerClassName="mb-0"
             className="w-32 h-9"
           />
           <span className="text-xs text-gray-400">
-            {t("common.age.unit", "岁")}
+            {t("common.age.unit", "세")}
           </span>
         </div>
       )}

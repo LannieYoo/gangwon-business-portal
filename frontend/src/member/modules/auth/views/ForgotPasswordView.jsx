@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Forgot Password View - Member Portal
  * Follows dev-frontend_patterns skill.
  */
@@ -40,16 +40,16 @@ export default function ForgotPasswordView() {
                 </svg>
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">
-                {t("auth.forgotPasswordSentTitle")}
+                {t("member.auth.forgotPasswordSentTitle")}
               </h2>
               <p className="text-sm text-gray-600 mb-6">
-                {t("auth.forgotPasswordSentMessage")}
+                {t("member.auth.forgotPasswordSentMessage")}
               </p>
               <Button
                 onClick={() => navigate("/member/home")}
                 className="w-full"
               >
-                {t("auth.backToLogin")}
+                {t("member.auth.backToLogin")}
               </Button>
             </div>
           </div>
@@ -67,10 +67,10 @@ export default function ForgotPasswordView() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900">
-            {t("auth.forgotPasswordTitle")}
+            {t("member.auth.forgotPasswordTitle")}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            {t("auth.forgotPasswordSubtitle")}
+            {t("member.auth.forgotPasswordSubtitle")}
           </p>
         </div>
       </div>
@@ -85,28 +85,28 @@ export default function ForgotPasswordView() {
             )}
 
             <Input
-              label={t("auth.businessLicense")}
+              label={t("member.auth.businessLicense")}
               type="text"
               name="businessNumber"
               value={formData.businessNumber}
               onChange={actions.handleChange}
               required
-              placeholder={t("auth.businessLicensePlaceholder")}
+              placeholder={t("member.auth.businessLicensePlaceholder")}
             />
 
             <Input
-              label={t("auth.email")}
+              label={t("member.auth.email")}
               type="email"
               name="email"
               value={formData.email}
               onChange={actions.handleChange}
               required
               autoComplete="email"
-              placeholder={t("auth.emailPlaceholder")}
+              placeholder={t("member.auth.emailPlaceholder")}
             />
 
             <Button type="submit" className="w-full" loading={isLoading}>
-              {t("auth.sendResetLink")}
+              {t("member.auth.sendResetLink")}
             </Button>
           </form>
         </div>
@@ -117,10 +117,14 @@ export default function ForgotPasswordView() {
             onClick={() => navigate("/member/home")}
             className="text-sm font-medium text-blue-600 hover:text-blue-500"
           >
-            {t("auth.backToLogin")}
+            {t("member.auth.backToLogin")}
           </button>
         </div>
       </div>
     </div>
   );
 }
+
+
+
+

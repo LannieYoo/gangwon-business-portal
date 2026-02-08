@@ -1,5 +1,6 @@
 {
-  "home": {
+  "member": {
+    "home": {
     "banner": {
       "welcome": "欢迎来到江原创业门户",
       "subtitle": "为创业企业提供一站式支持系统"
@@ -37,6 +38,19 @@
       "performanceSubmitted": "已提交业绩",
       "pendingReview": "待审核",
       "documentsUploaded": "已上传文档"
+    }
+    }
+  },
+  "home": {
+    "notices": {
+      "title": "公告事项",
+      "empty": "暂无公告",
+      "important": "重要",
+      "normal": "一般"
+    },
+    "news": {
+      "title": "支援事业公告",
+      "empty": "暂无新闻资料"
     }
   }
 }

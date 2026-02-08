@@ -92,12 +92,17 @@
         "targetBusinessNumber": "营业执照号码",
         "targetBusinessNumberPlaceholder": "例: 123-45-67890 (可选)",
         "noImage": "暂无图片",
-        "attachmentUploadError": "附件上传失败，请重试"
+        "attachmentUploadError": "附件上传失败，请重试",
+        "attachmentUploadSuccess": "附件上传成功"
       },
       "confirmDelete": "确定要删除这个支援事业吗？此操作无法撤销。",
       "deleteConfirmTitle": "删除支援事业",
       "deleteSuccess": "已删除",
       "deleteFailed": "删除失败",
+      "export": {
+        "filename": "支援事业列表",
+        "sheetName": "支援事业数据"
+      },
       "exportExcel": "导出 Excel",
       "exportCsv": "导出 CSV",
       "exportSuccess": "导出成功",
@@ -140,7 +145,10 @@
       "rejectReasonTitle": "输入拒绝原因",
       "rejectReasonLabel": "拒绝原因",
       "rejectReasonPlaceholder": "请输入拒绝原因...",
-      "rejectSuccess": "拒绝成功"
+      "rejectSuccess": "拒绝成功",
+      "contactPersonName": "负责人姓名",
+      "contactPhone": "负责人电话",
+      "attachments": "附件"
     }
   }
 }

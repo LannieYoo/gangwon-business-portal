@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Performance List Hook
  *
  * 处理成果列表的业务逻辑。
@@ -72,7 +72,7 @@ export const usePerformanceList = () => {
     try {
       await performanceService.deleteRecord(deleteConfirm.id);
       setMessageVariant("success");
-      setMessage(t("message.deleteSuccess", "删除成功"));
+      setMessage(t("message.deleteSuccess", "삭제되었습니다"));
       setDeleteConfirm({ open: false, id: null });
       // 清除缓存并刷新
       clearCache(`performance-list-${pagination.page}-${filters.year}-${filters.quarter}-${filters.status}`);
@@ -80,7 +80,7 @@ export const usePerformanceList = () => {
     } catch (error) {
       console.error("Delete performance error:", error);
       setMessageVariant("error");
-      setMessage(t("message.deleteFailed", "删除失败"));
+      setMessage(t("message.deleteFailed", "삭제에 실패했습니다"));
     }
   };
 

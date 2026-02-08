@@ -1,0 +1,5205 @@
+{
+  "generatedAt": "2026-02-07T22:33:25.837Z",
+  "summary": {
+    "hardcodedText": 0,
+    "missingKeys": 0,
+    "invalidKeyFormat": 3,
+    "dynamicKeys": 1,
+    "fallbackValues": 904,
+    "namespaceWarnings": 1
+  },
+  "issues": {
+    "hardcodedText": [],
+    "missingKeys": [],
+    "invalidKeyFormat": [
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx",
+        "keys": [
+          {
+            "key": "admin.statistics.filters.quantitive.revenueRange.1to5b",
+            "line": 97
+          },
+          {
+            "key": "admin.statistics.filters.quantitive.revenueRange.5to10b",
+            "line": 98
+          },
+          {
+            "key": "admin.statistics.filters.quantitive.employeeRange.10to50",
+            "line": 121
+          }
+        ]
+      }
+    ],
+    "dynamicKeys": [
+      {
+        "file": "shared\\enums\\index.js",
+        "calls": [
+          {
+            "template": "`enums.industry.startupType.${key}`",
+            "line": 8,
+            "type": "template-literal"
+          }
+        ]
+      }
+    ],
+    "fallbackValues": [
+      {
+        "file": "admin\\layouts\\Footer.jsx",
+        "calls": [
+          {
+            "key": "footer.termsOfService",
+            "fallback": "이용약관",
+            "line": 34
+          },
+          {
+            "key": "footer.privacyPolicy",
+            "fallback": "개인정보처리방침",
+            "line": 35
+          },
+          {
+            "key": "footer.termsOfService",
+            "fallback": "이용약관",
+            "line": 42
+          },
+          {
+            "key": "footer.privacyPolicy",
+            "fallback": "개인정보처리방침",
+            "line": 43
+          },
+          {
+            "key": "footer.noContent",
+            "fallback": "콘텐츠가 없습니다",
+            "line": 45
+          },
+          {
+            "key": "footer.error",
+            "fallback": "오류",
+            "line": 48
+          }
+        ]
+      },
+      {
+        "file": "admin\\layouts\\Header.jsx",
+        "calls": [
+          {
+            "key": "admin.layouts.login",
+            "fallback": "로그인",
+            "line": 207
+          }
+        ]
+      },
+      {
+        "file": "admin\\layouts\\Sidebar.jsx",
+        "calls": [
+          {
+            "key": "admin.layouts.menu.statistics",
+            "fallback": "통계 보고서",
+            "line": 70
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\content\\BannerManagement.jsx",
+        "calls": [
+          {
+            "key": "admin.content.banners.messages.saved",
+            "fallback": "저장되었습니다",
+            "line": 123
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 137
+          },
+          {
+            "key": "admin.content.banners.types.mainBanner",
+            "fallback": "메인 배너",
+            "line": 141
+          },
+          {
+            "key": "admin.content.banners.types.systemIntro",
+            "fallback": "시스템 소개",
+            "line": 142
+          },
+          {
+            "key": "admin.content.banners.types.projects",
+            "fallback": "지원사업",
+            "line": 143
+          },
+          {
+            "key": "admin.content.banners.types.performance",
+            "fallback": "성과",
+            "line": 144
+          },
+          {
+            "key": "admin.content.banners.types.support",
+            "fallback": "지원",
+            "line": 145
+          },
+          {
+            "key": "admin.content.banners.form.fields.desktopImage",
+            "fallback": "데스크톱 이미지",
+            "line": 154
+          },
+          {
+            "key": "admin.content.banners.form.fields.desktopImageHint",
+            "fallback": "권장: 1920 x 600 (16:5), 최소: 1440 x 450",
+            "line": 157
+          },
+          {
+            "key": "admin.content.banners.actions.uploadDesktop",
+            "fallback": "데스크톱 이미지 업로드",
+            "line": 187
+          },
+          {
+            "key": "admin.content.banners.form.fields.mobileImage",
+            "fallback": "모바일 이미지",
+            "line": 195
+          },
+          {
+            "key": "admin.content.banners.form.fields.mobileImageHint",
+            "fallback": "권장: 1080 x 1350 (4:5), 최소: 750 x 938",
+            "line": 198
+          },
+          {
+            "key": "admin.content.banners.actions.uploadMobile",
+            "fallback": "모바일 이미지 업로드",
+            "line": 228
+          },
+          {
+            "key": "admin.content.banners.form.fields.url",
+            "fallback": "링크 URL",
+            "line": 234
+          },
+          {
+            "key": "admin.content.banners.form.fields.urlPlaceholder",
+            "fallback": "https://example.com",
+            "line": 239
+          },
+          {
+            "key": "admin.content.banners.actions.save",
+            "fallback": "저장",
+            "line": 250
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\content\\ContentManagement.jsx",
+        "calls": [
+          {
+            "key": "admin.content.tabs.legal",
+            "fallback": "약관관리",
+            "line": 42
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\content\\FAQManagement.jsx",
+        "calls": [
+          {
+            "key": "admin.content.faq.categories.general",
+            "fallback": "일반 문의",
+            "line": 40
+          },
+          {
+            "key": "admin.content.faq.categories.registration",
+            "fallback": "등록 관련",
+            "line": 41
+          },
+          {
+            "key": "admin.content.faq.categories.performance",
+            "fallback": "성과 관리",
+            "line": 42
+          },
+          {
+            "key": "admin.content.faq.categories.project",
+            "fallback": "지원사업 신청",
+            "line": 43
+          },
+          {
+            "key": "admin.content.faq.categories.technical",
+            "fallback": "기술 지원",
+            "line": 44
+          },
+          {
+            "key": "admin.content.faq.question",
+            "fallback": "질문",
+            "line": 50
+          },
+          {
+            "key": "admin.content.faq.category",
+            "fallback": "카테고리",
+            "line": 59
+          },
+          {
+            "key": "admin.content.faq.displayOrder",
+            "fallback": "표시 순서",
+            "line": 67
+          },
+          {
+            "key": "admin.content.faq.createdAt",
+            "fallback": "생성일",
+            "line": 73
+          },
+          {
+            "key": "common.actions",
+            "fallback": "작업",
+            "line": 79
+          },
+          {
+            "key": "common.edit",
+            "fallback": "수정",
+            "line": 91
+          },
+          {
+            "key": "common.delete",
+            "fallback": "삭제",
+            "line": 101
+          },
+          {
+            "key": "admin.content.faq.title",
+            "fallback": "FAQ 관리",
+            "line": 183
+          },
+          {
+            "key": "admin.content.faq.addFaq",
+            "fallback": "FAQ 추가",
+            "line": 186
+          },
+          {
+            "key": "admin.content.faq.searchPlaceholder",
+            "fallback": "질문 또는 답변 검색...",
+            "line": 201
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 212
+          },
+          {
+            "key": "admin.content.faq.noData",
+            "fallback": "FAQ 데이터가 없습니다",
+            "line": 215
+          },
+          {
+            "key": "admin.content.faq.noSearchResult",
+            "fallback": "현재 검색 조건에 일치하는 FAQ가 없습니다",
+            "line": 219
+          },
+          {
+            "key": "admin.content.faq.editFaq",
+            "fallback": "FAQ 수정",
+            "line": 263
+          },
+          {
+            "key": "admin.content.faq.addFaq",
+            "fallback": "FAQ 추가",
+            "line": 264
+          },
+          {
+            "key": "admin.content.faq.deleteConfirm",
+            "fallback": "이 FAQ를 삭제하시겠습니까?",
+            "line": 282
+          },
+          {
+            "key": "admin.content.faq.deleteConfirmMessage",
+            "fallback": "이 작업은 취소할 수 없습니다. 계속하시겠습니까?",
+            "line": 287
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 292
+          },
+          {
+            "key": "common.delete",
+            "fallback": "삭제",
+            "line": 295
+          },
+          {
+            "key": "admin.content.faq.question",
+            "fallback": "질문",
+            "line": 341
+          },
+          {
+            "key": "admin.content.faq.questionPlaceholder",
+            "fallback": "FAQ 질문을 입력하세요",
+            "line": 346
+          },
+          {
+            "key": "admin.content.faq.answer",
+            "fallback": "답변",
+            "line": 352
+          },
+          {
+            "key": "admin.content.faq.answerPlaceholder",
+            "fallback": "FAQ 답변을 입력하세요",
+            "line": 359
+          },
+          {
+            "key": "admin.content.faq.category",
+            "fallback": "카테고리",
+            "line": 366
+          },
+          {
+            "key": "admin.content.faq.selectCategory",
+            "fallback": "카테고리 선택",
+            "line": 372
+          },
+          {
+            "key": "admin.content.faq.displayOrder",
+            "fallback": "표시 순서",
+            "line": 378
+          },
+          {
+            "key": "admin.content.faq.displayOrderPlaceholder",
+            "fallback": "표시 순서를 입력하세요",
+            "line": 386
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 393
+          },
+          {
+            "key": "common.save",
+            "fallback": "저장",
+            "line": 396
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\content\\LegalContentManagement.jsx",
+        "calls": [
+          {
+            "key": "admin.content.legal.messages.contentRequired",
+            "fallback": "내용을 입력해주세요",
+            "line": 78
+          },
+          {
+            "key": "admin.content.legal.messages.saved",
+            "fallback": "저장되었습니다",
+            "line": 91
+          },
+          {
+            "key": "admin.content.legal.messages.saveFailed",
+            "fallback": "저장에 실패했습니다",
+            "line": 95
+          },
+          {
+            "key": "admin.content.legal.termsOfService",
+            "fallback": "이용약관",
+            "line": 104
+          },
+          {
+            "key": "admin.content.legal.privacyPolicy",
+            "fallback": "개인정보 처리방침",
+            "line": 108
+          },
+          {
+            "key": "admin.content.legal.thirdPartySharing",
+            "fallback": "제3자 정보 제공 동의",
+            "line": 112
+          },
+          {
+            "key": "admin.content.legal.marketingConsent",
+            "fallback": "마케팅 정보 수신 동의",
+            "line": 116
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 124
+          },
+          {
+            "key": "admin.content.legal.title",
+            "fallback": "약관관리",
+            "line": 140
+          },
+          {
+            "key": "admin.content.legal.description",
+            "fallback": "이용약관과 개인정보처리방침 내용을 관리합니다.",
+            "line": 143
+          },
+          {
+            "key": "admin.content.legal.contentPlaceholder",
+            "fallback": "내용을 입력하세요...",
+            "line": 176
+          },
+          {
+            "key": "common.actions",
+            "fallback": "작업",
+            "line": 189
+          },
+          {
+            "key": "common.preview",
+            "fallback": "미리보기",
+            "line": 197
+          },
+          {
+            "key": "common.save",
+            "fallback": "저장",
+            "line": 206
+          },
+          {
+            "key": "admin.content.legal.helpTitle",
+            "fallback": "안내",
+            "line": 216
+          },
+          {
+            "key": "admin.content.legal.helpText",
+            "fallback": "여기서 입력한 내용은 회원가입 시 이용약관 및 개인정보처리방침 팝업에 표시됩니다.",
+            "line": 219
+          },
+          {
+            "key": "common.preview",
+            "fallback": "미리보기",
+            "line": 230
+          },
+          {
+            "key": "admin.content.legal.noContent",
+            "fallback": "미리볼 내용이 없습니다",
+            "line": 252
+          },
+          {
+            "key": "common.close",
+            "fallback": "닫기",
+            "line": 259
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\content\\NoticeManagement.jsx",
+        "calls": [
+          {
+            "key": "admin.content.notices.messages.loadFailed",
+            "fallback": "공지사항 상세 정보를 불러오지 못했습니다",
+            "line": 99
+          },
+          {
+            "key": "admin.content.notices.messages.validationError",
+            "fallback": "필수 항목을 입력해주세요",
+            "line": 115
+          },
+          {
+            "key": "admin.content.notices.messages.saved",
+            "fallback": "저장되었습니다",
+            "line": 130
+          },
+          {
+            "key": "admin.content.notices.messages.deleted",
+            "fallback": "삭제되었습니다",
+            "line": 150
+          },
+          {
+            "key": "admin.content.notices.list.title",
+            "fallback": "공지사항 목록",
+            "line": 168
+          },
+          {
+            "key": "admin.content.notices.list.description",
+            "fallback": "웹사이트 공지사항 관리",
+            "line": 169
+          },
+          {
+            "key": "admin.content.notices.actions.new",
+            "fallback": "새로 만들기",
+            "line": 172
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 177
+          },
+          {
+            "key": "admin.content.notices.list.empty",
+            "fallback": "공지사항이 없습니다",
+            "line": 180
+          },
+          {
+            "key": "admin.content.notices.views",
+            "fallback": "조회",
+            "line": 199
+          },
+          {
+            "key": "common.delete",
+            "fallback": "삭제",
+            "line": 211
+          },
+          {
+            "key": "admin.content.notices.form.editTitle",
+            "fallback": "공지사항 수정",
+            "line": 224
+          },
+          {
+            "key": "admin.content.notices.form.newTitle",
+            "fallback": "새 공지사항",
+            "line": 225
+          },
+          {
+            "key": "admin.content.notices.form.fields.title",
+            "fallback": "제목",
+            "line": 229
+          },
+          {
+            "key": "admin.content.notices.form.fields.boardTypeImportant",
+            "fallback": "중요",
+            "line": 250
+          },
+          {
+            "key": "admin.content.notices.form.fields.contentHtml",
+            "fallback": "내용",
+            "line": 256
+          },
+          {
+            "key": "admin.content.notices.form.fields.contentHtmlPlaceholder",
+            "fallback": "공지사항 내용을 입력하세요...",
+            "line": 261
+          },
+          {
+            "key": "admin.content.notices.form.fields.attachments",
+            "fallback": "첨부파일",
+            "line": 264
+          },
+          {
+            "key": "admin.content.notices.actions.update",
+            "fallback": "업데이트",
+            "line": 278
+          },
+          {
+            "key": "admin.content.notices.actions.create",
+            "fallback": "생성",
+            "line": 279
+          },
+          {
+            "key": "admin.content.notices.actions.confirmDelete",
+            "fallback": "이 공지사항을 삭제하시겠습니까?",
+            "line": 291
+          },
+          {
+            "key": "admin.content.notices.actions.confirmDeleteMessage",
+            "fallback": "이 작업은 취소할 수 없습니다. 계속하시겠습니까?",
+            "line": 296
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 301
+          },
+          {
+            "key": "common.delete",
+            "fallback": "삭제",
+            "line": 304
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\content\\SystemInfoManagement.jsx",
+        "calls": [
+          {
+            "key": "admin.content.systemInfo.messages.imageUploaded",
+            "fallback": "이미지가 업로드되었습니다",
+            "line": 63
+          },
+          {
+            "key": "admin.content.systemInfo.messages.imageUploadFailed",
+            "fallback": "이미지 업로드에 실패했습니다. 다시 시도해주세요",
+            "line": 67
+          },
+          {
+            "key": "admin.content.systemInfo.messages.imageUploadFailed",
+            "fallback": "이미지 업로드에 실패했습니다. 다시 시도해주세요",
+            "line": 71
+          },
+          {
+            "key": "admin.content.systemInfo.messages.contentRequired",
+            "fallback": "상세 내용을 입력하세요",
+            "line": 93
+          },
+          {
+            "key": "admin.content.systemInfo.messages.saved",
+            "fallback": "저장되었습니다",
+            "line": 110
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 119
+          },
+          {
+            "key": "admin.content.systemInfo.title",
+            "fallback": "시스템 소개 관리",
+            "line": 135
+          },
+          {
+            "key": "admin.content.systemInfo.description",
+            "fallback": "시스템 소개 페이지의 내용을 관리합니다. 제목, 설명, 상세 내용 및 표시 이미지를 포함합니다.",
+            "line": 138
+          },
+          {
+            "key": "admin.content.systemInfo.contentPlaceholder",
+            "fallback": "시스템 소개의 상세 내용을 입력하세요...",
+            "line": 150
+          },
+          {
+            "key": "error.validation.contentRequired",
+            "fallback": "상세 내용은 필수 입력 항목입니다",
+            "line": 153
+          },
+          {
+            "key": "admin.content.systemInfo.imageLabel",
+            "fallback": "표시 이미지",
+            "line": 166
+          },
+          {
+            "key": "admin.content.systemInfo.imageHint",
+            "fallback": "JPG, PNG, GIF 형식을 지원하며, 권장 크기는 800x600 픽셀, 파일 크기는 5MB를 초과할 수 없습니다",
+            "line": 169
+          },
+          {
+            "key": "common.remove",
+            "fallback": "제거",
+            "line": 187
+          },
+          {
+            "key": "admin.content.systemInfo.noImage",
+            "fallback": "이미지 없음",
+            "line": 196
+          },
+          {
+            "key": "admin.content.systemInfo.messages.imageTooLarge",
+            "fallback": "이미지 크기는 5MB를 초과할 수 없습니다",
+            "line": 208
+          },
+          {
+            "key": "common.uploading",
+            "fallback": "업로드 중...",
+            "line": 219
+          },
+          {
+            "key": "common.changeImage",
+            "fallback": "이미지 변경",
+            "line": 221
+          },
+          {
+            "key": "common.selectImage",
+            "fallback": "이미지 선택",
+            "line": 222
+          },
+          {
+            "key": "common.actions",
+            "fallback": "작업",
+            "line": 233
+          },
+          {
+            "key": "common.preview",
+            "fallback": "미리보기",
+            "line": 241
+          },
+          {
+            "key": "common.save",
+            "fallback": "저장",
+            "line": 250
+          },
+          {
+            "key": "common.preview",
+            "fallback": "미리보기",
+            "line": 262
+          },
+          {
+            "key": "admin.content.systemInfo.noContent",
+            "fallback": "미리볼 내용이 없습니다",
+            "line": 297
+          },
+          {
+            "key": "common.close",
+            "fallback": "닫기",
+            "line": 304
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\content\\utils.js",
+        "calls": [
+          {
+            "key": "admin.content.banners.form.fields.bannerType",
+            "fallback": "배너 유형",
+            "line": 27
+          },
+          {
+            "key": "admin.content.banners.form.fields.imageUrl",
+            "fallback": "이미지 URL",
+            "line": 32
+          },
+          {
+            "key": "admin.content.notices.form.fields.title",
+            "fallback": "제목",
+            "line": 57
+          },
+          {
+            "key": "admin.content.notices.form.fields.contentHtml",
+            "fallback": "내용",
+            "line": 62
+          },
+          {
+            "key": "admin.content.news.form.fields.title",
+            "fallback": "제목",
+            "line": 86
+          },
+          {
+            "key": "admin.content.news.form.fields.imageUrl",
+            "fallback": "이미지 URL",
+            "line": 91
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\dashboard\\CompanyStatus.jsx",
+        "calls": [
+          {
+            "key": "admin.dashboard.companyStatus.title",
+            "fallback": "기업 현황",
+            "line": 119
+          },
+          {
+            "key": "admin.dashboard.filter.year",
+            "fallback": "연도",
+            "line": 125
+          },
+          {
+            "key": "admin.dashboard.filter.quarter",
+            "fallback": "분기",
+            "line": 138
+          },
+          {
+            "key": "admin.dashboard.companyStatus.export",
+            "fallback": "Excel 내보내기",
+            "line": 162
+          },
+          {
+            "key": "common.unit",
+            "fallback": "단위",
+            "line": 192
+          },
+          {
+            "key": "common.currencyUnit",
+            "fallback": "만원",
+            "line": 192
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\members\\MemberDetail.jsx",
+        "calls": [
+          {
+            "key": "admin.members.approveSuccess",
+            "fallback": "승인 성공",
+            "line": 54
+          },
+          {
+            "key": "admin.members.rejectSuccess",
+            "fallback": "거부 성공",
+            "line": 71
+          },
+          {
+            "key": "admin.members.rejectFailed",
+            "fallback": "거부 실패",
+            "line": 78
+          },
+          {
+            "key": "performance.companyInfo.sections.basicInfo",
+            "fallback": "기본 정보",
+            "line": 150
+          },
+          {
+            "key": "performance.companyInfo.sections.logo",
+            "fallback": "기업 로고",
+            "line": 157
+          },
+          {
+            "key": "performance.companyInfo.profile.noLogo",
+            "fallback": "로고 없음",
+            "line": 172
+          },
+          {
+            "key": "member.companyName",
+            "fallback": "기업명",
+            "line": 180
+          },
+          {
+            "key": "member.businessLicense",
+            "fallback": "사업자등록번호",
+            "line": 188
+          },
+          {
+            "key": "member.corporationNumber",
+            "fallback": "법인등록번호",
+            "line": 196
+          },
+          {
+            "key": "member.establishedDate",
+            "fallback": "설립일",
+            "line": 204
+          },
+          {
+            "key": "member.representative",
+            "fallback": "대표자",
+            "line": 212
+          },
+          {
+            "key": "member.representativeBirthDate",
+            "fallback": "대표자 생년월일",
+            "line": 220
+          },
+          {
+            "key": "member.representativeGender",
+            "fallback": "대표자 성별",
+            "line": 230
+          },
+          {
+            "key": "common.male",
+            "fallback": "남성",
+            "line": 234
+          },
+          {
+            "key": "common.female",
+            "fallback": "여성",
+            "line": 236
+          },
+          {
+            "key": "member.representativePhone",
+            "fallback": "대표자 전화번호",
+            "line": 242
+          },
+          {
+            "key": "member.phone",
+            "fallback": "기업 전화번호",
+            "line": 250
+          },
+          {
+            "key": "member.contactPersonName",
+            "fallback": "담당자명",
+            "line": 258
+          },
+          {
+            "key": "member.contactPersonDepartment",
+            "fallback": "담당자 부서",
+            "line": 266
+          },
+          {
+            "key": "member.contactPersonPosition",
+            "fallback": "담당자 직책",
+            "line": 274
+          },
+          {
+            "key": "member.contactPersonPhone",
+            "fallback": "담당자 전화번호",
+            "line": 282
+          },
+          {
+            "key": "admin.members.table.status",
+            "fallback": "상태",
+            "line": 290
+          },
+          {
+            "key": "admin.members.detail.createdAt",
+            "fallback": "가입일시",
+            "line": 312
+          },
+          {
+            "key": "performance.companyInfo.sections.addressInfo",
+            "fallback": "주소 정보",
+            "line": 325
+          },
+          {
+            "key": "member.address",
+            "fallback": "주소",
+            "line": 332
+          },
+          {
+            "key": "member.region",
+            "fallback": "소재지",
+            "line": 340
+          },
+          {
+            "key": "performance.companyInfo.sections.businessInfo",
+            "fallback": "사업 정보",
+            "line": 355
+          },
+          {
+            "key": "member.startupType",
+            "fallback": "창업유형",
+            "line": 362
+          },
+          {
+            "key": "member.businessField",
+            "fallback": "사업분야",
+            "line": 375
+          },
+          {
+            "key": "member.ksicMajor",
+            "fallback": "한국표준산업분류코드[대분류]",
+            "line": 388
+          },
+          {
+            "key": "member.ksicSub",
+            "fallback": "한국표준사업분류코드[중분류]",
+            "line": 401
+          },
+          {
+            "key": "member.mainIndustryKsicMajor",
+            "fallback": "주력산업 KSIC 코드",
+            "line": 411
+          },
+          {
+            "key": "member.mainIndustryKsicCodes",
+            "fallback": "주력산업 KSIC 세부 코드",
+            "line": 424
+          },
+          {
+            "key": "member.gangwonIndustry",
+            "fallback": "강원도 7대 미래산업",
+            "line": 437
+          },
+          {
+            "key": "member.futureTech",
+            "fallback": "미래유망 신기술",
+            "line": 450
+          },
+          {
+            "key": "member.startupStage",
+            "fallback": "창업구분",
+            "line": 463
+          },
+          {
+            "key": "member.sales",
+            "fallback": "연간 매출액",
+            "line": 476
+          },
+          {
+            "key": "common.currency.krw",
+            "fallback": "원",
+            "line": 480
+          },
+          {
+            "key": "member.employeeCount",
+            "fallback": "직원 수",
+            "line": 486
+          },
+          {
+            "key": "common.people",
+            "fallback": "명",
+            "line": 490
+          },
+          {
+            "key": "member.website",
+            "fallback": "웹사이트",
+            "line": 496
+          },
+          {
+            "key": "member.mainBusiness",
+            "fallback": "주요 사업",
+            "line": 515
+          },
+          {
+            "key": "member.description",
+            "fallback": "기업소개",
+            "line": 523
+          },
+          {
+            "key": "performance.companyInfo.sections.additionalInfo",
+            "fallback": "추가 정보",
+            "line": 536
+          },
+          {
+            "key": "member.email",
+            "fallback": "이메일",
+            "line": 543
+          },
+          {
+            "key": "member.cooperationFields",
+            "fallback": "산업협력 희망 분야",
+            "line": 551
+          },
+          {
+            "key": "member.participationPrograms",
+            "fallback": "참여 프로그램",
+            "line": 579
+          },
+          {
+            "key": "member.investmentStatus",
+            "fallback": "투자 유치",
+            "line": 615
+          },
+          {
+            "key": "member.notSet",
+            "fallback": "미설정",
+            "line": 626
+          },
+          {
+            "key": "member.notSet",
+            "fallback": "미설정",
+            "line": 628
+          },
+          {
+            "key": "admin.members.detail.searchNiceDnb",
+            "fallback": "Nice D&B 조회",
+            "line": 648
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 652
+          },
+          {
+            "key": "admin.members.detail.nicednbWarning",
+            "fallback": "알림:",
+            "line": 677
+          },
+          {
+            "key": "common.personUnit",
+            "fallback": "명",
+            "line": 840
+          },
+          {
+            "key": "common.unit",
+            "fallback": "단위",
+            "line": 896
+          },
+          {
+            "key": "admin.members.detail.thousandKRW",
+            "fallback": "천원",
+            "line": 897
+          },
+          {
+            "key": "common.billionWon",
+            "fallback": "억원",
+            "line": 989
+          },
+          {
+            "key": "common.billionWon",
+            "fallback": "억원",
+            "line": 994
+          },
+          {
+            "key": "common.personUnit",
+            "fallback": "명",
+            "line": 999
+          },
+          {
+            "key": "admin.members.rejectReasonTitle",
+            "fallback": "거부 사유 입력",
+            "line": 1019
+          },
+          {
+            "key": "admin.members.rejectReasonLabel",
+            "fallback": "거부 사유 (선택사항)",
+            "line": 1025
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 1040
+          },
+          {
+            "key": "common.confirm",
+            "fallback": "확인",
+            "line": 1043
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\members\\MemberList.jsx",
+        "calls": [
+          {
+            "key": "admin.members.table.email",
+            "fallback": "이메일",
+            "line": 105
+          },
+          {
+            "key": "admin.members.exportSuccess",
+            "fallback": "내보내기 성공",
+            "line": 154
+          },
+          {
+            "key": "admin.members.exportFailed",
+            "fallback": "내보내기 실패",
+            "line": 159
+          },
+          {
+            "key": "admin.members.approveSuccess",
+            "fallback": "승인 성공",
+            "line": 172
+          },
+          {
+            "key": "admin.members.rejectSuccess",
+            "fallback": "거부 성공",
+            "line": 195
+          },
+          {
+            "key": "admin.members.rejectFailed",
+            "fallback": "거부 실패",
+            "line": 201
+          },
+          {
+            "key": "admin.members.resetSuccess",
+            "fallback": "검토 대기로 재설정되었습니다",
+            "line": 216
+          },
+          {
+            "key": "admin.members.table.email",
+            "fallback": "이메일",
+            "line": 261
+          },
+          {
+            "key": "admin.members.reject",
+            "fallback": "거부",
+            "line": 384
+          },
+          {
+            "key": "admin.members.resetPending",
+            "fallback": "취소",
+            "line": 399
+          },
+          {
+            "key": "admin.members.exportExcel",
+            "fallback": "Excel 내보내기",
+            "line": 442
+          },
+          {
+            "key": "admin.members.noMembers",
+            "fallback": "회원 데이터가 없습니다",
+            "line": 461
+          },
+          {
+            "key": "admin.members.rejectReasonTitle",
+            "fallback": "거부 사유 입력",
+            "line": 511
+          },
+          {
+            "key": "admin.members.rejectReasonLabel",
+            "fallback": "거부 사유 (선택사항)",
+            "line": 517
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 532
+          },
+          {
+            "key": "common.confirm",
+            "fallback": "확인",
+            "line": 535
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\messages\\ThreadList.jsx",
+        "calls": [
+          {
+            "key": "common.member",
+            "fallback": "회원",
+            "line": 335
+          },
+          {
+            "key": "common.send",
+            "fallback": "전송",
+            "line": 649
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+        "calls": [
+          {
+            "key": "common.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 17
+          },
+          {
+            "key": "performance.governmentSupportFields.projectName",
+            "fallback": "실행 지원사업명",
+            "line": 30
+          },
+          {
+            "key": "performance.governmentSupportFields.startupProjectName",
+            "fallback": "창업 지원사업명",
+            "line": 36
+          },
+          {
+            "key": "performance.governmentSupportFields.supportOrganization",
+            "fallback": "지원 기관명",
+            "line": 42
+          },
+          {
+            "key": "performance.governmentSupportFields.supportAmount",
+            "fallback": "지원 금액",
+            "line": 48
+          },
+          {
+            "key": "performance.governmentSupportFields.startDate",
+            "fallback": "시작일",
+            "line": 56
+          },
+          {
+            "key": "performance.governmentSupportFields.endDate",
+            "fallback": "종료일",
+            "line": 62
+          },
+          {
+            "key": "performance.governmentSupportFields.proofDocument",
+            "fallback": "증빙서류",
+            "line": 70
+          },
+          {
+            "key": "common.document",
+            "fallback": "증명문서",
+            "line": 79
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 97
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\performance\\components\\IntellectualPropertyTab.jsx",
+        "calls": [
+          {
+            "key": "common.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 27
+          },
+          {
+            "key": "admin.performance.intellectualPropertyFields.name",
+            "fallback": "지식재산권명",
+            "line": 40
+          },
+          {
+            "key": "admin.performance.intellectualPropertyFields.number",
+            "fallback": "지식재산권번호",
+            "line": 46
+          },
+          {
+            "key": "admin.performance.intellectualPropertyFields.type",
+            "fallback": "지식재산권 구분",
+            "line": 52
+          },
+          {
+            "key": "admin.performance.intellectualPropertyFields.registrationType",
+            "fallback": "지식재산권 등록 구분",
+            "line": 58
+          },
+          {
+            "key": "admin.performance.intellectualPropertyFields.country",
+            "fallback": "등록 국가",
+            "line": 64
+          },
+          {
+            "key": "admin.performance.intellectualPropertyFields.overseasType",
+            "fallback": "해외 신청 구분",
+            "line": 70
+          },
+          {
+            "key": "admin.performance.intellectualPropertyFields.registrationDate",
+            "fallback": "등록일",
+            "line": 76
+          },
+          {
+            "key": "admin.performance.intellectualPropertyFields.publicDisclosure",
+            "fallback": "공개 희망 여부",
+            "line": 82
+          },
+          {
+            "key": "common.yes",
+            "fallback": "예",
+            "line": 85
+          },
+          {
+            "key": "common.no",
+            "fallback": "아니오",
+            "line": 85
+          },
+          {
+            "key": "admin.performance.intellectualPropertyFields.proofDocument",
+            "fallback": "증빙서류",
+            "line": 92
+          },
+          {
+            "key": "common.document",
+            "fallback": "증명문서",
+            "line": 101
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 119
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+        "calls": [
+          {
+            "key": "performance.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 17
+          },
+          {
+            "key": "performance.salesEmploymentFields.sales",
+            "fallback": "매출액",
+            "line": 29
+          },
+          {
+            "key": "performance.salesEmploymentFields.unit.won",
+            "fallback": "원",
+            "line": 31
+          },
+          {
+            "key": "performance.salesEmploymentFields.previousYear",
+            "fallback": "전년도",
+            "line": 37
+          },
+          {
+            "key": "performance.year",
+            "fallback": "연도",
+            "line": 45
+          },
+          {
+            "key": "performance.salesEmploymentFields.reportingDate",
+            "fallback": "작성 기준일",
+            "line": 53
+          },
+          {
+            "key": "performance.salesEmploymentFields.export",
+            "fallback": "수출액",
+            "line": 65
+          },
+          {
+            "key": "performance.salesEmploymentFields.unit.won",
+            "fallback": "원",
+            "line": 67
+          },
+          {
+            "key": "performance.salesEmploymentFields.previousYear",
+            "fallback": "전년도",
+            "line": 73
+          },
+          {
+            "key": "performance.year",
+            "fallback": "연도",
+            "line": 81
+          },
+          {
+            "key": "performance.salesEmploymentFields.reportingDate",
+            "fallback": "작성 기준일",
+            "line": 89
+          },
+          {
+            "key": "performance.salesEmploymentFields.hskCode",
+            "fallback": "HSK 코드",
+            "line": 99
+          },
+          {
+            "key": "performance.salesEmploymentFields.exportCountry1",
+            "fallback": "수출 국가 1",
+            "line": 107
+          },
+          {
+            "key": "performance.salesEmploymentFields.exportCountry2",
+            "fallback": "수출 국가 2",
+            "line": 115
+          },
+          {
+            "key": "performance.salesEmploymentFields.employment",
+            "fallback": "고용 창출",
+            "line": 127
+          },
+          {
+            "key": "performance.salesEmploymentFields.unit.people",
+            "fallback": "명",
+            "line": 129
+          },
+          {
+            "key": "performance.salesEmploymentFields.currentEmployees",
+            "fallback": "현재 직원 수",
+            "line": 136
+          },
+          {
+            "key": "performance.salesEmploymentFields.previousYear",
+            "fallback": "전년도",
+            "line": 141
+          },
+          {
+            "key": "performance.year",
+            "fallback": "연도",
+            "line": 149
+          },
+          {
+            "key": "performance.salesEmploymentFields.newEmployees",
+            "fallback": "신규 고용 인원",
+            "line": 159
+          },
+          {
+            "key": "performance.salesEmploymentFields.previousYear",
+            "fallback": "전년도",
+            "line": 164
+          },
+          {
+            "key": "performance.year",
+            "fallback": "연도",
+            "line": 172
+          },
+          {
+            "key": "performance.salesEmploymentFields.totalEmployees",
+            "fallback": "총 인원",
+            "line": 182
+          },
+          {
+            "key": "performance.salesEmploymentFields.previousYear",
+            "fallback": "전년도",
+            "line": 187
+          },
+          {
+            "key": "performance.year",
+            "fallback": "연도",
+            "line": 195
+          },
+          {
+            "key": "performance.salesEmploymentFields.attachments",
+            "fallback": "증빙서류",
+            "line": 209
+          },
+          {
+            "key": "common.document",
+            "fallback": "증명문서",
+            "line": 218
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 236
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\performance\\PerformanceDetail.jsx",
+        "calls": [
+          {
+            "key": "admin.performance.approveSuccess",
+            "fallback": "승인 성공",
+            "line": 53
+          },
+          {
+            "key": "admin.performance.approveFailed",
+            "fallback": "승인 실패",
+            "line": 57
+          },
+          {
+            "key": "admin.performance.revisionCommentRequired",
+            "fallback": "수정 의견을 입력하세요",
+            "line": 63
+          },
+          {
+            "key": "admin.performance.revisionSuccess",
+            "fallback": "수정 요청이 전송되었습니다",
+            "line": 69
+          },
+          {
+            "key": "admin.performance.revisionFailed",
+            "fallback": "수정 요청 실패",
+            "line": 75
+          },
+          {
+            "key": "admin.performance.rejectCommentRequired",
+            "fallback": "거부 사유를 입력하세요",
+            "line": 81
+          },
+          {
+            "key": "admin.performance.rejectSuccess",
+            "fallback": "거부 성공",
+            "line": 87
+          },
+          {
+            "key": "admin.performance.rejectFailed",
+            "fallback": "거부 실패",
+            "line": 93
+          },
+          {
+            "key": "admin.performance.detail.fileNotFound",
+            "fallback": "파일을 찾을 수 없습니다",
+            "line": 99
+          },
+          {
+            "key": "admin.performance.detail.fileNotFound",
+            "fallback": "파일을 찾을 수 없습니다",
+            "line": 108
+          },
+          {
+            "key": "performance.status.approved",
+            "fallback": "승인 완료",
+            "line": 130
+          },
+          {
+            "key": "performance.status.submitted",
+            "fallback": "심사중",
+            "line": 131
+          },
+          {
+            "key": "performance.status.submitted",
+            "fallback": "심사중",
+            "line": 132
+          },
+          {
+            "key": "performance.status.revisionRequested",
+            "fallback": "수정 필요",
+            "line": 133
+          },
+          {
+            "key": "performance.status.revisionRequested",
+            "fallback": "수정 필요",
+            "line": 134
+          },
+          {
+            "key": "performance.status.draft",
+            "fallback": "임시저장",
+            "line": 135
+          },
+          {
+            "key": "performance.status.rejected",
+            "fallback": "거부됨",
+            "line": 136
+          },
+          {
+            "key": "performance.tabs.salesEmployment",
+            "fallback": "매출 고용",
+            "line": 148
+          },
+          {
+            "key": "performance.tabs.governmentSupport",
+            "fallback": "정부지원 수혜 이력",
+            "line": 160
+          },
+          {
+            "key": "performance.tabs.intellectualProperty",
+            "fallback": "지식재산권",
+            "line": 172
+          },
+          {
+            "key": "admin.performance.detail.notFound",
+            "fallback": "실적 기록이 존재하지 않습니다",
+            "line": 191
+          },
+          {
+            "key": "admin.performance.reject",
+            "fallback": "거부",
+            "line": 230
+          },
+          {
+            "key": "admin.performance.detail.basicInfo",
+            "fallback": "기본 정보",
+            "line": 243
+          },
+          {
+            "key": "admin.performance.table.memberName",
+            "fallback": "기업명",
+            "line": 252
+          },
+          {
+            "key": "admin.members.detail.businessNumber",
+            "fallback": "사업자번호",
+            "line": 260
+          },
+          {
+            "key": "admin.performance.table.year",
+            "fallback": "연도",
+            "line": 270
+          },
+          {
+            "key": "admin.performance.table.quarter",
+            "fallback": "분기",
+            "line": 276
+          },
+          {
+            "key": "performance.quarter.q${record.quarter}",
+            "fallback": "${record.quarter}분기",
+            "line": 279
+          },
+          {
+            "key": "performance.annual",
+            "fallback": "연간",
+            "line": 279
+          },
+          {
+            "key": "admin.performance.table.companyPhone",
+            "fallback": "기업 전화번호",
+            "line": 284
+          },
+          {
+            "key": "admin.performance.table.submittedAt",
+            "fallback": "제출 시간",
+            "line": 290
+          },
+          {
+            "key": "admin.performance.detail.createdAt",
+            "fallback": "생성 시간",
+            "line": 296
+          },
+          {
+            "key": "admin.performance.detail.updatedAt",
+            "fallback": "업데이트 시간",
+            "line": 302
+          },
+          {
+            "key": "admin.performance.rejectModal.title",
+            "fallback": "실적 기록 거부",
+            "line": 373
+          },
+          {
+            "key": "admin.performance.rejectModal.description",
+            "fallback": "거부 사유를 입력하세요.",
+            "line": 376
+          },
+          {
+            "key": "admin.performance.rejectModal.placeholder",
+            "fallback": "거부 사유를 입력하세요...",
+            "line": 380
+          },
+          {
+            "key": "admin.performance.reject",
+            "fallback": "거부",
+            "line": 399
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\performance\\PerformanceList.jsx",
+        "calls": [
+          {
+            "key": "admin.performance.approveSuccess",
+            "fallback": "승인 성공",
+            "line": 121
+          },
+          {
+            "key": "admin.performance.approveFailed",
+            "fallback": "승인 실패",
+            "line": 128
+          },
+          {
+            "key": "admin.performance.revisionCommentRequired",
+            "fallback": "수정 의견을 입력하세요",
+            "line": 134
+          },
+          {
+            "key": "admin.performance.revisionSuccess",
+            "fallback": "수정 요청이 전송되었습니다",
+            "line": 140
+          },
+          {
+            "key": "admin.performance.revisionFailed",
+            "fallback": "수정 요청 실패",
+            "line": 147
+          },
+          {
+            "key": "admin.performance.rejectCommentRequired",
+            "fallback": "거부 사유를 입력하세요",
+            "line": 153
+          },
+          {
+            "key": "admin.performance.rejectSuccess",
+            "fallback": "거부 성공",
+            "line": 159
+          },
+          {
+            "key": "admin.performance.rejectFailed",
+            "fallback": "거부 실패",
+            "line": 166
+          },
+          {
+            "key": "admin.performance.cancelReviewSuccess",
+            "fallback": "취소 성공",
+            "line": 173
+          },
+          {
+            "key": "admin.performance.cancelReviewFailed",
+            "fallback": "취소 실패",
+            "line": 177
+          },
+          {
+            "key": "admin.performance.detail.notFound",
+            "fallback": "실적 기록이 존재하지 않습니다",
+            "line": 183
+          },
+          {
+            "key": "admin.performance.table.memberName",
+            "fallback": "기업명",
+            "line": 205
+          },
+          {
+            "key": "admin.performance.table.businessNumber",
+            "fallback": "사업자등록번호",
+            "line": 210
+          },
+          {
+            "key": "performance.quarter.q${value}",
+            "fallback": "${value}분기",
+            "line": 217
+          },
+          {
+            "key": "performance.annual",
+            "fallback": "연간",
+            "line": 217
+          },
+          {
+            "key": "admin.performance.table.submittedAt",
+            "fallback": "제출 시간",
+            "line": 238
+          },
+          {
+            "key": "admin.performance.exportSuccess",
+            "fallback": "내보내기 성공",
+            "line": 267
+          },
+          {
+            "key": "admin.performance.exportFailed",
+            "fallback": "내보내기 실패",
+            "line": 270
+          },
+          {
+            "key": "admin.performance.table.memberName",
+            "fallback": "기업명",
+            "line": 280
+          },
+          {
+            "key": "admin.performance.table.businessNumber",
+            "fallback": "사업자등록번호",
+            "line": 289
+          },
+          {
+            "key": "performance.quarter.q${value}",
+            "fallback": "${value}분기",
+            "line": 300
+          },
+          {
+            "key": "performance.annual",
+            "fallback": "연간",
+            "line": 300
+          },
+          {
+            "key": "admin.performance.table.submittedAt",
+            "fallback": "제출 시간",
+            "line": 312
+          },
+          {
+            "key": "admin.performance.table.memberName",
+            "fallback": "기업명",
+            "line": 320
+          },
+          {
+            "key": "admin.performance.table.businessNumber",
+            "fallback": "사업자등록번호",
+            "line": 329
+          },
+          {
+            "key": "performance.quarter.q${value}",
+            "fallback": "${value}분기",
+            "line": 339
+          },
+          {
+            "key": "performance.annual",
+            "fallback": "연간",
+            "line": 339
+          },
+          {
+            "key": "admin.performance.table.submittedAt",
+            "fallback": "제출 시간",
+            "line": 355
+          },
+          {
+            "key": "admin.performance.table.actions",
+            "fallback": "작업",
+            "line": 360
+          },
+          {
+            "key": "admin.performance.requestRevision",
+            "fallback": "보완 요청",
+            "line": 387
+          },
+          {
+            "key": "admin.performance.reject",
+            "fallback": "거부",
+            "line": 399
+          },
+          {
+            "key": "admin.performance.reject",
+            "fallback": "거부",
+            "line": 401
+          },
+          {
+            "key": "admin.performance.approve",
+            "fallback": "승인",
+            "line": 411
+          },
+          {
+            "key": "admin.performance.cancelReview",
+            "fallback": "취소",
+            "line": 427
+          },
+          {
+            "key": "admin.performance.cancelReview",
+            "fallback": "취소",
+            "line": 429
+          },
+          {
+            "key": "admin.performance.searchPlaceholder",
+            "fallback": "기업명, 사업자등록번호, 연도, 유형, 상태 등 검색",
+            "line": 453
+          },
+          {
+            "key": "admin.performance.exportExcel",
+            "fallback": "Excel 내보내기",
+            "line": 462
+          },
+          {
+            "key": "admin.performance.rejectModal.title",
+            "fallback": "실적 기록 거부",
+            "line": 565
+          },
+          {
+            "key": "admin.performance.rejectModal.description",
+            "fallback": "거부 사유를 입력하세요.",
+            "line": 568
+          },
+          {
+            "key": "admin.performance.rejectModal.placeholder",
+            "fallback": "거부 사유를 입력하세요...",
+            "line": 572
+          },
+          {
+            "key": "admin.performance.reject",
+            "fallback": "거부",
+            "line": 592
+          },
+          {
+            "key": "admin.performance.approveModal.title",
+            "fallback": "실적 기록 승인",
+            "line": 606
+          },
+          {
+            "key": "admin.performance.approveModal.description",
+            "fallback": "승인 의견을 입력하세요 (선택사항).",
+            "line": 609
+          },
+          {
+            "key": "admin.performance.approveModal.placeholder",
+            "fallback": "승인 의견을 입력하세요...",
+            "line": 613
+          },
+          {
+            "key": "admin.performance.approve",
+            "fallback": "승인",
+            "line": 632
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\projects\\ProjectDetail.jsx",
+        "calls": [
+          {
+            "key": "admin.projects.status.active",
+            "fallback": "진행중",
+            "line": 98
+          },
+          {
+            "key": "admin.projects.status.inactive",
+            "fallback": "종료됨",
+            "line": 99
+          },
+          {
+            "key": "admin.projects.status.draft",
+            "fallback": "초안",
+            "line": 100
+          },
+          {
+            "key": "admin.projects.status.cancelled",
+            "fallback": "취소됨",
+            "line": 101
+          },
+          {
+            "key": "common.attachment",
+            "fallback": "첨부파일",
+            "line": 115
+          },
+          {
+            "key": "admin.applications.updateStatusFailed",
+            "fallback": "상태 업데이트 실패",
+            "line": 148
+          },
+          {
+            "key": "admin.applications.rejectReasonRequired",
+            "fallback": "거부 사유를 입력하세요",
+            "line": 156
+          },
+          {
+            "key": "admin.applications.rejectSuccess",
+            "fallback": "거부 성공",
+            "line": 175
+          },
+          {
+            "key": "admin.applications.updateStatusFailed",
+            "fallback": "상태 업데이트 실패",
+            "line": 180
+          },
+          {
+            "key": "admin.applications.table.company",
+            "fallback": "기업명",
+            "line": 204
+          },
+          {
+            "key": "admin.applications.table.applicationReason",
+            "fallback": "신청 사유",
+            "line": 210
+          },
+          {
+            "key": "admin.applications.table.submittedAt",
+            "fallback": "신청일",
+            "line": 220
+          },
+          {
+            "key": "admin.applications.table.reviewedAt",
+            "fallback": "심사일",
+            "line": 226
+          },
+          {
+            "key": "admin.applications.table.status",
+            "fallback": "상태",
+            "line": 232
+          },
+          {
+            "key": "common.view",
+            "fallback": "보기",
+            "line": 270
+          },
+          {
+            "key": "admin.applications.viewMember",
+            "fallback": "기업",
+            "line": 282
+          },
+          {
+            "key": "common.approve",
+            "fallback": "승인",
+            "line": 296
+          },
+          {
+            "key": "common.reject",
+            "fallback": "거절",
+            "line": 306
+          },
+          {
+            "key": "admin.projects.detail.notFound",
+            "fallback": "지원사업을 찾을 수 없습니다",
+            "line": 323
+          },
+          {
+            "key": "common.backToList",
+            "fallback": "목록으로",
+            "line": 325
+          },
+          {
+            "key": "common.backToList",
+            "fallback": "목록으로",
+            "line": 344
+          },
+          {
+            "key": "common.edit",
+            "fallback": "수정",
+            "line": 352
+          },
+          {
+            "key": "admin.projects.detail.basicInfo",
+            "fallback": "기본 정보",
+            "line": 363
+          },
+          {
+            "key": "admin.projects.detail.title",
+            "fallback": "지원사업",
+            "line": 370
+          },
+          {
+            "key": "admin.projects.detail.status",
+            "fallback": "상태",
+            "line": 377
+          },
+          {
+            "key": "admin.projects.detail.createdAt",
+            "fallback": "생성일",
+            "line": 387
+          },
+          {
+            "key": "admin.projects.detail.startDate",
+            "fallback": "시작일",
+            "line": 393
+          },
+          {
+            "key": "admin.projects.detail.endDate",
+            "fallback": "종료일",
+            "line": 399
+          },
+          {
+            "key": "admin.projects.detail.image",
+            "fallback": "대표 이미지",
+            "line": 410
+          },
+          {
+            "key": "admin.projects.detail.noImage",
+            "fallback": "표지 이미지가 없습니다",
+            "line": 425
+          },
+          {
+            "key": "admin.projects.detail.content",
+            "fallback": "지원사업",
+            "line": 437
+          },
+          {
+            "key": "admin.projects.detail.attachments",
+            "fallback": "첨부파일 목록",
+            "line": 451
+          },
+          {
+            "key": "admin.projects.detail.attachmentCount",
+            "fallback": "개 첨부파일",
+            "line": 453
+          },
+          {
+            "key": "common.attachment",
+            "fallback": "첨부파일",
+            "line": 479
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 503
+          },
+          {
+            "key": "admin.projects.detail.applications",
+            "fallback": "신청 현황",
+            "line": 515
+          },
+          {
+            "key": "admin.projects.detail.applicationCount",
+            "fallback": "개 신청",
+            "line": 517
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 524
+          },
+          {
+            "key": "admin.projects.detail.noApplications",
+            "fallback": "신청이 없습니다",
+            "line": 528
+          },
+          {
+            "key": "admin.projects.detail.totalApplications",
+            "fallback": "총 신청수",
+            "line": 536
+          },
+          {
+            "key": "admin.projects.detail.approvedApplications",
+            "fallback": "승인됨",
+            "line": 544
+          },
+          {
+            "key": "admin.projects.detail.pendingApplications",
+            "fallback": "대기중",
+            "line": 552
+          },
+          {
+            "key": "admin.projects.detail.applicationList",
+            "fallback": "신청 목록",
+            "line": 563
+          },
+          {
+            "key": "admin.applications.detail",
+            "fallback": "신청 상세",
+            "line": 592
+          },
+          {
+            "key": "admin.applications.table.company",
+            "fallback": "기업명",
+            "line": 599
+          },
+          {
+            "key": "admin.applications.table.status",
+            "fallback": "상태",
+            "line": 607
+          },
+          {
+            "key": "admin.applications.contactPersonName",
+            "fallback": "담당자 이름",
+            "line": 625
+          },
+          {
+            "key": "admin.applications.contactPhone",
+            "fallback": "전화번호",
+            "line": 633
+          },
+          {
+            "key": "admin.applications.table.submittedAt",
+            "fallback": "신청일",
+            "line": 641
+          },
+          {
+            "key": "admin.applications.table.reviewedAt",
+            "fallback": "심사일",
+            "line": 651
+          },
+          {
+            "key": "admin.applications.table.applicationReason",
+            "fallback": "신청 사유",
+            "line": 662
+          },
+          {
+            "key": "admin.applications.attachments",
+            "fallback": "첨부파일",
+            "line": 673
+          },
+          {
+            "key": "common.attachment",
+            "fallback": "첨부파일",
+            "line": 696
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 715
+          },
+          {
+            "key": "admin.applications.viewMemberDetail",
+            "fallback": "기업 상세 보기",
+            "line": 728
+          },
+          {
+            "key": "common.approve",
+            "fallback": "승인",
+            "line": 736
+          },
+          {
+            "key": "common.reject",
+            "fallback": "거절",
+            "line": 743
+          },
+          {
+            "key": "admin.applications.rejectReasonTitle",
+            "fallback": "거부 사유 입력",
+            "line": 758
+          },
+          {
+            "key": "admin.applications.rejectReasonLabel",
+            "fallback": "거부 사유",
+            "line": 764
+          },
+          {
+            "key": "admin.applications.rejectReasonPlaceholder",
+            "fallback": "거부 사유를 입력하세요...",
+            "line": 769
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 779
+          },
+          {
+            "key": "common.confirm",
+            "fallback": "확인",
+            "line": 785
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\projects\\ProjectForm.jsx",
+        "calls": [
+          {
+            "key": "admin.projects.form.requiredFields",
+            "fallback": "필수 항목을 입력하세요: 지원사업, 시작일, 종료일",
+            "line": 78
+          },
+          {
+            "key": "admin.projects.form.dateError",
+            "fallback": "종료일은 시작일보다 이전일 수 없습니다",
+            "line": 85
+          },
+          {
+            "key": "admin.projects.form.updateSuccess",
+            "fallback": "지원사업이 성공적으로 업데이트되었습니다",
+            "line": 106
+          },
+          {
+            "key": "admin.projects.form.createSuccess",
+            "fallback": "지원사업이 성공적으로 생성되었습니다",
+            "line": 109
+          },
+          {
+            "key": "admin.projects.form.submitError",
+            "fallback": "저장 실패, 다시 시도해주세요",
+            "line": 118
+          },
+          {
+            "key": "admin.projects.form.uploadError",
+            "fallback": "이미지 업로드 실패, 다시 시도해주세요",
+            "line": 140
+          },
+          {
+            "key": "admin.projects.form.attachmentUploadSuccess",
+            "fallback": "成功上传 ${uploadedFiles.length} 个附件",
+            "line": 183
+          },
+          {
+            "key": "admin.projects.form.attachmentUploadError",
+            "fallback": "첨부파일 업로드 실패, 다시 시도해주세요",
+            "line": 188
+          },
+          {
+            "key": "common.back",
+            "fallback": "뒤로",
+            "line": 207
+          },
+          {
+            "key": "admin.projects.form.createTitle",
+            "fallback": "지원사업 생성",
+            "line": 211
+          },
+          {
+            "key": "common.save",
+            "fallback": "저장",
+            "line": 217
+          },
+          {
+            "key": "common.create",
+            "fallback": "생성",
+            "line": 217
+          },
+          {
+            "key": "admin.projects.form.title",
+            "fallback": "지원사업",
+            "line": 230
+          },
+          {
+            "key": "admin.projects.form.titlePlaceholder",
+            "fallback": "지원사업을 입력하세요",
+            "line": 235
+          },
+          {
+            "key": "admin.projects.form.startDate",
+            "fallback": "시작일",
+            "line": 241
+          },
+          {
+            "key": "admin.projects.form.endDate",
+            "fallback": "종료일",
+            "line": 255
+          },
+          {
+            "key": "admin.projects.form.status",
+            "fallback": "지원사업 상태",
+            "line": 269
+          },
+          {
+            "key": "admin.projects.status.active",
+            "fallback": "진행중",
+            "line": 274
+          },
+          {
+            "key": "admin.projects.status.inactive",
+            "fallback": "종료됨",
+            "line": 275
+          },
+          {
+            "key": "admin.projects.status.archived",
+            "fallback": "보관됨",
+            "line": 276
+          },
+          {
+            "key": "admin.projects.form.description",
+            "fallback": "지원사업",
+            "line": 281
+          },
+          {
+            "key": "admin.projects.form.descriptionPlaceholder",
+            "fallback": "지원사업 상세 설명을 입력하세요...",
+            "line": 286
+          },
+          {
+            "key": "admin.projects.form.coverImage",
+            "fallback": "지원사업 대표 이미지",
+            "line": 307
+          },
+          {
+            "key": "admin.projects.form.imageHint",
+            "fallback": "JPG, PNG 형식 지원, 권장 크기 800x400",
+            "line": 310
+          },
+          {
+            "key": "admin.projects.form.coverImageAlt",
+            "fallback": "지원사업 대표 이미지",
+            "line": 320
+          },
+          {
+            "key": "common.remove",
+            "fallback": "제거",
+            "line": 329
+          },
+          {
+            "key": "admin.projects.form.noImage",
+            "fallback": "이미지가 없습니다",
+            "line": 334
+          },
+          {
+            "key": "common.uploading",
+            "fallback": "업로드 중...",
+            "line": 348
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\projects\\ProjectList.jsx",
+        "calls": [
+          {
+            "key": "admin.projects.table.viewCount",
+            "fallback": "조회수",
+            "line": 107
+          },
+          {
+            "key": "admin.projects.table.applicationsCount",
+            "fallback": "신청인원",
+            "line": 112
+          },
+          {
+            "key": "admin.projects.deleteSuccess",
+            "fallback": "삭제되었습니다",
+            "line": 183
+          },
+          {
+            "key": "admin.projects.deleteFailed",
+            "fallback": "삭제 실패",
+            "line": 188
+          },
+          {
+            "key": "admin.projects.exportSuccess",
+            "fallback": "내보내기 성공",
+            "line": 222
+          },
+          {
+            "key": "admin.projects.exportFailed",
+            "fallback": "내보내기 실패",
+            "line": 227
+          },
+          {
+            "key": "admin.projects.table.viewCount",
+            "fallback": "조회수",
+            "line": 278
+          },
+          {
+            "key": "admin.projects.table.applicationsCount",
+            "fallback": "신청인원",
+            "line": 285
+          },
+          {
+            "key": "admin.projects.searchPlaceholder",
+            "fallback": "공고명, 목표기업, 사업자등록번호 등 검색",
+            "line": 347
+          },
+          {
+            "key": "admin.projects.exportExcel",
+            "fallback": "Excel 내보내기",
+            "line": 356
+          },
+          {
+            "key": "admin.projects.noProjects",
+            "fallback": "공고 데이터가 없습니다",
+            "line": 370
+          },
+          {
+            "key": "admin.projects.noProjectsHint",
+            "fallback": "첫 번째 공고를 생성하거나 페이지를 새로고침하세요",
+            "line": 373
+          },
+          {
+            "key": "admin.projects.noMatchingProjects",
+            "fallback": "현재 필터 조건에 맞는 공고가 없습니다",
+            "line": 374
+          },
+          {
+            "key": "admin.projects.deleteConfirmTitle",
+            "fallback": "지원사업 삭제",
+            "line": 411
+          },
+          {
+            "key": "admin.projects.confirmDelete",
+            "fallback": "이 지원사업을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+            "line": 416
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 420
+          },
+          {
+            "key": "common.delete",
+            "fallback": "삭제",
+            "line": 423
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\AgeFilters.jsx",
+        "calls": [
+          {
+            "key": "common.age.unit",
+            "fallback": "세",
+            "line": 94
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\BusinessFieldFilters.jsx",
+        "calls": [
+          {
+            "key": "common.all",
+            "fallback": "전체",
+            "line": 22
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\DemographicFilters.jsx",
+        "calls": [
+          {
+            "key": "admin.statistics.filters.all",
+            "fallback": "전체",
+            "line": 45
+          },
+          {
+            "key": "common.age.unit",
+            "fallback": "세",
+            "line": 107
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\EmployeeFilters.jsx",
+        "calls": [
+          {
+            "key": "common.people",
+            "fallback": "명",
+            "line": 93
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\FilterPanel.jsx",
+        "calls": [
+          {
+            "key": "admin.statistics.filters.title",
+            "fallback": "필터",
+            "line": 89
+          },
+          {
+            "key": "admin.statistics.filters.reset",
+            "fallback": "초기화",
+            "line": 322
+          },
+          {
+            "key": "admin.statistics.filters.apply",
+            "fallback": "조회",
+            "line": 330
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx",
+        "calls": [
+          {
+            "key": "admin.statistics.filters.selectedConditions",
+            "fallback": "선택된 조건",
+            "line": 164
+          },
+          {
+            "key": "admin.statistics.filters.clearAll",
+            "fallback": "전체 초기화",
+            "line": 171
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\FilterSummary.jsx",
+        "calls": [
+          {
+            "key": "admin.statistics.filters.noFilters",
+            "fallback": "선택된 필터 없음",
+            "line": 14
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\FutureTechnologyFilters.jsx",
+        "calls": [
+          {
+            "key": "admin.statistics.filters.all",
+            "fallback": "전체",
+            "line": 31
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\GangwonFutureIndustryFilters.jsx",
+        "calls": [
+          {
+            "key": "admin.statistics.filters.all",
+            "fallback": "전체",
+            "line": 34
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\GenderFilters.jsx",
+        "calls": [
+          {
+            "key": "admin.statistics.filters.all",
+            "fallback": "전체",
+            "line": 11
+          },
+          {
+            "key": "admin.statistics.filters.representative.male",
+            "fallback": "남",
+            "line": 14
+          },
+          {
+            "key": "admin.statistics.filters.representative.female",
+            "fallback": "여",
+            "line": 18
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\IndustryFilters.jsx",
+        "calls": [
+          {
+            "key": "member.mainIndustryKsicMajor",
+            "fallback": "주력산업 KSIC 코드",
+            "line": 40
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\QuantitiveFilters.jsx",
+        "calls": [
+          {
+            "key": "common.currency.krw",
+            "fallback": "₩",
+            "line": 110
+          },
+          {
+            "key": "common.people",
+            "fallback": "명",
+            "line": 166
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\ResultCounter.jsx",
+        "calls": [
+          {
+            "key": "statistics.filters.matchingCompanies",
+            "fallback": "일치하는 기업",
+            "line": 25
+          },
+          {
+            "key": "statistics.filters.calculating",
+            "fallback": "계산 중...",
+            "line": 33
+          },
+          {
+            "key": "statistics.filters.companies",
+            "fallback": "개 기업",
+            "line": 42
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\RevenueFilters.jsx",
+        "calls": [
+          {
+            "key": "common.currency.krw",
+            "fallback": "₩",
+            "line": 93
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\StartupTypeFilters.jsx",
+        "calls": [
+          {
+            "key": "common.all",
+            "fallback": "전체",
+            "line": 22
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\TimeFilters.jsx",
+        "calls": [
+          {
+            "key": "admin.statistics.filters.all",
+            "fallback": "전체",
+            "line": 14
+          },
+          {
+            "key": "admin.statistics.filters.time.yearUnit",
+            "fallback": "년",
+            "line": 19
+          },
+          {
+            "key": "admin.statistics.filters.time.monthUnit",
+            "fallback": "월",
+            "line": 30
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Filter\\WorkYearsFilters.jsx",
+        "calls": [
+          {
+            "key": "common.all",
+            "fallback": "전체",
+            "line": 26
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Report\\ColumnVisibilityPanel.jsx",
+        "calls": [
+          {
+            "key": "admin.statistics.table.required",
+            "fallback": "필수",
+            "line": 121
+          },
+          {
+            "key": "admin.statistics.table.columnSettings",
+            "fallback": "열 설정",
+            "line": 155
+          },
+          {
+            "key": "admin.statistics.table.quickActions",
+            "fallback": "빠른 설정",
+            "line": 183
+          },
+          {
+            "key": "admin.statistics.table.showAll",
+            "fallback": "전체 표시",
+            "line": 214
+          },
+          {
+            "key": "admin.statistics.table.hideAll",
+            "fallback": "전체 숨김",
+            "line": 221
+          },
+          {
+            "key": "admin.statistics.table.columnSettings",
+            "fallback": "열 설정",
+            "line": 253
+          }
+        ]
+      },
+      {
+        "file": "admin\\modules\\statistics\\components\\Report\\StatisticsTable.jsx",
+        "calls": [
+          {
+            "key": "common.pagination.items",
+            "fallback": "개",
+            "line": 392
+          }
+        ]
+      },
+      {
+        "file": "App.jsx",
+        "calls": [
+          {
+            "key": "common.initializing",
+            "fallback": "초기화 중...",
+            "line": 58
+          }
+        ]
+      },
+      {
+        "file": "main.jsx",
+        "calls": [
+          {
+            "key": "error.appInit.title",
+            "fallback": "응용 프로그램 초기화 실패",
+            "line": 34
+          },
+          {
+            "key": "error.appInit.message",
+            "fallback": "페이지를 새로 고치고 다시 시도하십시오.",
+            "line": 35
+          }
+        ]
+      },
+      {
+        "file": "member\\layouts\\components\\Header\\DesktopNav.jsx",
+        "calls": [
+          {
+            "key": "member.layout.mainNav",
+            "fallback": "주요 탐색",
+            "line": 24
+          }
+        ]
+      },
+      {
+        "file": "member\\layouts\\components\\Header\\MobileMenu.jsx",
+        "calls": [
+          {
+            "key": "member.layout.mobileMenuLabel",
+            "fallback": "모바일 내비게이션",
+            "line": 49
+          }
+        ]
+      },
+      {
+        "file": "member\\layouts\\components\\Header\\UserMenu.jsx",
+        "calls": [
+          {
+            "key": "member.layout.profile",
+            "fallback": "기업 정보",
+            "line": 96
+          },
+          {
+            "key": "member.layout.support",
+            "fallback": "고객 지원",
+            "line": 105
+          },
+          {
+            "key": "member.layout.logout",
+            "fallback": "로그아웃",
+            "line": 116
+          }
+        ]
+      },
+      {
+        "file": "member\\layouts\\Header.jsx",
+        "calls": [
+          {
+            "key": "member.layout.toggleMenu",
+            "fallback": "메뉴 전환",
+            "line": 51
+          },
+          {
+            "key": "member.layout.title",
+            "fallback": "강원비즈니스포털",
+            "line": 66
+          },
+          {
+            "key": "member.layout.login",
+            "fallback": "로그인",
+            "line": 119
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\about\\components\\SystemInfoDisplay.jsx",
+        "calls": [
+          {
+            "key": "member.about.loading",
+            "fallback": "로딩 중...",
+            "line": 24
+          },
+          {
+            "key": "member.about.error",
+            "fallback": "로딩 실패",
+            "line": 33
+          },
+          {
+            "key": "member.about.noContent",
+            "fallback": "콘텐츠가 없습니다",
+            "line": 44
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\about\\hooks\\useSystemInfo.js",
+        "calls": [
+          {
+            "key": "member.about.fetchError",
+            "fallback": "Failed to fetch content",
+            "line": 37
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\auth\\components\\RegisterStep2Info.jsx",
+        "calls": [
+          {
+            "key": "common.selectFile",
+            "fallback": "파일 선택",
+            "line": 93
+          },
+          {
+            "key": "common.selectFile",
+            "fallback": "파일 선택",
+            "line": 122
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\auth\\components\\RegisterStep4Business.jsx",
+        "calls": [
+          {
+            "key": "member.auth.startupType",
+            "fallback": "창업유형",
+            "line": 96
+          },
+          {
+            "key": "member.auth.selectStartupType",
+            "fallback": "창업유형을 선택하세요",
+            "line": 105
+          },
+          {
+            "key": "member.auth.businessField",
+            "fallback": "사업 분야",
+            "line": 117
+          },
+          {
+            "key": "member.auth.selectBusinessField",
+            "fallback": "사업 분야를 선택하세요",
+            "line": 126
+          },
+          {
+            "key": "member.auth.ksicMajor",
+            "fallback": "한국표준산업분류코드[대분류]",
+            "line": 139
+          },
+          {
+            "key": "member.auth.selectKsicMajor",
+            "fallback": "대분류를 선택하세요",
+            "line": 148
+          },
+          {
+            "key": "member.auth.ksicSub",
+            "fallback": "한국표준산업분류코드[중분류]",
+            "line": 160
+          },
+          {
+            "key": "member.auth.selectKsicSub",
+            "fallback": "중분류를 선택하세요",
+            "line": 171
+          },
+          {
+            "key": "member.auth.mainIndustryKsicMajor",
+            "fallback": "주력산업 KSIC 코드",
+            "line": 189
+          },
+          {
+            "key": "auth.selectMainIndustryKsicMajor",
+            "fallback": "주력산업을 선택하세요",
+            "line": 198
+          },
+          {
+            "key": "member.auth.mainIndustryKsicCodes",
+            "fallback": "주력산업 KSIC 세부 코드",
+            "line": 210
+          },
+          {
+            "key": "member.auth.gangwonIndustry",
+            "fallback": "강원도 7대 미래산업",
+            "line": 240
+          },
+          {
+            "key": "member.auth.selectGangwonIndustry",
+            "fallback": "선택하세요",
+            "line": 249
+          },
+          {
+            "key": "member.auth.futureTech",
+            "fallback": "미래유망 신기술",
+            "line": 261
+          },
+          {
+            "key": "member.auth.selectFutureTech",
+            "fallback": "선택하세요",
+            "line": 270
+          },
+          {
+            "key": "member.auth.startupStage",
+            "fallback": "창업구분",
+            "line": 283
+          },
+          {
+            "key": "member.auth.selectStartupStage",
+            "fallback": "창업구분을 선택하세요",
+            "line": 294
+          },
+          {
+            "key": "common.commaSeparatedHint",
+            "fallback": "여러 값은 쉼표로 구분해주세요",
+            "line": 378
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\home\\components\\NoticesPreview.jsx",
+        "calls": [
+          {
+            "key": "member.home.notices.title",
+            "fallback": "공지사항",
+            "line": 21
+          },
+          {
+            "key": "member.home.notices.empty",
+            "fallback": "공고가 없습니다",
+            "line": 25
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\home\\hooks\\useNoticesPreview.js",
+        "calls": [
+          {
+            "key": "member.home.notices.important",
+            "fallback": "중요",
+            "line": 55
+          },
+          {
+            "key": "member.home.notices.normal",
+            "fallback": "일반",
+            "line": 56
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\home\\hooks\\useProjectPreview.js",
+        "calls": [
+          {
+            "key": "member.projects.status.active",
+            "fallback": "진행중",
+            "line": 56
+          },
+          {
+            "key": "member.projects.status.inactive",
+            "fallback": "비활성",
+            "line": 60
+          },
+          {
+            "key": "member.projects.status.archived",
+            "fallback": "보관됨",
+            "line": 64
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx",
+        "calls": [
+          {
+            "key": "member.performance.companyInfo.sections.basicInfo",
+            "fallback": "기본 정보",
+            "line": 60
+          },
+          {
+            "key": "member.performance.companyInfo.sections.logo",
+            "fallback": "기업 로고",
+            "line": 67
+          },
+          {
+            "key": "common.uploading",
+            "fallback": "업로드 중...",
+            "line": 84
+          },
+          {
+            "key": "member.performance.companyInfo.fields.email",
+            "fallback": "이메일",
+            "line": 173
+          },
+          {
+            "key": "member.performance.companyInfo.fields.address",
+            "fallback": "주소",
+            "line": 246
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx",
+        "calls": [
+          {
+            "key": "member.performance.companyInfo.sections.businessInfo",
+            "fallback": "사업 정보",
+            "line": 129
+          },
+          {
+            "key": "member.performance.companyInfo.fields.startupType",
+            "fallback": "창업유형",
+            "line": 136
+          },
+          {
+            "key": "member.performance.companyInfo.fields.ksicMajor",
+            "fallback": "한국표준산업분류코드[대분류]",
+            "line": 153
+          },
+          {
+            "key": "member.performance.companyInfo.fields.ksicSub",
+            "fallback": "한국표준사업분류코드[중분류]",
+            "line": 160
+          },
+          {
+            "key": "member.performance.companyInfo.fields.revenue",
+            "fallback": "연간 매출액 (원)",
+            "line": 229
+          },
+          {
+            "key": "common.notSet",
+            "fallback": "설정되지 않음",
+            "line": 289
+          },
+          {
+            "key": "common.notSet",
+            "fallback": "설정되지 않음",
+            "line": 337
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\CompanyInfo\\CompanyContactPersonInfo.jsx",
+        "calls": [
+          {
+            "key": "member.performance.companyInfo.sections.contactPerson",
+            "fallback": "담당자 정보",
+            "line": 19
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\CompanyInfo\\CompanyInfo.jsx",
+        "calls": [
+          {
+            "key": "member.performance.companyInfo.title",
+            "fallback": "기업 정보",
+            "line": 57
+          },
+          {
+            "key": "member.performance.companyInfo.profile.loginRequired",
+            "fallback": "로그인 필요",
+            "line": 66
+          },
+          {
+            "key": "common.login",
+            "fallback": "로그인",
+            "line": 76
+          },
+          {
+            "key": "common.register",
+            "fallback": "회원가입",
+            "line": 80
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\CompanyInfo\\CompanyInvestmentStatus.jsx",
+        "calls": [
+          {
+            "key": "common.yes",
+            "fallback": "예",
+            "line": 16
+          },
+          {
+            "key": "common.no",
+            "fallback": "아니오",
+            "line": 17
+          },
+          {
+            "key": "member.performance.companyInfo.sections.investmentStatus",
+            "fallback": "투자 정보",
+            "line": 30
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\CompanyInfo\\CompanyProfileHeader.jsx",
+        "calls": [
+          {
+            "key": "member.performance.companyInfo.title",
+            "fallback": "기업 정보",
+            "line": 26
+          },
+          {
+            "key": "member.approved",
+            "fallback": "승인됨",
+            "line": 41
+          },
+          {
+            "key": "member.pending",
+            "fallback": "검토 중",
+            "line": 42
+          },
+          {
+            "key": "member.rejected",
+            "fallback": "반려됨",
+            "line": 43
+          },
+          {
+            "key": "common.edit",
+            "fallback": "수정",
+            "line": 53
+          },
+          {
+            "key": "common.save",
+            "fallback": "저장",
+            "line": 58
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 61
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\CompanyInfo\\CompanyRepresentativeInfo.jsx",
+        "calls": [
+          {
+            "key": "common.male",
+            "fallback": "남성",
+            "line": 16
+          },
+          {
+            "key": "common.female",
+            "fallback": "여성",
+            "line": 17
+          },
+          {
+            "key": "member.performance.companyInfo.sections.representativeInfo",
+            "fallback": "대표자 정보",
+            "line": 24
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx",
+        "calls": [
+          {
+            "key": "member.performance.governmentSupport",
+            "fallback": "정부지원",
+            "line": 48
+          },
+          {
+            "key": "member.performance.governmentSupportFields.add",
+            "fallback": "추가",
+            "line": 52
+          },
+          {
+            "key": "common.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 58
+          },
+          {
+            "key": "member.performance.governmentSupportFields.supportAmount",
+            "fallback": "지원 금액",
+            "line": 107
+          },
+          {
+            "key": "member.performance.governmentSupportFields.supportAmountUnit",
+            "fallback": "천원",
+            "line": 107
+          },
+          {
+            "key": "member.performance.governmentSupportFields.endDate",
+            "fallback": "종료일",
+            "line": 126
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx",
+        "calls": [
+          {
+            "key": "member.performance.intellectualPropertyFields.types.patent",
+            "fallback": "특허",
+            "line": 55
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.types.design",
+            "fallback": "디자인",
+            "line": 73
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.types.other",
+            "fallback": "기타",
+            "line": 77
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.registrationTypes.application",
+            "fallback": "신청",
+            "line": 84
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.registrationTypes.registered",
+            "fallback": "등록",
+            "line": 88
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.overseasTypes.domestic",
+            "fallback": "국내",
+            "line": 95
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.overseasTypes.overseas",
+            "fallback": "해외",
+            "line": 99
+          },
+          {
+            "key": "common.yes",
+            "fallback": "예",
+            "line": 106
+          },
+          {
+            "key": "common.no",
+            "fallback": "아니오",
+            "line": 110
+          },
+          {
+            "key": "member.performance.intellectualProperty",
+            "fallback": "지식재산권",
+            "line": 118
+          },
+          {
+            "key": "common.add",
+            "fallback": "추가",
+            "line": 122
+          },
+          {
+            "key": "common.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 128
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.type",
+            "fallback": "유형",
+            "line": 165
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.registrationType",
+            "fallback": "등록 구분",
+            "line": 171
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.country",
+            "fallback": "국가",
+            "line": 177
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.countryPlaceholder",
+            "fallback": "예: 대한민국",
+            "line": 180
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.overseasType",
+            "fallback": "해외신청구분",
+            "line": 183
+          },
+          {
+            "key": "member.performance.intellectualPropertyFields.publicDisclosure",
+            "fallback": "공개희망 여부",
+            "line": 189
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\PerformanceForm\\PerformanceForm.jsx",
+        "calls": [
+          {
+            "key": "member.performance.tabs.salesEmployment",
+            "fallback": "매출 고용",
+            "line": 49
+          },
+          {
+            "key": "member.performance.tabs.governmentSupport",
+            "fallback": "정부지원 수혜 이력",
+            "line": 53
+          },
+          {
+            "key": "member.performance.tabs.intellectualProperty",
+            "fallback": "지식재산권",
+            "line": 57
+          },
+          {
+            "key": "member.performance.quarter1",
+            "fallback": "1분기",
+            "line": 62
+          },
+          {
+            "key": "member.performance.quarter2",
+            "fallback": "2분기",
+            "line": 63
+          },
+          {
+            "key": "member.performance.quarter3",
+            "fallback": "3분기",
+            "line": 64
+          },
+          {
+            "key": "member.performance.quarter4",
+            "fallback": "4분기",
+            "line": 65
+          },
+          {
+            "key": "member.performance.edit",
+            "fallback": "성과 수정",
+            "line": 73
+          },
+          {
+            "key": "member.performance.createNew",
+            "fallback": "성과 등록",
+            "line": 74
+          },
+          {
+            "key": "member.performance.saveDraft",
+            "fallback": "임시저장",
+            "line": 82
+          },
+          {
+            "key": "common.submit",
+            "fallback": "제출",
+            "line": 89
+          },
+          {
+            "key": "member.performance.sections.basicInfo",
+            "fallback": "기본 정보",
+            "line": 97
+          },
+          {
+            "key": "member.performance.year",
+            "fallback": "연도",
+            "line": 101
+          },
+          {
+            "key": "member.performance.quarter",
+            "fallback": "분기",
+            "line": 113
+          },
+          {
+            "key": "member.performance.annual",
+            "fallback": "연간",
+            "line": 117
+          },
+          {
+            "key": "common.confirmSubmitTitle",
+            "fallback": "제출 확인",
+            "line": 159
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 173
+          },
+          {
+            "key": "common.submit",
+            "fallback": "제출",
+            "line": 176
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx",
+        "calls": [
+          {
+            "key": "member.performance.salesEmploymentFields.sales",
+            "fallback": "매출액",
+            "line": 38
+          },
+          {
+            "key": "member.performance.salesEmploymentFields.unit.won",
+            "fallback": "원",
+            "line": 40
+          },
+          {
+            "key": "member.performance.year",
+            "fallback": "년도",
+            "line": 56
+          },
+          {
+            "key": "member.performance.salesEmploymentFields.export",
+            "fallback": "수출액",
+            "line": 80
+          },
+          {
+            "key": "member.performance.salesEmploymentFields.unit.won",
+            "fallback": "원",
+            "line": 82
+          },
+          {
+            "key": "member.performance.year",
+            "fallback": "년도",
+            "line": 98
+          },
+          {
+            "key": "member.performance.salesEmploymentFields.hskCode",
+            "fallback": "HSK 코드",
+            "line": 119
+          },
+          {
+            "key": "member.performance.salesEmploymentFields.hskCodePlaceholder",
+            "fallback": "HSK코드 10자리",
+            "line": 125
+          },
+          {
+            "key": "member.performance.salesEmploymentFields.employment",
+            "fallback": "고용 창출",
+            "line": 155
+          },
+          {
+            "key": "member.performance.salesEmploymentFields.unit.people",
+            "fallback": "명",
+            "line": 158
+          },
+          {
+            "key": "member.performance.year",
+            "fallback": "년도",
+            "line": 184
+          },
+          {
+            "key": "member.performance.year",
+            "fallback": "년도",
+            "line": 217
+          },
+          {
+            "key": "member.performance.salesEmploymentFields.attachments",
+            "fallback": "증빙서류",
+            "line": 234
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\components\\PerformanceList\\PerformanceList.jsx",
+        "calls": [
+          {
+            "key": "member.performance.status.draft",
+            "fallback": "임시저장",
+            "line": 64
+          },
+          {
+            "key": "member.performance.status.submitted",
+            "fallback": "심사중",
+            "line": 65
+          },
+          {
+            "key": "member.performance.status.revisionRequested",
+            "fallback": "수정 필요",
+            "line": 66
+          },
+          {
+            "key": "member.performance.status.approved",
+            "fallback": "승인 완료",
+            "line": 67
+          },
+          {
+            "key": "member.performance.status.rejected",
+            "fallback": "거부됨",
+            "line": 68
+          },
+          {
+            "key": "common.all",
+            "fallback": "전체",
+            "line": 87
+          },
+          {
+            "key": "common.year",
+            "fallback": "년",
+            "line": 92
+          },
+          {
+            "key": "common.all",
+            "fallback": "전체",
+            "line": 98
+          },
+          {
+            "key": "common.all",
+            "fallback": "전체",
+            "line": 106
+          },
+          {
+            "key": "member.performance.status.draft",
+            "fallback": "임시저장",
+            "line": 107
+          },
+          {
+            "key": "member.performance.status.submitted",
+            "fallback": "심사중",
+            "line": 108
+          },
+          {
+            "key": "member.performance.status.revisionRequested",
+            "fallback": "수정 필요",
+            "line": 111
+          },
+          {
+            "key": "member.performance.status.approved",
+            "fallback": "승인 완료",
+            "line": 113
+          },
+          {
+            "key": "member.performance.status.rejected",
+            "fallback": "거부됨",
+            "line": 114
+          },
+          {
+            "key": "member.performance.query",
+            "fallback": "성과 조회",
+            "line": 129
+          },
+          {
+            "key": "common.filter",
+            "fallback": "필터",
+            "line": 136
+          },
+          {
+            "key": "member.performance.year",
+            "fallback": "연도",
+            "line": 142
+          },
+          {
+            "key": "member.performance.quarter",
+            "fallback": "분기",
+            "line": 148
+          },
+          {
+            "key": "member.performance.documentStatus",
+            "fallback": "문서 상태",
+            "line": 154
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 173
+          },
+          {
+            "key": "common.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 177
+          },
+          {
+            "key": "member.performance.period",
+            "fallback": "기간",
+            "line": 184
+          },
+          {
+            "key": "member.performance.documentStatus",
+            "fallback": "문서 상태",
+            "line": 186
+          },
+          {
+            "key": "member.performance.submittedAt",
+            "fallback": "제출시간",
+            "line": 189
+          },
+          {
+            "key": "member.performance.updatedAt",
+            "fallback": "수정시간",
+            "line": 192
+          },
+          {
+            "key": "common.actions",
+            "fallback": "작업",
+            "line": 194
+          },
+          {
+            "key": "common.year",
+            "fallback": "년",
+            "line": 203
+          },
+          {
+            "key": "member.performance.annual",
+            "fallback": "연간",
+            "line": 206
+          },
+          {
+            "key": "member.performance.viewComments",
+            "fallback": "검토 의견 보기",
+            "line": 225
+          },
+          {
+            "key": "common.edit",
+            "fallback": "수정",
+            "line": 241
+          },
+          {
+            "key": "common.delete",
+            "fallback": "삭제",
+            "line": 250
+          },
+          {
+            "key": "common.confirmDeleteTitle",
+            "fallback": "삭제 확인",
+            "line": 279
+          },
+          {
+            "key": "common.confirmDelete",
+            "fallback": "이 기록을 삭제하시겠습니까?",
+            "line": 283
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 290
+          },
+          {
+            "key": "common.delete",
+            "fallback": "삭제",
+            "line": 293
+          },
+          {
+            "key": "member.performance.reviewComments",
+            "fallback": "검토 의견",
+            "line": 303
+          },
+          {
+            "key": "member.performance.noComments",
+            "fallback": "검토 의견이 없습니다",
+            "line": 325
+          },
+          {
+            "key": "common.close",
+            "fallback": "닫기",
+            "line": 336
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\hooks\\useCompanyInfo.js",
+        "calls": [
+          {
+            "key": "member.companyName",
+            "fallback": "Company Name",
+            "line": 293
+          },
+          {
+            "key": "member.establishedDate",
+            "fallback": "Established Date",
+            "line": 294
+          },
+          {
+            "key": "member.representative",
+            "fallback": "Representative",
+            "line": 295
+          },
+          {
+            "key": "member.phone",
+            "fallback": "Phone",
+            "line": 296
+          },
+          {
+            "key": "member.region",
+            "fallback": "Region",
+            "line": 297
+          },
+          {
+            "key": "member.address",
+            "fallback": "Address",
+            "line": 298
+          },
+          {
+            "key": "member.performance.companyInfo.validation.fieldErrors",
+            "fallback": "다음 오류를 수정해주세요: {{errors}}",
+            "line": 306
+          },
+          {
+            "key": "member.performance.companyInfo.message.saveSuccess",
+            "fallback": "저장되었습니다",
+            "line": 379
+          },
+          {
+            "key": "common.saveFailed",
+            "fallback": "저장에 실패했습니다",
+            "line": 385
+          },
+          {
+            "key": "member.performance.companyInfo.message.logoUploadSuccess",
+            "fallback": "로고 업로드 성공",
+            "line": 414
+          },
+          {
+            "key": "common.uploadFailed",
+            "fallback": "업로드에 실패했습니다",
+            "line": 419
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\hooks\\usePerformanceList.js",
+        "calls": [
+          {
+            "key": "message.deleteSuccess",
+            "fallback": "삭제되었습니다",
+            "line": 75
+          },
+          {
+            "key": "message.deleteFailed",
+            "fallback": "삭제에 실패했습니다",
+            "line": 83
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\performance\\views\\PerformanceLayoutView.jsx",
+        "calls": [
+          {
+            "key": "member.performance.companyInfo.title",
+            "fallback": "기업 정보",
+            "line": 21
+          },
+          {
+            "key": "member.performance.input",
+            "fallback": "성과 입력",
+            "line": 27
+          },
+          {
+            "key": "member.performance.query",
+            "fallback": "성과 조회",
+            "line": 33
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationModal\\ApplicationForm.jsx",
+        "calls": [
+          {
+            "key": "member.projects.applicationStatus",
+            "fallback": "신청 상태",
+            "line": 59
+          },
+          {
+            "key": "member.projects.submittedAt",
+            "fallback": "제출 시간",
+            "line": 70
+          },
+          {
+            "key": "member.projects.companyId",
+            "fallback": "기업 ID",
+            "line": 82
+          },
+          {
+            "key": "member.projects.companyName",
+            "fallback": "기업명",
+            "line": 90
+          },
+          {
+            "key": "member.projects.application.form.applicantName",
+            "fallback": "담당자 이름",
+            "line": 104
+          },
+          {
+            "key": "member.projects.application.form.applicantPhone",
+            "fallback": "담당자 전화번호",
+            "line": 122
+          },
+          {
+            "key": "member.projects.application.form.reason",
+            "fallback": "신청 사유",
+            "line": 143
+          },
+          {
+            "key": "common.characters",
+            "fallback": "자",
+            "line": 155
+          },
+          {
+            "key": "member.projects.application.form.attachments",
+            "fallback": "첨부파일",
+            "line": 163
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationModal\\index.jsx",
+        "calls": [
+          {
+            "key": "fileAttachments.uploadError",
+            "fallback": "파일 업로드 실패, 다시 시도해주세요",
+            "line": 103
+          },
+          {
+            "key": "common.loginRequired",
+            "fallback": "먼저 로그인해주세요",
+            "line": 110
+          },
+          {
+            "key": "member.projects.projectNotFound",
+            "fallback": "사업을 찾을 수 없습니다",
+            "line": 115
+          },
+          {
+            "key": "member.projects.application.applicantNameRequired",
+            "fallback": "담당자 이름을 입력해주세요",
+            "line": 125
+          },
+          {
+            "key": "member.projects.application.validationError",
+            "fallback": "필수 항목을 확인한 뒤 다시 시도해주세요.",
+            "line": 128
+          },
+          {
+            "key": "member.projects.application.applicantPhoneRequired",
+            "fallback": "담당자 전화번호를 입력해주세요",
+            "line": 136
+          },
+          {
+            "key": "member.projects.application.validationError",
+            "fallback": "필수 항목을 확인한 뒤 다시 시도해주세요.",
+            "line": 139
+          },
+          {
+            "key": "member.projects.application.reasonMinLength",
+            "fallback": "신청 사유는 최소 10자 이상 입력해주세요",
+            "line": 147
+          },
+          {
+            "key": "member.projects.application.validationError",
+            "fallback": "필수 항목을 확인한 뒤 다시 시도해주세요.",
+            "line": 150
+          },
+          {
+            "key": "member.projects.applicationDetail",
+            "fallback": "신청 상세",
+            "line": 178
+          },
+          {
+            "key": "member.projects.reapply",
+            "fallback": "재신청",
+            "line": 180
+          },
+          {
+            "key": "member.projects.apply",
+            "fallback": "프로그램 신청",
+            "line": 181
+          },
+          {
+            "key": "common.close",
+            "fallback": "닫기",
+            "line": 208
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 209
+          },
+          {
+            "key": "common.submitting",
+            "fallback": "제출 중...",
+            "line": 223
+          },
+          {
+            "key": "member.projects.resubmit",
+            "fallback": "재제출",
+            "line": 225
+          },
+          {
+            "key": "common.submit",
+            "fallback": "제출",
+            "line": 226
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationRecords\\ApplicationActionButtons.jsx",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.cancelApplication",
+            "fallback": "신청 취소",
+            "line": 32
+          },
+          {
+            "key": "member.projects.applicationRecords.viewReason",
+            "fallback": "사유 확인",
+            "line": 47
+          },
+          {
+            "key": "member.projects.applicationRecords.submitMaterials",
+            "fallback": "자료 제출",
+            "line": 62
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationRecords\\ApplicationRecordsHeader.jsx",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.title",
+            "fallback": "신청 기록",
+            "line": 15
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationRecords\\ApplicationRecordsList.jsx",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.loading",
+            "fallback": "로딩중...",
+            "line": 27
+          },
+          {
+            "key": "member.projects.applicationRecords.noRecords",
+            "fallback": "신청 기록이 없습니다.",
+            "line": 40
+          },
+          {
+            "key": "common.noSearchResults",
+            "fallback": "일치하는 결과를 찾을 수 없습니다",
+            "line": 41
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationRecords\\ApplicationRecordsMobileList.jsx",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.applicationDate",
+            "fallback": "신청일",
+            "line": 33
+          },
+          {
+            "key": "member.projects.applicationRecords.processedDate",
+            "fallback": "처리일",
+            "line": 44
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationRecords\\ApplicationRecordsTable.jsx",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.projectName",
+            "fallback": "사업명",
+            "line": 19
+          },
+          {
+            "key": "member.projects.applicationRecords.applicationDate",
+            "fallback": "신청일",
+            "line": 22
+          },
+          {
+            "key": "member.projects.applicationRecords.progressStatus",
+            "fallback": "진행 상태",
+            "line": 25
+          },
+          {
+            "key": "member.projects.applicationRecords.processedDate",
+            "fallback": "처리일",
+            "line": 28
+          },
+          {
+            "key": "member.projects.applicationRecords.action",
+            "fallback": "작업",
+            "line": 31
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationRecords\\CancelApplicationModal.jsx",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.cancelConfirm.title",
+            "fallback": "신청 취소",
+            "line": 16
+          },
+          {
+            "key": "member.projects.applicationRecords.cancelConfirm.cancel",
+            "fallback": "돌아가기",
+            "line": 33
+          },
+          {
+            "key": "member.projects.applicationRecords.loading",
+            "fallback": "로딩중...",
+            "line": 37
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationRecords\\RejectionReasonModal.jsx",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.rejectionReason.title",
+            "fallback": "거절 사유",
+            "line": 11
+          },
+          {
+            "key": "member.projects.applicationRecords.rejectionReason.close",
+            "fallback": "닫기",
+            "line": 23
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ApplicationRecords\\SupplementMaterialsModal.jsx",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.supplementTitle",
+            "fallback": "추가 자료 제출",
+            "line": 21
+          },
+          {
+            "key": "member.projects.applicationRecords.requestedMaterials",
+            "fallback": "요청된 자료",
+            "line": 26
+          },
+          {
+            "key": "member.projects.applicationRecords.selectFiles",
+            "fallback": "파일 선택",
+            "line": 42
+          },
+          {
+            "key": "member.projects.applicationRecords.selectedFiles",
+            "fallback": "선택된 파일",
+            "line": 58
+          },
+          {
+            "key": "member.projects.applicationRecords.cancel",
+            "fallback": "취소",
+            "line": 85
+          },
+          {
+            "key": "member.projects.applicationRecords.loading",
+            "fallback": "로딩중...",
+            "line": 93
+          },
+          {
+            "key": "member.projects.applicationRecords.submit",
+            "fallback": "제출",
+            "line": 94
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ProjectDetail\\ProjectAttachments.jsx",
+        "calls": [
+          {
+            "key": "fileAttachments.attachments",
+            "fallback": "첨부파일",
+            "line": 41
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 59
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ProjectDetail\\ProjectDetailActions.jsx",
+        "calls": [
+          {
+            "key": "member.projects.apply",
+            "fallback": "프로그램 신청",
+            "line": 22
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ProjectDetail\\ProjectDetailBackButton.jsx",
+        "calls": [
+          {
+            "key": "common.backToList",
+            "fallback": "목록으로",
+            "line": 19
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ProjectDetail\\ProjectDetailError.jsx",
+        "calls": [
+          {
+            "key": "common.notFound",
+            "fallback": "해당 공지사항을 찾을 수 없습니다",
+            "line": 16
+          },
+          {
+            "key": "common.back",
+            "fallback": "뒤로",
+            "line": 22
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ProjectList\\ProjectList.jsx",
+        "calls": [
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 26
+          },
+          {
+            "key": "common.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 39
+          },
+          {
+            "key": "common.noSearchResults",
+            "fallback": "일치하는 결과를 찾을 수 없습니다",
+            "line": 40
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ProjectList\\ProjectListFilter.jsx",
+        "calls": [
+          {
+            "key": "member.projects.searchPlaceholder",
+            "fallback": "사업명 또는 키워드로 검색",
+            "line": 25
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ProjectList\\ProjectListHeader.jsx",
+        "calls": [
+          {
+            "key": "member.projects.title",
+            "fallback": "사업 관리",
+            "line": 15
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ProjectList\\ProjectListItem.jsx",
+        "calls": [
+          {
+            "key": "member.projects.apply",
+            "fallback": "프로그램 신청",
+            "line": 79
+          },
+          {
+            "key": "member.projects.notAvailable",
+            "fallback": "신청 불가",
+            "line": 80
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\components\\ProjectSubmenu.jsx",
+        "calls": [
+          {
+            "key": "member.projects.tabs.projectList",
+            "fallback": "사업 목록",
+            "line": 16
+          },
+          {
+            "key": "member.projects.tabs.applicationRecords",
+            "fallback": "신청 기록",
+            "line": 35
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\hooks\\useApplicationRecords.js",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.noFilesSelected",
+            "fallback": "파일을 선택해주세요.",
+            "line": 96
+          },
+          {
+            "key": "member.projects.applicationRecords.featureComingSoon",
+            "fallback": "기능 준비 중입니다",
+            "line": 103
+          },
+          {
+            "key": "member.projects.applicationRecords.projectName",
+            "fallback": "사업명",
+            "line": 112
+          },
+          {
+            "key": "member.projects.applicationRecords.applicationDate",
+            "fallback": "신청일",
+            "line": 117
+          },
+          {
+            "key": "member.projects.applicationRecords.progressStatus",
+            "fallback": "진행 상태",
+            "line": 122
+          },
+          {
+            "key": "member.projects.applicationRecords.processedDate",
+            "fallback": "처리일",
+            "line": 130
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\hooks\\useApplicationStatus.js",
+        "calls": [
+          {
+            "key": "member.projects.applicationRecords.status.pending",
+            "fallback": "접수 대기",
+            "line": 19
+          },
+          {
+            "key": "member.projects.applicationRecords.status.submitted",
+            "fallback": "접수 완료",
+            "line": 24
+          },
+          {
+            "key": "member.projects.applicationRecords.status.under_review",
+            "fallback": "심사중",
+            "line": 29
+          },
+          {
+            "key": "member.projects.applicationRecords.status.reviewing",
+            "fallback": "심사중",
+            "line": 34
+          },
+          {
+            "key": "member.projects.applicationRecords.status.approved",
+            "fallback": "승인",
+            "line": 48
+          },
+          {
+            "key": "member.projects.applicationRecords.status.rejected",
+            "fallback": "거절",
+            "line": 53
+          },
+          {
+            "key": "member.projects.applicationRecords.status.cancelled",
+            "fallback": "취소",
+            "line": 59
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\hooks\\useProjectApplication.js",
+        "calls": [
+          {
+            "key": "common.unknownError",
+            "fallback": "알 수 없는 오류가 발생했습니다",
+            "line": 63
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\hooks\\useProjectDetail.js",
+        "calls": [
+          {
+            "key": "common.notFound",
+            "fallback": "해당 공지사항을 찾을 수 없습니다",
+            "line": 21
+          },
+          {
+            "key": "common.error",
+            "fallback": "오류",
+            "line": 39
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\hooks\\useProjectList.js",
+        "calls": [
+          {
+            "key": "member.projects.apply",
+            "fallback": "프로그램 신청",
+            "line": 121
+          },
+          {
+            "key": "member.projects.notAvailable",
+            "fallback": "신청 불가",
+            "line": 123
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\projects\\hooks\\useProjectStatus.js",
+        "calls": [
+          {
+            "key": "member.projects.status.active",
+            "fallback": "진행중",
+            "line": 19
+          },
+          {
+            "key": "member.projects.status.inactive",
+            "fallback": "비활성",
+            "line": 23
+          },
+          {
+            "key": "member.projects.status.archived",
+            "fallback": "보관됨",
+            "line": 27
+          },
+          {
+            "key": "member.projects.status.recruiting",
+            "fallback": "모집중",
+            "line": 31
+          },
+          {
+            "key": "member.projects.status.ongoing",
+            "fallback": "진행중",
+            "line": 35
+          },
+          {
+            "key": "member.projects.status.closed",
+            "fallback": "마감",
+            "line": 39
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\components\\FAQPage\\FAQFilter.jsx",
+        "calls": [
+          {
+            "key": "member.support.faqSearchPlaceholder",
+            "fallback": "질문 또는 답변 검색...",
+            "line": 29
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\components\\FAQPage\\FAQItem.jsx",
+        "calls": [
+          {
+            "key": "member.support.viewsLabel",
+            "fallback": "회 조회",
+            "line": 62
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\components\\FAQPage\\FAQPage.jsx",
+        "calls": [
+          {
+            "key": "member.support.faq",
+            "fallback": "FAQ",
+            "line": 58
+          },
+          {
+            "key": "member.support.faq.description",
+            "fallback": "자주 묻는 질문과 답변",
+            "line": 61
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 85
+          },
+          {
+            "key": "member.support.noFaqResults",
+            "fallback": "일치하는 질문을 찾을 수 없습니다",
+            "line": 89
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\components\\InquiryHistoryPage\\InquiryHistoryFilter.jsx",
+        "calls": [
+          {
+            "key": "member.support.searchPlaceholder",
+            "fallback": "문의 제목 검색...",
+            "line": 28
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\components\\InquiryHistoryPage\\InquiryHistoryTable.jsx",
+        "calls": [
+          {
+            "key": "member.support.noInquiries",
+            "fallback": "문의 내역이 없습니다",
+            "line": 45
+          },
+          {
+            "key": "member.support.noMatchingInquiries",
+            "fallback": "일치하는 문의 기록이 없습니다",
+            "line": 46
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\components\\NoticeDetailPage\\NoticeAttachmentList.jsx",
+        "calls": [
+          {
+            "key": "fileAttachments.attachments",
+            "fallback": "첨부파일",
+            "line": 20
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 38
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\components\\NoticeDetailPage\\NoticeDetailPage.jsx",
+        "calls": [
+          {
+            "key": "common.notFound",
+            "fallback": "해당 공지사항을 찾을 수 없습니다",
+            "line": 43
+          },
+          {
+            "key": "common.back",
+            "fallback": "뒤로",
+            "line": 45
+          },
+          {
+            "key": "home.notices.important",
+            "fallback": "중요",
+            "line": 54
+          },
+          {
+            "key": "home.notices.normal",
+            "fallback": "일반",
+            "line": 55
+          },
+          {
+            "key": "common.backToList",
+            "fallback": "목록으로",
+            "line": 65
+          },
+          {
+            "key": "admin.content.notices.views",
+            "fallback": "조회",
+            "line": 83
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\components\\NoticesPage\\NoticesFilter.jsx",
+        "calls": [
+          {
+            "key": "member.support.notices.searchPlaceholder",
+            "fallback": "공지사항 검색...",
+            "line": 26
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx",
+        "calls": [
+          {
+            "key": "member.support.notices.important",
+            "fallback": "중요",
+            "line": 44
+          },
+          {
+            "key": "member.support.notices.normal",
+            "fallback": "일반",
+            "line": 45
+          },
+          {
+            "key": "common.retry",
+            "fallback": "다시 시도",
+            "line": 91
+          },
+          {
+            "key": "member.support.notices.empty",
+            "fallback": "공고가 없습니다",
+            "line": 97
+          },
+          {
+            "key": "common.type",
+            "fallback": "구분",
+            "line": 109
+          },
+          {
+            "key": "common.title",
+            "fallback": "제목",
+            "line": 111
+          },
+          {
+            "key": "common.date",
+            "fallback": "날짜",
+            "line": 113
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\hooks\\useFAQ.js",
+        "calls": [
+          {
+            "key": "member.support.faqCategory.registration",
+            "fallback": "회원가입",
+            "line": 56
+          },
+          {
+            "key": "member.support.faqCategory.general",
+            "fallback": "일반",
+            "line": 57
+          },
+          {
+            "key": "member.support.faqCategory.performance",
+            "fallback": "성과관리",
+            "line": 58
+          },
+          {
+            "key": "member.support.faqCategory.project",
+            "fallback": "지원사업",
+            "line": 59
+          },
+          {
+            "key": "member.support.faqCategory.profile",
+            "fallback": "기업프로필",
+            "line": 60
+          },
+          {
+            "key": "member.support.faqCategory.support",
+            "fallback": "문의/지원",
+            "line": 61
+          },
+          {
+            "key": "member.support.faqCategory.other",
+            "fallback": "기타",
+            "line": 62
+          },
+          {
+            "key": "common.all",
+            "fallback": "전체",
+            "line": 70
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\hooks\\useNoticeDetail.js",
+        "calls": [
+          {
+            "key": "common.notFound",
+            "fallback": "해당 공지사항을 찾을 수 없습니다",
+            "line": 43
+          },
+          {
+            "key": "common.error",
+            "fallback": "오류",
+            "line": 47
+          }
+        ]
+      },
+      {
+        "file": "member\\modules\\support\\hooks\\useNotices.js",
+        "calls": [
+          {
+            "key": "common.all",
+            "fallback": "전체",
+            "line": 87
+          },
+          {
+            "key": "home.notices.important",
+            "fallback": "중요",
+            "line": 88
+          },
+          {
+            "key": "home.notices.normal",
+            "fallback": "일반",
+            "line": 89
+          },
+          {
+            "key": "common.error",
+            "fallback": "오류",
+            "line": 101
+          }
+        ]
+      },
+      {
+        "file": "router.jsx",
+        "calls": [
+          {
+            "key": "error.page403.title",
+            "fallback": "접근 권한이 없습니다",
+            "line": 163
+          },
+          {
+            "key": "error.page403.message",
+            "fallback": "이 페이지에 접근할 수 있는 권한이 없습니다.",
+            "line": 165
+          },
+          {
+            "key": "error.page403.adminHomeButton",
+            "fallback": "관리자 홈으로 돌아가기",
+            "line": 178
+          },
+          {
+            "key": "error.page403.homeButton",
+            "fallback": "홈으로 돌아가기",
+            "line": 179
+          },
+          {
+            "key": "error.page403.adminLoginButton",
+            "fallback": "관리자 로그인",
+            "line": 184
+          },
+          {
+            "key": "common.login",
+            "fallback": "로그인",
+            "line": 188
+          },
+          {
+            "key": "error.page403.memberLoginButton",
+            "fallback": "회원 로그인",
+            "line": 193
+          },
+          {
+            "key": "error.page403.adminLoginButton",
+            "fallback": "관리자 로그인",
+            "line": 199
+          },
+          {
+            "key": "error.page404.title",
+            "fallback": "페이지를 찾을 수 없습니다",
+            "line": 239
+          },
+          {
+            "key": "error.page404.message",
+            "fallback": "요청하신 페이지가 존재하지 않거나 이동되었습니다.",
+            "line": 241
+          },
+          {
+            "key": "error.page404.adminHomeButton",
+            "fallback": "관리자 홈으로 돌아가기",
+            "line": 245
+          },
+          {
+            "key": "error.page404.homeButton",
+            "fallback": "홈으로 돌아가기",
+            "line": 246
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\AddressSearch.jsx",
+        "calls": [
+          {
+            "key": "common.addressPlaceholder",
+            "fallback": "주소를 검색하세요",
+            "line": 102
+          },
+          {
+            "key": "common.searchAddress",
+            "fallback": "주소 검색",
+            "line": 116
+          },
+          {
+            "key": "common.searchAddress",
+            "fallback": "주소 검색",
+            "line": 125
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\Charts\\BaseChart.jsx",
+        "calls": [
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 44
+          },
+          {
+            "key": "admin.dashboard.charts.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 65
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\Charts\\MemberGrowthChart.jsx",
+        "calls": [
+          {
+            "key": "admin.dashboard.stats.totalMembers",
+            "fallback": "총 기업 회원 수",
+            "line": 36
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\Charts\\PerformanceTrendChart.jsx",
+        "calls": [
+          {
+            "key": "admin.dashboard.stats.totalSales",
+            "fallback": "총 매출액",
+            "line": 38
+          },
+          {
+            "key": "admin.dashboard.stats.totalEmployment",
+            "fallback": "총 고용 인원",
+            "line": 47
+          },
+          {
+            "key": "admin.dashboard.stats.totalIP",
+            "fallback": "총 지식재산권",
+            "line": 56
+          },
+          {
+            "key": "admin.dashboard.stats.totalSales",
+            "fallback": "총 매출액",
+            "line": 67
+          },
+          {
+            "key": "admin.dashboard.stats.totalEmployment",
+            "fallback": "총 고용 인원",
+            "line": 72
+          },
+          {
+            "key": "admin.dashboard.stats.totalIP",
+            "fallback": "총 지식재산권",
+            "line": 77
+          },
+          {
+            "key": "admin.dashboard.stats.totalSales",
+            "fallback": "총 매출액",
+            "line": 92
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\Charts\\ProjectApplicationChart.jsx",
+        "calls": [
+          {
+            "key": "admin.projects.applications",
+            "fallback": "신청 수",
+            "line": 48
+          },
+          {
+            "key": "admin.projects.approvalRate",
+            "fallback": "승인율",
+            "line": 55
+          },
+          {
+            "key": "admin.projects.applications",
+            "fallback": "신청 수",
+            "line": 70
+          },
+          {
+            "key": "admin.projects.approved",
+            "fallback": "승인됨",
+            "line": 75
+          },
+          {
+            "key": "admin.projects.rejected",
+            "fallback": "거부됨",
+            "line": 80
+          },
+          {
+            "key": "admin.projects.pending",
+            "fallback": "대기 중",
+            "line": 85
+          },
+          {
+            "key": "admin.projects.applications",
+            "fallback": "신청 수",
+            "line": 103
+          },
+          {
+            "key": "admin.projects.approvalRate",
+            "fallback": "승인율",
+            "line": 108
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\ErrorBoundary.jsx",
+        "calls": [
+          {
+            "key": "error.boundary.title",
+            "fallback": "오류가 발생했습니다",
+            "line": 95
+          },
+          {
+            "key": "error.boundary.message",
+            "fallback": "죄송합니다. 애플리케이션에 예기치 않은 오류가 발생했습니다. 다시 시도하거나 페이지를 새로고침해 주세요.",
+            "line": 98
+          },
+          {
+            "key": "error.boundary.detailsTitle",
+            "fallback": "오류 상세 (개발 환경 전용)",
+            "line": 104
+          },
+          {
+            "key": "error.boundary.maxRetriesReached",
+            "fallback": "최대 재시도 횟수 도달",
+            "line": 126
+          },
+          {
+            "key": "error.boundary.retryButton",
+            "fallback": "다시 시도",
+            "line": 129
+          },
+          {
+            "key": "error.boundary.reloadButton",
+            "fallback": "페이지 새로고침",
+            "line": 138
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\ExportButtons.jsx",
+        "calls": [
+          {
+            "key": "common.export.excel",
+            "fallback": "Excel 내보내기",
+            "line": 38
+          },
+          {
+            "key": "common.export.csv",
+            "fallback": "CSV 내보내기",
+            "line": 39
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\FileAttachments.jsx",
+        "calls": [
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 145
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 147
+          },
+          {
+            "key": "common.remove",
+            "fallback": "제거",
+            "line": 154
+          },
+          {
+            "key": "components.fileUpload.addFiles",
+            "fallback": "첨부파일 추가",
+            "line": 175
+          },
+          {
+            "key": "components.fileUpload.uploading",
+            "fallback": "업로드 중...",
+            "line": 176
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\FileUploadButton.jsx",
+        "calls": [
+          {
+            "key": "common.uploading",
+            "fallback": "업로드 중...",
+            "line": 60
+          },
+          {
+            "key": "common.upload",
+            "fallback": "업로드",
+            "line": 61
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\HomeCard.jsx",
+        "calls": [
+          {
+            "key": "components.fileUpload.attachments",
+            "fallback": "첨부파일",
+            "line": 124
+          },
+          {
+            "key": "components.fileUpload.attachments",
+            "fallback": "첨부파일",
+            "line": 127
+          },
+          {
+            "key": "components.fileUpload.attachments",
+            "fallback": "첨부파일",
+            "line": 136
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\HomeList.jsx",
+        "calls": [
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 54
+          },
+          {
+            "key": "common.retry",
+            "fallback": "다시 시도",
+            "line": 64
+          },
+          {
+            "key": "common.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 93
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 114
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 119
+          },
+          {
+            "key": "admin.content.notices.views",
+            "fallback": "조회",
+            "line": 147
+          },
+          {
+            "key": "components.fileUpload.attachments",
+            "fallback": "첨부파일",
+            "line": 162
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 214
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\HomePreview.jsx",
+        "calls": [
+          {
+            "key": "common.viewAll",
+            "fallback": "전체 보기",
+            "line": 35
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 42
+          },
+          {
+            "key": "common.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 65
+          },
+          {
+            "key": "common.loading",
+            "fallback": "로딩 중...",
+            "line": 75
+          },
+          {
+            "key": "admin.content.notices.views",
+            "fallback": "조회",
+            "line": 111
+          },
+          {
+            "key": "components.fileUpload.attachments",
+            "fallback": "첨부파일",
+            "line": 129
+          },
+          {
+            "key": "common.download",
+            "fallback": "다운로드",
+            "line": 189
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\LanguageSwitcher.jsx",
+        "calls": [
+          {
+            "key": "common.language.korean",
+            "fallback": "한국어",
+            "line": 22
+          },
+          {
+            "key": "common.language.chinese",
+            "fallback": "중국어",
+            "line": 23
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\Pagination.jsx",
+        "calls": [
+          {
+            "key": "common.previous",
+            "fallback": "이전",
+            "line": 105
+          },
+          {
+            "key": "common.next",
+            "fallback": "다음",
+            "line": 161
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\Select.jsx",
+        "calls": [
+          {
+            "key": "common.all",
+            "fallback": "전체",
+            "line": 29
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\TermsModal.jsx",
+        "calls": [
+          {
+            "key": "common.noData",
+            "fallback": "데이터가 없습니다",
+            "line": 82
+          },
+          {
+            "key": "error.generic.message",
+            "fallback": "작업 중 오류가 발생했습니다.",
+            "line": 86
+          },
+          {
+            "key": "common.close",
+            "fallback": "닫기",
+            "line": 137
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\ThemeSwitcher.jsx",
+        "calls": [
+          {
+            "key": "common.theme.switchToLight",
+            "fallback": "라이트 모드로 전환",
+            "line": 31
+          },
+          {
+            "key": "common.theme.switchToDark",
+            "fallback": "다크 모드로 전환",
+            "line": 31
+          },
+          {
+            "key": "common.theme.light",
+            "fallback": "라이트",
+            "line": 39
+          },
+          {
+            "key": "common.theme.dark",
+            "fallback": "다크",
+            "line": 39
+          }
+        ]
+      },
+      {
+        "file": "shared\\components\\TiptapEditor.jsx",
+        "calls": [
+          {
+            "key": "components.editor.placeholder",
+            "fallback": "내용을 입력하세요...",
+            "line": 35
+          },
+          {
+            "key": "components.editor.bold",
+            "fallback": "굵게",
+            "line": 236
+          },
+          {
+            "key": "components.editor.italic",
+            "fallback": "기울임",
+            "line": 248
+          },
+          {
+            "key": "components.editor.underline",
+            "fallback": "밑줄",
+            "line": 260
+          },
+          {
+            "key": "components.editor.heading1",
+            "fallback": "제목 1",
+            "line": 278
+          },
+          {
+            "key": "components.editor.heading2",
+            "fallback": "제목 2",
+            "line": 293
+          },
+          {
+            "key": "components.editor.heading3",
+            "fallback": "제목 3",
+            "line": 308
+          },
+          {
+            "key": "components.editor.bulletList",
+            "fallback": "글머리 기호 목록",
+            "line": 323
+          },
+          {
+            "key": "components.editor.orderedList",
+            "fallback": "번호 매기기 목록",
+            "line": 335
+          },
+          {
+            "key": "components.editor.link",
+            "fallback": "링크",
+            "line": 350
+          },
+          {
+            "key": "components.editor.image",
+            "fallback": "이미지",
+            "line": 359
+          },
+          {
+            "key": "components.editor.table",
+            "fallback": "표",
+            "line": 370
+          },
+          {
+            "key": "components.editor.undo",
+            "fallback": "실행 취소",
+            "line": 383
+          },
+          {
+            "key": "components.editor.redo",
+            "fallback": "다시 실행",
+            "line": 393
+          },
+          {
+            "key": "components.editor.uploading",
+            "fallback": "업로드 중...",
+            "line": 418
+          },
+          {
+            "key": "components.editor.addLink",
+            "fallback": "링크 추가",
+            "line": 444
+          },
+          {
+            "key": "components.editor.linkText",
+            "fallback": "링크 텍스트",
+            "line": 450
+          },
+          {
+            "key": "components.editor.linkUrl",
+            "fallback": "링크 주소",
+            "line": 459
+          },
+          {
+            "key": "common.cancel",
+            "fallback": "취소",
+            "line": 475
+          },
+          {
+            "key": "common.confirm",
+            "fallback": "확인",
+            "line": 478
+          }
+        ]
+      }
+    ],
+    "namespaceWarnings": [
+      {
+        "file": "shared\\utils\\excelExporter.js",
+        "keys": [
+          {
+            "key": "admin.statistics.title",
+            "line": 44
+          }
+        ]
+      }
+    ],
+    "suggestions": []
+  }
+}

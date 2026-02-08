@@ -1,4 +1,4 @@
-// 自定义 Hooks
+﻿// 自定义 Hooks
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuthStore } from "@shared/stores";
@@ -10,6 +10,7 @@ import { DEFAULT_PAGE_SIZE } from "@shared/utils/constants";
 // 导出其他 hooks
 export { useBanners } from "./useBanners";
 export { useApiCache, clearAllCache, clearCache } from "./useApiCache";
+export { useEnumTranslation } from "./useEnumTranslation";
 
 // =============================================================================
 // useAuth - 认证

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Pagination Component
  */
 
@@ -165,3 +165,7 @@ export function Pagination({
 }
 
 export default Pagination;
+
+
+
+

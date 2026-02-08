@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 项目申请逻辑 Hook
  *
  * 封装项目申请相关的逻辑，包括文件上传和提交申请。
@@ -60,7 +60,7 @@ export function useProjectApplication() {
         const message = i18nKey
           ? t(i18nKey)
           : error?.message ||
-            t("common.unknownError", "发生未知错误，请稍后再试");
+            t("common.unknownError", "알 수 없는 오류가 발생했습니다");
         throw new Error(message);
       } finally {
         setSubmitting(false);

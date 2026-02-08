@@ -1,6 +1,6 @@
-/**
+﻿/**
  * 通知消息解析工具
- * 
+ *
  * 后端发送结构化的 JSON 数据，前端根据类型和状态自动翻译
  */
 
@@ -8,10 +8,10 @@
  * 检查字符串是否为 JSON 格式
  */
 function isJsonString(str) {
-  if (!str || typeof str !== 'string') return false;
+  if (!str || typeof str !== "string") return false;
   try {
     const parsed = JSON.parse(str);
-    return typeof parsed === 'object' && parsed !== null;
+    return typeof parsed === "object" && parsed !== null;
   } catch {
     return false;
   }
@@ -28,12 +28,12 @@ export function parseNotification(subject, content) {
   if (isJsonString(subject)) {
     return JSON.parse(subject);
   }
-  
+
   // 尝试解析 content
   if (isJsonString(content)) {
     return JSON.parse(content);
   }
-  
+
   return null;
 }
 
@@ -44,25 +44,29 @@ export function parseNotification(subject, content) {
  * @param {string} namespace - 翻译命名空间前缀，默认 'support'，管理员端使用 'admin.messages'
  * @returns {string} - 翻译键
  */
-export function getNotificationTranslationKey(data, field = 'subject', namespace = 'support') {
+export function getNotificationTranslationKey(
+  data,
+  field = "subject",
+  namespace = "member.support",
+) {
   if (!data || !data.type) return null;
-  
+
   const { type, status, comments } = data;
-  
+
   // 根据类型和状态返回翻译键
   const keyMap = {
     // 业绩管理通知
     performance_review: {
       subject: `${namespace}.notifications.performance.review.subject`,
-      content: comments 
-        ? `${namespace}.notifications.performance.review.contentWithComments` 
+      content: comments
+        ? `${namespace}.notifications.performance.review.contentWithComments`
         : `${namespace}.notifications.performance.review.content`,
     },
     performance_submission: {
       subject: `${namespace}.notifications.performance.submission.subject`,
       content: `${namespace}.notifications.performance.submission.content`,
     },
-    
+
     // 会员管理通知
     member_registration: {
       subject: `${namespace}.notifications.member.registration.subject`,
@@ -76,7 +80,7 @@ export function getNotificationTranslationKey(data, field = 'subject', namespace
       subject: `${namespace}.notifications.member.rejected.subject`,
       content: `${namespace}.notifications.member.rejected.content`,
     },
-    
+
     // 项目管理通知
     project_application: {
       subject: `${namespace}.notifications.project.application.subject`,
@@ -87,7 +91,7 @@ export function getNotificationTranslationKey(data, field = 'subject', namespace
       content: `${namespace}.notifications.project.result.content`,
     },
   };
-  
+
   const keys = keyMap[type];
   return keys ? keys[field] : null;
 }
@@ -98,15 +102,15 @@ export function getNotificationTranslationKey(data, field = 'subject', namespace
  * @returns {string} - 分类标识 ('performance', 'member', 'project', 'system')
  */
 export function getNotificationCategory(data) {
-  if (!data || !data.type) return 'system';
-  
+  if (!data || !data.type) return "system";
+
   const { type } = data;
-  
-  if (type.startsWith('performance_')) return 'performance';
-  if (type.startsWith('member_')) return 'member';
-  if (type.startsWith('project_')) return 'project';
-  
-  return 'system';
+
+  if (type.startsWith("performance_")) return "performance";
+  if (type.startsWith("member_")) return "member";
+  if (type.startsWith("project_")) return "project";
+
+  return "system";
 }
 
 /**
@@ -116,9 +120,9 @@ export function getNotificationCategory(data) {
  */
 export function formatNotificationParams(data) {
   if (!data) return {};
-  
+
   const params = { ...data };
-  
+
   // 转换 snake_case 字段为 camelCase（用于翻译模板）
   if (params.company_name) {
     params.companyName = params.company_name;
@@ -132,7 +136,7 @@ export function formatNotificationParams(data) {
   if (params.project_title) {
     params.projectTitle = params.project_title;
   }
-  
+
   // 格式化时间周期
   if (params.year) {
     if (params.quarter) {
@@ -145,15 +149,15 @@ export function formatNotificationParams(data) {
       params.periodZh = `${params.year}年 年度`;
     }
   }
-  
+
   // 格式化状态 - 为韩语和中文分别提供翻译
   if (params.status) {
     const statusMap = {
-      approved: { ko: '승인', zh: '批准' },
-      rejected: { ko: '거부', zh: '驳回' },
-      revision_requested: { ko: '보완 요청', zh: '要求补充' },
-      submitted: { ko: '제출', zh: '提交' },
-      pending: { ko: '대기', zh: '待处理' },
+      approved: { ko: "승인", zh: "批准" },
+      rejected: { ko: "거부", zh: "驳回" },
+      revision_requested: { ko: "보완 요청", zh: "要求补充" },
+      submitted: { ko: "제출", zh: "提交" },
+      pending: { ko: "대기", zh: "待处理" },
     };
     const statusText = statusMap[params.status];
     if (statusText) {
@@ -165,6 +169,27 @@ export function formatNotificationParams(data) {
       params.statusZh = params.status;
     }
   }
-  
+
+  // 翻译常见的评论文本
+  if (params.comments) {
+    const commentTranslations = {
+      审核已取消: { ko: "심사가 취소되었습니다", zh: "审核已取消" },
+      审查已取消: { ko: "심사가 취소되었습니다", zh: "审查已取消" },
+      已批准: { ko: "승인되었습니다", zh: "已批准" },
+      已拒绝: { ko: "거부되었습니다", zh: "已拒绝" },
+      需要补充: { ko: "보완이 필요합니다", zh: "需要补充" },
+      请补充资料: { ko: "자료를 보완해 주세요", zh: "请补充资料" },
+    };
+    const translation = commentTranslations[params.comments];
+    if (translation) {
+      params.commentsKo = translation.ko;
+      params.commentsZh = translation.zh;
+    } else {
+      // 没有映射时使用原始值
+      params.commentsKo = params.comments;
+      params.commentsZh = params.comments;
+    }
+  }
+
   return params;
 }

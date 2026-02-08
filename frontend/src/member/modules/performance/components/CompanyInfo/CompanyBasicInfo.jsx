@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Company Basic Info
  *
  * 企业基本信息部分。
@@ -8,6 +8,7 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Input, Textarea, Select, Button } from "@shared/components";
+import { useEnumTranslation } from "@shared/hooks";
 
 const CompanyBasicInfo = ({
   data,
@@ -18,32 +19,29 @@ const CompanyBasicInfo = ({
   errors,
 }) => {
   const { t } = useTranslation();
+  const { getRegionOptions } = useEnumTranslation();
 
-  // 地区选项
+  // 地区选项 - 使用统一的 hook 获取
   const regionOptions = useMemo(() => {
-    const regions = [
-      'chuncheon', 'wonju', 'gangneung', 'donghae', 'taebaek', 'sokcho', 'samcheok',
-      'hongcheon', 'hoengseong', 'yeongwol', 'pyeongchang', 'jeongseon',
-      'cheorwon', 'hwacheon', 'yanggu', 'inje', 'goseong', 'yangyang', 'other'
-    ];
-    return regions.map(region => ({
-      value: t(`performance.companyInfo.profile.regions.${region}`),
-      label: t(`performance.companyInfo.profile.regions.${region}`)
-    }));
-  }, [t]);
+    // getRegionOptions 返回 { value, label } 格式，第一项是空选项
+    return getRegionOptions(
+      true,
+      t("member.performance.companyInfo.fields.selectRegion", "지역 선택"),
+    );
+  }, [getRegionOptions, t]);
 
   return (
     <Card className="shadow-sm p-0">
       <div className="flex items-center gap-3 border-b border-gray-100 p-6 sm:p-8">
         <h2 className="text-xl font-semibold text-gray-900 m-0">
-          {t('performance.companyInfo.sections.basicInfo', '기본 정보')}
+          {t("member.performance.companyInfo.sections.basicInfo", "기본 정보")}
         </h2>
       </div>
       <div className="p-6 sm:p-8 space-y-6">
         {/* Logo */}
         <div className="mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-gray-200">
           <label className="block text-sm sm:text-base font-medium text-gray-700 mb-3 sm:mb-4">
-            {t('performance.companyInfo.sections.logo', '기업 로고')}
+            {t("member.performance.companyInfo.sections.logo", "기업 로고")}
           </label>
           <div className="flex flex-col items-start gap-4">
             {isEditing ? (
@@ -60,7 +58,7 @@ const CompanyBasicInfo = ({
                   <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 border-2 border-blue-300 rounded-lg flex flex-col items-center justify-center bg-blue-50">
                     <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-2"></div>
                     <span className="text-xs text-blue-600">
-                      {t('common.uploading', '업로드 중...')}
+                      {t("common.uploading", "업로드 중...")}
                     </span>
                   </div>
                 ) : data.logoPreview || data.logoUrl ? (
@@ -70,8 +68,8 @@ const CompanyBasicInfo = ({
                       document.getElementById("logo-upload")?.click()
                     }
                     title={t(
-                      "performance.companyInfo.profile.clickToChangeLogo",
-                      "点击更换Logo",
+                      "member.performance.companyInfo.profile.clickToChangeLogo",
+                      "로고 변경하려면 클릭",
                     )}
                   >
                     <img
@@ -91,17 +89,20 @@ const CompanyBasicInfo = ({
                       document.getElementById("logo-upload")?.click()
                     }
                     title={t(
-                      "performance.companyInfo.profile.clickToUploadLogo",
-                      "点击上传Logo",
+                      "member.performance.companyInfo.profile.clickToUploadLogo",
+                      "로고 업로드하려면 클릭",
                     )}
                   >
-                    {t('performance.companyInfo.profile.noLogo', '로고 없음')}
+                    {t(
+                      "member.performance.companyInfo.profile.noLogo",
+                      "로고 없음",
+                    )}
                   </div>
                 )}
                 <small className="text-xs text-gray-500">
                   {t(
-                    "performance.companyInfo.profile.logoHint",
-                    "支持 JPG, PNG, GIF 格式，最大 10MB",
+                    "member.performance.companyInfo.profile.logoHint",
+                    "JPG, PNG, GIF 형식 지원, 최대 5MB",
                   )}
                 </small>
               </>
@@ -121,7 +122,10 @@ const CompanyBasicInfo = ({
                   </div>
                 ) : (
                   <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 text-gray-500 text-xs sm:text-sm">
-                    {t('performance.companyInfo.profile.noLogo', '로고 없음')}
+                    {t(
+                      "member.performance.companyInfo.profile.noLogo",
+                      "로고 없음",
+                    )}
                   </div>
                 )}
               </>
@@ -132,7 +136,10 @@ const CompanyBasicInfo = ({
         {/* Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            label={t('performance.companyInfo.fields.companyName', '기업명')}
+            label={t(
+              "member.performance.companyInfo.fields.companyName",
+              "기업명",
+            )}
             value={data.companyName}
             onChange={(e) => onChange("companyName", e.target.value)}
             disabled={!isEditing}
@@ -140,7 +147,7 @@ const CompanyBasicInfo = ({
             error={errors.companyName}
           />
           <Input
-            label={t('performance.companyInfo.fields.email', '이메일')}
+            label={t("member.performance.companyInfo.fields.email", "이메일")}
             value={data.email}
             onChange={(e) => onChange("email", e.target.value)}
             disabled={!isEditing}
@@ -148,8 +155,8 @@ const CompanyBasicInfo = ({
           />
           <Input
             label={t(
-              "performance.companyInfo.fields.businessNumber",
-              "工商注册号",
+              "member.performance.companyInfo.fields.businessNumber",
+              "사업자등록번호",
             )}
             value={data.businessNumber}
             onChange={(e) => onChange("businessNumber", e.target.value)}
@@ -158,8 +165,8 @@ const CompanyBasicInfo = ({
           />
           <Input
             label={t(
-              "performance.companyInfo.fields.corporationNumber",
-              "法人注册号",
+              "member.performance.companyInfo.fields.corporationNumber",
+              "법인등록번호",
             )}
             value={data.legalNumber}
             onChange={(e) => onChange("legalNumber", e.target.value)}
@@ -167,7 +174,10 @@ const CompanyBasicInfo = ({
             error={errors.legalNumber}
           />
           <Input
-            label={t('performance.companyInfo.fields.foundingDate', '설립일')}
+            label={t(
+              "member.performance.companyInfo.fields.foundingDate",
+              "설립일",
+            )}
             type="date"
             value={data.foundingDate}
             onChange={(e) => onChange("foundingDate", e.target.value)}
@@ -176,7 +186,10 @@ const CompanyBasicInfo = ({
             error={errors.foundingDate}
           />
           <Input
-            label={t('performance.companyInfo.fields.website', '홈페이지')}
+            label={t(
+              "member.performance.companyInfo.fields.website",
+              "홈페이지",
+            )}
             value={data.website}
             onChange={(e) => onChange("website", e.target.value)}
             disabled={!isEditing}
@@ -186,19 +199,19 @@ const CompanyBasicInfo = ({
         </div>
         <div className="grid grid-cols-1 gap-6">
           <Select
-            label={t('performance.companyInfo.fields.region', '소재지역')}
+            label={t(
+              "member.performance.companyInfo.fields.region",
+              "소재지역",
+            )}
             value={data.region}
             onChange={(e) => onChange("region", e.target.value)}
             disabled={!isEditing}
             required
             error={errors.region}
-            options={[
-              { value: '', label: t('performance.companyInfo.fields.selectRegion', '지역 선택') },
-              ...regionOptions
-            ]}
+            options={regionOptions}
           />
           <Input
-            label={t('performance.companyInfo.fields.address', '주소')}
+            label={t("member.performance.companyInfo.fields.address", "주소")}
             value={data.address}
             onChange={(e) => onChange("address", e.target.value)}
             disabled={!isEditing}
@@ -206,7 +219,10 @@ const CompanyBasicInfo = ({
             error={errors.address}
           />
           <Textarea
-            label={t('performance.companyInfo.fields.description', '기업소개')}
+            label={t(
+              "member.performance.companyInfo.fields.description",
+              "기업소개",
+            )}
             value={data.description}
             onChange={(e) => onChange("description", e.target.value)}
             disabled={!isEditing}

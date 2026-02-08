@@ -1,8 +1,8 @@
 /**
  * Header Logic Hook
- * 处理 Header 组件的业务逻辑：菜单项配置、活跃状态判断、登录/登出处理
+ * 会员端 Header 逻辑钩子：导航菜单定义/激活状态/登录弹窗
  *
- * 遵循 dev-frontend_patterns skill 规范。
+ * 参考 dev-frontend_patterns skill 构建
  */
 
 import { useState } from "react";
@@ -27,13 +27,13 @@ export function useHeader() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingPath, setPendingPath] = useState(null);
 
-  // 一级导航菜单配置
+  // 主导航菜单项配置
   const mainMenuItems = [
     {
       key: "home",
       path: "/member/home",
       icon: DashboardIcon,
-      label: t("menu.home"),
+      label: t("member.layout.menu.home"),
       exact: true,
       requiresAuth: false,
     },
@@ -41,35 +41,35 @@ export function useHeader() {
       key: "about",
       path: "/member/about",
       icon: DocumentIcon,
-      label: t("menu.about"),
+      label: t("member.layout.menu.about"),
       requiresAuth: false,
     },
     {
       key: "projects",
       path: "/member/programs",
       icon: FolderIcon,
-      label: t("menu.projects"),
+      label: t("member.layout.menu.projects"),
       requiresAuth: true,
     },
     {
       key: "performance",
       path: "/member/performance",
       icon: ChartIcon,
-      label: t("menu.performance"),
+      label: t("member.layout.menu.performance"),
       requiresAuth: true,
     },
     {
       key: "support",
       path: "/member/support",
       icon: SupportIcon,
-      label: t("menu.support"),
+      label: t("member.layout.menu.support"),
       requiresAuth: true,
     },
   ];
 
-  // 菜单激活状态计算
+  // 判断菜单是否激活
   const isMenuActive = (item) => {
-    // 首页模块
+    // 首页特殊处理
     if (item.key === "home") {
       return (
         location.pathname === "/member/home" ||
@@ -77,14 +77,14 @@ export function useHeader() {
         location.pathname.startsWith("/member/news")
       );
     }
-    // 支援事业模块
+    // 项目菜单特殊处理
     if (item.key === "projects") {
       return (
         location.pathname.startsWith("/member/programs") ||
         location.pathname.startsWith("/member/project")
       );
     }
-    // 一站式支持模块
+    // 支持菜单特殊处理
     if (item.key === "support") {
       return (
         location.pathname.startsWith("/member/support") ||
@@ -97,7 +97,7 @@ export function useHeader() {
     return location.pathname.startsWith(item.path);
   };
 
-  // 处理菜单项点击
+  // 菜单点击处理器
   const handleMenuClick = (e, item) => {
     if (item.requiresAuth && !isAuthenticated) {
       e.preventDefault();
@@ -108,7 +108,7 @@ export function useHeader() {
     }
   };
 
-  // 处理登录成功
+  // 登录成功处理
   const handleLoginSuccess = (response) => {
     setShowLoginModal(false);
     if (pendingPath) {

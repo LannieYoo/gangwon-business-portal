@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 咨询表单业务逻辑 Hook
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -47,7 +47,7 @@ export function useInquiry({ onSubmitSuccess } = {}) {
 
     const remainingSlots = MAX_ATTACHMENTS - formData.attachments.length;
     if (remainingSlots <= 0) {
-      setError(t("support.maxAttachmentsReached", { max: MAX_ATTACHMENTS }));
+      setError(t("member.support.maxAttachmentsReached", { max: MAX_ATTACHMENTS }));
       return;
     }
 
@@ -74,7 +74,7 @@ export function useInquiry({ onSubmitSuccess } = {}) {
     if (e) e.preventDefault();
 
     if (!formData.subject || !formData.content) {
-      setError(t("support.fillAllFields"));
+      setError(t("member.support.fillAllFields"));
       return;
     }
 
@@ -120,7 +120,7 @@ export function useInquiry({ onSubmitSuccess } = {}) {
         attachments: threadAttachments,
       });
 
-      setSuccess(t("support.submitSuccess"));
+      setSuccess(t("member.support.submitSuccess"));
       setFormData({
         category: "general",
         subject: "",
@@ -132,7 +132,7 @@ export function useInquiry({ onSubmitSuccess } = {}) {
         onSubmitSuccess();
       }
     } catch (err) {
-      setError(t("support.submitFailed"));
+      setError(t("member.support.submitFailed"));
     } finally {
       setIsSubmitting(false);
     }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Intellectual Property Form
  *
  * 知识产权记录表单部分。
@@ -52,51 +52,51 @@ const IntellectualPropertyForm = ({
   const ipTypeOptions = [
     {
       value: "patent",
-      label: t('performance.intellectualPropertyFields.types.patent', '특허'),
+      label: t('member.performance.intellectualPropertyFields.types.patent', '특허'),
     },
     {
       value: "trademark",
       label: t(
         "performance.intellectualPropertyFields.types.trademark",
-        "商标权",
+        "상표권",
       ),
     },
     {
       value: "utility",
       label: t(
         "performance.intellectualPropertyFields.types.utility",
-        "实用新型",
+        "실용신안",
       ),
     },
     {
       value: "design",
-      label: t('performance.intellectualPropertyFields.types.design', '디자인'),
+      label: t('member.performance.intellectualPropertyFields.types.design', '디자인'),
     },
     {
       value: "other",
-      label: t('performance.intellectualPropertyFields.types.other', '기타'),
+      label: t('member.performance.intellectualPropertyFields.types.other', '기타'),
     },
   ];
 
   const registrationTypeOptions = [
     {
       value: "application",
-      label: t("performance.intellectualPropertyFields.registrationTypes.application", "신청"),
+      label: t("member.performance.intellectualPropertyFields.registrationTypes.application", "신청"),
     },
     {
       value: "registered",
-      label: t("performance.intellectualPropertyFields.registrationTypes.registered", "등록"),
+      label: t("member.performance.intellectualPropertyFields.registrationTypes.registered", "등록"),
     },
   ];
 
   const overseasTypeOptions = [
     {
       value: "domestic",
-      label: t("performance.intellectualPropertyFields.overseasTypes.domestic", "국내"),
+      label: t("member.performance.intellectualPropertyFields.overseasTypes.domestic", "국내"),
     },
     {
       value: "overseas",
-      label: t("performance.intellectualPropertyFields.overseasTypes.overseas", "해외"),
+      label: t("member.performance.intellectualPropertyFields.overseasTypes.overseas", "해외"),
     },
   ];
 
@@ -115,7 +115,7 @@ const IntellectualPropertyForm = ({
     <div className="space-y-4">
       <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg">
         <h3 className="text-md font-semibold m-0">
-          {t("performance.intellectualProperty", "지식재산권")}
+          {t("member.performance.intellectualProperty", "지식재산권")}
         </h3>
         <Button variant="secondary" size="small" onClick={handleAddField}>
           <PlusIcon className="w-4 h-4 mr-1" />
@@ -162,31 +162,31 @@ const IntellectualPropertyForm = ({
               }
             />
             <Select
-              label={t("performance.intellectualPropertyFields.type", "유형")}
+              label={t("member.performance.intellectualPropertyFields.type", "유형")}
               value={item.type}
               onChange={(e) => handleItemChange(index, "type", e.target.value)}
               options={ipTypeOptions}
             />
             <Select
-              label={t("performance.intellectualPropertyFields.registrationType", "등록 구분")}
+              label={t("member.performance.intellectualPropertyFields.registrationType", "등록 구분")}
               value={item.registrationType}
               onChange={(e) => handleItemChange(index, "registrationType", e.target.value)}
               options={registrationTypeOptions}
             />
             <Input
-              label={t("performance.intellectualPropertyFields.country", "국가")}
+              label={t("member.performance.intellectualPropertyFields.country", "국가")}
               value={item.country}
               onChange={(e) => handleItemChange(index, "country", e.target.value)}
-              placeholder={t("performance.intellectualPropertyFields.countryPlaceholder", "예: 대한민국")}
+              placeholder={t("member.performance.intellectualPropertyFields.countryPlaceholder", "예: 대한민국")}
             />
             <Select
-              label={t("performance.intellectualPropertyFields.overseasType", "해외신청구분")}
+              label={t("member.performance.intellectualPropertyFields.overseasType", "해외신청구분")}
               value={item.overseasType}
               onChange={(e) => handleItemChange(index, "overseasType", e.target.value)}
               options={overseasTypeOptions}
             />
             <Select
-              label={t("performance.intellectualPropertyFields.publicDisclosure", "공개희망 여부")}
+              label={t("member.performance.intellectualPropertyFields.publicDisclosure", "공개희망 여부")}
               value={item.publicDisclosure}
               onChange={(e) => handleItemChange(index, "publicDisclosure", e.target.value)}
               options={publicDisclosureOptions}

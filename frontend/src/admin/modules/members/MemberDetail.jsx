@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Member Detail Component - Admin Portal
  * 企业会员详情
  */
@@ -8,7 +8,12 @@ import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Badge, Loading, Alert, Modal } from "@shared/components";
 import membersService from "./services/members.service";
-import { useDateFormatter, useMessage } from "@shared/hooks";
+import {
+  useDateFormatter,
+  useMessage,
+  useEnumTranslation,
+} from "@shared/hooks";
+import { normalizeStartupType } from "@shared/enums";
 
 export default function MemberDetail() {
   const { t, i18n } = useTranslation();
@@ -28,13 +33,27 @@ export default function MemberDetail() {
     showWarning,
     clearMessage,
   } = useMessage();
+  const {
+    translateRegion,
+    translateStartupType,
+    translateStartupStage,
+    translateBusinessField,
+    translateKsicMajor,
+    translateKsicSub,
+    translateMainIndustryKsic,
+    translateMainIndustryKsicCodes,
+    translateGangwonIndustry,
+    translateFutureTech,
+    translateGender,
+    translateParticipationPrograms,
+  } = useEnumTranslation();
   const [loading, setLoading] = useState(true);
   const [member, setMember] = useState(null);
   const [niceDnbData, setNiceDnbData] = useState(null);
   const [niceDnbLoading, setNiceDnbLoading] = useState(false);
   const [niceDnbError, setNiceDnbError] = useState(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
+  const [rejectReason, setRejectReason] = useState("");
 
   useEffect(() => {
     loadMemberDetail();
@@ -51,7 +70,7 @@ export default function MemberDetail() {
 
   const handleApprove = async () => {
     await membersService.approveMember(id);
-    showSuccess(t('admin.members.approveSuccess', '승인 성공'));
+    showSuccess(t("admin.members.approveSuccess", "승인 성공"));
     const memberData = await membersService.getMemberDetail(id);
     if (memberData) {
       setMember(memberData);
@@ -59,7 +78,7 @@ export default function MemberDetail() {
   };
 
   const handleReject = () => {
-    setRejectReason('');
+    setRejectReason("");
     setShowRejectModal(true);
   };
 
@@ -67,26 +86,31 @@ export default function MemberDetail() {
     try {
       await membersService.rejectMember(id, rejectReason || null);
       setShowRejectModal(false);
-      setRejectReason('');
-      showSuccess(t('admin.members.rejectSuccess', '거부 성공'));
+      setRejectReason("");
+      showSuccess(t("admin.members.rejectSuccess", "거부 성공"));
       const memberData = await membersService.getMemberDetail(id);
       if (memberData) {
         setMember(memberData);
       }
     } catch (error) {
-      console.error('Failed to reject member:', error);
-      showError(t('admin.members.rejectFailed', '거부 실패'));
+      console.error("Failed to reject member:", error);
+      showError(t("admin.members.rejectFailed", "거부 실패"));
     }
   };
 
   const handleCancelReject = () => {
     setShowRejectModal(false);
-    setRejectReason('');
+    setRejectReason("");
   };
 
   const handleSearchNiceDnb = async () => {
     if (!member || !member.businessNumber) {
-      setNiceDnbError(t('admin.members.detail.nicednbNoBusinessNumber', '사업자등록번호를 사용할 수 없습니다'));
+      setNiceDnbError(
+        t(
+          "admin.members.detail.nicednbNoBusinessNumber",
+          "사업자등록번호를 사용할 수 없습니다",
+        ),
+      );
       return;
     }
 
@@ -142,14 +166,14 @@ export default function MemberDetail() {
       <Card className="mb-6 p-6">
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 m-0">
-            {t('performance.companyInfo.sections.basicInfo', '기본 정보')}
+            {t("performance.companyInfo.sections.basicInfo", "기본 정보")}
           </h2>
         </div>
 
         {/* Logo Display */}
         <div className="mb-6 pb-6 border-b border-gray-200">
           <label className="block text-sm text-gray-600 font-medium mb-3">
-            {t('performance.companyInfo.sections.logo', '기업 로고')}
+            {t("performance.companyInfo.sections.logo", "기업 로고")}
           </label>
           {member.logoUrl ? (
             <div className="w-24 h-24 sm:w-32 sm:h-32 border-2 border-gray-200 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
@@ -164,7 +188,7 @@ export default function MemberDetail() {
             </div>
           ) : (
             <div className="w-24 h-24 sm:w-32 sm:h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 text-gray-500 text-xs sm:text-sm">
-              {t('performance.companyInfo.profile.noLogo', '로고 없음')}
+              {t("performance.companyInfo.profile.noLogo", "로고 없음")}
             </div>
           )}
         </div>
@@ -225,11 +249,7 @@ export default function MemberDetail() {
               {t("member.representativeGender", "대표자 성별")}
             </label>
             <span className="text-base text-gray-900">
-              {member.representativeGender === "male"
-                ? t("common.male", "남성")
-                : member.representativeGender === "female"
-                  ? t("common.female", "여성")
-                  : "-"}
+              {translateGender(member.representativeGender)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -282,7 +302,7 @@ export default function MemberDetail() {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t('admin.members.table.status', '상태')}
+              {t("admin.members.table.status", "상태")}
             </label>
             <div>
               <Badge
@@ -294,7 +314,11 @@ export default function MemberDetail() {
                       : "danger"
                 }
               >
-                {t(`admin.members.status.${member.approvalStatus}`)}
+                {{
+                  approved: t("admin.members.status.approved"),
+                  pending: t("admin.members.status.pending"),
+                  rejected: t("admin.members.status.rejected"),
+                }[member.approvalStatus] || member.approvalStatus}
               </Badge>
             </div>
           </div>
@@ -313,7 +337,7 @@ export default function MemberDetail() {
       <Card className="mb-6 p-6">
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 m-0">
-            {t('performance.companyInfo.sections.addressInfo', '주소 정보')}
+            {t("performance.companyInfo.sections.addressInfo", "주소 정보")}
           </h2>
         </div>
 
@@ -331,9 +355,7 @@ export default function MemberDetail() {
               {t("member.region", "소재지")}
             </label>
             <span className="text-base text-gray-900">
-              {member.region
-                ? t(`profile.regions.${member.region}`, member.region)
-                : "-"}
+              {translateRegion(member.region)}
             </span>
           </div>
         </div>
@@ -343,7 +365,7 @@ export default function MemberDetail() {
       <Card className="mb-6 p-6">
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 m-0">
-            {t('performance.companyInfo.sections.businessInfo', '사업 정보')}
+            {t("performance.companyInfo.sections.businessInfo", "사업 정보")}
           </h2>
         </div>
 
@@ -353,12 +375,7 @@ export default function MemberDetail() {
               {t("member.startupType", "창업유형")}
             </label>
             <span className="text-base text-gray-900">
-              {member.startupType
-                ? t(
-                    `industryClassification.startupType.${member.startupType}`,
-                    member.startupType,
-                  )
-                : "-"}
+              {translateStartupType(member.startupType)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -366,12 +383,7 @@ export default function MemberDetail() {
               {t("member.businessField", "사업분야")}
             </label>
             <span className="text-base text-gray-900">
-              {member.businessField
-                ? t(
-                    `industryClassification.businessField.${member.businessField}`,
-                    member.businessField,
-                  )
-                : "-"}
+              {translateBusinessField(member.businessField)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -379,12 +391,7 @@ export default function MemberDetail() {
               {t("member.ksicMajor", "한국표준산업분류코드[대분류]")}
             </label>
             <span className="text-base text-gray-900">
-              {member.ksicMajor
-                ? t(
-                    `industryClassification.ksicMajor.${member.ksicMajor}`,
-                    member.ksicMajor,
-                  )
-                : "-"}
+              {translateKsicMajor(member.ksicMajor)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -392,12 +399,7 @@ export default function MemberDetail() {
               {t("member.ksicSub", "한국표준사업분류코드[중분류]")}
             </label>
             <span className="text-base text-gray-900">
-              {member.ksicSub
-                ? t(
-                    `industryClassification.ksicSub.${member.ksicSub}`,
-                    member.ksicSub,
-                  )
-                : "-"}
+              {translateKsicSub(member.ksicSub)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -405,12 +407,7 @@ export default function MemberDetail() {
               {t("member.mainIndustryKsicMajor", "주력산업 KSIC 코드")}
             </label>
             <span className="text-base text-gray-900">
-              {member.mainIndustryKsicMajor
-                ? t(
-                    `industryClassification.mainIndustryKsic.${member.mainIndustryKsicMajor}`,
-                    member.mainIndustryKsicMajor,
-                  )
-                : "-"}
+              {translateMainIndustryKsic(member.mainIndustryKsicMajor)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -418,12 +415,7 @@ export default function MemberDetail() {
               {t("member.mainIndustryKsicCodes", "주력산업 KSIC 세부 코드")}
             </label>
             <span className="text-base text-gray-900">
-              {member.mainIndustryKsicCodes
-                ? t(
-                    `industryClassification.mainIndustryKsicCodes.${member.mainIndustryKsicCodes}`,
-                    member.mainIndustryKsicCodes,
-                  )
-                : "-"}
+              {translateMainIndustryKsicCodes(member.mainIndustryKsicCodes)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -431,12 +423,7 @@ export default function MemberDetail() {
               {t("member.gangwonIndustry", "강원도 7대 미래산업")}
             </label>
             <span className="text-base text-gray-900">
-              {member.gangwonIndustry
-                ? t(
-                    `industryClassification.gangwonIndustry.${member.gangwonIndustry}`,
-                    member.gangwonIndustry,
-                  )
-                : "-"}
+              {translateGangwonIndustry(member.gangwonIndustry)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -444,12 +431,7 @@ export default function MemberDetail() {
               {t("member.futureTech", "미래유망 신기술")}
             </label>
             <span className="text-base text-gray-900">
-              {member.futureTech
-                ? t(
-                    `industryClassification.futureTech.${member.futureTech}`,
-                    member.futureTech,
-                  )
-                : "-"}
+              {translateFutureTech(member.futureTech)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -457,12 +439,7 @@ export default function MemberDetail() {
               {t("member.startupStage", "창업구분")}
             </label>
             <span className="text-base text-gray-900">
-              {member.startupStage
-                ? t(
-                    `industryClassification.startupStage.${member.startupStage}`,
-                    member.startupStage,
-                  )
-                : "-"}
+              {translateStartupStage(member.startupStage)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -470,7 +447,9 @@ export default function MemberDetail() {
               {t("member.sales", "연간 매출액")}
             </label>
             <span className="text-base text-gray-900">
-              {member.revenue ? `${formatNumber(member.revenue)} ${t('common.currency.krw', '원')}` : "-"}
+              {member.revenue
+                ? `${formatNumber(member.revenue)} ${t("common.currency.krw", "원")}`
+                : "-"}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -479,7 +458,7 @@ export default function MemberDetail() {
             </label>
             <span className="text-base text-gray-900">
               {member.employeeCount
-                ? `${formatNumber(member.employeeCount)} ${t('common.people', '명')}`
+                ? `${formatNumber(member.employeeCount)} ${t("common.people", "명")}`
                 : "-"}
             </span>
           </div>
@@ -525,7 +504,7 @@ export default function MemberDetail() {
       <Card className="mb-6 p-6">
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 m-0">
-            {t('performance.companyInfo.sections.additionalInfo', '추가 정보')}
+            {t("performance.companyInfo.sections.additionalInfo", "추가 정보")}
           </h2>
         </div>
 
@@ -571,35 +550,7 @@ export default function MemberDetail() {
               {t("member.participationPrograms", "참여 프로그램")}
             </label>
             <span className="text-base text-gray-900">
-              {(() => {
-                try {
-                  const programs =
-                    typeof member.participationPrograms === "string"
-                      ? JSON.parse(member.participationPrograms)
-                      : member.participationPrograms;
-                  if (Array.isArray(programs) && programs.length > 0) {
-                    return programs
-                      .map((program) => {
-                        const camelCaseProgram = program
-                          .split("_")
-                          .map((word, index) =>
-                            index === 0
-                              ? word
-                              : word.charAt(0).toUpperCase() + word.slice(1),
-                          )
-                          .join("");
-                        return t(
-                          `performance.companyInfo.profile.participationPrograms.${camelCaseProgram}`,
-                          program,
-                        );
-                      })
-                      .join(", ");
-                  }
-                  return "-";
-                } catch {
-                  return member.participationPrograms || "-";
-                }
-              })()}
+              {translateParticipationPrograms(member.participationPrograms)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -641,9 +592,7 @@ export default function MemberDetail() {
           </Button>
         </div>
 
-        {niceDnbLoading && (
-          <Loading text={t("common.loading", "로딩 중...")} />
-        )}
+        {niceDnbLoading && <Loading text={t("common.loading", "로딩 중...")} />}
 
         {niceDnbError && (
           <div className="p-8 text-center text-red-600">
@@ -667,12 +616,23 @@ export default function MemberDetail() {
               niceDnbData.data.businessNumber.replace(/-/g, "") !==
                 member.businessNumber.replace(/-/g, "") && (
                 <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                  <strong>{t('admin.members.detail.nicednbWarning', '알림:')}</strong>
-                  {t('admin.members.detail.nicednbMismatch', '조회에 사용된 사업자등록번호는')}{" "}
+                  <strong>
+                    {t("admin.members.detail.nicednbWarning", "알림:")}
+                  </strong>
+                  {t(
+                    "admin.members.detail.nicednbMismatch",
+                    "조회에 사용된 사업자등록번호는",
+                  )}{" "}
                   <strong>{member.businessNumber}</strong>
-                  {t('admin.members.detail.nicednbButReturned', ', 하지만 Nice D&B API가 반환한 사업자등록번호는')}{" "}
+                  {t(
+                    "admin.members.detail.nicednbButReturned",
+                    ", 하지만 Nice D&B API가 반환한 사업자등록번호는",
+                  )}{" "}
                   <strong>{niceDnbData.data.businessNumber}</strong>
-                  {t('admin.members.detail.nicednbInconsistent', ', 둘이 일치하지 않습니다.')}
+                  {t(
+                    "admin.members.detail.nicednbInconsistent",
+                    ", 둘이 일치하지 않습니다.",
+                  )}
                 </div>
               )}
 
@@ -872,7 +832,12 @@ export default function MemberDetail() {
                 niceDnbData.data.assetAmount) && (
                 <div className="mb-6">
                   <h4 className="text-md font-medium text-gray-700 mb-4">
-                    {t('admin.members.detail.currentFinancialIndicators', '현재 재무지표')} ({t('common.unit', '단위')}: {t('admin.members.detail.thousandKRW', '천원')})
+                    {t(
+                      "admin.members.detail.currentFinancialIndicators",
+                      "현재 재무지표",
+                    )}{" "}
+                    ({t("common.unit", "단위")}:{" "}
+                    {t("admin.members.detail.thousandKRW", "천원")})
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {niceDnbData.data.salesAmount && (
@@ -994,28 +959,31 @@ export default function MemberDetail() {
         <Modal
           isOpen={showRejectModal}
           onClose={handleCancelReject}
-          title={t('admin.members.rejectReasonTitle', '거부 사유 입력')}
+          title={t("admin.members.rejectReasonTitle", "거부 사유 입력")}
           size="md"
         >
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.members.rejectReasonLabel', '거부 사유 (선택사항)')}
+                {t("admin.members.rejectReasonLabel", "거부 사유 (선택사항)")}
               </label>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                placeholder={t('admin.members.rejectReasonPlaceholder', '거부 사유를 입력하세요...')}
+                placeholder={t(
+                  "admin.members.rejectReasonPlaceholder",
+                  "거부 사유를 입력하세요...",
+                )}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 rows={4}
               />
             </div>
             <div className="flex justify-end space-x-3">
               <Button variant="outline" onClick={handleCancelReject}>
-                {t('common.cancel', '취소')}
+                {t("common.cancel", "취소")}
               </Button>
               <Button variant="danger" onClick={handleConfirmReject}>
-                {t('common.confirm', '확인')}
+                {t("common.confirm", "확인")}
               </Button>
             </div>
           </div>

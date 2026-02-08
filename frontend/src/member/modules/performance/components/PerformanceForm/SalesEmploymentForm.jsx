@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Sales and Employment Form
  *
  * 销售额与雇佣表单部分。
@@ -35,9 +35,9 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload, uploading }) => {
       {/* Sales */}
       <div>
         <h3 className="text-md font-semibold mb-4 pb-2 border-b border-gray-100 flex items-center justify-between">
-          <span>{t("performance.salesEmploymentFields.sales", "매출액")}</span>
+          <span>{t("member.performance.salesEmploymentFields.sales", "매출액")}</span>
           <span className="text-sm font-normal text-gray-400">
-            ({t("performance.salesEmploymentFields.unit.won", "원")})
+            ({t("member.performance.salesEmploymentFields.unit.won", "원")})
           </span>
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -53,7 +53,7 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload, uploading }) => {
             placeholder="0"
           />
           <Input
-            label={`${year}${t("performance.year", "년도")}`}
+            label={`${year}${t("member.performance.year", "년도")}`}
             value={formatAmount(data?.sales?.currentYear)}
             onChange={(e) =>
               handleAmountChange("salesEmployment.sales.currentYear", e.target.value)
@@ -77,9 +77,9 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload, uploading }) => {
       {/* Export */}
       <div>
         <h3 className="text-md font-semibold mb-4 pb-2 border-b border-gray-100 flex items-center justify-between">
-          <span>{t("performance.salesEmploymentFields.export", "수출액")}</span>
+          <span>{t("member.performance.salesEmploymentFields.export", "수출액")}</span>
           <span className="text-sm font-normal text-gray-400">
-            ({t("performance.salesEmploymentFields.unit.won", "원")})
+            ({t("member.performance.salesEmploymentFields.unit.won", "원")})
           </span>
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -95,7 +95,7 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload, uploading }) => {
             placeholder="0"
           />
           <Input
-            label={`${year}${t("performance.year", "년도")}`}
+            label={`${year}${t("member.performance.year", "년도")}`}
             value={formatAmount(data?.export?.currentYear)}
             onChange={(e) =>
               handleAmountChange("salesEmployment.export.currentYear", e.target.value)
@@ -116,13 +116,13 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload, uploading }) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <Input
-            label={t("performance.salesEmploymentFields.hskCode", "HSK 코드")}
+            label={t("member.performance.salesEmploymentFields.hskCode", "HSK 코드")}
             value={data?.export?.hskCode || ""}
             onChange={(e) => {
               const val = e.target.value.replace(/[^0-9]/g, "").slice(0, 10);
               onChange("salesEmployment.export.hskCode", val);
             }}
-            placeholder={t("performance.salesEmploymentFields.hskCodePlaceholder", "HSK코드 10자리")}
+            placeholder={t("member.performance.salesEmploymentFields.hskCodePlaceholder", "HSK코드 10자리")}
             maxLength={10}
           />
           <Input
@@ -152,10 +152,10 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload, uploading }) => {
       <div>
         <h3 className="text-md font-semibold mb-4 pb-2 border-b border-gray-100 flex items-center justify-between">
           <span>
-            {t("performance.salesEmploymentFields.employment", "고용 창출")}
+            {t("member.performance.salesEmploymentFields.employment", "고용 창출")}
           </span>
           <span className="text-sm font-normal text-gray-400">
-            ({t("performance.salesEmploymentFields.unit.people", "명")})
+            ({t("member.performance.salesEmploymentFields.unit.people", "명")})
           </span>
         </h3>
         <div className="space-y-4">
@@ -181,7 +181,7 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload, uploading }) => {
               placeholder="0"
             />
             <Input
-              label={`${year}${t("performance.year", "년도")}`}
+              label={`${year}${t("member.performance.year", "년도")}`}
               value={data?.employment?.currentEmployees?.currentYear || ""}
               onChange={(e) =>
                 onChange(
@@ -214,7 +214,7 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload, uploading }) => {
               placeholder="0"
             />
             <Input
-              label={`${year}${t("performance.year", "년도")}`}
+              label={`${year}${t("member.performance.year", "년도")}`}
               value={data?.employment?.newEmployees?.currentYear || ""}
               onChange={(e) =>
                 onChange(
@@ -231,7 +231,7 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload, uploading }) => {
       {/* Attachments */}
       <div>
         <h3 className="text-md font-semibold mb-4 pb-2 border-b border-gray-100">
-          {t("performance.salesEmploymentFields.attachments", "증빙서류")}
+          {t("member.performance.salesEmploymentFields.attachments", "증빙서류")}
         </h3>
         <FileAttachments
           attachments={data?.attachments || []}

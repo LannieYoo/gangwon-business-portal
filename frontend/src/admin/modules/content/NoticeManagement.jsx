@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Notice Management Component
  * 公告管理组件
  */
@@ -318,3 +318,6 @@ function createEmptyForm() {
     attachments: []
   };
 }
+
+
+

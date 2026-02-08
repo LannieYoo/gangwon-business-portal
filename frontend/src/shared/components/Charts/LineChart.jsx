@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Line Chart Component
  * 折线图组件 - 用于显示趋势数据
  */
@@ -179,4 +179,8 @@ function hexToRgb(hex) {
     ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
     : '59, 130, 246';
 }
+
+
+
+
 

@@ -1,5 +1,6 @@
 {
-  "auth": {
+  "member": {
+    "auth": {
     "companyName": "기업명",
     "region": "소재지",
     "selectRegion": "지역을 선택하세요",
@@ -189,5 +190,6 @@
     "minLength": "최소 {{min}}자 이상 입력해주세요",
     "maxLength": "최대 {{max}}자까지 입력 가능합니다",
     "invalidFormat": "형식이 올바르지 않습니다"
+  }
   }
 }

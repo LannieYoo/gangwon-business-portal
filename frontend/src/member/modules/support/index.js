@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Support 功能模块导出文件
  *
  * 遵循 dev-frontend_patterns skill 规范。

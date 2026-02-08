@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 支援事业公告预览组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -18,11 +18,11 @@ export default function ProjectPreview() {
 
   return (
     <HomePreview
-      title={t("home.news.title")}
+      title={t("member.home.news.title")}
       viewAllLink={ROUTES.MEMBER_PROJECTS}
       items={projects}
       loading={loading}
-      emptyMessage={t("home.news.empty")}
+      emptyMessage={t("member.home.news.empty")}
       getBadgeInfo={getBadgeInfo}
       onItemClick={handleProjectClick}
       showModal={false}

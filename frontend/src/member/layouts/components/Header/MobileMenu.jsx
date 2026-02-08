@@ -2,7 +2,7 @@
  * Mobile Navigation Menu
  * 移动端导航菜单组件
  *
- * 遵循 dev-frontend_patterns skill 规范。
+ * 参考 dev-frontend_patterns skill 构建
  */
 
 import { NavLink } from "react-router-dom";
@@ -15,9 +15,9 @@ import { useMobileMenu } from "../../hooks/useMobileMenu";
  * @param {Object} props
  * @param {boolean} props.isOpen - 菜单是否打开
  * @param {Function} props.onClose - 关闭回调
- * @param {Array} props.menuItems - 菜单项配置列表
+ * @param {Array} props.menuItems - 菜单项配置数组
  * @param {Function} props.isMenuActive - 判断菜单项是否激活的函数
- * @param {Function} props.onMenuClick - 菜单项点击回调
+ * @param {Function} props.onMenuClick - 菜单点击回调
  */
 export function MobileMenu({
   isOpen,
@@ -46,7 +46,7 @@ export function MobileMenu({
         className={`fixed top-[60px] left-0 right-0 bg-white shadow-lg z-[1000] transition-transform duration-300 ease-in-out md:hidden max-h-[calc(100vh-60px)] overflow-y-auto ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        aria-label={t('header.mobileMenuLabel', '모바일 내비게이션')}
+        aria-label={t("member.layout.mobileMenuLabel", "모바일 내비게이션")}
       >
         <ul className="list-none m-0 p-0">
           {menuItems.map((item) => {

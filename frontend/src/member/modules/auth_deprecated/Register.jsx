@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Register Page - Member Portal
  * Multi-step Registration Form - Clean Design
  */
@@ -612,62 +612,62 @@ export default function Register() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                   >
                     <option value="">{t("member.selectRegion")}</option>
-                    <option value={t("profile.regions.chuncheon")}>
-                      {t("profile.regions.chuncheon")}
+                    <option value={t("enums.regions.chuncheon")}>
+                      {t("enums.regions.chuncheon")}
                     </option>
-                    <option value={t("profile.regions.wonju")}>
-                      {t("profile.regions.wonju")}
+                    <option value={t("enums.regions.wonju")}>
+                      {t("enums.regions.wonju")}
                     </option>
-                    <option value={t("profile.regions.gangneung")}>
-                      {t("profile.regions.gangneung")}
+                    <option value={t("enums.regions.gangneung")}>
+                      {t("enums.regions.gangneung")}
                     </option>
-                    <option value={t("profile.regions.donghae")}>
-                      {t("profile.regions.donghae")}
+                    <option value={t("enums.regions.donghae")}>
+                      {t("enums.regions.donghae")}
                     </option>
-                    <option value={t("profile.regions.taebaek")}>
-                      {t("profile.regions.taebaek")}
+                    <option value={t("enums.regions.taebaek")}>
+                      {t("enums.regions.taebaek")}
                     </option>
-                    <option value={t("profile.regions.sokcho")}>
-                      {t("profile.regions.sokcho")}
+                    <option value={t("enums.regions.sokcho")}>
+                      {t("enums.regions.sokcho")}
                     </option>
-                    <option value={t("profile.regions.samcheok")}>
-                      {t("profile.regions.samcheok")}
+                    <option value={t("enums.regions.samcheok")}>
+                      {t("enums.regions.samcheok")}
                     </option>
-                    <option value={t("profile.regions.hongcheon")}>
-                      {t("profile.regions.hongcheon")}
+                    <option value={t("enums.regions.hongcheon")}>
+                      {t("enums.regions.hongcheon")}
                     </option>
-                    <option value={t("profile.regions.hoengseong")}>
-                      {t("profile.regions.hoengseong")}
+                    <option value={t("enums.regions.hoengseong")}>
+                      {t("enums.regions.hoengseong")}
                     </option>
-                    <option value={t("profile.regions.yeongwol")}>
-                      {t("profile.regions.yeongwol")}
+                    <option value={t("enums.regions.yeongwol")}>
+                      {t("enums.regions.yeongwol")}
                     </option>
-                    <option value={t("profile.regions.pyeongchang")}>
-                      {t("profile.regions.pyeongchang")}
+                    <option value={t("enums.regions.pyeongchang")}>
+                      {t("enums.regions.pyeongchang")}
                     </option>
-                    <option value={t("profile.regions.jeongseon")}>
-                      {t("profile.regions.jeongseon")}
+                    <option value={t("enums.regions.jeongseon")}>
+                      {t("enums.regions.jeongseon")}
                     </option>
-                    <option value={t("profile.regions.cheorwon")}>
-                      {t("profile.regions.cheorwon")}
+                    <option value={t("enums.regions.cheorwon")}>
+                      {t("enums.regions.cheorwon")}
                     </option>
-                    <option value={t("profile.regions.hwacheon")}>
-                      {t("profile.regions.hwacheon")}
+                    <option value={t("enums.regions.hwacheon")}>
+                      {t("enums.regions.hwacheon")}
                     </option>
-                    <option value={t("profile.regions.yanggu")}>
-                      {t("profile.regions.yanggu")}
+                    <option value={t("enums.regions.yanggu")}>
+                      {t("enums.regions.yanggu")}
                     </option>
-                    <option value={t("profile.regions.inje")}>
-                      {t("profile.regions.inje")}
+                    <option value={t("enums.regions.inje")}>
+                      {t("enums.regions.inje")}
                     </option>
-                    <option value={t("profile.regions.goseong")}>
-                      {t("profile.regions.goseong")}
+                    <option value={t("enums.regions.goseong")}>
+                      {t("enums.regions.goseong")}
                     </option>
-                    <option value={t("profile.regions.yangyang")}>
-                      {t("profile.regions.yangyang")}
+                    <option value={t("enums.regions.yangyang")}>
+                      {t("enums.regions.yangyang")}
                     </option>
-                    <option value={t("profile.regions.other")}>
-                      {t("profile.regions.other")}
+                    <option value={t("enums.regions.other")}>
+                      {t("enums.regions.other")}
                     </option>
                   </select>
                 </div>
@@ -1021,48 +1021,48 @@ export default function Register() {
                   >
                     <option value="">{t("member.selectStartupType")}</option>
                     <option value="student_startup">
-                      {t("industryClassification.startupType.student_startup")}
+                      {t("enums.industry.startupType.student_startup")}
                     </option>
                     <option value="faculty_startup">
-                      {t("industryClassification.startupType.faculty_startup")}
+                      {t("enums.industry.startupType.faculty_startup")}
                     </option>
                     <option value="women_enterprise">
-                      {t("industryClassification.startupType.women_enterprise")}
+                      {t("enums.industry.startupType.women_enterprise")}
                     </option>
                     <option value="research_institute">
                       {t(
-                        "industryClassification.startupType.research_institute",
+                        "enums.industry.startupType.research_institute",
                       )}
                     </option>
                     <option value="venture_company">
-                      {t("industryClassification.startupType.venture_company")}
+                      {t("enums.industry.startupType.venture_company")}
                     </option>
                     <option value="non_venture">
-                      {t("industryClassification.startupType.non_venture")}
+                      {t("enums.industry.startupType.non_venture")}
                     </option>
                     <option value="preliminary_social_enterprise">
                       {t(
-                        "industryClassification.startupType.preliminary_social_enterprise",
+                        "enums.industry.startupType.preliminary_social_enterprise",
                       )}
                     </option>
                     <option value="social_enterprise">
                       {t(
-                        "industryClassification.startupType.social_enterprise",
+                        "enums.industry.startupType.social_enterprise",
                       )}
                     </option>
                     <option value="youth_enterprise">
-                      {t("industryClassification.startupType.youth_enterprise")}
+                      {t("enums.industry.startupType.youth_enterprise")}
                     </option>
                     <option value="cooperative">
-                      {t("industryClassification.startupType.cooperative")}
+                      {t("enums.industry.startupType.cooperative")}
                     </option>
                     <option value="village_enterprise">
                       {t(
-                        "industryClassification.startupType.village_enterprise",
+                        "enums.industry.startupType.village_enterprise",
                       )}
                     </option>
                     <option value="other">
-                      {t("industryClassification.startupType.other")}
+                      {t("enums.industry.startupType.other")}
                     </option>
                   </select>
                 </div>
@@ -1102,7 +1102,7 @@ export default function Register() {
                       "U",
                     ].map((code) => (
                       <option key={code} value={code}>
-                        {t(`industryClassification.ksicMajor.${code}`)}
+                        {t(`enums.industry.ksicMajor.${code}`)}
                       </option>
                     ))}
                   </select>
@@ -1135,7 +1135,7 @@ export default function Register() {
                       "31",
                     ].map((code) => (
                       <option key={code} value={code}>
-                        {t(`industryClassification.ksicSub.${code}`)}
+                        {t(`enums.industry.ksicSub.${code}`)}
                       </option>
                     ))}
                   </select>
@@ -1444,3 +1444,7 @@ export default function Register() {
     </div>
   );
 }
+
+
+
+

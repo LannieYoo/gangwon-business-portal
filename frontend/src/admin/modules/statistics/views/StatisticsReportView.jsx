@@ -18,7 +18,6 @@ export const StatisticsReportView = () => {
   const { t } = useTranslation();
   const [message, setMessage] = useState(null);
   const [messageVariant, setMessageVariant] = useState("success");
-  const [exportingCsv, setExportingCsv] = useState(false);
 
   // 1. 业务数据 Hooks
   const {
@@ -33,7 +32,6 @@ export const StatisticsReportView = () => {
     changePageSize,
     changeSort,
     exportToExcel,
-    exportToCsv,
     totalItems,
     currentPage,
     totalPages,
@@ -171,27 +169,10 @@ export const StatisticsReportView = () => {
     const success = await exportToExcel();
     if (success) {
       setMessageVariant("success");
-      setMessage(t("statistics.messages.exportSuccess"));
+      setMessage(t("admin.statistics.messages.exportSuccess"));
       setTimeout(() => setMessage(null), 3000);
     }
   }, [exportToExcel, t]);
-
-  const handleExportCsv = useCallback(async () => {
-    setExportingCsv(true);
-    try {
-      await exportToCsv();
-      setMessageVariant("success");
-      setMessage(t("statistics.export.csvSuccess", "CSV 导出成功"));
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      console.error("[StatisticsReportView] CSV export error:", error);
-      setMessageVariant("error");
-      setMessage(t("statistics.export.csvError", "CSV 导出失败"));
-      setTimeout(() => setMessage(null), 3000);
-    } finally {
-      setExportingCsv(false);
-    }
-  }, [exportToCsv, t]);
 
   return (
     <div className="w-full">
@@ -208,9 +189,7 @@ export const StatisticsReportView = () => {
       <ReportHeader
         loading={loading}
         exporting={exporting}
-        exportingCsv={exportingCsv}
         onExport={handleExport}
-        onExportCsv={handleExportCsv}
       />
 
       <main className="w-full space-y-5">

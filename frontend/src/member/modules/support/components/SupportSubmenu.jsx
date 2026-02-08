@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Support 模块共用二级导航组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -16,32 +16,32 @@ export default function SupportSubmenu() {
     {
       key: "support-notices",
       path: ROUTES.MEMBER_NOTICES,
-      label: t("home.notices.title"),
+      label: t("member.support.notices.title"),
       activePaths: [ROUTES.MEMBER_NOTICES],
     },
     {
       key: "support-faq",
       path: "/member/support/faq",
-      label: t("support.faq"),
+      label: t("member.support.faq"),
       activePaths: ["/member/support/faq"],
     },
     {
       key: "support-inquiry",
       path: "/member/support/inquiry",
-      label: t("support.inquiry"),
+      label: t("member.support.inquiry"),
       activePaths: ["/member/support/inquiry"],
       exact: true,
     },
     {
       key: "support-inquiry-history",
       path: "/member/support/inquiry-history",
-      label: t("support.inquiryHistory"),
+      label: t("member.support.inquiryHistory"),
       activePaths: ["/member/support/inquiry-history"],
     },
     {
       key: "support-notification-history",
       path: "/member/support/notifications",
-      label: t("support.notificationHistory"),
+      label: t("member.support.notificationHistory"),
       activePaths: ["/member/support/notifications"],
     },
   ];

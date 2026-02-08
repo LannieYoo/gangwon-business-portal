@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 申请弹窗主组件
  *
  * 负责申请流程的状态管理和逻辑控制。
@@ -112,7 +112,7 @@ export default function ApplicationModal({
     }
 
     if (!project?.id) {
-      setFormMessage(t('projects.projectNotFound', '사업을 찾을 수 없습니다'));
+      setFormMessage(t('member.projects.projectNotFound', '사업을 찾을 수 없습니다'));
       return;
     }
 
@@ -122,10 +122,10 @@ export default function ApplicationModal({
     const trimmedName = applicantName.trim();
     if (!trimmedName) {
       setFormError(
-        t('projects.application.applicantNameRequired', '담당자 이름을 입력해주세요'),
+        t('member.projects.application.applicantNameRequired', '담당자 이름을 입력해주세요'),
       );
       setFormMessage(
-        t('projects.application.validationError', '필수 항목을 확인한 뒤 다시 시도해주세요.'),
+        t('member.projects.application.validationError', '필수 항목을 확인한 뒤 다시 시도해주세요.'),
       );
       return;
     }
@@ -133,10 +133,10 @@ export default function ApplicationModal({
     const trimmedPhone = applicantPhone.trim();
     if (!trimmedPhone) {
       setFormError(
-        t('projects.application.applicantPhoneRequired', '담당자 전화번호를 입력해주세요'),
+        t('member.projects.application.applicantPhoneRequired', '담당자 전화번호를 입력해주세요'),
       );
       setFormMessage(
-        t('projects.application.validationError', '필수 항목을 확인한 뒤 다시 시도해주세요.'),
+        t('member.projects.application.validationError', '필수 항목을 확인한 뒤 다시 시도해주세요.'),
       );
       return;
     }
@@ -144,10 +144,10 @@ export default function ApplicationModal({
     const trimmedReason = applicationReason.trim();
     if (!trimmedReason || trimmedReason.length < 10) {
       setFormError(
-        t('projects.application.reasonMinLength', '신청 사유는 최소 10자 이상 입력해주세요'),
+        t('member.projects.application.reasonMinLength', '신청 사유는 최소 10자 이상 입력해주세요'),
       );
       setFormMessage(
-        t('projects.application.validationError', '필수 항목을 확인한 뒤 다시 시도해주세요.'),
+        t('member.projects.application.validationError', '필수 항목을 확인한 뒤 다시 시도해주세요.'),
       );
       return;
     }
@@ -175,10 +175,10 @@ export default function ApplicationModal({
       onClose={onClose}
       title={
         actualViewMode
-          ? t("projects.applicationDetail", "신청 상세")
+          ? t("member.projects.applicationDetail", "신청 상세")
           : canReapply
-            ? t("projects.reapply", "재신청")
-            : t("projects.apply", "프로그램 신청")
+            ? t("member.projects.reapply", "재신청")
+            : t("member.projects.apply", "프로그램 신청")
       }
       size="lg"
     >
@@ -222,7 +222,7 @@ export default function ApplicationModal({
               {submitting
                 ? t("common.submitting", "제출 중...")
                 : canReapply
-                  ? t("projects.resubmit", "재제출")
+                  ? t("member.projects.resubmit", "재제출")
                   : t("common.submit", "제출")}
             </Button>
           )}

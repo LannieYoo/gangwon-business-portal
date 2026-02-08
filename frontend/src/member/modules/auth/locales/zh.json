@@ -1,5 +1,6 @@
 {
-  "auth": {
+  "member": {
+    "auth": {
     "companyName": "企业名称",
     "region": "所在地区",
     "selectRegion": "请选择地区",
@@ -189,5 +190,6 @@
     "minLength": "至少需要{{min}}个字符",
     "maxLength": "最多允许{{max}}个字符",
     "invalidFormat": "格式不正确"
+  }
   }
 }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 公告筛选组件
  */
 
@@ -23,7 +23,7 @@ export default function NoticesFilter({
           data={allNotices}
           columns={columns}
           onFilter={handleFilterChange}
-          placeholder={t('support.notices.searchPlaceholder', '공지사항 검색...')}
+          placeholder={t('member.support.notices.searchPlaceholder', '공지사항 검색...')}
           className="flex-1 min-w-[200px] max-w-md"
         />
         <div className="w-full sm:w-48 sm:flex-shrink-0">

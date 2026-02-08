@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Performance List Component - Admin Portal
  * 业绩管理列表
  */
@@ -10,7 +10,12 @@ import { Card, Table, Button, Badge, Modal, Textarea, Pagination, Alert, SearchI
 import performanceService from './services/performance.service';
 import membersService from '../members/services/members.service';
 import { uploadService } from '@shared/services';
-import { formatBusinessLicense } from '@shared/utils';
+import {
+  formatBusinessLicense,
+  exportToExcel,
+  exportToCsv,
+  generateExportFilename,
+} from '@shared/utils';
 import { useDateFormatter, useMessage } from '@shared/hooks';
 
 export default function PerformanceList() {
@@ -193,16 +198,75 @@ export default function PerformanceList() {
     handleViewDetail(record.id);
   };
 
+  // 导出列配置
+  const exportColumns = useMemo(() => [
+    {
+      key: 'memberCompanyName',
+      label: t('admin.performance.table.memberName', '기업명'),
+      exportRender: (value, row) => value || row.memberBusinessNumber || '-',
+    },
+    {
+      key: 'memberBusinessNumber',
+      label: t('admin.performance.table.businessNumber', '사업자등록번호'),
+      exportRender: (value) => value ? formatBusinessLicense(value) : '-',
+    },
+    { key: 'year', label: t('admin.performance.table.year') },
+    {
+      key: 'quarter',
+      label: t('admin.performance.table.quarter'),
+      exportRender: (value) => value ? t(`performance.quarter.q${value}`, `${value}분기`) : t('performance.annual', '연간'),
+    },
+    {
+      key: 'status',
+      label: t('admin.performance.table.status'),
+      exportRender: (value) => {
+        const statusKeyMap = {
+          approved: 'approved',
+          submitted: 'submitted',
+          pending: 'submitted',
+          revision_requested: 'revisionRequested',
+          revision_required: 'revisionRequested',
+          draft: 'draft',
+          rejected: 'rejected'
+        };
+        const statusKey = statusKeyMap[value] || value;
+        return t(`performance.status.${statusKey}`, value);
+      },
+    },
+    {
+      key: 'submittedAt',
+      label: t('admin.performance.table.submittedAt', '제출 시간'),
+      exportRender: (value) => formatDateTime(value),
+    },
+  ], [t, formatDateTime]);
+
   const handleExport = async (format = 'excel') => {
     setLoading(true);
     try {
-      const params = {
-        format,
-        memberId: memberId || undefined
-      };
-      await performanceService.exportPerformance(params);
+      const filename = generateExportFilename(t('admin.performance.export.filename'));
+      const sheetName = t('admin.performance.export.sheetName');
+
+      if (format === 'csv') {
+        await exportToCsv({
+          data: allRecords,
+          columns: exportColumns,
+          t,
+          filename,
+          sheetName,
+        });
+      } else {
+        await exportToExcel({
+          data: allRecords,
+          columns: exportColumns,
+          t,
+          filename,
+          sheetName,
+        });
+      }
+
       showSuccess(t('admin.performance.exportSuccess', '내보내기 성공'));
     } catch (error) {
+      console.error('Export failed:', error);
       showError(t('admin.performance.exportFailed', '내보내기 실패'));
     } finally {
       setLoading(false);
@@ -390,19 +454,12 @@ export default function PerformanceList() {
             className="flex-1 min-w-[200px] max-w-md"
           />
           <div className="flex items-center space-x-2 md:ml-4 w-full md:w-auto">
-            <Button 
-              onClick={() => handleExport('excel')} 
+            <Button
+              onClick={() => handleExport('excel')}
               variant="outline"
               disabled={loading}
             >
               {t('admin.performance.exportExcel', 'Excel 내보내기')}
-            </Button>
-            <Button 
-              onClick={() => handleExport('csv')} 
-              variant="outline"
-              disabled={loading}
-            >
-              {t('admin.performance.exportCsv', 'CSV 내보내기')}
             </Button>
           </div>
         </div>
@@ -580,4 +637,8 @@ export default function PerformanceList() {
     </div>
   );
 }
+
+
+
+
 

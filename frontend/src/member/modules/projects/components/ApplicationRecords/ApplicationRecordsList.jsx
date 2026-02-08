@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 申请记录列表组件
  *
  * 处理加载中、无数据及列表渲染。
@@ -24,7 +24,7 @@ export function ApplicationRecordsList({
       <Card>
         <div className="text-center py-12 px-4">
           <p className="text-base text-gray-500 m-0">
-            {t('projects.applicationRecords.loading', '로딩중...')}
+            {t('member.projects.applicationRecords.loading', '로딩중...')}
           </p>
         </div>
       </Card>
@@ -37,7 +37,7 @@ export function ApplicationRecordsList({
         <div className="text-center py-12 px-4">
           <p className="text-base text-gray-500 m-0">
             {!hasApplications
-              ? t('projects.applicationRecords.noRecords', '신청 기록이 없습니다.')
+              ? t('member.projects.applicationRecords.noRecords', '신청 기록이 없습니다.')
               : t('common.noSearchResults', '일치하는 결과를 찾을 수 없습니다')}
           </p>
         </div>

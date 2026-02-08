@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Project List Component - Admin Portal
  * 事业公告列表
  */
@@ -10,7 +10,12 @@ import { Card, Table, Button, Badge, Pagination, SearchInput, Alert, Modal } fro
 import { apiService } from '@shared/services';
 import projectsService from './services/projects.service';
 import { API_PREFIX } from '@shared/utils/constants';
-import { formatBusinessLicense } from '@shared/utils';
+import {
+  formatBusinessLicense,
+  exportToExcel,
+  exportToCsv,
+  generateExportFilename,
+} from '@shared/utils';
 
 export default function ProjectList() {
   const { t } = useTranslation();
@@ -109,6 +114,37 @@ export default function ProjectList() {
     }
   ], [t]);
 
+  // 导出列配置 - 带国际化
+  const exportColumns = useMemo(() => [
+    {
+      key: 'title',
+      labelKey: 'admin.projects.table.title'
+    },
+    {
+      key: 'startDate',
+      labelKey: 'admin.projects.table.startDate'
+    },
+    {
+      key: 'endDate',
+      labelKey: 'admin.projects.table.endDate'
+    },
+    {
+      key: 'status',
+      labelKey: 'admin.projects.table.status',
+      exportRender: (value, row, t) => t(`admin.projects.status.${value}`, value)
+    },
+    {
+      key: 'viewCount',
+      labelKey: 'admin.projects.table.viewCount',
+      exportRender: (value) => value?.toString() || '0'
+    },
+    {
+      key: 'applicationsCount',
+      labelKey: 'admin.projects.table.applicationsCount',
+      exportRender: (value) => value?.toString() || '0'
+    }
+  ], []);
+
   // 分页后的数据
   const projects = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -162,11 +198,32 @@ export default function ProjectList() {
   const handleExport = async (format = 'excel') => {
     setLoading(true);
     try {
-      await projectsService.exportProjects({ format });
+      const filename = generateExportFilename(t('admin.projects.export.filename'));
+      const sheetName = t('admin.projects.export.sheetName');
+
+      if (format === 'excel') {
+        await exportToExcel({
+          data: filteredProjects,
+          columns: exportColumns,
+          t,
+          filename,
+          sheetName
+        });
+      } else {
+        await exportToCsv({
+          data: filteredProjects,
+          columns: exportColumns,
+          t,
+          filename,
+          sheetName
+        });
+      }
+
       setMessage(t('admin.projects.exportSuccess', '내보내기 성공'));
       setMessageVariant('success');
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
+      console.error('Export failed:', error);
       setMessage(t('admin.projects.exportFailed', '내보내기 실패'));
       setMessageVariant('error');
       setTimeout(() => setMessage(null), 3000);
@@ -291,19 +348,12 @@ export default function ProjectList() {
             className="flex-1 min-w-[200px] max-w-md"
           />
           <div className="flex items-center space-x-2 md:ml-4 w-full md:w-auto">
-            <Button 
-              onClick={() => handleExport('excel')} 
+            <Button
+              onClick={() => handleExport('excel')}
               variant="outline"
               disabled={loading}
             >
               {t('admin.projects.exportExcel', 'Excel 내보내기')}
-            </Button>
-            <Button 
-              onClick={() => handleExport('csv')} 
-              variant="outline"
-              disabled={loading}
-            >
-              {t('admin.projects.exportCsv', 'CSV 내보내기')}
             </Button>
             <Button onClick={handleCreate}>
               {t('admin.projects.create')}
@@ -379,4 +429,8 @@ export default function ProjectList() {
     </div>
   );
 }
+
+
+
+
 

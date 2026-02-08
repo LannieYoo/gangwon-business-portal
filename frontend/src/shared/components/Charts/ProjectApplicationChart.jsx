@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Project Application Chart Component
  * 项目申请统计图表组件 - 用于显示项目申请统计数据
  */
@@ -126,4 +126,8 @@ export default function ProjectApplicationChart({
     />
   );
 }
+
+
+
+
 

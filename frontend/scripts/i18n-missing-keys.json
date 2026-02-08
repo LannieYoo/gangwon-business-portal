@@ -1,0 +1,1346 @@
+{
+  "generatedAt": "2026-02-07T21:45:22.166Z",
+  "summary": {
+    "totalKeysUsed": 1208,
+    "missingInKo": 204,
+    "missingInZh": 204
+  },
+  "missingInKo": {
+    "footer.copyright": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.termsOfService": [
+      "admin\\layouts\\Footer.jsx",
+      "admin\\layouts\\Footer.jsx",
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.privacyPolicy": [
+      "admin\\layouts\\Footer.jsx",
+      "admin\\layouts\\Footer.jsx",
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.version": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.loading": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.noContent": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.error": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "admin.content.banners.form.fields.bannerType": [
+      "admin\\modules\\content\\utils.js"
+    ],
+    "admin.content.banners.form.fields.imageUrl": [
+      "admin\\modules\\content\\utils.js"
+    ],
+    "performance.companyInfo.sections.basicInfo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.sections.logo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.profile.noLogo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.businessLicense": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.representativeBirthDate": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.representativeGender": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.sections.addressInfo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.sections.businessInfo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.website": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.description": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.sections.additionalInfo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.email": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.participationPrograms": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.investmentStatus": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.notSet": [
+      "admin\\modules\\members\\MemberDetail.jsx",
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "common.personUnit": [
+      "admin\\modules\\members\\MemberDetail.jsx",
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "admin.members.detail.currentFinancialIndicators": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "admin.members.detail.thousandKRW": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "common.billionWon": [
+      "admin\\modules\\members\\MemberDetail.jsx",
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.governmentSupportFields.projectName": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.governmentSupportFields.startupProjectName": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.governmentSupportFields.supportOrganization": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.governmentSupportFields.supportAmount": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx"
+    ],
+    "performance.governmentSupportFields.startDate": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.governmentSupportFields.endDate": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx"
+    ],
+    "performance.governmentSupportFields.proofDocument": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.noData": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.sales": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.unit.won": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.previousYear": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.year": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.reportingDate": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.export": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.hskCode": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.exportCountry1": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.exportCountry2": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.employment": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.unit.people": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.currentEmployees": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.newEmployees": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.totalEmployees": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.attachments": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.status.approved": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.status.submitted": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx",
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.status.revisionRequested": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx",
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.status.draft": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.status.rejected": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.tabs.salesEmployment": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.tabs.governmentSupport": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.tabs.intellectualProperty": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.annual": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx",
+      "admin\\modules\\performance\\PerformanceList.jsx",
+      "admin\\modules\\performance\\PerformanceList.jsx",
+      "admin\\modules\\performance\\PerformanceList.jsx"
+    ],
+    "admin.applications.contactPersonName": [
+      "admin\\modules\\projects\\ProjectDetail.jsx"
+    ],
+    "admin.applications.contactPhone": [
+      "admin\\modules\\projects\\ProjectDetail.jsx"
+    ],
+    "admin.applications.attachments": [
+      "admin\\modules\\projects\\ProjectDetail.jsx"
+    ],
+    "admin.projects.form.attachmentUploadSuccess": [
+      "admin\\modules\\projects\\ProjectForm.jsx"
+    ],
+    "common.age.unit": [
+      "admin\\modules\\statistics\\components\\Filter\\AgeFilters.jsx",
+      "admin\\modules\\statistics\\components\\Filter\\DemographicFilters.jsx"
+    ],
+    "member.cooperationFields_items.tech": [
+      "admin\\modules\\statistics\\components\\Filter\\CooperationFilters.jsx"
+    ],
+    "member.cooperationFields_items.market": [
+      "admin\\modules\\statistics\\components\\Filter\\CooperationFilters.jsx"
+    ],
+    "member.cooperationFields_items.talent": [
+      "admin\\modules\\statistics\\components\\Filter\\CooperationFilters.jsx"
+    ],
+    "admin.statistics.filters.representative.ageRange": [
+      "admin\\modules\\statistics\\components\\Filter\\DemographicFilters.jsx"
+    ],
+    "statistics.filters.time.yearUnit": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.time.monthUnit": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.investment.yes": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.investment.no": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.investment.title": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.quantitive.revenueRange.custom": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.quantitive.revenue": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.quantitive.employeeRange.custom": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.quantitive.employees": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.selectedConditions": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.clearAll": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.matchingCompanies": [
+      "admin\\modules\\statistics\\components\\Filter\\ResultCounter.jsx"
+    ],
+    "statistics.filters.calculating": [
+      "admin\\modules\\statistics\\components\\Filter\\ResultCounter.jsx"
+    ],
+    "statistics.filters.companies": [
+      "admin\\modules\\statistics\\components\\Filter\\ResultCounter.jsx"
+    ],
+    "admin.statistics.filters.programs.university": [
+      "admin\\modules\\statistics\\enum.js"
+    ],
+    "admin.statistics.filters.programs.global": [
+      "admin\\modules\\statistics\\enum.js"
+    ],
+    "statistics.columnGroups.basic": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnGroups.quickFilters": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnGroups.companyProfile": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnGroups.businessMetrics": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnGroups.representative": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnPresets.all": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnPresets.core": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnPresets.minimum": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "common.appName": [
+      "member\\layouts\\components\\Header\\UserMenu.jsx",
+      "member\\layouts\\components\\Header\\UserMenu.jsx"
+    ],
+    "common.selectFile": [
+      "member\\modules\\auth\\components\\RegisterStep2Info.jsx",
+      "member\\modules\\auth\\components\\RegisterStep2Info.jsx"
+    ],
+    "auth.selectMainIndustryKsicMajor": [
+      "member\\modules\\auth\\components\\RegisterStep4Business.jsx"
+    ],
+    "auth.selectMainIndustryKsicCodes": [
+      "member\\modules\\auth\\components\\RegisterStep4Business.jsx"
+    ],
+    "auth.selectMainIndustryKsicMajorFirst": [
+      "member\\modules\\auth\\components\\RegisterStep4Business.jsx"
+    ],
+    "home.notices.title": [
+      "member\\modules\\home\\components\\NoticesPreview.jsx",
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx",
+      "member\\modules\\support\\components\\SupportSubmenu.jsx"
+    ],
+    "home.notices.empty": [
+      "member\\modules\\home\\components\\NoticesPreview.jsx",
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx"
+    ],
+    "home.news.title": [
+      "member\\modules\\home\\components\\ProjectPreview.jsx"
+    ],
+    "home.news.empty": [
+      "member\\modules\\home\\components\\ProjectPreview.jsx"
+    ],
+    "home.notices.important": [
+      "member\\modules\\home\\hooks\\useNoticesPreview.js",
+      "member\\modules\\support\\components\\NoticeDetailPage\\NoticeDetailPage.jsx",
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx",
+      "member\\modules\\support\\hooks\\useNotices.js"
+    ],
+    "home.notices.normal": [
+      "member\\modules\\home\\hooks\\useNoticesPreview.js",
+      "member\\modules\\support\\components\\NoticeDetailPage\\NoticeDetailPage.jsx",
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx",
+      "member\\modules\\support\\hooks\\useNotices.js"
+    ],
+    "performance.companyInfo.profile.clickToChangeLogo": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.profile.clickToUploadLogo": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.profile.logoHint": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.fields.businessNumber": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.fields.corporationNumber": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.profile.cooperationFields.tech": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.cooperationFields.market": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.cooperationFields.talent": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.participationPrograms.startupCenterUniversity": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.participationPrograms.globalBusiness": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.participationPrograms.riseBusiness": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.businessField": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.mainIndustryKsicMajor": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.mainIndustryKsicCodes": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.gangwonIndustry": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.futureTech": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.startupStage": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.employeeCount": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.cooperationFields": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.participationPrograms": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.contactPersonName": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyContactPersonInfo.jsx"
+    ],
+    "performance.companyInfo.fields.contactPersonDepartment": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyContactPersonInfo.jsx"
+    ],
+    "performance.companyInfo.fields.contactPersonPosition": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyContactPersonInfo.jsx"
+    ],
+    "performance.companyInfo.fields.contactPersonPhone": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyContactPersonInfo.jsx"
+    ],
+    "performance.companyInfo.profile.loginRequiredDesc": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyInfo.jsx"
+    ],
+    "performance.companyInfo.fields.hasInvestment": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyInvestmentStatus.jsx"
+    ],
+    "performance.companyInfo.fields.investmentAmount": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyInvestmentStatus.jsx"
+    ],
+    "performance.companyInfo.fields.investmentInstitution": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyInvestmentStatus.jsx"
+    ],
+    "performance.companyInfo.fields.representative": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyRepresentativeInfo.jsx"
+    ],
+    "performance.companyInfo.fields.representativeBirthDate": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyRepresentativeInfo.jsx"
+    ],
+    "performance.companyInfo.fields.representativeGender": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyRepresentativeInfo.jsx"
+    ],
+    "performance.companyInfo.fields.representativePhone": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyRepresentativeInfo.jsx"
+    ],
+    "performance.intellectualPropertyFields.types.trademark": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.types.utility": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "member.performance.intellectualPropertyFields.overseasTypes.overseas": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.name": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.number": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "member.performance.intellectualPropertyFields.countryPlaceholder": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.registrationDate": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.proofDocument": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "common.confirmSubmitTitle": [
+      "member\\modules\\performance\\components\\PerformanceForm\\PerformanceForm.jsx"
+    ],
+    "performance.confirmSubmitMessage": [
+      "member\\modules\\performance\\components\\PerformanceForm\\PerformanceForm.jsx"
+    ],
+    "member.performance.salesEmploymentFields.hskCodePlaceholder": [
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.companyInfo.validation.invalidPhone": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js"
+    ],
+    "performance.companyInfo.validation.invalidWebsite": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js"
+    ],
+    "performance.companyInfo.validation.invalidEmail": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js"
+    ],
+    "common.saveFailed": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js"
+    ],
+    "common.uploadFailed": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js",
+      "member\\modules\\support\\hooks\\useInquiry.js"
+    ],
+    "message.deleteSuccess": [
+      "member\\modules\\performance\\hooks\\usePerformanceList.js"
+    ],
+    "message.deleteFailed": [
+      "member\\modules\\performance\\hooks\\usePerformanceList.js"
+    ],
+    "projects.application.form.applicantNamePlaceholder": [
+      "member\\modules\\projects\\components\\ApplicationModal\\ApplicationForm.jsx"
+    ],
+    "projects.application.form.applicantPhonePlaceholder": [
+      "member\\modules\\projects\\components\\ApplicationModal\\ApplicationForm.jsx"
+    ],
+    "projects.application.form.reasonPlaceholder": [
+      "member\\modules\\projects\\components\\ApplicationModal\\ApplicationForm.jsx"
+    ],
+    "fileAttachments.uploadError": [
+      "member\\modules\\projects\\components\\ApplicationModal\\index.jsx"
+    ],
+    "common.submitting": [
+      "member\\modules\\projects\\components\\ApplicationModal\\index.jsx",
+      "member\\modules\\support\\components\\InquiryPage\\InquiryPage.jsx"
+    ],
+    "projects.applicationRecords.searchPlaceholder": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\ApplicationRecordsFilter.jsx"
+    ],
+    "projects.applicationRecords.cancelConfirm.message": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\CancelApplicationModal.jsx"
+    ],
+    "projects.applicationRecords.cancelConfirm.warning": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\CancelApplicationModal.jsx"
+    ],
+    "projects.applicationRecords.cancelConfirm.confirm": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\CancelApplicationModal.jsx"
+    ],
+    "projects.applicationRecords.rejectionReason.noReason": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\RejectionReasonModal.jsx"
+    ],
+    "projects.applicationRecords.supplementDefaultMessage": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\SupplementMaterialsModal.jsx"
+    ],
+    "projects.applicationRecords.uploadHint": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\SupplementMaterialsModal.jsx"
+    ],
+    "fileAttachments.attachments": [
+      "member\\modules\\projects\\components\\ProjectDetail\\ProjectAttachments.jsx",
+      "member\\modules\\support\\components\\NoticeDetailPage\\NoticeAttachmentList.jsx"
+    ],
+    "projects.applicationRecords.fileTooLarge": [
+      "member\\modules\\projects\\hooks\\useApplicationRecords.js"
+    ],
+    "projects.applicationRecords.status.needs_supplement": [
+      "member\\modules\\projects\\hooks\\useApplicationStatus.js"
+    ],
+    "common.unknownError": [
+      "member\\modules\\projects\\hooks\\useProjectApplication.js"
+    ],
+    "member.support.faq.description": [
+      "member\\modules\\support\\components\\FAQPage\\FAQPage.jsx"
+    ],
+    "member.support.inquiryHistory.description": [
+      "member\\modules\\support\\components\\InquiryHistoryPage\\InquiryHistoryPage.jsx"
+    ],
+    "common.type": [
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx"
+    ],
+    "notifications.unread": [
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx",
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx"
+    ],
+    "notifications.systemNotifications": [
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx",
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx"
+    ],
+    "member.support.notificationHistory.description": [
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx"
+    ],
+    "notifications.empty": [
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryTable.jsx"
+    ],
+    "auth.loginFailed": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.approvalPending": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.accountSuspended": [
+      "shared\\components\\LoginModal.jsx",
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.invalidCredentials": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.login": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.businessLicense": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.businessLicensePlaceholder": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.businessLicenseHelp": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.password": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.forgotPassword": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.hidePassword": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.showPassword": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.rememberMe": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.noAccount": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.passwordStrength.strong": [
+      "shared\\components\\PasswordStrength.jsx"
+    ],
+    "auth.passwordStrength.medium": [
+      "shared\\components\\PasswordStrength.jsx"
+    ],
+    "auth.passwordStrength.weak": [
+      "shared\\components\\PasswordStrength.jsx"
+    ],
+    "support.replyFailed": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.inquiryDetail": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.noMessages": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.user": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.admin": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.replyPlaceholder": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.sendReply": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "statistics.export.filename": [
+      "shared\\utils\\excelExporter.js"
+    ],
+    "statistics.export.sheetName": [
+      "shared\\utils\\excelExporter.js"
+    ],
+    "statistics.table.xxx": [
+      "shared\\utils\\excelExporter.js"
+    ]
+  },
+  "missingInZh": {
+    "footer.copyright": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.termsOfService": [
+      "admin\\layouts\\Footer.jsx",
+      "admin\\layouts\\Footer.jsx",
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.privacyPolicy": [
+      "admin\\layouts\\Footer.jsx",
+      "admin\\layouts\\Footer.jsx",
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.version": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.loading": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.noContent": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "footer.error": [
+      "admin\\layouts\\Footer.jsx"
+    ],
+    "admin.content.banners.form.fields.bannerType": [
+      "admin\\modules\\content\\utils.js"
+    ],
+    "admin.content.banners.form.fields.imageUrl": [
+      "admin\\modules\\content\\utils.js"
+    ],
+    "performance.companyInfo.sections.basicInfo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.sections.logo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.profile.noLogo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.businessLicense": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.representativeBirthDate": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.representativeGender": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.sections.addressInfo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.sections.businessInfo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.website": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.description": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.companyInfo.sections.additionalInfo": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.email": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.participationPrograms": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.investmentStatus": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "member.notSet": [
+      "admin\\modules\\members\\MemberDetail.jsx",
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "common.personUnit": [
+      "admin\\modules\\members\\MemberDetail.jsx",
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "admin.members.detail.currentFinancialIndicators": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "admin.members.detail.thousandKRW": [
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "common.billionWon": [
+      "admin\\modules\\members\\MemberDetail.jsx",
+      "admin\\modules\\members\\MemberDetail.jsx"
+    ],
+    "performance.governmentSupportFields.projectName": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.governmentSupportFields.startupProjectName": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.governmentSupportFields.supportOrganization": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.governmentSupportFields.supportAmount": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx"
+    ],
+    "performance.governmentSupportFields.startDate": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.governmentSupportFields.endDate": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx"
+    ],
+    "performance.governmentSupportFields.proofDocument": [
+      "admin\\modules\\performance\\components\\GovernmentSupportTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\GovernmentSupportForm.jsx"
+    ],
+    "performance.noData": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.sales": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.unit.won": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.previousYear": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.year": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.reportingDate": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.export": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.hskCode": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.exportCountry1": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.exportCountry2": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.employment": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.unit.people": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.currentEmployees": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.newEmployees": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx",
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.salesEmploymentFields.totalEmployees": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.salesEmploymentFields.attachments": [
+      "admin\\modules\\performance\\components\\SalesEmploymentTab.jsx"
+    ],
+    "performance.status.approved": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.status.submitted": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx",
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.status.revisionRequested": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx",
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.status.draft": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.status.rejected": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.tabs.salesEmployment": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.tabs.governmentSupport": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.tabs.intellectualProperty": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx"
+    ],
+    "performance.annual": [
+      "admin\\modules\\performance\\PerformanceDetail.jsx",
+      "admin\\modules\\performance\\PerformanceList.jsx",
+      "admin\\modules\\performance\\PerformanceList.jsx",
+      "admin\\modules\\performance\\PerformanceList.jsx"
+    ],
+    "admin.applications.contactPersonName": [
+      "admin\\modules\\projects\\ProjectDetail.jsx"
+    ],
+    "admin.applications.contactPhone": [
+      "admin\\modules\\projects\\ProjectDetail.jsx"
+    ],
+    "admin.applications.attachments": [
+      "admin\\modules\\projects\\ProjectDetail.jsx"
+    ],
+    "admin.projects.form.attachmentUploadSuccess": [
+      "admin\\modules\\projects\\ProjectForm.jsx"
+    ],
+    "common.age.unit": [
+      "admin\\modules\\statistics\\components\\Filter\\AgeFilters.jsx",
+      "admin\\modules\\statistics\\components\\Filter\\DemographicFilters.jsx"
+    ],
+    "member.cooperationFields_items.tech": [
+      "admin\\modules\\statistics\\components\\Filter\\CooperationFilters.jsx"
+    ],
+    "member.cooperationFields_items.market": [
+      "admin\\modules\\statistics\\components\\Filter\\CooperationFilters.jsx"
+    ],
+    "member.cooperationFields_items.talent": [
+      "admin\\modules\\statistics\\components\\Filter\\CooperationFilters.jsx"
+    ],
+    "admin.statistics.filters.representative.ageRange": [
+      "admin\\modules\\statistics\\components\\Filter\\DemographicFilters.jsx"
+    ],
+    "statistics.filters.time.yearUnit": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.time.monthUnit": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.investment.yes": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.investment.no": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.investment.title": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.quantitive.revenueRange.custom": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.quantitive.revenue": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.quantitive.employeeRange.custom": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.quantitive.employees": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.selectedConditions": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.clearAll": [
+      "admin\\modules\\statistics\\components\\Filter\\FilterPreview.jsx"
+    ],
+    "statistics.filters.matchingCompanies": [
+      "admin\\modules\\statistics\\components\\Filter\\ResultCounter.jsx"
+    ],
+    "statistics.filters.calculating": [
+      "admin\\modules\\statistics\\components\\Filter\\ResultCounter.jsx"
+    ],
+    "statistics.filters.companies": [
+      "admin\\modules\\statistics\\components\\Filter\\ResultCounter.jsx"
+    ],
+    "admin.statistics.filters.programs.university": [
+      "admin\\modules\\statistics\\enum.js"
+    ],
+    "admin.statistics.filters.programs.global": [
+      "admin\\modules\\statistics\\enum.js"
+    ],
+    "statistics.columnGroups.basic": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnGroups.quickFilters": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnGroups.companyProfile": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnGroups.businessMetrics": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnGroups.representative": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnPresets.all": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnPresets.core": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "statistics.columnPresets.minimum": [
+      "admin\\modules\\statistics\\hooks\\useColumnVisibility.js"
+    ],
+    "common.appName": [
+      "member\\layouts\\components\\Header\\UserMenu.jsx",
+      "member\\layouts\\components\\Header\\UserMenu.jsx"
+    ],
+    "common.selectFile": [
+      "member\\modules\\auth\\components\\RegisterStep2Info.jsx",
+      "member\\modules\\auth\\components\\RegisterStep2Info.jsx"
+    ],
+    "auth.selectMainIndustryKsicMajor": [
+      "member\\modules\\auth\\components\\RegisterStep4Business.jsx"
+    ],
+    "auth.selectMainIndustryKsicCodes": [
+      "member\\modules\\auth\\components\\RegisterStep4Business.jsx"
+    ],
+    "auth.selectMainIndustryKsicMajorFirst": [
+      "member\\modules\\auth\\components\\RegisterStep4Business.jsx"
+    ],
+    "home.notices.title": [
+      "member\\modules\\home\\components\\NoticesPreview.jsx",
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx",
+      "member\\modules\\support\\components\\SupportSubmenu.jsx"
+    ],
+    "home.notices.empty": [
+      "member\\modules\\home\\components\\NoticesPreview.jsx",
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx"
+    ],
+    "home.news.title": [
+      "member\\modules\\home\\components\\ProjectPreview.jsx"
+    ],
+    "home.news.empty": [
+      "member\\modules\\home\\components\\ProjectPreview.jsx"
+    ],
+    "home.notices.important": [
+      "member\\modules\\home\\hooks\\useNoticesPreview.js",
+      "member\\modules\\support\\components\\NoticeDetailPage\\NoticeDetailPage.jsx",
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx",
+      "member\\modules\\support\\hooks\\useNotices.js"
+    ],
+    "home.notices.normal": [
+      "member\\modules\\home\\hooks\\useNoticesPreview.js",
+      "member\\modules\\support\\components\\NoticeDetailPage\\NoticeDetailPage.jsx",
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx",
+      "member\\modules\\support\\hooks\\useNotices.js"
+    ],
+    "performance.companyInfo.profile.clickToChangeLogo": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.profile.clickToUploadLogo": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.profile.logoHint": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.fields.businessNumber": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.fields.corporationNumber": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBasicInfo.jsx"
+    ],
+    "performance.companyInfo.profile.cooperationFields.tech": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.cooperationFields.market": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.cooperationFields.talent": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.participationPrograms.startupCenterUniversity": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.participationPrograms.globalBusiness": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.profile.participationPrograms.riseBusiness": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.businessField": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.mainIndustryKsicMajor": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.mainIndustryKsicCodes": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.gangwonIndustry": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.futureTech": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.startupStage": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.employeeCount": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.cooperationFields": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.participationPrograms": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyBusinessInfo.jsx"
+    ],
+    "performance.companyInfo.fields.contactPersonName": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyContactPersonInfo.jsx"
+    ],
+    "performance.companyInfo.fields.contactPersonDepartment": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyContactPersonInfo.jsx"
+    ],
+    "performance.companyInfo.fields.contactPersonPosition": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyContactPersonInfo.jsx"
+    ],
+    "performance.companyInfo.fields.contactPersonPhone": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyContactPersonInfo.jsx"
+    ],
+    "performance.companyInfo.profile.loginRequiredDesc": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyInfo.jsx"
+    ],
+    "performance.companyInfo.fields.hasInvestment": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyInvestmentStatus.jsx"
+    ],
+    "performance.companyInfo.fields.investmentAmount": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyInvestmentStatus.jsx"
+    ],
+    "performance.companyInfo.fields.investmentInstitution": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyInvestmentStatus.jsx"
+    ],
+    "performance.companyInfo.fields.representative": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyRepresentativeInfo.jsx"
+    ],
+    "performance.companyInfo.fields.representativeBirthDate": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyRepresentativeInfo.jsx"
+    ],
+    "performance.companyInfo.fields.representativeGender": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyRepresentativeInfo.jsx"
+    ],
+    "performance.companyInfo.fields.representativePhone": [
+      "member\\modules\\performance\\components\\CompanyInfo\\CompanyRepresentativeInfo.jsx"
+    ],
+    "performance.intellectualPropertyFields.types.trademark": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.types.utility": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "member.performance.intellectualPropertyFields.overseasTypes.overseas": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.name": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.number": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "member.performance.intellectualPropertyFields.countryPlaceholder": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.registrationDate": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "performance.intellectualPropertyFields.proofDocument": [
+      "member\\modules\\performance\\components\\PerformanceForm\\IntellectualPropertyForm.jsx"
+    ],
+    "common.confirmSubmitTitle": [
+      "member\\modules\\performance\\components\\PerformanceForm\\PerformanceForm.jsx"
+    ],
+    "performance.confirmSubmitMessage": [
+      "member\\modules\\performance\\components\\PerformanceForm\\PerformanceForm.jsx"
+    ],
+    "member.performance.salesEmploymentFields.hskCodePlaceholder": [
+      "member\\modules\\performance\\components\\PerformanceForm\\SalesEmploymentForm.jsx"
+    ],
+    "performance.companyInfo.validation.invalidPhone": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js"
+    ],
+    "performance.companyInfo.validation.invalidWebsite": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js"
+    ],
+    "performance.companyInfo.validation.invalidEmail": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js"
+    ],
+    "common.saveFailed": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js"
+    ],
+    "common.uploadFailed": [
+      "member\\modules\\performance\\hooks\\useCompanyInfo.js",
+      "member\\modules\\support\\hooks\\useInquiry.js"
+    ],
+    "message.deleteSuccess": [
+      "member\\modules\\performance\\hooks\\usePerformanceList.js"
+    ],
+    "message.deleteFailed": [
+      "member\\modules\\performance\\hooks\\usePerformanceList.js"
+    ],
+    "projects.application.form.applicantNamePlaceholder": [
+      "member\\modules\\projects\\components\\ApplicationModal\\ApplicationForm.jsx"
+    ],
+    "projects.application.form.applicantPhonePlaceholder": [
+      "member\\modules\\projects\\components\\ApplicationModal\\ApplicationForm.jsx"
+    ],
+    "projects.application.form.reasonPlaceholder": [
+      "member\\modules\\projects\\components\\ApplicationModal\\ApplicationForm.jsx"
+    ],
+    "fileAttachments.uploadError": [
+      "member\\modules\\projects\\components\\ApplicationModal\\index.jsx"
+    ],
+    "common.submitting": [
+      "member\\modules\\projects\\components\\ApplicationModal\\index.jsx",
+      "member\\modules\\support\\components\\InquiryPage\\InquiryPage.jsx"
+    ],
+    "projects.applicationRecords.searchPlaceholder": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\ApplicationRecordsFilter.jsx"
+    ],
+    "projects.applicationRecords.cancelConfirm.message": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\CancelApplicationModal.jsx"
+    ],
+    "projects.applicationRecords.cancelConfirm.warning": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\CancelApplicationModal.jsx"
+    ],
+    "projects.applicationRecords.cancelConfirm.confirm": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\CancelApplicationModal.jsx"
+    ],
+    "projects.applicationRecords.rejectionReason.noReason": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\RejectionReasonModal.jsx"
+    ],
+    "projects.applicationRecords.supplementDefaultMessage": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\SupplementMaterialsModal.jsx"
+    ],
+    "projects.applicationRecords.uploadHint": [
+      "member\\modules\\projects\\components\\ApplicationRecords\\SupplementMaterialsModal.jsx"
+    ],
+    "fileAttachments.attachments": [
+      "member\\modules\\projects\\components\\ProjectDetail\\ProjectAttachments.jsx",
+      "member\\modules\\support\\components\\NoticeDetailPage\\NoticeAttachmentList.jsx"
+    ],
+    "projects.applicationRecords.fileTooLarge": [
+      "member\\modules\\projects\\hooks\\useApplicationRecords.js"
+    ],
+    "projects.applicationRecords.status.needs_supplement": [
+      "member\\modules\\projects\\hooks\\useApplicationStatus.js"
+    ],
+    "common.unknownError": [
+      "member\\modules\\projects\\hooks\\useProjectApplication.js"
+    ],
+    "member.support.faq.description": [
+      "member\\modules\\support\\components\\FAQPage\\FAQPage.jsx"
+    ],
+    "member.support.inquiryHistory.description": [
+      "member\\modules\\support\\components\\InquiryHistoryPage\\InquiryHistoryPage.jsx"
+    ],
+    "common.type": [
+      "member\\modules\\support\\components\\NoticesPage\\NoticesPage.jsx"
+    ],
+    "notifications.unread": [
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx",
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx"
+    ],
+    "notifications.systemNotifications": [
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx",
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx"
+    ],
+    "member.support.notificationHistory.description": [
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryPage.jsx"
+    ],
+    "notifications.empty": [
+      "member\\modules\\support\\components\\NotificationHistoryPage\\NotificationHistoryTable.jsx"
+    ],
+    "auth.loginFailed": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.approvalPending": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.accountSuspended": [
+      "shared\\components\\LoginModal.jsx",
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.invalidCredentials": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.login": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.businessLicense": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.businessLicensePlaceholder": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.businessLicenseHelp": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.password": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.forgotPassword": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.hidePassword": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.showPassword": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.rememberMe": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.noAccount": [
+      "shared\\components\\LoginModal.jsx"
+    ],
+    "auth.passwordStrength.strong": [
+      "shared\\components\\PasswordStrength.jsx"
+    ],
+    "auth.passwordStrength.medium": [
+      "shared\\components\\PasswordStrength.jsx"
+    ],
+    "auth.passwordStrength.weak": [
+      "shared\\components\\PasswordStrength.jsx"
+    ],
+    "support.replyFailed": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.inquiryDetail": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.noMessages": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.user": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.admin": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.replyPlaceholder": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "support.sendReply": [
+      "shared\\components\\ThreadDetailModal.jsx"
+    ],
+    "statistics.export.filename": [
+      "shared\\utils\\excelExporter.js"
+    ],
+    "statistics.export.sheetName": [
+      "shared\\utils\\excelExporter.js"
+    ],
+    "statistics.table.xxx": [
+      "shared\\utils\\excelExporter.js"
+    ]
+  }
+}

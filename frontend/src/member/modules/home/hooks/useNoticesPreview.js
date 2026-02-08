@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 最新公告预览 Hook
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -37,22 +37,23 @@ export function useNoticesPreview() {
     return [];
   }, []);
 
-  const { data: notices, loading, error, refresh } = useApiCache(
-    fetchNotices,
-    'notices-preview',
-    {
-      cacheDuration: 1 * 60 * 1000, // 1分钟缓存
-      enabled: true
-    }
-  );
+  const {
+    data: notices,
+    loading,
+    error,
+    refresh,
+  } = useApiCache(fetchNotices, "notices-preview", {
+    cacheDuration: 1 * 60 * 1000, // 1分钟缓存
+    enabled: true,
+  });
 
   const getBadgeInfo = useCallback(
     (notice) => {
       return {
         variant: notice.important ? "danger" : "gray",
         text: notice.important
-          ? t("home.notices.important", "重要")
-          : t("home.notices.normal", "一般"),
+          ? t("member.home.notices.important", "중요")
+          : t("member.home.notices.normal", "일반"),
       };
     },
     [t],

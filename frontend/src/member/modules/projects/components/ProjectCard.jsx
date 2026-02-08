@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 项目模块卡片组件
  *
  * 遵循 dev-frontend_patterns skill 规范。

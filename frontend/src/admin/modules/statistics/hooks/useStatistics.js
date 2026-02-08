@@ -4,17 +4,28 @@
  * 功能:
  * - 管理筛选条件状态
  * - 执行查询和分页
- * - 处理 Excel 导出
+ * - 处理 Excel 导出（前端生成，支持完整国际化）
  * - 处理加载和错误状态
  */
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import statisticsService from "../services/statistics.service";
-import { DEFAULT_QUERY_PARAMS, PAGINATION_CONFIG } from "../enum";
+import {
+  DEFAULT_QUERY_PARAMS,
+  PAGINATION_CONFIG,
+  TABLE_COLUMN_CONFIGS,
+} from "../enum";
+import { useEnumTranslation } from "@/shared/hooks/useEnumTranslation";
+import {
+  exportToExcel as exportExcel,
+  exportToCsv as exportCsv,
+  generateExportFilename,
+} from "@shared/utils/excelExporter";
 
 export const useStatistics = (initialParams = {}) => {
   const { t } = useTranslation();
+  const { translateFieldValue } = useEnumTranslation();
 
   // 筛选参数状态
   const [params, setParams] = useState({
@@ -67,7 +78,8 @@ export const useStatistics = (initialParams = {}) => {
 
         return response;
       } catch (err) {
-        const errorMessage = err.message || t("statistics.messages.queryError");
+        const errorMessage =
+          err.message || t("admin.statistics.messages.queryError");
         setError(errorMessage);
         console.error("[useStatistics] fetchData error:", err);
       } finally {
@@ -149,7 +161,8 @@ export const useStatistics = (initialParams = {}) => {
   );
 
   /**
-   * 导出 Excel
+   * 导出 Excel（前端生成，支持完整国际化）
+   * 使用分页循环获取所有数据（后端限制 pageSize 最大 100）
    */
   const exportToExcel = useCallback(
     async (customFilename = null) => {
@@ -165,35 +178,63 @@ export const useStatistics = (initialParams = {}) => {
           throw new Error(errorMessages);
         }
 
-        // 2. 生成默认文件名 (如果未提供)
-        let filename = customFilename;
-        if (!filename) {
-          const year = params.year || new Date().getFullYear();
-          const timestamp = new Date()
-            .toISOString()
-            .slice(0, 10)
-            .replace(/-/g, "");
-          filename = `统计报告_${year}_${timestamp}`;
-        }
+        // 2. 使用分页循环获取全部数据（后端限制 pageSize 最大 100）
+        const allItems = [];
+        const batchSize = 100; // 后端允许的最大 pageSize
+        let currentPage = 1;
+        let totalFetched = 0;
+        let totalCount = 0;
 
-        // 3. 执行导出
-        const result = await statisticsService.exportToExcel(params, filename);
+        do {
+          const response = await statisticsService.queryCompanies({
+            ...params,
+            page: currentPage,
+            pageSize: batchSize,
+          });
 
-        return result;
+          const items = response.items || [];
+          allItems.push(...items);
+          totalFetched += items.length;
+          totalCount = response.total || 0;
+          currentPage++;
+
+          // 防止无限循环：如果返回的数据少于请求的数量，说明已经到最后一页
+        } while (totalFetched < totalCount && allItems.length < totalCount);
+
+        // 3. 生成文件名
+        const filename =
+          customFilename ||
+          generateExportFilename(t("admin.statistics.export.filename"), {
+            year: params.year || new Date().getFullYear(),
+          });
+
+        // 4. 使用共享导出工具（前端生成 Excel）
+        await exportExcel({
+          data: allItems,
+          columns: TABLE_COLUMN_CONFIGS,
+          t,
+          filename,
+          sheetName: t("admin.statistics.export.sheetName"),
+          valueTranslator: (key, value) => translateFieldValue(key, value),
+        });
+
+        return { success: true, filename };
       } catch (err) {
         const errorMessage =
-          err.message || t("statistics.messages.exportError");
+          err.message || t("admin.statistics.messages.exportError");
         setError(errorMessage);
         console.error("[useStatistics] exportToExcel error:", err);
+        return { success: false, error: errorMessage };
       } finally {
         setExporting(false);
       }
     },
-    [params, t],
+    [params, t, translateFieldValue],
   );
 
   /**
-   * 导出 CSV
+   * 导出 CSV（前端生成，支持完整国际化）
+   * 使用分页循环获取所有数据（后端限制 pageSize 最大 100）
    */
   const exportToCsv = useCallback(
     async (customFilename = null) => {
@@ -209,31 +250,58 @@ export const useStatistics = (initialParams = {}) => {
           throw new Error(errorMessages);
         }
 
-        // 2. 生成默认文件名 (如果未提供)
-        let filename = customFilename;
-        if (!filename) {
-          const year = params.year || new Date().getFullYear();
-          const timestamp = new Date()
-            .toISOString()
-            .slice(0, 10)
-            .replace(/-/g, "");
-          filename = `统计报告_${year}_${timestamp}`;
-        }
+        // 2. 使用分页循环获取全部数据（后端限制 pageSize 最大 100）
+        const allItems = [];
+        const batchSize = 100; // 后端允许的最大 pageSize
+        let currentPage = 1;
+        let totalFetched = 0;
+        let totalCount = 0;
 
-        // 3. 执行导出
-        const result = await statisticsService.exportToCsv(params, filename);
+        do {
+          const response = await statisticsService.queryCompanies({
+            ...params,
+            page: currentPage,
+            pageSize: batchSize,
+          });
 
-        return result;
+          const items = response.items || [];
+          allItems.push(...items);
+          totalFetched += items.length;
+          totalCount = response.total || 0;
+          currentPage++;
+
+          // 防止无限循环：如果返回的数据少于请求的数量，说明已经到最后一页
+        } while (totalFetched < totalCount && allItems.length < totalCount);
+
+        // 3. 生成文件名
+        const filename =
+          customFilename ||
+          generateExportFilename(t("admin.statistics.export.filename"), {
+            year: params.year || new Date().getFullYear(),
+          });
+
+        // 4. 使用共享导出工具（前端生成 CSV）
+        await exportCsv({
+          data: allItems,
+          columns: TABLE_COLUMN_CONFIGS,
+          t,
+          filename,
+          sheetName: t("admin.statistics.export.sheetName"),
+          valueTranslator: (key, value) => translateFieldValue(key, value),
+        });
+
+        return { success: true, filename };
       } catch (err) {
         const errorMessage =
-          err.message || t("statistics.messages.exportError");
+          err.message || t("admin.statistics.messages.exportError");
         setError(errorMessage);
         console.error("[useStatistics] exportToCsv error:", err);
+        return { success: false, error: errorMessage };
       } finally {
         setExporting(false);
       }
     },
-    [params, t],
+    [params, t, translateFieldValue],
   );
 
   /**

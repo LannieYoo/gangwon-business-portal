@@ -3,7 +3,7 @@
  */
 import { useTranslation } from "react-i18next";
 import { Select } from "@shared/components";
-import { FUTURE_TECHNOLOGY_OPTIONS } from "../../enum";
+import { FUTURE_TECHNOLOGIES, getTranslatedOptions } from "@/shared/enums";
 
 export const FutureTechnologyFilters = ({ technologies = [], onChange }) => {
   const { t } = useTranslation();
@@ -17,15 +17,19 @@ export const FutureTechnologyFilters = ({ technologies = [], onChange }) => {
   // 获取当前选中的值（取数组第一个元素）
   const selectedValue = technologies.length > 0 ? technologies[0] : "";
 
+  // 获取翻译后的选项
+  const translatedOptions = getTranslatedOptions(
+    FUTURE_TECHNOLOGIES,
+    "enums.industry.futureTech",
+    t,
+  );
+
   return (
     <Select
       value={selectedValue}
       options={[
-        { value: "", label: t("statistics.filters.all", "全部") },
-        ...FUTURE_TECHNOLOGY_OPTIONS.map((option) => ({
-          value: option.value,
-          label: t(option.labelKey),
-        }))
+        { value: "", label: t("admin.statistics.filters.all", "전체") },
+        ...translatedOptions,
       ]}
       onChange={handleChange}
       containerClassName="mb-0"

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Intellectual Property Tab Component
  * 知识产权标签页内容
  */
@@ -128,3 +128,7 @@ export default function IntellectualPropertyTab({ record, onDownload, onDownload
     </div>
   );
 }
+
+
+
+

@@ -16,7 +16,7 @@ export const PatentFilters = ({ minPatents, maxPatents, onChange }) => {
   return (
     <Select
       value={selectedValue}
-      placeholder={t("statistics.filters.patent.countRange")}
+      placeholder={t("admin.statistics.filters.patent.countRange")}
       options={PATENT_RANGES_OPTIONS.map((r) => ({
         value: r.value,
         label: t(r.labelKey),

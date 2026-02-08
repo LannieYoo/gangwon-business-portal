@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Register View - Member Portal
  * Orchestrates the registration process using components and hooks.
  * Follows dev-frontend_patterns skill.
@@ -133,7 +133,7 @@ export default function RegisterView() {
                   disabled={isSubmitting || isValidating}
                   className="flex-1 px-6 py-3 text-gray-700 bg-gray-100 rounded-lg font-medium hover:bg-gray-200 transition disabled:opacity-50"
                 >
-                  {t("auth.previousStep")}
+                  {t("member.auth.previousStep")}
                 </button>
               )}
               <button
@@ -161,7 +161,7 @@ export default function RegisterView() {
                     </svg>
                   </span>
                 ) : currentStep < totalSteps ? (
-                  t("auth.nextStep")
+                  t("member.auth.nextStep")
                 ) : (
                   t("common.register")
                 )}
@@ -170,7 +170,7 @@ export default function RegisterView() {
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-500">
-            {t("auth.hasAccount")}{" "}
+            {t("member.auth.hasAccount")}{" "}
             <button
               type="button"
               onClick={() => actions.setShowLoginModal(true)}
@@ -204,3 +204,7 @@ export default function RegisterView() {
     </div>
   );
 }
+
+
+
+

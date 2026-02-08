@@ -1,4 +1,4 @@
-/**
+﻿/**
  * i18n Configuration
  *
  * 翻译文件从各 feature 模块的 locales 目录导入并合并。
@@ -9,9 +9,9 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-// Shared locales (common translations)
-import ko from "./locales/ko.json";
-import zh from "./locales/zh.json";
+// Shared locales (common translations) - now split into modular files
+import ko from "./locales/ko";
+import zh from "./locales/zh";
 
 // Feature locales - about
 import aboutKo from "../../member/modules/about/locales/ko.json";
@@ -61,24 +61,39 @@ import adminProjectsZh from "../../admin/modules/projects/locales/zh.json";
 import adminStatisticsKo from "../../admin/modules/statistics/locales/ko.json";
 import adminStatisticsZh from "../../admin/modules/statistics/locales/zh.json";
 
-// Helper to safely merge locales (shallow deep merge for top-level objects)
-const safeMerge = (...locales) => {
-  const result = {};
-  locales.forEach((locale) => {
-    if (!locale) return;
-    Object.keys(locale).forEach((key) => {
-      if (
-        typeof locale[key] === "object" &&
-        locale[key] !== null &&
-        !Array.isArray(locale[key])
-      ) {
-        result[key] = { ...(result[key] || {}), ...locale[key] };
-      } else {
-        result[key] = locale[key];
-      }
-    });
+// Helper to deeply merge locales recursively
+const deepMerge = (target, source) => {
+  const result = { ...target };
+
+  Object.keys(source).forEach((key) => {
+    const sourceValue = source[key];
+    const targetValue = result[key];
+
+    if (
+      typeof sourceValue === "object" &&
+      sourceValue !== null &&
+      !Array.isArray(sourceValue) &&
+      typeof targetValue === "object" &&
+      targetValue !== null &&
+      !Array.isArray(targetValue)
+    ) {
+      // 递归深度合并对象
+      result[key] = deepMerge(targetValue, sourceValue);
+    } else {
+      // 直接覆盖原始值、数组或其他类型
+      result[key] = sourceValue;
+    }
   });
+
   return result;
+};
+
+// Helper to safely merge locales (deep merge for all nested objects)
+const safeMerge = (...locales) => {
+  return locales.reduce((result, locale) => {
+    if (!locale) return result;
+    return deepMerge(result, locale);
+  }, {});
 };
 
 const resources = {
@@ -100,7 +115,7 @@ const resources = {
       adminMessagesKo,
       adminPerformanceKo,
       adminProjectsKo,
-      adminStatisticsKo
+      adminStatisticsKo,
     ),
   },
   zh: {
@@ -121,7 +136,7 @@ const resources = {
       adminMessagesZh,
       adminPerformanceZh,
       adminProjectsZh,
-      adminStatisticsZh
+      adminStatisticsZh,
     ),
   },
 };

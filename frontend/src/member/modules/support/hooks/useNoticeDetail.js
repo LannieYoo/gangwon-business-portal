@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 公告详情业务逻辑 Hook
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -40,7 +40,7 @@ export function useNoticeDetail() {
             attachments: detail.attachments || [],
           });
         } else {
-          setError(t("common.notFound", "未找到该公告"));
+          setError(t("common.notFound", "해당 공지사항을 찾을 수 없습니다"));
         }
       } catch (err) {
         console.error("Failed to load notice:", err);

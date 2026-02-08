@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+﻿import { useTranslation } from "react-i18next";
 import { Modal, Button } from "@shared/components";
 
 export default function RejectionReasonModal({ isOpen, onClose, reason }) {
@@ -8,19 +8,19 @@ export default function RejectionReasonModal({ isOpen, onClose, reason }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={t('projects.applicationRecords.rejectionReason.title', '거절 사유')}
+      title={t('member.projects.applicationRecords.rejectionReason.title', '거절 사유')}
     >
       <div className="p-4">
         <p className="text-gray-700 mb-4">
           {reason ||
             t(
               "projects.applicationRecords.rejectionReason.noReason",
-              "未提供拒绝原因。",
+              "거절 사유가 제공되지 않았습니다.",
             )}
         </p>
         <div className="flex justify-end">
           <Button variant="secondary" onClick={onClose}>
-            {t('projects.applicationRecords.rejectionReason.close', '닫기')}
+            {t('member.projects.applicationRecords.rejectionReason.close', '닫기')}
           </Button>
         </div>
       </div>

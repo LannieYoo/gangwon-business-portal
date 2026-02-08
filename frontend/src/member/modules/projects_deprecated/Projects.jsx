@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Projects Page - Member Portal
  * 项目页面 - 显示项目列表和申请记录
  * Requirements: 7.1, 7.2
@@ -48,3 +48,7 @@ export default function Projects() {
     </div>
   );
 }
+
+
+
+

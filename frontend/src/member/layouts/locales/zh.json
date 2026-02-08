@@ -1,28 +1,28 @@
 {
-  "common": {
-    "appName": "江原道商务门户"
-  },
-  "header": {
-    "toggleMenu": "切换菜单",
-    "title": "江原道商务门户",
-    "login": "登录",
-    "mobileMenuLabel": "移动端导航",
-    "mainNav": "主导航",
-    "profile": "企业信息",
-    "support": "客户支持",
-    "logout": "退出登录"
-  },
-  "menu": {
-    "home": "首页",
-    "about": "关于我们",
-    "projects": "项目公告",
-    "performance": "经营成果",
-    "support": "一站式支持"
-  },
-  "footer": {
-    "copyright": "江原道政府. 保留所有权利.",
-    "termsOfService": "服务条款",
-    "privacyPolicy": "隐私政策",
-    "version": "版本"
+  "member": {
+    "layout": {
+      "appName": "江原道商务门户",
+      "title": "江原道商务门户",
+      "toggleMenu": "切换菜单",
+      "login": "登录",
+      "mobileMenuLabel": "移动端导航",
+      "mainNav": "主导航",
+      "profile": "企业信息",
+      "support": "客户支持",
+      "logout": "退出登录",
+      "menu": {
+        "home": "首页",
+        "about": "关于我们",
+        "projects": "项目公告",
+        "performance": "经营成果",
+        "support": "一站式支持"
+      },
+      "footer": {
+        "copyright": "江原道政府. 保留所有权利.",
+        "termsOfService": "服务条款",
+        "privacyPolicy": "隐私政策",
+        "version": "版本"
+      }
+    }
   }
 }

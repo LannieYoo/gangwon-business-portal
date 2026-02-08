@@ -1,9 +1,9 @@
 /**
  * Header Component - Member Portal
- * 会员端顶部导航 - Korean Government Style
+ * 会员端页面头部 - Korean Government Style
  *
- * 遵循 dev-frontend_patterns skill 规范。
- * UI 与 逻辑完全分离。
+ * 参考 dev-frontend_patterns skill 构建
+ * UI 包含导航和用户操作
  */
 
 import { Link } from "react-router-dom";
@@ -48,7 +48,7 @@ function Header() {
         <button
           className="hidden max-md:flex bg-transparent border-none cursor-pointer py-2 px-3 text-blue-950 transition-all duration-200 rounded items-center justify-center mr-2 hover:text-blue-600"
           onClick={() => setShowMobileMenu(!showMobileMenu)}
-          aria-label={t('header.toggleMenu', '메뉴 전환')}
+          aria-label={t("member.layout.toggleMenu", "메뉴 전환")}
         >
           {showMobileMenu ? (
             <XIcon className="w-6 h-6" />
@@ -63,7 +63,7 @@ function Header() {
         >
           <img
             src={LAYOUT_CONFIG.LOGO_URL}
-            alt={t('header.title', '강원비즈니스포털')}
+            alt={t("member.layout.title", "강원비즈니스포털")}
             className="h-7 w-auto object-contain"
           />
         </Link>
@@ -94,8 +94,8 @@ function Header() {
         </div>
 
         {isAuthenticated && (
-          <NotificationBell 
-            userType="member" 
+          <NotificationBell
+            userType="member"
             variant="light"
             services={{
               getUnreadCount: supportService.getMemberUnreadCount,
@@ -116,7 +116,7 @@ function Header() {
               className="px-4 py-2 rounded-md cursor-pointer transition-all duration-200 font-medium text-sm text-white border border-blue-950 bg-blue-950 hover:text-white hover:border-blue-800 active:bg-blue-900"
               onClick={() => setShowLoginModal(true)}
             >
-              {t('header.login', '로그인')}
+              {t("member.layout.login", "로그인")}
             </button>
           </div>
         )}

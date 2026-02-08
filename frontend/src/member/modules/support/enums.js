@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Support 模块枚举与常量定义
  *
  * 遵循 dev-frontend_patterns skill 规范。

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 首页页面组件 (页面内容布局)
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -43,3 +43,7 @@ const HomePage = memo(function HomePage() {
 });
 
 export default HomePage;
+
+
+
+

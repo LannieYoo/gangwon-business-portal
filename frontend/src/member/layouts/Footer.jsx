@@ -1,9 +1,9 @@
 /**
  * Footer Component - Member Portal
- * 会员端页脚 - Windster Style
+ * 页脚组件 - Windster Style
  *
- * 遵循 dev-frontend_patterns skill 规范。
- * 已重构为组合式组件。
+ * 参考 dev-frontend_patterns skill 构建
+ * 包含版权、服务条款等内容
  */
 
 import { TermsModal } from "@shared/components";

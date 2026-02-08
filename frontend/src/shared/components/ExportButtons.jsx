@@ -1,4 +1,4 @@
-/*
+﻿/*
  * ExportButtons - 通用导出按钮组件
  * 
  * 提供 Excel 和 CSV 导出按钮，可在任何需要导出功能的页面使用
@@ -35,8 +35,8 @@ export const ExportButtons = ({
 }) => {
   const { t } = useTranslation();
 
-  const defaultExcelLabel = t("common.export.excel", "Excel 导出");
-  const defaultCsvLabel = t("common.export.csv", "CSV 导出");
+  const defaultExcelLabel = t("common.export.excel", "Excel 내보내기");
+  const defaultCsvLabel = t("common.export.csv", "CSV 내보내기");
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
@@ -70,3 +70,7 @@ export const ExportButtons = ({
 };
 
 export default ExportButtons;
+
+
+
+

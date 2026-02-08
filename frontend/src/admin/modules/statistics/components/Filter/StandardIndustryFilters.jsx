@@ -4,10 +4,10 @@
 import { Select } from "@shared/components";
 import { useTranslation } from "react-i18next";
 import {
-  KSIC_MAJOR_CATEGORY_KEYS,
-  KSIC_SUB_CATEGORY_KEYS,
-  translateOptions,
-} from "@shared/data/industryClassification";
+  KSIC_MAJOR_CATEGORIES,
+  KSIC_SUB_CATEGORIES,
+  getTranslatedOptions,
+} from "@/shared/enums";
 
 export const StandardIndustryFilters = ({
   codes = [],
@@ -20,20 +20,26 @@ export const StandardIndustryFilters = ({
   const subValue = subCodes && subCodes.length > 0 ? subCodes[0] : "";
 
   // 转换大类选项
-  const majorOptions = translateOptions(KSIC_MAJOR_CATEGORY_KEYS, t);
+  const majorOptions = getTranslatedOptions(
+    KSIC_MAJOR_CATEGORIES,
+    "enums.industry.ksicMajor",
+    t,
+  );
 
   // 根据选择的大类获取中类选项
-  const subCategories = majorValue
-    ? KSIC_SUB_CATEGORY_KEYS[majorValue] || []
-    : [];
-  const subOptions = translateOptions(subCategories, t);
+  const subCategories = majorValue ? KSIC_SUB_CATEGORIES[majorValue] || [] : [];
+  const subOptions = getTranslatedOptions(
+    subCategories,
+    "enums.industry.ksicSub",
+    t,
+  );
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Select
         value={majorValue}
         options={majorOptions}
-        placeholder={t("statistics.filters.industry.major")}
+        placeholder={t("admin.statistics.filters.industry.major")}
         containerClassName="mb-0"
         className="w-48 h-9"
         onChange={(e) => {
@@ -48,7 +54,7 @@ export const StandardIndustryFilters = ({
         value={subValue}
         options={subOptions}
         disabled={!majorValue}
-        placeholder={t("statistics.filters.industry.medium")}
+        placeholder={t("admin.statistics.filters.industry.medium")}
         containerClassName="mb-0"
         className="w-48 h-9"
         onChange={(e) => {

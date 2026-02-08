@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Application Records Page - Member Portal
  * 申请记录查询页面 - 显示会员的项目申请记录
  * Requirements: 7.1-7.14
@@ -495,3 +495,7 @@ export default function ApplicationRecords() {
   );
 
 }
+
+
+
+

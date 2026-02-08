@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Company Profile Header
  *
  * 企业信息页面头部。
@@ -23,7 +23,7 @@ const CompanyProfileHeader = ({
     <div className="mb-6 sm:mb-8 lg:mb-10 flex justify-between items-center gap-4 sm:gap-6 min-h-[48px]">
       <div className="flex items-center gap-3 sm:gap-4">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 m-0">
-          {t('performance.companyInfo.title', '기업 정보')}
+          {t('member.performance.companyInfo.title', '기업 정보')}
         </h1>
         {approvalStatus && (
           <Badge

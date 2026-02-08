@@ -18,6 +18,10 @@
             "cancelReviewConfirm": "정말 취소하시겠습니까? 기록이 심사 대기 상태로 돌아갑니다.",
             "cancelReviewSuccess": "취소 성공",
             "cancelReviewFailed": "취소 실패",
+            "export": {
+                "filename": "실적_리포트",
+                "sheetName": "실적데이터"
+            },
             "exportExcel": "Excel 내보내기",
             "exportCsv": "CSV 내보내기",
             "exportSuccess": "내보내기 성공",
@@ -87,11 +91,11 @@
                 "noAttachments": "이 기록에 첨부 파일이 없습니다",
                 "downloadFailed": "다운로드 실패",
                 "notFound": "실적 기록이 존재하지 않습니다",
-                "draftHint": "（초안 상태，기업이 아직 제출하지 않음）",
-                "submittedHint": "（검토 대기 중）",
-                "revisionHint": "（수정 필요，기업의 보완 대기 중）",
-                "approvedHint": "（승인됨）",
-                "rejectedHint": "（거부됨）"
+                "draftHint": "(초안 상태, 기업이 아직 제출하지 않음)",
+                "submittedHint": "(검토 대기 중)",
+                "revisionHint": "(수정 필요, 기업의 보완 대기 중)",
+                "approvedHint": "(승인됨)",
+                "rejectedHint": "(거부됨)"
             },
             "download": {
                 "multipleFiles": "이 기록에 {count}개의 첨부 파일이 있습니다. 모두 다운로드하시겠습니까?",

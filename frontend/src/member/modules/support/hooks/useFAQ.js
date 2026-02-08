@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FAQ 业务逻辑 Hook
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -53,13 +53,13 @@ export function useFAQ() {
   // FAQ 分类翻译映射
   const categoryTranslations = useMemo(
     () => ({
-      회원가입: t("support.faqCategory.registration", "会员注册"),
-      general: t("support.faqCategory.general", "一般"),
-      성과관리: t("support.faqCategory.performance", "业绩管理"),
-      프로젝트: t("support.faqCategory.project", "项目"),
-      기업프로필: t("support.faqCategory.profile", "企业资料"),
-      "문의/지원": t("support.faqCategory.support", "咨询/支持"),
-      기타: t("support.faqCategory.other", "其他"),
+      회원가입: t("member.support.faqCategory.registration", "회원가입"),
+      general: t("member.support.faqCategory.general", "일반"),
+      성과관리: t("member.support.faqCategory.performance", "성과관리"),
+      프로젝트: t("member.support.faqCategory.project", "지원사업"),
+      기업프로필: t("member.support.faqCategory.profile", "기업프로필"),
+      "문의/지원": t("member.support.faqCategory.support", "문의/지원"),
+      기타: t("member.support.faqCategory.other", "기타"),
     }),
     [t],
   );

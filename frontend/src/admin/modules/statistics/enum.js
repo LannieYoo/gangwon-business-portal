@@ -83,22 +83,28 @@ export const STARTUP_STAGE = {
 };
 
 /**
- * 创业阶段选项列表
+ * 创业阶段选项列表（使用共享 enums 翻译）
  */
 export const STARTUP_STAGE_OPTIONS = [
   {
     value: STARTUP_STAGE.PRE_STARTUP,
-    labelKey: "statistics.filters.stage.preStartup",
+    labelKey: "enums.industry.startupStage.preliminary",
   },
   {
     value: STARTUP_STAGE.INITIAL,
-    labelKey: "statistics.filters.stage.initial",
+    labelKey: "enums.industry.startupStage.startupUnder3Years",
   },
-  { value: STARTUP_STAGE.GROWTH, labelKey: "statistics.filters.stage.growth" },
-  { value: STARTUP_STAGE.LEAP, labelKey: "statistics.filters.stage.leap" },
+  {
+    value: STARTUP_STAGE.GROWTH,
+    labelKey: "enums.industry.startupStage.growthOver7Years",
+  },
+  {
+    value: STARTUP_STAGE.LEAP,
+    labelKey: "enums.industry.startupStage.growthOver7Years", // 跃进期也使用成长期翻译
+  },
   {
     value: STARTUP_STAGE.RE_STARTUP,
-    labelKey: "statistics.filters.stage.reStartup",
+    labelKey: "enums.industry.startupStage.restart",
   },
 ];
 
@@ -130,31 +136,35 @@ export const GANGWON_INDUSTRIES = {
 
 /**
  * 江原道重点产业选项
- * 从统一数据源导入: MAIN_INDUSTRY_KSIC_MAJOR_KEYS
+ * 从共享枚举导入: MAIN_INDUSTRY_KSIC_MAJORS
+ * 翻译键: enums.industry.mainIndustryKsic.*
  */
-import { MAIN_INDUSTRY_KSIC_MAJOR_KEYS } from "@/shared/data/industryClassification";
-export const GANGWON_INDUSTRY_OPTIONS = MAIN_INDUSTRY_KSIC_MAJOR_KEYS;
+import { MAIN_INDUSTRY_KSIC_MAJORS } from "@/shared/enums";
+export const GANGWON_INDUSTRY_OPTIONS = MAIN_INDUSTRY_KSIC_MAJORS;
 
 /**
  * 创业类型选项 (与会员模块同步)
- * 从统一数据源导入: STARTUP_TYPE_KEYS
+ * 从共享枚举导入: STARTUP_TYPES
+ * 翻译键: enums.industry.startupType.*
  */
-import { STARTUP_TYPE_KEYS } from "@/shared/data/industryClassification";
-export const STARTUP_TYPE_OPTIONS = STARTUP_TYPE_KEYS;
+import { STARTUP_TYPES } from "@/shared/enums";
+export const STARTUP_TYPE_OPTIONS = STARTUP_TYPES;
 
 /**
  * 业务领域选项 (Business Field)
- * 从统一数据源导入: BUSINESS_FIELD_KEYS
+ * 从共享枚举导入: BUSINESS_FIELDS
+ * 翻译键: enums.industry.businessField.*
  */
-import { BUSINESS_FIELD_KEYS } from "@/shared/data/industryClassification";
-export const BUSINESS_FIELD_OPTIONS = BUSINESS_FIELD_KEYS;
+import { BUSINESS_FIELDS } from "@/shared/enums";
+export const BUSINESS_FIELD_OPTIONS = BUSINESS_FIELDS;
 
 /**
  * 标准产业分类 (KSIC-大分类)
- * 从统一数据源导入: KSIC_MAJOR_CATEGORY_KEYS
+ * 从共享枚举导入: KSIC_MAJOR_CATEGORIES
+ * 翻译键: enums.industry.ksicMajor.*
  */
-import { KSIC_MAJOR_CATEGORY_KEYS } from "@/shared/data/industryClassification";
-export const MAJOR_INDUSTRY_OPTIONS = KSIC_MAJOR_CATEGORY_KEYS;
+import { KSIC_MAJOR_CATEGORIES } from "@/shared/enums";
+export const MAJOR_INDUSTRY_OPTIONS = KSIC_MAJOR_CATEGORIES;
 
 /**
  * 政策关联选项列表
@@ -162,15 +172,15 @@ export const MAJOR_INDUSTRY_OPTIONS = KSIC_MAJOR_CATEGORY_KEYS;
 export const POLICY_TAGS_OPTIONS = [
   {
     value: POLICY_TAGS.STARTUP_UNIVERSITY,
-    labelKey: "statistics.filters.programs.university", // 匹配韩国语原文：창업중심대학
+    labelKey: "admin.statistics.filters.programs.university", // 匹配韩国语原文：창업중심대학
   },
   {
     value: POLICY_TAGS.GLOBAL_GLOCAL,
-    labelKey: "statistics.filters.programs.global", // 匹配韩国语原文：글로벌사업
+    labelKey: "admin.statistics.filters.programs.global", // 匹配韩国语原文：글로벌사업
   },
   {
     value: POLICY_TAGS.RISE,
-    labelKey: "statistics.filters.programs.rise", // 匹配韩国语原文：RISE 사업단
+    labelKey: "admin.statistics.filters.programs.rise", // 匹配韩国语原文：RISE 사업단
   },
 ];
 
@@ -197,13 +207,16 @@ export const INVESTMENT_STATUS = {
 export const INVESTMENT_STATUS_OPTIONS = [
   {
     value: INVESTMENT_STATUS.ALL,
-    labelKey: "statistics.filters.investment.all",
+    labelKey: "admin.statistics.filters.investment.all",
   },
   {
     value: INVESTMENT_STATUS.YES,
-    labelKey: "statistics.filters.investment.yes",
+    labelKey: "admin.statistics.filters.investment.yes",
   },
-  { value: INVESTMENT_STATUS.NO, labelKey: "statistics.filters.investment.no" },
+  {
+    value: INVESTMENT_STATUS.NO,
+    labelKey: "admin.statistics.filters.investment.no",
+  },
 ];
 
 /**
@@ -218,19 +231,19 @@ export const INVESTMENT_RANGES = {
   RANGE_1000: {
     min: 1000,
     max: null,
-    labelKey: "statistics.filters.investment.range1000",
+    labelKey: "admin.statistics.filters.investment.range1000",
   },
   /** 5000万以上 (5천만원 이상) */
   RANGE_5000: {
     min: 5000,
     max: null,
-    labelKey: "statistics.filters.investment.range5000",
+    labelKey: "admin.statistics.filters.investment.range5000",
   },
   /** 1亿以上 (1억원 이상) */
   RANGE_10000: {
     min: 10000,
     max: null,
-    labelKey: "statistics.filters.investment.range10000",
+    labelKey: "admin.statistics.filters.investment.range10000",
   },
 };
 
@@ -253,16 +266,28 @@ export const INVESTMENT_RANGES_OPTIONS = [
  */
 export const PATENT_RANGES = {
   /** 1个以上 (1개 이상) */
-  RANGE_1: { min: 1, max: null, labelKey: "statistics.filters.patent.range1" },
+  RANGE_1: {
+    min: 1,
+    max: null,
+    labelKey: "admin.statistics.filters.patent.range1",
+  },
   /** 3个以上 (3개 이상) */
-  RANGE_3: { min: 3, max: null, labelKey: "statistics.filters.patent.range3" },
+  RANGE_3: {
+    min: 3,
+    max: null,
+    labelKey: "admin.statistics.filters.patent.range3",
+  },
   /** 5个以上 (5개 이상) */
-  RANGE_5: { min: 5, max: null, labelKey: "statistics.filters.patent.range5" },
+  RANGE_5: {
+    min: 5,
+    max: null,
+    labelKey: "admin.statistics.filters.patent.range5",
+  },
   /** 10个以上 (10개 이상) */
   RANGE_10: {
     min: 10,
     max: null,
-    labelKey: "statistics.filters.patent.range10",
+    labelKey: "admin.statistics.filters.patent.range10",
   },
 };
 
@@ -295,10 +320,13 @@ export const GENDER = {
  * 性别选项列表
  */
 export const GENDER_OPTIONS = [
-  { value: GENDER.MALE, labelKey: "statistics.filters.representative.male" },
+  {
+    value: GENDER.MALE,
+    labelKey: "admin.statistics.filters.representative.male",
+  },
   {
     value: GENDER.FEMALE,
-    labelKey: "statistics.filters.representative.female",
+    labelKey: "admin.statistics.filters.representative.female",
   },
 ];
 
@@ -313,37 +341,37 @@ export const GENDER_OPTIONS = [
 export const REVENUE_RANGE_OPTIONS = [
   {
     value: "under_100m",
-    labelKey: "statistics.filters.quantitive.revenueRange.under100m",
+    labelKey: "admin.statistics.filters.quantitive.revenueRange.under100m",
     min: null,
     max: 100000000,
   },
   {
     value: "100m_500m",
-    labelKey: "statistics.filters.quantitive.revenueRange.100m500m",
+    labelKey: "admin.statistics.filters.quantitive.revenueRange.100m500m",
     min: 100000000,
     max: 500000000,
   },
   {
     value: "500m_1b",
-    labelKey: "statistics.filters.quantitive.revenueRange.500m1b",
+    labelKey: "admin.statistics.filters.quantitive.revenueRange.500m1b",
     min: 500000000,
     max: 1000000000,
   },
   {
     value: "1b_5b",
-    labelKey: "statistics.filters.quantitive.revenueRange.1b5b",
+    labelKey: "admin.statistics.filters.quantitive.revenueRange.1b5b",
     min: 1000000000,
     max: 5000000000,
   },
   {
     value: "5b_10b",
-    labelKey: "statistics.filters.quantitive.revenueRange.5b10b",
+    labelKey: "admin.statistics.filters.quantitive.revenueRange.5b10b",
     min: 5000000000,
     max: 10000000000,
   },
   {
     value: "over_10b",
-    labelKey: "statistics.filters.quantitive.revenueRange.over10b",
+    labelKey: "admin.statistics.filters.quantitive.revenueRange.over10b",
     min: 10000000000,
     max: null,
   },
@@ -358,43 +386,43 @@ export const REVENUE_RANGE_OPTIONS = [
 export const EMPLOYEE_RANGE_OPTIONS = [
   {
     value: "under_5",
-    labelKey: "statistics.filters.quantitive.employeeRange.under5",
+    labelKey: "admin.statistics.filters.quantitive.employeeRange.under5",
     min: null,
     max: 5,
   },
   {
     value: "5_10",
-    labelKey: "statistics.filters.quantitive.employeeRange.5to10",
+    labelKey: "admin.statistics.filters.quantitive.employeeRange.5to10",
     min: 5,
     max: 10,
   },
   {
     value: "10_30",
-    labelKey: "statistics.filters.quantitive.employeeRange.10to30",
+    labelKey: "admin.statistics.filters.quantitive.employeeRange.10to30",
     min: 10,
     max: 30,
   },
   {
     value: "30_50",
-    labelKey: "statistics.filters.quantitive.employeeRange.30to50",
+    labelKey: "admin.statistics.filters.quantitive.employeeRange.30to50",
     min: 30,
     max: 50,
   },
   {
     value: "50_100",
-    labelKey: "statistics.filters.quantitive.employeeRange.50to100",
+    labelKey: "admin.statistics.filters.quantitive.employeeRange.50to100",
     min: 50,
     max: 100,
   },
   {
     value: "100_300",
-    labelKey: "statistics.filters.quantitive.employeeRange.100to300",
+    labelKey: "admin.statistics.filters.quantitive.employeeRange.100to300",
     min: 100,
     max: 300,
   },
   {
     value: "over_300",
-    labelKey: "statistics.filters.quantitive.employeeRange.over300",
+    labelKey: "admin.statistics.filters.quantitive.employeeRange.over300",
     min: 300,
     max: null,
   },
@@ -409,37 +437,37 @@ export const EMPLOYEE_RANGE_OPTIONS = [
 export const AGE_RANGE_OPTIONS = [
   {
     value: "under_20",
-    labelKey: "statistics.filters.representative.ageRange.under20",
+    labelKey: "admin.statistics.filters.representative.ageRange.under20",
     min: null,
     max: 20,
   },
   {
     value: "20_29",
-    labelKey: "statistics.filters.representative.ageRange.20to29",
+    labelKey: "admin.statistics.filters.representative.ageRange.20to29",
     min: 20,
     max: 29,
   },
   {
     value: "30_39",
-    labelKey: "statistics.filters.representative.ageRange.30to39",
+    labelKey: "admin.statistics.filters.representative.ageRange.30to39",
     min: 30,
     max: 39,
   },
   {
     value: "40_49",
-    labelKey: "statistics.filters.representative.ageRange.40to49",
+    labelKey: "admin.statistics.filters.representative.ageRange.40to49",
     min: 40,
     max: 49,
   },
   {
     value: "50_59",
-    labelKey: "statistics.filters.representative.ageRange.50to59",
+    labelKey: "admin.statistics.filters.representative.ageRange.50to59",
     min: 50,
     max: 59,
   },
   {
     value: "over_60",
-    labelKey: "statistics.filters.representative.ageRange.over60",
+    labelKey: "admin.statistics.filters.representative.ageRange.over60",
     min: 60,
     max: null,
   },
@@ -455,60 +483,67 @@ export const AGE_RANGE_OPTIONS = [
  */
 export const WORK_YEARS = {
   /** 3年以下 (3년 이하) */
-  UNDER_3: { min: 0, max: 3, labelKey: "statistics.filters.workYears.under3" },
+  UNDER_3: {
+    min: 0,
+    max: 3,
+    labelKey: "admin.statistics.filters.workYears.under3",
+  },
   /** 3-7年 (3-7년) */
   RANGE_3_7: {
     min: 3,
     max: 7,
-    labelKey: "statistics.filters.workYears.range37",
+    labelKey: "admin.statistics.filters.workYears.range37",
   },
   /** 7年以上 (7년 이상) */
-  OVER_7: { min: 7, max: null, labelKey: "statistics.filters.workYears.over7" },
+  OVER_7: {
+    min: 7,
+    max: null,
+    labelKey: "admin.statistics.filters.workYears.over7",
+  },
 };
 
 /**
  * 江原道地区选项
  * Gangwon Province Regions (7 cities + 11 counties)
- * 使用 profile.regions 翻译键以保持一致性
+ * 使用 enums.regions 翻译键以保持一致性
  */
 export const LOCATION_OPTIONS = [
   // 市 (Cities)
-  { value: "chuncheon", labelKey: "profile.regions.chuncheon" },
-  { value: "wonju", labelKey: "profile.regions.wonju" },
-  { value: "gangneung", labelKey: "profile.regions.gangneung" },
-  { value: "donghae", labelKey: "profile.regions.donghae" },
-  { value: "taebaek", labelKey: "profile.regions.taebaek" },
-  { value: "sokcho", labelKey: "profile.regions.sokcho" },
-  { value: "samcheok", labelKey: "profile.regions.samcheok" },
+  { value: "chuncheon", labelKey: "enums.regions.chuncheon" },
+  { value: "wonju", labelKey: "enums.regions.wonju" },
+  { value: "gangneung", labelKey: "enums.regions.gangneung" },
+  { value: "donghae", labelKey: "enums.regions.donghae" },
+  { value: "taebaek", labelKey: "enums.regions.taebaek" },
+  { value: "sokcho", labelKey: "enums.regions.sokcho" },
+  { value: "samcheok", labelKey: "enums.regions.samcheok" },
   // 郡 (Counties)
-  { value: "hongcheon", labelKey: "profile.regions.hongcheon" },
-  { value: "hoengseong", labelKey: "profile.regions.hoengseong" },
-  { value: "yeongwol", labelKey: "profile.regions.yeongwol" },
-  { value: "pyeongchang", labelKey: "profile.regions.pyeongchang" },
-  { value: "jeongseon", labelKey: "profile.regions.jeongseon" },
-  { value: "cheorwon", labelKey: "profile.regions.cheorwon" },
-  { value: "hwacheon", labelKey: "profile.regions.hwacheon" },
-  { value: "yanggu", labelKey: "profile.regions.yanggu" },
-  { value: "inje", labelKey: "profile.regions.inje" },
-  { value: "goseong", labelKey: "profile.regions.goseong" },
-  { value: "yangyang", labelKey: "profile.regions.yangyang" },
+  { value: "hongcheon", labelKey: "enums.regions.hongcheon" },
+  { value: "hoengseong", labelKey: "enums.regions.hoengseong" },
+  { value: "yeongwol", labelKey: "enums.regions.yeongwol" },
+  { value: "pyeongchang", labelKey: "enums.regions.pyeongchang" },
+  { value: "jeongseon", labelKey: "enums.regions.jeongseon" },
+  { value: "cheorwon", labelKey: "enums.regions.cheorwon" },
+  { value: "hwacheon", labelKey: "enums.regions.hwacheon" },
+  { value: "yanggu", labelKey: "enums.regions.yanggu" },
+  { value: "inje", labelKey: "enums.regions.inje" },
+  { value: "goseong", labelKey: "enums.regions.goseong" },
+  { value: "yangyang", labelKey: "enums.regions.yangyang" },
 ];
 
 /**
  * 江原道7大未来产业选项
  * Gangwon 7 Future Industries
- * 从统一数据源导入: GANGWON_FUTURE_INDUSTRIES
+ * 从共享枚举导入: GANGWON_FUTURE_INDUSTRIES
+ * 翻译键: enums.industry.gangwonIndustry.*
  */
-import {
-  GANGWON_FUTURE_INDUSTRIES,
-  FUTURE_TECHNOLOGIES,
-} from "@/shared/data/industryClassification";
+import { GANGWON_FUTURE_INDUSTRIES, FUTURE_TECHNOLOGIES } from "@/shared/enums";
 export const GANGWON_FUTURE_INDUSTRY_OPTIONS = GANGWON_FUTURE_INDUSTRIES;
 
 /**
  * 未来有望新技术选项
  * Future Promising Technologies
- * 从统一数据源导入: FUTURE_TECHNOLOGIES
+ * 从共享枚举导入: FUTURE_TECHNOLOGIES
+ * 翻译键: enums.industry.futureTech.*
  */
 export const FUTURE_TECHNOLOGY_OPTIONS = FUTURE_TECHNOLOGIES;
 
@@ -559,14 +594,20 @@ export const SORT_ORDER = {
 export const SORT_FIELD_OPTIONS = [
   {
     value: SORT_FIELD.ENTERPRISE_NAME,
-    labelKey: "statistics.sort.companyName",
+    labelKey: "admin.statistics.sort.companyName",
   },
   {
     value: SORT_FIELD.TOTAL_INVESTMENT,
-    labelKey: "statistics.sort.investment",
+    labelKey: "admin.statistics.sort.investment",
   },
-  { value: SORT_FIELD.PATENT_COUNT, labelKey: "statistics.sort.patentCount" },
-  { value: SORT_FIELD.ANNUAL_REVENUE, labelKey: "statistics.sort.revenue" },
+  {
+    value: SORT_FIELD.PATENT_COUNT,
+    labelKey: "admin.statistics.sort.patentCount",
+  },
+  {
+    value: SORT_FIELD.ANNUAL_REVENUE,
+    labelKey: "admin.statistics.sort.revenue",
+  },
 ];
 
 // ==================== 分页配置 ====================
@@ -635,19 +676,19 @@ export const TABLE_COLUMN_CONFIGS = [
   // 时间维度
   {
     key: TABLE_COLUMNS.YEAR,
-    labelKey: "statistics.table.year",
+    labelKey: "admin.statistics.table.year",
     width: 80,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.QUARTER,
-    labelKey: "statistics.table.quarter",
+    labelKey: "admin.statistics.table.quarter",
     width: 80,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.MONTH,
-    labelKey: "statistics.table.month",
+    labelKey: "admin.statistics.table.month",
     width: 70,
     align: "center",
   },
@@ -655,13 +696,13 @@ export const TABLE_COLUMN_CONFIGS = [
   // 基本信息
   {
     key: TABLE_COLUMNS.BUSINESS_REG_NO,
-    labelKey: "statistics.table.businessRegNo",
+    labelKey: "admin.statistics.table.businessRegNo",
     width: 130,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.ENTERPRISE_NAME,
-    labelKey: "statistics.table.enterpriseName",
+    labelKey: "admin.statistics.table.enterpriseName",
     width: 180,
     align: "center",
   },
@@ -669,7 +710,7 @@ export const TABLE_COLUMN_CONFIGS = [
   // 快速筛选组
   {
     key: TABLE_COLUMNS.POLICY_TAGS,
-    labelKey: "statistics.table.programs",
+    labelKey: "admin.statistics.table.programs",
     width: 140,
     align: "center",
   },
@@ -677,55 +718,55 @@ export const TABLE_COLUMN_CONFIGS = [
   // 企业特征组
   {
     key: TABLE_COLUMNS.KSIC_MAJOR,
-    labelKey: "statistics.table.ksicMajor",
+    labelKey: "admin.statistics.table.ksicMajor",
     width: 150,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.KSIC_SUB,
-    labelKey: "statistics.table.ksicSub",
+    labelKey: "admin.statistics.table.ksicSub",
     width: 150,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.GANGWON_INDUSTRY,
-    labelKey: "statistics.table.gangwonIndustry",
+    labelKey: "admin.statistics.table.gangwonIndustry",
     width: 150,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.GANGWON_INDUSTRY_SUB,
-    labelKey: "statistics.table.gangwonIndustrySub",
+    labelKey: "admin.statistics.table.gangwonIndustrySub",
     width: 150,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.GANGWON_FUTURE_INDUSTRY,
-    labelKey: "statistics.table.gangwonFutureIndustry",
+    labelKey: "admin.statistics.table.gangwonFutureIndustry",
     width: 150,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.FUTURE_TECH,
-    labelKey: "statistics.table.futureTech",
+    labelKey: "admin.statistics.table.futureTech",
     width: 150,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.WORK_YEARS,
-    labelKey: "statistics.table.workYears",
+    labelKey: "admin.statistics.table.workYears",
     width: 90,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.STARTUP_STAGE,
-    labelKey: "statistics.table.startupStage",
+    labelKey: "admin.statistics.table.startupStage",
     width: 100,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.REGION,
-    labelKey: "statistics.table.region",
+    labelKey: "admin.statistics.table.region",
     width: 120,
     align: "center",
   },
@@ -733,31 +774,31 @@ export const TABLE_COLUMN_CONFIGS = [
   // 经营指标组
   {
     key: TABLE_COLUMNS.TOTAL_INVESTMENT,
-    labelKey: "statistics.table.investmentAmount",
+    labelKey: "admin.statistics.table.investmentAmount",
     width: 110,
     align: "right",
   },
   {
     key: TABLE_COLUMNS.ANNUAL_REVENUE,
-    labelKey: "statistics.table.revenue",
+    labelKey: "admin.statistics.table.revenue",
     width: 110,
     align: "right",
   },
   {
     key: TABLE_COLUMNS.EXPORT_AMOUNT,
-    labelKey: "statistics.table.exportAmount",
+    labelKey: "admin.statistics.table.exportAmount",
     width: 110,
     align: "right",
   },
   {
     key: TABLE_COLUMNS.EMPLOYEE_COUNT,
-    labelKey: "statistics.table.employeeCount",
+    labelKey: "admin.statistics.table.employeeCount",
     width: 80,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.PATENT_COUNT,
-    labelKey: "statistics.table.patentCount",
+    labelKey: "admin.statistics.table.patentCount",
     width: 70,
     align: "center",
   },
@@ -765,13 +806,13 @@ export const TABLE_COLUMN_CONFIGS = [
   // 代表者信息组
   {
     key: TABLE_COLUMNS.REPRESENTATIVE_GENDER,
-    labelKey: "statistics.table.representativeGender",
+    labelKey: "admin.statistics.table.representativeGender",
     width: 80,
     align: "center",
   },
   {
     key: TABLE_COLUMNS.REPRESENTATIVE_AGE,
-    labelKey: "statistics.table.representativeAge",
+    labelKey: "admin.statistics.table.representativeAge",
     width: 80,
     align: "center",
   },
@@ -883,114 +924,27 @@ export const UI_EXTENDED_PARAMS = {
   ageRange: "all",
 };
 
-/**
- * 政策标签 -> i18n key 映射
- * 数据库可能存储多种格式，需要统一映射
- */
-export const POLICY_TAG_I18N_MAP = {
-  // 小写下划线格式 (标准格式)
-  startup_university: "statistics.filters.participation.startup_university",
-  global_glocal: "statistics.filters.participation.global_glocal",
-  rise: "statistics.filters.participation.rise",
-  // 大写格式 (旧数据兼容)
-  STARTUP_UNIVERSITY: "statistics.filters.participation.startup_university",
-  GLOBAL_GLOCAL: "statistics.filters.participation.global_glocal",
-  RISE: "statistics.filters.participation.rise",
-  // 驼峰格式 (旧数据兼容)
-  startupCenterUniversity:
-    "statistics.filters.participation.startup_university",
-  globalBusiness: "statistics.filters.participation.global_glocal",
-  riseBusiness: "statistics.filters.participation.rise",
-  // 其他变体
-  startup_center_university:
-    "statistics.filters.participation.startup_university",
-  global_business: "statistics.filters.participation.global_glocal",
-  rise_business: "statistics.filters.participation.rise",
-  // 中文文本（旧数据兼容）
-  创业中心大学: "statistics.filters.participation.startup_university",
-  全球事业: "statistics.filters.participation.global_glocal",
-  "全球·글로컬 사업": "statistics.filters.participation.global_glocal",
-  "글로벌 사업": "statistics.filters.participation.global_glocal",
-  "글로벌·글로컬 사업": "statistics.filters.participation.global_glocal",
-  "RISE 사업단": "statistics.filters.participation.rise",
-  "RISE 事业团": "statistics.filters.participation.rise",
-  RISE事业: "statistics.filters.participation.rise",
-  RISE사업: "statistics.filters.participation.rise",
-  // 特殊值
-  无: null, // 不显示
-  없음: null, // 不显示
-  none: null, // 不显示
-  None: null, // 不显示
-  "": null, // 空字符串不显示
-};
-
-/**
- * 创业阶段 -> i18n key 映射
- */
-export const STARTUP_STAGE_I18N_MAP = {
-  pre_startup: "statistics.filters.stage.preStartup",
-  initial: "statistics.filters.stage.initial",
-  growth: "statistics.filters.stage.growth",
-  leap: "statistics.filters.stage.leap",
-  re_startup: "statistics.filters.stage.reStartup",
-  startup_under_3years: "statistics.filters.stage.startupUnder3Years",
-  startup_3_to_7years: "statistics.filters.stage.startup3To7Years",
-  startup_over_7years: "statistics.filters.stage.startupOver7Years",
-  // 其他可能的数据库值
-  village_enterprise: "industryClassification.startupType.village_enterprise",
-  youth_enterprise: "industryClassification.startupType.youth_enterprise",
-  student_startup: "industryClassification.startupType.student_startup",
-  faculty_startup: "industryClassification.startupType.faculty_startup",
-  women_enterprise: "industryClassification.startupType.women_enterprise",
-  venture_company: "industryClassification.startupType.venture_company",
-  social_enterprise: "industryClassification.startupType.social_enterprise",
-};
-
-/**
- * 字段翻译路径映射
- * Field Translation Path Mapping
- *
- * 用于 StatisticsTable 中快速查找字段对应的翻译路径
- */
-export const FIELD_TRANSLATION_PATHS = {
-  // KSIC 产业分类
-  ksicMajor: "industryClassification.ksicMajor",
-  ksicSub: "industryClassification.ksicSub",
-
-  // 江原道产业分类
-  gangwonIndustry: "industryClassification.mainIndustryKsic", // 江原主导产业
-  gangwonFutureIndustry: "industryClassification.gangwonIndustry", // 江原7大未来产业
-
-  // 技术和地区
-  futureTech: "industryClassification.futureTech",
-  region: "statistics.filters.location", // 修复：使用正确的翻译路径
-
-  // 创业阶段
-  startupStage: "statistics.filters.stage",
-
-  // 性别
-  representativeGender: "statistics.table",
-};
-
-/**
- * 获取字段的翻译文本
- * @param {Function} t - i18n 翻译函数
- * @param {string} fieldKey - 字段键名
- * @param {string} value - 字段值
- * @returns {string} 翻译后的文本，如果找不到翻译则返回原值
- */
-export const getFieldTranslation = (t, fieldKey, value) => {
-  if (!value) return "-";
-
-  const basePath = FIELD_TRANSLATION_PATHS[fieldKey];
-  if (!basePath) return value;
-
-  const translationKey = `${basePath}.${value}`;
-  const translated = t(translationKey);
-
-  // 如果翻译键不存在，t() 会返回键本身
-  return translated !== translationKey ? translated : value;
-};
+// ==================== 翻译辅助函数 (已迁移) ====================
+//
+// 以下功能已迁移到 @/shared/hooks/useEnumTranslation.js
+// 请使用 useEnumTranslation hook 中的 translateFieldValue 方法
+//
+// 迁移的内容:
+// - POLICY_TAG_I18N_MAP -> hook 内部常量
+// - STARTUP_STAGE_I18N_MAP -> hook 内部常量
+// - GANGWON_FUTURE_INDUSTRY_I18N_MAP -> hook 内部常量
+// - FIELD_TRANSLATION_PATHS -> hook 内部常量
+// - getFieldTranslation() -> translateFieldValue() 方法
+//
+// 使用示例:
+// ```jsx
+// import { useEnumTranslation } from "@/shared/hooks/useEnumTranslation";
+//
+// function MyComponent() {
+//   const { translateFieldValue } = useEnumTranslation();
+//   return <span>{translateFieldValue('policyTags', data.policyTags)}</span>;
+// }
+// ```
 
 /**
  * 完整的 UI 筛选参数 (后端参数 + UI 扩展参数)

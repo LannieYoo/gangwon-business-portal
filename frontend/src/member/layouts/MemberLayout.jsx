@@ -1,8 +1,8 @@
 /**
  * Member Portal Layout
- * 企业会员端主布局
+ * 会员端布局组件
  *
- * 遵循 dev-frontend_patterns skill 规范。
+ * 参考 dev-frontend_patterns skill 构建
  */
 
 import { Outlet } from "react-router-dom";
@@ -19,8 +19,8 @@ function MemberLayout() {
       <Header />
 
       {/* 
-        pt-[70px] 对应 desktop header 高度 
-        max-md:pt-[60px] 对应 mobile header 高度
+        pt-[70px] 配合 desktop header 高度 
+        max-md:pt-[60px] 配合 mobile header 高度
       */}
       <div className="flex flex-1 flex-col pt-[70px] max-md:pt-[60px]">
         <main className="flex-1 flex flex-col w-full bg-gray-50">

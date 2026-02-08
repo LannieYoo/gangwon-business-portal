@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Support 模块入口视图 (重定向)
  *
  * 遵循 dev-frontend_patterns skill 规范。

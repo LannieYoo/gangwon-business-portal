@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Inquiry History Page - Member Portal
  * 1:1 문의 내역 페이지
  */
@@ -50,3 +50,7 @@ export default function InquiryHistoryPage() {
     </div>
   );
 }
+
+
+
+

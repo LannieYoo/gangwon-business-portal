@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HomeList Component
  * 首页列表组件 - 用于展示公告、项目等内容的网格列表
  */
@@ -159,7 +159,7 @@ function HomeList({
                   {selectedItem.attachments && selectedItem.attachments.length > 0 && (
                     <div className="border-t pt-4 mt-4">
                       <h4 className="text-sm font-medium text-gray-700 mb-3">
-                        {t('fileAttachments.attachments', '첨부파일')} ({selectedItem.attachments.length})
+                        {t('components.fileUpload.attachments', '첨부파일')} ({selectedItem.attachments.length})
                       </h4>
                       <div className="space-y-2">
                         {(() => {
@@ -231,3 +231,7 @@ function HomeList({
 }
 
 export default HomeList;
+
+
+
+

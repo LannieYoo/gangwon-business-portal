@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Confirm Modal Component
  */
 
@@ -35,3 +35,7 @@ export default function ConfirmModal({
     </Modal>
   );
 }
+
+
+
+

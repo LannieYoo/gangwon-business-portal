@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 项目列表业务逻辑 Hook
  *
  * 处理项目拉取、筛选、搜索、申请弹窗状态及申请逻辑。
@@ -118,9 +118,9 @@ export function useProjectList() {
         key: "actions",
         render: (_, row) => {
           if (row.status === ProjectStatus.ACTIVE) {
-            return t("projects.apply", "程序申请");
+            return t("member.projects.apply", "프로그램 신청");
           }
-          return t("projects.notAvailable", "不可申请");
+          return t("member.projects.notAvailable", "신청 불가");
         },
       },
     ],

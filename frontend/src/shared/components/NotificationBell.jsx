@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Notification Bell Component
  * 右上角通知图标组件 - 下拉框形式
  *
@@ -13,7 +13,11 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@shared/components";
 import { formatDateTime } from "@shared/utils";
-import { parseNotification, getNotificationTranslationKey, formatNotificationParams } from "@shared/utils/notificationParser";
+import {
+  parseNotification,
+  getNotificationTranslationKey,
+  formatNotificationParams,
+} from "@shared/utils/notificationParser";
 import { EnvelopeIcon, EnvelopeOpenIcon } from "@shared/components/Icons";
 import ThreadDetailModal from "./ThreadDetailModal";
 
@@ -49,19 +53,19 @@ export default function NotificationBell({
   const translateNotification = (msg) => {
     // 尝试解析 JSON 格式的通知
     const parsedData = parseNotification(msg.subject, msg.content);
-    
+
     if (parsedData) {
       // 是结构化通知，使用翻译
-      const subjectKey = getNotificationTranslationKey(parsedData, 'subject');
-      const contentKey = getNotificationTranslationKey(parsedData, 'content');
+      const subjectKey = getNotificationTranslationKey(parsedData, "subject");
+      const contentKey = getNotificationTranslationKey(parsedData, "content");
       const params = formatNotificationParams(parsedData);
-      
+
       return {
         subject: subjectKey ? t(subjectKey, params) : msg.subject,
         content: contentKey ? t(contentKey, params) : msg.content,
       };
     }
-    
+
     // 不是结构化通知，直接返回原文
     return {
       subject: msg.subject,
@@ -105,8 +109,8 @@ export default function NotificationBell({
           .map((thread) => ({
             id: thread.id,
             subject: thread.subject,
-            content: t("notifications.fromMember", {
-              name: thread.memberName || t("admin.messages.thread.member"),
+            content: t("components.notification.fromMember", {
+              name: thread.memberName || t("common.member"),
             }),
             isRead: false,
             isImportant: false,
@@ -154,7 +158,7 @@ export default function NotificationBell({
           .map((thread) => ({
             id: thread.id,
             subject: thread.subject,
-            content: t("notifications.adminReplied"),
+            content: t("components.notification.adminReplied"),
             isRead: false,
             isImportant: false,
             createdAt: thread.lastMessageAt || thread.createdAt,
@@ -225,13 +229,13 @@ export default function NotificationBell({
     const handleNotificationRead = () => {
       loadUnreadCount();
     };
-    window.addEventListener('notification-read', handleNotificationRead);
+    window.addEventListener("notification-read", handleNotificationRead);
 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
-      window.removeEventListener('notification-read', handleNotificationRead);
+      window.removeEventListener("notification-read", handleNotificationRead);
     };
   }, [userType]);
 
@@ -332,7 +336,7 @@ export default function NotificationBell({
               </h3>
               {unreadCount > 0 && (
                 <Badge variant="error" size="sm">
-                  {unreadCount} {t("notifications.unread")}
+                  {unreadCount} {t("components.notification.unread")}
                 </Badge>
               )}
             </div>
@@ -346,7 +350,7 @@ export default function NotificationBell({
               ) : notifications.length === 0 ? (
                 <div className="py-8 text-center">
                   <p className="text-sm text-gray-500">
-                    {t("notifications.empty")}
+                    {t("components.notification.empty")}
                   </p>
                 </div>
               ) : (
@@ -357,8 +361,8 @@ export default function NotificationBell({
                       <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
                         <h4 className="text-xs font-semibold text-gray-600 uppercase">
                           {userType === "admin"
-                            ? t("notifications.memberInquiries")
-                            : t("notifications.adminReplies")}
+                            ? t("components.notification.memberInquiries")
+                            : t("components.notification.adminReplies")}
                         </h4>
                       </div>
                       <div className="divide-y divide-gray-100">
@@ -389,7 +393,7 @@ export default function NotificationBell({
                                     </h4>
                                     {notification.isImportant && (
                                       <Badge variant="error" size="sm">
-                                        {t("notifications.important")}
+                                        {t("components.notification.important")}
                                       </Badge>
                                     )}
                                     {!notification.isRead && (
@@ -419,7 +423,7 @@ export default function NotificationBell({
                     <div>
                       <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
                         <h4 className="text-xs font-semibold text-gray-600 uppercase">
-                          {t("notifications.systemNotifications")}
+                          {t("components.notification.systemNotifications")}
                         </h4>
                       </div>
                       <div className="divide-y divide-gray-100">
@@ -450,7 +454,7 @@ export default function NotificationBell({
                                     </h4>
                                     {notification.isImportant && (
                                       <Badge variant="error" size="sm">
-                                        {t("notifications.important")}
+                                        {t("components.notification.important")}
                                       </Badge>
                                     )}
                                     {!notification.isRead && (
@@ -495,7 +499,7 @@ export default function NotificationBell({
                     }}
                     className="block w-full text-center text-sm text-primary-600 hover:text-primary-800 font-medium bg-transparent border-none cursor-pointer"
                   >
-                    {t("notifications.viewAllInquiries")}
+                    {t("components.notification.viewAllInquiries")}
                   </button>
 
                   {/* 直接消息查看全部 */}
@@ -510,7 +514,7 @@ export default function NotificationBell({
                     }}
                     className="block w-full text-center text-sm text-primary-600 hover:text-primary-800 font-medium bg-transparent border-none cursor-pointer"
                   >
-                    {t("notifications.viewAllNotifications")}
+                    {t("components.notification.viewAllNotifications")}
                   </button>
                 </>
               ) : notifications.length > 0 ? (
@@ -535,7 +539,7 @@ export default function NotificationBell({
                   }}
                   className="block w-full text-center text-sm text-primary-600 hover:text-primary-800 font-medium bg-transparent border-none cursor-pointer"
                 >
-                  {t("notifications.viewAll")}
+                  {t("components.notification.viewAll")}
                 </button>
               ) : null}
             </div>

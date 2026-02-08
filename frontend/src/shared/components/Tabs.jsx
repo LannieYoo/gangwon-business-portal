@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tabs Component
  * 标签页组件
  */
@@ -48,3 +48,7 @@ export function Tabs({ tabs, activeTab, onChange, className, ...props }) {
 }
 
 export default Tabs;
+
+
+
+

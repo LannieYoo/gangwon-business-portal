@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 公告事项预览组件
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -18,11 +18,11 @@ export default function NoticesPreview() {
 
   return (
     <HomePreview
-      title={t('home.notices.title', '공지사항')}
+      title={t("member.home.notices.title", "공지사항")}
       viewAllLink={ROUTES.MEMBER_SUPPORT_NOTICES}
       items={notices}
       loading={loading}
-      emptyMessage={t('home.notices.empty', '공고가 없습니다')}
+      emptyMessage={t("member.home.notices.empty", "공고가 없습니다")}
       onItemClick={handleNoticeClick}
       getBadgeInfo={getBadgeInfo}
       showModal={false}

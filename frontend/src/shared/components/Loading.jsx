@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Loading Component
  */
 
@@ -41,3 +41,7 @@ export function LoadingOverlay({ text }) {
 }
 
 export default Loading;
+
+
+
+

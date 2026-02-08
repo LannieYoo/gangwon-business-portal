@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Error Boundary Component
  * 
  * React error boundary to catch JavaScript errors in child components
@@ -150,3 +150,7 @@ function ErrorBoundaryContent({ error, errorInfo, retryCount, maxRetries, onRese
 }
 
 export default ErrorBoundary;
+
+
+
+

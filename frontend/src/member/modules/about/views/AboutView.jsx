@@ -1,4 +1,4 @@
-/**
+﻿/**
  * About View - System Information
  * 系统介绍页面视图
  *
@@ -39,3 +39,7 @@ const AboutView = () => {
 };
 
 export default AboutView;
+
+
+
+

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Banner Component - Generic
  * 通用横幅组件 - 简化版，以性能为主
  * 
@@ -159,3 +159,7 @@ export default function Banner({
 
 // Export the useIsMobile hook for use in other components
 export { useIsMobile };
+
+
+
+

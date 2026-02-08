@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Company Info Hook
  *
  * 处理企业信息的业务逻辑。
@@ -181,7 +181,7 @@ export const useCompanyInfo = () => {
       if (field === "phone" && value && !/^[\d\s\-+()]+$/.test(value)) {
         errors.phone = t(
           "performance.companyInfo.validation.invalidPhone",
-          "请输入有效的电话号码",
+          "유효한 전화번호를 입력해주세요",
         );
       } else if (
         field === "website" &&
@@ -190,7 +190,7 @@ export const useCompanyInfo = () => {
       ) {
         errors.website = t(
           "performance.companyInfo.validation.invalidWebsite",
-          "请输入有效的网站地址",
+          "유효한 웹사이트 주소를 입력해주세요",
         );
       } else if (
         field === "email" &&
@@ -199,7 +199,7 @@ export const useCompanyInfo = () => {
       ) {
         errors.email = t(
           "performance.companyInfo.validation.invalidEmail",
-          "请输入有效的邮箱地址",
+          "유효한 이메일 주소를 입력해주세요",
         );
       } else {
         delete errors[field];
@@ -303,7 +303,7 @@ export const useCompanyInfo = () => {
     if (Object.keys(fieldErrors).length > 0) {
       setMessageVariant("error");
       setMessage(
-        t("performance.companyInfo.validation.fieldErrors", "请修正表单错误"),
+        t("member.performance.companyInfo.validation.fieldErrors", "다음 오류를 수정해주세요: {{errors}}"),
       );
       return;
     }
@@ -314,7 +314,7 @@ export const useCompanyInfo = () => {
         .join(", ");
       setMessageVariant("error");
       setMessage(
-        t("performance.companyInfo.validation.missingRequiredFields", {
+        t("member.performance.companyInfo.validation.missingRequiredFields", {
           fields: missingFieldNames,
         }),
       );
@@ -376,13 +376,13 @@ export const useCompanyInfo = () => {
       await performanceService.updateCompanyProfile(saveData);
       setIsEditing(false);
       setMessageVariant("success");
-      setMessage(t("performance.companyInfo.message.saveSuccess", "保存成功"));
+      setMessage(t("member.performance.companyInfo.message.saveSuccess", "저장되었습니다"));
       setTimeout(() => setMessage(null), 3000);
       await loadProfile();
     } catch (error) {
       console.error("Failed to save profile:", error);
       setMessageVariant("error");
-      setMessage(t("common.saveFailed", "保存失败"));
+      setMessage(t("common.saveFailed", "저장에 실패했습니다"));
     } finally {
       setSaving(false);
     }
@@ -411,12 +411,12 @@ export const useCompanyInfo = () => {
       }));
       setMessageVariant("success");
       setMessage(
-        t("performance.companyInfo.message.logoUploadSuccess", "Logo上传成功"),
+        t("member.performance.companyInfo.message.logoUploadSuccess", "로고 업로드 성공"),
       );
       setTimeout(() => setMessage(null), 3000);
     } catch (err) {
       setMessageVariant("error");
-      setMessage(t("common.uploadFailed", "上传失败"));
+      setMessage(t("common.uploadFailed", "업로드에 실패했습니다"));
     }
   };
 

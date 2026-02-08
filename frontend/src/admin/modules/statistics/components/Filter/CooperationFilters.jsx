@@ -25,7 +25,13 @@ export const CooperationFilters = ({ values = [], onChange }) => {
       {COOPERATION_OPTIONS.map((opt) => (
         <Checkbox
           key={opt.value}
-          label={t(`statistics.filters.cooperation.${opt.value}`)}
+          label={
+            {
+              tech: t("admin.statistics.filters.cooperation.tech"),
+              market: t("admin.statistics.filters.cooperation.market"),
+              talent: t("admin.statistics.filters.cooperation.talent"),
+            }[opt.value] || opt.value
+          }
           checked={values.includes(opt.value)}
           onChange={(checked) => handleToggle(opt.value, checked)}
           className="py-1.5"

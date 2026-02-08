@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Upload Progress Component
  * 
  * Displays file upload progress with a progress bar
@@ -45,4 +45,8 @@ export default function UploadProgress({
     </div>
   );
 }
+
+
+
+
 

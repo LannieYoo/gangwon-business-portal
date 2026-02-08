@@ -4,10 +4,10 @@
 import { Select } from "@shared/components";
 import { useTranslation } from "react-i18next";
 import {
-  MAIN_INDUSTRY_KSIC_MAJOR_KEYS,
+  MAIN_INDUSTRY_KSIC_MAJORS,
   MAIN_INDUSTRY_KSIC_CODES,
-  translateOptions,
-} from "@shared/data/industryClassification";
+  getTranslatedOptions,
+} from "@/shared/enums";
 
 export const IndustryFilters = ({ codes = [], subCodes = [], onChange }) => {
   const { t } = useTranslation();
@@ -16,13 +16,21 @@ export const IndustryFilters = ({ codes = [], subCodes = [], onChange }) => {
   const subValue = subCodes && subCodes.length > 0 ? subCodes[0] : "";
 
   // 转换大类选项
-  const majorOptions = translateOptions(MAIN_INDUSTRY_KSIC_MAJOR_KEYS, t);
+  const majorOptions = getTranslatedOptions(
+    MAIN_INDUSTRY_KSIC_MAJORS,
+    "enums.industry.mainIndustryKsic",
+    t,
+  );
 
   // 根据大类获取细分选项
   const subCategories = majorValue
     ? MAIN_INDUSTRY_KSIC_CODES[majorValue] || []
     : [];
-  const subOptions = translateOptions(subCategories, t);
+  const subOptions = getTranslatedOptions(
+    subCategories,
+    "enums.industry.mainIndustryKsicCodes",
+    t,
+  );
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -42,9 +50,10 @@ export const IndustryFilters = ({ codes = [], subCodes = [], onChange }) => {
         value={subValue}
         options={subOptions}
         disabled={!majorValue}
-        placeholder={
-          t("member.mainIndustryKsicCodes", "주력산업 KSIC 세부 코드")
-        }
+        placeholder={t(
+          "member.mainIndustryKsicCodes",
+          "주력산업 KSIC 세부 코드",
+        )}
         containerClassName="mb-0"
         className="w-48 h-9"
         onChange={(e) => {

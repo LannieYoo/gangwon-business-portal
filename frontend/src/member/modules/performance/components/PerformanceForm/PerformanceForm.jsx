@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Performance Form Component
  *
  * 成果输入表单。
@@ -46,23 +46,23 @@ const PerformanceForm = () => {
   const tabs = [
     {
       key: "salesEmployment",
-      label: t('performance.tabs.salesEmployment', '매출 고용'),
+      label: t('member.performance.tabs.salesEmployment', '매출 고용'),
     },
     {
       key: "governmentSupport",
-      label: t('performance.tabs.governmentSupport', '정부지원 수혜 이력'),
+      label: t('member.performance.tabs.governmentSupport', '정부지원 수혜 이력'),
     },
     {
       key: "intellectualProperty",
-      label: t('performance.tabs.intellectualProperty', '지식재산권'),
+      label: t('member.performance.tabs.intellectualProperty', '지식재산권'),
     },
   ];
 
   const quarterOptions = [
-    { value: "1", label: t('performance.quarter1', '1분기') },
-    { value: "2", label: t('performance.quarter2', '2분기') },
-    { value: "3", label: t('performance.quarter3', '3분기') },
-    { value: "4", label: t('performance.quarter4', '4분기') },
+    { value: "1", label: t('member.performance.quarter1', '1분기') },
+    { value: "2", label: t('member.performance.quarter2', '2분기') },
+    { value: "3", label: t('member.performance.quarter3', '3분기') },
+    { value: "4", label: t('member.performance.quarter4', '4분기') },
   ];
 
   return (
@@ -70,8 +70,8 @@ const PerformanceForm = () => {
       <div className="mb-6 sm:mb-8 lg:mb-10 flex justify-between items-center gap-4 min-h-[48px]">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 m-0">
           {id
-            ? t('performance.edit', '성과 수정')
-            : t('performance.createNew', '성과 등록')}
+            ? t('member.performance.edit', '성과 수정')
+            : t('member.performance.createNew', '성과 등록')}
         </h1>
         <div className="flex gap-3 flex-shrink-0">
           <Button
@@ -79,7 +79,7 @@ const PerformanceForm = () => {
             variant="secondary"
             disabled={saving}
           >
-            {t('performance.saveDraft', '임시저장')}
+            {t('member.performance.saveDraft', '임시저장')}
           </Button>
           <Button
             onClick={() => setSubmitConfirm({ open: true })}
@@ -94,11 +94,11 @@ const PerformanceForm = () => {
       <Card className="mb-6">
         <div className="p-6">
           <h2 className="text-lg font-semibold mb-4">
-            {t("performance.sections.basicInfo", "기본 정보")}
+            {t("member.performance.sections.basicInfo", "기본 정보")}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label={t("performance.year", "연도")}
+              label={t("member.performance.year", "연도")}
               type="number"
               value={formData.year}
               onChange={(e) =>
@@ -110,11 +110,11 @@ const PerformanceForm = () => {
               required
             />
             <Select
-              label={t("performance.quarter", "분기")}
+              label={t("member.performance.quarter", "분기")}
               value={formData.quarter}
               onChange={(e) => handleChange("quarter", e.target.value)}
               options={quarterOptions}
-              placeholder={t("performance.annual", "연간")}
+              placeholder={t("member.performance.annual", "연간")}
             />
           </div>
         </div>

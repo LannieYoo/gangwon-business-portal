@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Thread Detail Modal Component
  * 消息详情模态框 - 可复用组件（精简版）
  * 
@@ -302,3 +302,7 @@ export default function ThreadDetailModal({
     </Modal>
   );
 }
+
+
+
+

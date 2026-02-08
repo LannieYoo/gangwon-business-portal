@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FAQ Management Component - Admin Portal
  * FAQ管理组件
  */
@@ -390,7 +390,7 @@ function FAQForm({ initialValues, onSubmit, onCancel, categoryOptions }) {
 
       <div className="flex justify-end gap-3 mt-6">
         <Button variant="outline" onClick={onCancel}>
-          {t('common.cancel', '取消')}
+          {t('common.cancel', '취소')}
         </Button>
         <Button loading={loading} onClick={handleSubmit}>
           {t('common.save', '저장')}
@@ -399,3 +399,6 @@ function FAQForm({ initialValues, onSubmit, onCancel, categoryOptions }) {
     </div>
   );
 }
+
+
+

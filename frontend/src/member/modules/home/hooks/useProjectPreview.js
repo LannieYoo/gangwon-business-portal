@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 支援事业预览 Hook
  *
  * 遵循 dev-frontend_patterns skill 规范。
@@ -38,29 +38,30 @@ export function useProjectPreview() {
     return [];
   }, [i18n.language]);
 
-  const { data: projects, loading, error, refresh } = useApiCache(
-    fetchProjects,
-    'projects-preview',
-    {
-      cacheDuration: 1 * 60 * 1000, // 1分钟缓存
-      enabled: true,
-      deps: [i18n.language]
-    }
-  );
+  const {
+    data: projects,
+    loading,
+    error,
+    refresh,
+  } = useApiCache(fetchProjects, "projects-preview", {
+    cacheDuration: 1 * 60 * 1000, // 1分钟缓存
+    enabled: true,
+    deps: [i18n.language],
+  });
 
   const getBadgeInfo = useCallback(
     (project) => {
       const statusMap = {
         active: {
-          text: t("projects.status.active", "进行中"),
+          text: t("member.projects.status.active", "진행중"),
           variant: "success",
         },
         inactive: {
-          text: t("projects.status.inactive", "已结束"),
+          text: t("member.projects.status.inactive", "비활성"),
           variant: "secondary",
         },
         archived: {
-          text: t("projects.status.archived", "已归档"),
+          text: t("member.projects.status.archived", "보관됨"),
           variant: "secondary",
         },
       };
