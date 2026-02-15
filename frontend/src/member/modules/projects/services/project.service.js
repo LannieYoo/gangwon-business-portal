@@ -39,6 +39,14 @@ class ProjectService {
       `${API_PREFIX}/member/applications/${applicationId}/cancel`,
     );
   }
+
+  // 보충자료 제출
+  async submitSupplement(applicationId, attachments) {
+    return await apiService.post(
+      `${API_PREFIX}/member/applications/${applicationId}/supplement`,
+      { attachments },
+    );
+  }
 }
 
 export const projectService = new ProjectService();

@@ -72,15 +72,15 @@ export default function Submenu({
       className={cn(
         "relative w-full z-10 mt-0 mb-6 flex items-center justify-between",
         "min-h-[50px] bg-white border-b-2 border-gray-300 shadow-sm",
-        "px-8 lg:px-6 md:px-4",
+        "px-8 lg:px-6 md:px-4 max-sm:px-2",
         className,
       )}
     >
       <div className="flex items-center gap-4 flex-shrink-0 min-w-0">
         {renderLeft && renderLeft({ title: activeTitle })}
       </div>
-      <div className="flex-1 flex justify-center items-center min-w-0 mx-8 lg:mx-6 md:mx-4">
-        <ul className="flex items-center gap-1 list-none m-0 p-0 justify-center">
+      <div className="flex-1 flex justify-center items-center min-w-0 mx-8 lg:mx-6 md:mx-4 max-sm:mx-1 overflow-x-auto scrollbar-none">
+        <ul className="flex items-center gap-1 list-none m-0 p-0 justify-center max-sm:justify-start">
           {items.map((item) => {
             if (item.show === false) {
               return null;
@@ -132,7 +132,7 @@ export default function Submenu({
                       "transition-all duration-200 relative",
                       "text-gray-600 border-b-[3px] border-b-transparent",
                       "hover:font-semibold hover:text-[#004c97] hover:border-b-[#0066cc]",
-                      "md:py-3 md:px-5 md:text-sm",
+                      "md:py-3 md:px-5 md:text-sm max-sm:py-2.5 max-sm:px-3 max-sm:text-xs",
                       isActive &&
                         "font-bold !text-[#004c97] !border-b-[#004c97]",
                     )}
@@ -191,7 +191,7 @@ export default function Submenu({
                       "transition-all duration-200 relative",
                       "text-gray-600 border-b-[3px] border-b-transparent",
                       "hover:font-semibold hover:text-[#004c97] hover:border-b-[#0066cc]",
-                      "md:py-3 md:px-5 md:text-sm",
+                      "md:py-3 md:px-5 md:text-sm max-sm:py-2.5 max-sm:px-3 max-sm:text-xs",
                       isActive &&
                         "font-bold !text-[#004c97] !border-b-[#004c97]",
                     )}
@@ -218,7 +218,7 @@ export default function Submenu({
                     "transition-all duration-200 relative",
                     "text-gray-600 border-b-[3px] border-b-transparent",
                     "hover:font-semibold hover:text-[#004c97] hover:border-b-[#0066cc]",
-                    "md:py-3 md:px-5 md:text-sm",
+                    "md:py-3 md:px-5 md:text-sm max-sm:py-2.5 max-sm:px-3 max-sm:text-xs",
                     item.active &&
                       "font-bold !text-[#004c97] !border-b-[#004c97]",
                   )}

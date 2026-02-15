@@ -75,7 +75,7 @@
         "descriptionPlaceholder": "지원사업 상세 설명을 입력하세요...",
         "coverImage": "지원사업 대표 이미지",
         "coverImageAlt": "지원사업 대표 이미지",
-        "imageHint": "JPG, PNG 형식 지원, 권장 크기 800x400",
+        "imageHint": "JPG, PNG 형식 지원, 권장 크기 850x1200",
         "selectImage": "이미지 선택",
         "changeImage": "이미지 변경",
         "removeImage": "이미지 삭제",

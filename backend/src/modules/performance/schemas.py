@@ -247,3 +247,28 @@ class PerformanceApprovalRequest(BaseModel):
     """审批请求"""
 
     comments: Optional[str] = Field(None, max_length=1000, description="Review comments")
+
+
+class InvestmentCompanyDetail(BaseModel):
+    """투자 기업 상세 정보"""
+    member_id: str
+    company_name: str
+    amount: float
+    year: Optional[int] = None
+
+
+class InvestmentInstitutionSummary(BaseModel):
+    """기관별 투자금액 합계"""
+    institution: str = Field(..., description="투자 기관명")
+    investment_type: str = Field(..., description="투자 유형 (domestic/overseas)")
+    total_amount: float = Field(..., description="투자 합계 금액 (백만원)")
+    company_count: int = Field(..., description="투자 기업 수")
+    companies: list[InvestmentCompanyDetail] = Field(default_factory=list, description="투자 기업 목록")
+
+
+class InvestmentSummaryResponse(BaseModel):
+    """기관별 투자금액 합계 응답"""
+    items: list[InvestmentInstitutionSummary]
+    total_investment: float = Field(..., description="전체 투자 합계")
+    total_institutions: int = Field(..., description="전체 기관 수")
+    year: Optional[int] = Field(None, description="조회 연도")

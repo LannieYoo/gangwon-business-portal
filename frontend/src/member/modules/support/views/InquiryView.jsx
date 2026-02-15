@@ -11,6 +11,7 @@ import InquiryPage from "../components/InquiryPage/InquiryPage";
 import { Banner } from "@shared/components";
 import { BANNER_TYPES } from "@shared/utils/constants";
 import SupportSubmenu from "../components/SupportSubmenu";
+import { clearCache } from "@shared/hooks/useApiCache";
 
 /**
  * 咨询提交视图组件
@@ -19,6 +20,11 @@ export default function InquiryView() {
   const navigate = useNavigate();
 
   const handleSubmitSuccess = () => {
+    // Clear inquiry history cache so the list refreshes immediately
+    clearCache("inquiry-history-");
+    clearCache("inquiry-history-open");
+    clearCache("inquiry-history-resolved");
+    clearCache("inquiry-history-closed");
     navigate("/member/support/inquiry-history");
   };
 

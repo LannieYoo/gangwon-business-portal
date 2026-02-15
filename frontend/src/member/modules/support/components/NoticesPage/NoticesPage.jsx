@@ -8,14 +8,7 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { PageContainer } from "@member/layouts";
 import { Card, Loading, Badge, Pagination } from "@shared/components";
-import {
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableHeader,
-  TableCell,
-} from "@shared/components/Table";
+import { Table } from "@shared/components/Table";
 
 import NoticesFilter from "./NoticesFilter";
 
@@ -108,43 +101,65 @@ export default function NoticesPage({
               </div>
             ) : (
               <>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableHeader className="w-24">
-                        {t("common.type", "구분")}
-                      </TableHeader>
-                      <TableHeader>{t("common.title", "제목")}</TableHeader>
-                      <TableHeader className="w-40">
-                        {t("common.date", "날짜")}
-                      </TableHeader>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {notices.map((notice) => {
-                      const badgeInfo = getBadgeInfo(notice);
-                      return (
-                        <TableRow
-                          key={notice.id}
-                          onClick={() => handleNoticeClick(notice.id)}
-                          className="cursor-pointer hover:bg-gray-50"
-                        >
-                          <TableCell>
+                {/* Desktop Table View */}
+                <div className="hidden md:block">
+                  <Table
+                    columns={[
+                      {
+                        key: "type",
+                        label: t("common.type", "구분"),
+                        width: "100px",
+                        render: (_, notice) => {
+                          const badgeInfo = getBadgeInfo(notice);
+                          return (
                             <Badge variant={badgeInfo.variant}>
                               {badgeInfo.text}
                             </Badge>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {notice.title}
-                          </TableCell>
-                          <TableCell className="text-gray-500">
+                          );
+                        },
+                      },
+                      {
+                        key: "title",
+                        label: t("common.title", "제목"),
+                        cellClassName: "font-medium",
+                      },
+                      {
+                        key: "date",
+                        label: t("common.date", "날짜"),
+                        width: "140px",
+                        cellClassName: "text-gray-500",
+                      },
+                    ]}
+                    data={notices}
+                    onRowClick={(notice) => handleNoticeClick(notice.id)}
+                  />
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="block md:hidden space-y-3">
+                  {notices.map((notice) => {
+                    const badgeInfo = getBadgeInfo(notice);
+                    return (
+                      <div
+                        key={notice.id}
+                        onClick={() => handleNoticeClick(notice.id)}
+                        className="p-4 border border-gray-200 rounded-lg cursor-pointer hover:shadow-md hover:border-blue-200 transition-all bg-white"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant={badgeInfo.variant}>
+                            {badgeInfo.text}
+                          </Badge>
+                          <span className="text-sm text-gray-500">
                             {notice.date}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                          </span>
+                        </div>
+                        <h3 className="text-base font-medium text-gray-900 m-0">
+                          {notice.title}
+                        </h3>
+                      </div>
+                    );
+                  })}
+                </div>
 
                 {/* Pagination */}
                 {totalPages > 1 && (

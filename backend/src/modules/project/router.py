@@ -28,6 +28,7 @@ from .schemas import (
     ApplicationListQuery,
     ApplicationListResponsePaginated,
     ApplicationStatusUpdate,
+    SupplementCreate,
 )
 
 
@@ -444,7 +445,29 @@ async def update_application_status(
     Update application status (admin only).
     """
     application = await service.update_application_status(
-        application_id, data.status
+        application_id, data.status, data.review_notes
+    )
+    return ProjectApplicationResponse.model_validate(application)
+
+
+@router.post(
+    "/api/member/applications/{application_id}/supplement",
+    response_model=ProjectApplicationResponse,
+    tags=["projects"],
+    summary="Submit supplement materials",
+)
+@audit_log(action="supplement", resource_type="project_application")
+async def submit_supplement(
+    application_id: UUID,
+    data: SupplementCreate,
+    request: Request,
+    current_user: Annotated[Member, Depends(get_current_active_user)],
+):
+    """
+    Submit supplementary materials for an application (member only).
+    """
+    application = await service.submit_supplement(
+        application_id, current_user.id, data.attachments
     )
     return ProjectApplicationResponse.model_validate(application)
 

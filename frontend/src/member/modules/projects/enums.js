@@ -21,6 +21,7 @@ export const ApplicationStatus = {
   UNDER_REVIEW: "under_review",
   REVIEWING: "reviewing",
   NEEDS_SUPPLEMENT: "needs_supplement",
+  SUPPLEMENT_SUBMITTED: "supplement_submitted",
   APPROVED: "approved",
   REJECTED: "rejected",
   CANCELLED: "cancelled",

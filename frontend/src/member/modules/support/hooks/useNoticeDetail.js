@@ -44,7 +44,7 @@ export function useNoticeDetail() {
         }
       } catch (err) {
         console.error("Failed to load notice:", err);
-        setError(t('common.error', '오류'));
+        setError(t("common.error", "오류"));
       } finally {
         setLoading(false);
       }
@@ -59,7 +59,8 @@ export function useNoticeDetail() {
 
   const handleDownload = (attachment) => {
     const url = attachment.fileUrl;
-    const fileName = attachment.fileName || "download";
+    const fileName =
+      attachment.originalName || attachment.fileName || "download";
 
     if (!url) {
       console.error("No file URL found for attachment:", attachment);

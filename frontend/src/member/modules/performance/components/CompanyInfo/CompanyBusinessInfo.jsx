@@ -14,7 +14,6 @@ import {
   STARTUP_STAGE_KEYS,
   KSIC_MAJOR_CATEGORY_KEYS,
   getSubCategoryKeysByMajor,
-  BUSINESS_FIELD_KEYS,
   MAIN_INDUSTRY_KSIC_MAJOR_KEYS,
   getMainIndustryKsicCodesByMajor,
   GANGWON_FUTURE_INDUSTRIES,
@@ -34,7 +33,6 @@ const CompanyBusinessInfo = ({
     getStartupStageOptions,
     getKsicMajorOptions,
     getKsicSubOptions,
-    getBusinessFieldOptions,
     getMainIndustryKsicOptions,
     getMainIndustryKsicCodesOptions,
     getGangwonIndustryOptions,
@@ -73,11 +71,6 @@ const CompanyBusinessInfo = ({
     getMainIndustryKsicCodesOptions,
     i18n.language,
   ]);
-
-  const businessFieldOptions = useMemo(
-    () => getBusinessFieldOptions(BUSINESS_FIELD_KEYS),
-    [getBusinessFieldOptions, i18n.language],
-  );
 
   const gangwonIndustryOptions = useMemo(
     () => getGangwonIndustryOptions(GANGWON_FUTURE_INDUSTRIES),
@@ -168,13 +161,10 @@ const CompanyBusinessInfo = ({
             disabled={!isEditing}
           />
           <Select
-            label={t(
-              "performance.companyInfo.fields.businessField",
-              "사업 분야",
-            )}
-            value={data.businessField}
-            onChange={(e) => onChange("businessField", e.target.value)}
-            options={businessFieldOptions}
+            label={t("performance.companyInfo.fields.startupStage", "창업구분")}
+            value={data.startupStage}
+            onChange={(e) => onChange("startupStage", e.target.value)}
+            options={startupStageOptions}
             disabled={!isEditing}
           />
           <Select
@@ -239,17 +229,6 @@ const CompanyBusinessInfo = ({
             value={data.futureTech}
             onChange={(e) => onChange("futureTech", e.target.value)}
             options={futureTechOptions}
-            disabled={!isEditing}
-          />
-        </div>
-
-        {/* Startup Stage */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Select
-            label={t("performance.companyInfo.fields.startupStage", "창업구분")}
-            value={data.startupStage}
-            onChange={(e) => onChange("startupStage", e.target.value)}
-            options={startupStageOptions}
             disabled={!isEditing}
           />
         </div>

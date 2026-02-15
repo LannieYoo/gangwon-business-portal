@@ -50,11 +50,11 @@ export default function ProjectListItem({ project, onApply, onDetail }) {
       <div className="mb-4 sm:mb-5 lg:mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           {project.imageUrl && (
-            <div className="flex-shrink-0 w-full md:w-48 lg:w-56">
+            <div className="flex-shrink-0 w-full md:w-40 lg:w-44">
               <img
                 src={project.imageUrl}
                 alt={project.title}
-                className="w-full h-32 md:h-36 lg:h-40 object-cover rounded-lg"
+                className="w-full h-48 md:h-52 lg:h-56 object-cover rounded-lg"
               />
             </div>
           )}
@@ -76,8 +76,8 @@ export default function ProjectListItem({ project, onApply, onDetail }) {
           disabled={project.status !== ProjectStatus.ACTIVE}
         >
           {project.status === ProjectStatus.ACTIVE
-            ? t('member.projects.apply', '프로그램 신청')
-            : t('member.projects.notAvailable', '신청 불가')}
+            ? t("member.projects.apply", "프로그램 신청")
+            : t("member.projects.notAvailable", "신청 불가")}
         </Button>
       </div>
     </Card>

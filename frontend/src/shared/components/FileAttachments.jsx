@@ -10,11 +10,8 @@ import { cn } from "@shared/utils/helpers";
 import { MAX_FILE_SIZE } from "@shared/utils/constants";
 
 function formatFileSize(bytes) {
-  if (bytes === 0) return "0 B";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+  if (bytes === 0) return "0 MB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
 export function FileAttachments({
@@ -110,8 +107,8 @@ export function FileAttachments({
         <div className="space-y-2 mb-3">
           {attachments.map((attachment, index) => {
             const fileName =
-              attachment.fileName ||
               attachment.originalName ||
+              attachment.fileName ||
               attachment.name ||
               "Unknown";
             const fileSize = attachment.fileSize || attachment.size;
@@ -197,7 +194,3 @@ export function FileAttachments({
 }
 
 export default FileAttachments;
-
-
-
-

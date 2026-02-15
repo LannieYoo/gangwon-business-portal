@@ -507,6 +507,7 @@ class ProjectService:
         self,
         application_id: UUID,
         status: ApplicationStatus,
+        review_notes: Optional[str] = None,
     ) -> dict:
         """
         Update application status (admin only).
@@ -514,12 +515,14 @@ class ProjectService:
         Args:
             application_id: Application UUID
             status: New status
+            review_notes: Optional review notes (rejection reason / supplement request)
 
         Returns:
             Updated application dict
 
         Raises:
             NotFoundError: If application not found
+            ValidationError: If status transition is invalid
         """
         # Use helper method to get application
         application = await supabase_service.get_by_id('project_applications', str(application_id))
@@ -527,16 +530,40 @@ class ProjectService:
         if not application:
             raise NotFoundError(resource_type="Project application")
 
+        current_status = application.get('status')
+
+        # Validate status transitions
+        valid_transitions = {
+            'submitted': ['under_review', 'approved', 'rejected', 'needs_supplement'],
+            'under_review': ['approved', 'rejected', 'needs_supplement'],
+            'needs_supplement': ['under_review'],  # Only after member submits supplement
+            'supplement_submitted': ['under_review', 'approved', 'rejected'],
+        }
+        allowed = valid_transitions.get(current_status, [])
+        if status.value not in allowed:
+            raise ValidationError(
+                f"Cannot transition from '{current_status}' to '{status.value}'. "
+                f"Allowed transitions: {allowed}"
+            )
+
         # Build update data
         update_data = {"status": status.value}
         if status in [ApplicationStatus.approved, ApplicationStatus.rejected]:
             update_data["reviewed_at"] = datetime.utcnow().isoformat()
 
+        # Save review notes (rejection reason or supplement request message)
+        if review_notes is not None:
+            update_data["review_note"] = review_notes
+
+        # Save supplement request message in material_request field
+        if status == ApplicationStatus.needs_supplement and review_notes:
+            update_data["material_request"] = review_notes
+
         # Use helper method
         updated = await supabase_service.update_record('project_applications', str(application_id), update_data)
         
         # Send notification to member about application result
-        if status in [ApplicationStatus.approved, ApplicationStatus.rejected]:
+        if status in [ApplicationStatus.approved, ApplicationStatus.rejected, ApplicationStatus.needs_supplement]:
             try:
                 from ...modules.messages.service import service as message_service
                 from ...modules.messages.schemas import MessageCreate
@@ -550,11 +577,17 @@ class ProjectService:
                 project_title = project.get('title', '알 수 없음') if project else '알 수 없음'
                 
                 # Prepare notification data
+                notification_type = "project_application_result"
+                if status == ApplicationStatus.needs_supplement:
+                    notification_type = "project_supplement_request"
+                
                 notification_data = {
-                    "type": "project_application_result",
+                    "type": notification_type,
                     "project_title": project_title,
                     "status": status.value,
                 }
+                if review_notes:
+                    notification_data["review_notes"] = review_notes
                 
                 await message_service.create_direct_message(
                     sender_id=None,
@@ -569,6 +602,84 @@ class ProjectService:
                 import logging
                 logging.getLogger(__name__).warning(f"Failed to send application result notification: {e}")
         
+        return updated
+
+    async def submit_supplement(
+        self,
+        application_id: UUID,
+        member_id: UUID,
+        attachments: list,
+    ) -> dict:
+        """
+        Submit supplementary materials for an application (member only).
+
+        Args:
+            application_id: Application UUID
+            member_id: Member UUID (for ownership verification)
+            attachments: List of attachment dicts
+
+        Returns:
+            Updated application dict
+
+        Raises:
+            NotFoundError: If application not found or not owned by member
+            ValidationError: If application status is not needs_supplement
+        """
+        application = await self.get_application_by_id(application_id, member_id)
+
+        if application.get('status') != 'needs_supplement':
+            raise ValidationError(
+                f"Cannot submit supplement for application with status: {application.get('status')}. "
+                f"Only applications in 'needs_supplement' status can receive supplements."
+            )
+
+        # Update application with supplement materials
+        update_data = {
+            "status": "supplement_submitted",
+            "material_response": json.dumps(attachments, ensure_ascii=False) if not isinstance(attachments, str) else attachments,
+        }
+
+        updated = await supabase_service.update_record(
+            'project_applications', str(application_id), update_data
+        )
+
+        # Notify admins about supplement submission
+        try:
+            from ...modules.messages.service import service as message_service
+            from ...modules.messages.schemas import MessageCreate
+
+            member = await supabase_service.get_by_id('members', str(member_id))
+            company_name = member.get('company_name', '알 수 없음') if member else '알 수 없음'
+            project = await supabase_service.get_by_id('projects', str(application.get('project_id')))
+            project_title = project.get('title', '알 수 없음') if project else '알 수 없음'
+
+            admins_result = supabase_service.client.table('admins').select('id').eq('is_active', 'true').execute()
+            admin_ids = [admin['id'] for admin in (admins_result.data or [])]
+
+            notification_data = {
+                "type": "project_supplement_submitted",
+                "company_name": company_name,
+                "project_title": project_title,
+            }
+
+            for admin_id in admin_ids:
+                try:
+                    await message_service.create_direct_message(
+                        sender_id=member_id,
+                        recipient_id=UUID(admin_id),
+                        data=MessageCreate(
+                            subject=json.dumps(notification_data, ensure_ascii=False),
+                            content=json.dumps(notification_data, ensure_ascii=False),
+                            recipient_id=UUID(admin_id),
+                        ),
+                    )
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Failed to send admin notification: {e}")
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to notify admins about supplement submission: {e}")
+
         return updated
 
     async def export_projects_data(

@@ -11,6 +11,8 @@ import { formatDate } from "@shared/utils";
 import { usePagination } from "@shared/hooks";
 import { useMyApplications } from "./useMyApplications";
 import { useApplicationStatus } from "./useApplicationStatus";
+import { useUpload } from "@shared/hooks";
+import { MAX_DOCUMENT_SIZE } from "@shared/utils/helpers";
 
 export function useApplicationRecords(pageSize = 10) {
   const { t } = useTranslation();
@@ -30,6 +32,8 @@ export function useApplicationRecords(pageSize = 10) {
   const [cancelLoading, setCancelLoading] = useState(false);
   const [supplementFiles, setSupplementFiles] = useState([]);
   const [supplementLoading, setSupplementLoading] = useState(false);
+
+  const { uploading: supplementUploading, uploadAttachments } = useUpload();
 
   // Initialize filtered applications when data loads
   useEffect(() => {
@@ -79,12 +83,12 @@ export function useApplicationRecords(pageSize = 10) {
   const handleFileSelect = useCallback(
     (files) => {
       const validFiles = files.filter((file) => {
-        const maxSize = 10 * 1024 * 1024; // 10MB
+        const maxSize = MAX_DOCUMENT_SIZE; // 20MB
         if (file.size > maxSize) {
           alert(
             t(
-              "projects.applicationRecords.fileTooLarge",
-              "파일 크기가 너무 큽니다.",
+              "member.projects.applicationRecords.fileTooLarge",
+              "파일 크기가 너무 큽니다. (최대 20MB)",
             ),
           );
           return false;
@@ -111,19 +115,42 @@ export function useApplicationRecords(pageSize = 10) {
       return;
     }
     setSupplementLoading(true);
-    // TODO: Implement actual file upload in hook
-    setTimeout(() => {
-      setSupplementLoading(false);
+    try {
+      const uploadedFiles = await uploadAttachments(supplementFiles);
+      if (uploadedFiles && selectedApplication) {
+        // Submit supplement materials with uploaded file references
+        const { projectService } = await import("../services/project.service");
+        await projectService.submitSupplement(
+          selectedApplication.id,
+          uploadedFiles.map((f) => ({
+            fileName: f.fileName || f.originalName,
+            fileUrl: f.fileUrl || f.url,
+            fileSize: f.fileSize || f.size,
+            mimeType: f.mimeType,
+          })),
+        );
+        alert(
+          t(
+            "member.projects.applicationRecords.supplementSuccess",
+            "추가 자료가 성공적으로 제출되었습니다.",
+          ),
+        );
+        setShowSupplementModal(false);
+        setSupplementFiles([]);
+        refresh();
+      }
+    } catch (err) {
+      console.error("Supplement submit failed:", err);
       alert(
         t(
-          "member.projects.applicationRecords.featureComingSoon",
-          "기능 준비 중입니다",
+          "member.projects.applicationRecords.supplementFailed",
+          "제출에 실패했습니다. 다시 시도해주세요.",
         ),
       );
-      setShowSupplementModal(false);
-      setSupplementFiles([]);
-    }, 500);
-  }, [supplementFiles, t]);
+    } finally {
+      setSupplementLoading(false);
+    }
+  }, [supplementFiles, selectedApplication, uploadAttachments, refresh, t]);
 
   const columns = [
     {

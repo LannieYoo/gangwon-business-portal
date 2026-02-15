@@ -58,48 +58,76 @@ export default function InquiryHistoryTable({
   }
 
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableHeader>{t("member.support.subject")}</TableHeader>
-          <TableHeader>{t("member.support.categoryLabel")}</TableHeader>
-          <TableHeader>{t("member.support.statusLabel")}</TableHeader>
-          <TableHeader>{t("member.support.createdDate")}</TableHeader>
-          <TableHeader>{t("member.support.lastReply")}</TableHeader>
-          <TableHeader>{t("member.support.messageCount")}</TableHeader>
-          <TableHeader>{t("common.actions")}</TableHeader>
-        </TableRow>
-      </TableHead>
-      <TableBody>
+    <>
+      {/* Desktop Table View */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeader>{t("member.support.subject")}</TableHeader>
+              <TableHeader>{t("member.support.categoryLabel")}</TableHeader>
+              <TableHeader>{t("member.support.statusLabel")}</TableHeader>
+              <TableHeader>{t("member.support.createdDate")}</TableHeader>
+              <TableHeader>{t("member.support.lastReply")}</TableHeader>
+              <TableHeader>{t("member.support.messageCount")}</TableHeader>
+              <TableHeader>{t("common.actions")}</TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredThreads.map((thread) => (
+              <TableRow key={thread.id}>
+                <TableCell className="whitespace-normal min-w-[300px]">
+                  <span className="font-medium">{thread.subject}</span>
+                </TableCell>
+                <TableCell>{getCategoryBadge(thread.category)}</TableCell>
+                <TableCell>{getStatusBadge(thread.status)}</TableCell>
+                <TableCell className="text-gray-600 text-sm whitespace-nowrap">
+                  {thread.createdAt ? formatDateTime(thread.createdAt) : "-"}
+                </TableCell>
+                <TableCell className="text-gray-600 text-sm whitespace-nowrap">
+                  {thread.lastMessageAt
+                    ? formatDateTime(thread.lastMessageAt)
+                    : "-"}
+                </TableCell>
+                <TableCell className="text-gray-600 text-sm">
+                  {thread.messageCount || 0}
+                </TableCell>
+                <TableCell>
+                  <button
+                    onClick={() => openDetailModal(thread.id)}
+                    className="text-primary-600 hover:text-primary-900 font-medium text-sm bg-transparent border-none"
+                  >
+                    {t("common.view")}
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="block md:hidden space-y-3">
         {filteredThreads.map((thread) => (
-          <TableRow key={thread.id}>
-            <TableCell className="whitespace-normal min-w-[300px]">
-              <span className="font-medium">{thread.subject}</span>
-            </TableCell>
-            <TableCell>{getCategoryBadge(thread.category)}</TableCell>
-            <TableCell>{getStatusBadge(thread.status)}</TableCell>
-            <TableCell className="text-gray-600 text-sm whitespace-nowrap">
-              {thread.createdAt ? formatDateTime(thread.createdAt) : "-"}
-            </TableCell>
-            <TableCell className="text-gray-600 text-sm whitespace-nowrap">
-              {thread.lastMessageAt
-                ? formatDateTime(thread.lastMessageAt)
-                : "-"}
-            </TableCell>
-            <TableCell className="text-gray-600 text-sm">
-              {thread.messageCount || 0}
-            </TableCell>
-            <TableCell>
-              <button
-                onClick={() => openDetailModal(thread.id)}
-                className="text-primary-600 hover:text-primary-900 font-medium text-sm bg-transparent border-none"
-              >
-                {t("common.view")}
-              </button>
-            </TableCell>
-          </TableRow>
+          <div
+            key={thread.id}
+            onClick={() => openDetailModal(thread.id)}
+            className="p-4 border border-gray-200 rounded-lg cursor-pointer hover:shadow-md hover:border-blue-200 transition-all bg-white"
+          >
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              {getCategoryBadge(thread.category)}
+              {getStatusBadge(thread.status)}
+            </div>
+            <h3 className="text-base font-medium text-gray-900 m-0 mb-2">
+              {thread.subject}
+            </h3>
+            <div className="flex items-center justify-between text-sm text-gray-500">
+              <span>{thread.createdAt ? formatDateTime(thread.createdAt) : "-"}</span>
+              <span>{t("member.support.messageCount")}: {thread.messageCount || 0}</span>
+            </div>
+          </div>
         ))}
-      </TableBody>
-    </Table>
+      </div>
+    </>
   );
 }

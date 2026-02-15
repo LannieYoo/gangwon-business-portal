@@ -1,7 +1,7 @@
 """业绩管理路由"""
 from fastapi import APIRouter, Depends, status, Query, Response
 from uuid import UUID
-from typing import Annotated
+from typing import Annotated, Optional
 from math import ceil
 from datetime import datetime
 
@@ -19,6 +19,7 @@ from .schemas import (
     PerformanceListQuery,
     PerformanceListResponsePaginated,
     PerformanceApprovalRequest,
+    InvestmentSummaryResponse,
 )
 
 
@@ -213,6 +214,28 @@ async def export_performance_data(
                 "Content-Disposition": f'attachment; filename="performance_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
             },
         )
+
+
+@router.get(
+    "/api/admin/performance/investment-summary",
+    response_model=InvestmentSummaryResponse,
+    tags=["admin-performance"],
+    summary="Get investment summary by institution (Admin, Issue 11)",
+)
+async def get_investment_summary(
+    request: Request,
+    current_admin: Annotated[Admin, Depends(get_current_admin_user)],
+    year: Optional[int] = Query(None, description="Filter by year"),
+):
+    """기관별 투자금액 합계 조회 (관리원)"""
+    summary = await service.get_investment_summary_by_institution(year)
+    total_investment = sum(item['total_amount'] for item in summary)
+    return InvestmentSummaryResponse(
+        items=summary,
+        total_investment=total_investment,
+        total_institutions=len(summary),
+        year=year,
+    )
 
 
 @router.get(

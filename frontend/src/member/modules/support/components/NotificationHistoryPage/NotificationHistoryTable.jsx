@@ -95,7 +95,8 @@ export default function NotificationHistoryTable({
 
   return (
     <>
-      <div className="overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -160,6 +161,37 @@ export default function NotificationHistoryTable({
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="block md:hidden space-y-3">
+        {filteredNotifications.map((notification) => {
+          const translated = translateNotification(notification);
+
+          return (
+            <div
+              key={notification.id}
+              onClick={() => openDetailModal(notification)}
+              className={`p-4 border border-gray-200 rounded-lg cursor-pointer hover:shadow-md hover:border-blue-200 transition-all ${
+                !notification.isRead ? "bg-blue-50" : "bg-white"
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                {getCategoryBadge(notification.subject, notification.content)}
+                {getReadBadge(notification.isRead)}
+              </div>
+              <h3 className="text-base font-medium text-gray-900 m-0 mb-1">
+                {translated.subject}
+              </h3>
+              <p className="text-sm text-gray-500 m-0 mb-2 line-clamp-2">
+                {translated.content}
+              </p>
+              <div className="text-sm text-gray-400">
+                {formatDate(notification.createdAt)}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Pagination */}

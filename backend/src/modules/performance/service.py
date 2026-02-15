@@ -494,3 +494,104 @@ class PerformanceService:
             })
 
         return export_data
+
+    async def get_investment_summary_by_institution(
+        self, year: Optional[int] = None
+    ) -> list[dict]:
+        """
+        기관별 투자금액 합계 조회 (관리원, Issue 11)
+
+        Aggregates investment information from performance records,
+        grouping by institution name and investment type (domestic/overseas).
+        """
+        # Fetch all approved performance records with investment data
+        query = supabase_service.client.table('performance_records')\
+            .select('id, member_id, year, data_json, members!performance_records_member_id_fkey(company_name, business_number)')\
+            .eq('status', 'approved')\
+            .is_('deleted_at', 'null')
+
+        if year:
+            query = query.eq('year', year)
+
+        result = query.execute()
+        records = result.data or []
+
+        # Aggregate investment data by institution
+        institution_map = {}  # key: (institution, investmentType) -> { total_amount, companies }
+
+        for record in records:
+            data_json = record.get('data_json')
+            if not data_json:
+                continue
+
+            if isinstance(data_json, str):
+                try:
+                    data_json = json.loads(data_json)
+                except (json.JSONDecodeError, TypeError):
+                    continue
+
+            investment_info = data_json.get('investmentInfo') or data_json.get('investment_info')
+            if not investment_info:
+                continue
+
+            has_investment = investment_info.get('hasInvestment') or investment_info.get('has_investment')
+            if not has_investment:
+                continue
+
+            institution = (investment_info.get('institution') or '').strip()
+            if not institution:
+                continue
+
+            amount_str = str(investment_info.get('amount', '0'))
+            try:
+                amount = float(amount_str.replace(',', ''))
+            except (ValueError, TypeError):
+                amount = 0
+
+            investment_type = investment_info.get('investmentType') or investment_info.get('investment_type') or 'domestic'
+            member_info = record.pop('members', None) or {}
+            company_name = member_info.get('company_name', '')
+            member_id = record.get('member_id', '')
+
+            key = (institution, investment_type)
+            if key not in institution_map:
+                institution_map[key] = {
+                    'institution': institution,
+                    'investment_type': investment_type,
+                    'total_amount': 0,
+                    'company_count': 0,
+                    'companies': [],
+                    'record_ids': [],
+                }
+
+            institution_map[key]['total_amount'] += amount
+            institution_map[key]['record_ids'].append(str(record['id']))
+
+            # Track unique companies
+            if member_id not in [c.get('member_id') for c in institution_map[key]['companies']]:
+                institution_map[key]['company_count'] += 1
+                institution_map[key]['companies'].append({
+                    'member_id': str(member_id),
+                    'company_name': company_name,
+                    'amount': amount,
+                    'year': record.get('year'),
+                })
+            else:
+                # Update existing company amount if same member appears again
+                for c in institution_map[key]['companies']:
+                    if c.get('member_id') == str(member_id):
+                        c['amount'] += amount
+                        break
+
+        # Convert to sorted list
+        summary = sorted(
+            institution_map.values(),
+            key=lambda x: x['total_amount'],
+            reverse=True
+        )
+
+        # Remove internal tracking data
+        for item in summary:
+            del item['record_ids']
+
+        return summary

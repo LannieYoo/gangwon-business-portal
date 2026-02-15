@@ -44,9 +44,15 @@ export const usePerformanceForm = () => {
         totalEmployees: { previousYear: "", currentYear: "" },
       },
       attachments: [],
+      evidenceDocuments: {
+        salesRevenue: [],
+        exportAmount: [],
+        employmentCreation: [],
+      },
     },
     governmentSupport: [],
     intellectualProperty: [],
+    investmentInfo: [],
     notes: "",
   });
 
@@ -99,12 +105,53 @@ export const usePerformanceForm = () => {
           salesEmploymentData.attachments = [];
         }
 
+        // Restore evidence documents with category defaults (Issue 7)
+        if (!salesEmploymentData.evidenceDocuments) {
+          salesEmploymentData.evidenceDocuments = {
+            salesRevenue: [],
+            exportAmount: [],
+            employmentCreation: [],
+          };
+        } else {
+          salesEmploymentData.evidenceDocuments = {
+            salesRevenue:
+              salesEmploymentData.evidenceDocuments.salesRevenue || [],
+            exportAmount:
+              salesEmploymentData.evidenceDocuments.exportAmount || [],
+            employmentCreation:
+              salesEmploymentData.evidenceDocuments.employmentCreation || [],
+          };
+        }
+
+        // Restore investment info (Issue 11) - support both old object and new array format
+        let investmentInfoData = [];
+        if (Array.isArray(dataJson.investmentInfo)) {
+          investmentInfoData = dataJson.investmentInfo.map((item) => ({
+            ...item,
+            attachments: item.attachments || [],
+          }));
+        } else if (
+          dataJson.investmentInfo &&
+          dataJson.investmentInfo.hasInvestment
+        ) {
+          // Migrate old single-object format to array
+          investmentInfoData = [
+            {
+              amount: dataJson.investmentInfo.amount || "",
+              institution: dataJson.investmentInfo.institution || "",
+              investmentType: dataJson.investmentInfo.investmentType || "",
+              attachments: dataJson.investmentInfo.attachments || [],
+            },
+          ];
+        }
+
         setFormData({
           year: record.year,
           quarter: record.quarter ? record.quarter.toString() : "",
           salesEmployment: salesEmploymentData,
           governmentSupport: governmentSupportData,
           intellectualProperty: intellectualPropertyData,
+          investmentInfo: investmentInfoData,
           notes: dataJson.notes || "",
         });
       }

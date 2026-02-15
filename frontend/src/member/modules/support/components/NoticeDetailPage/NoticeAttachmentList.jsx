@@ -17,11 +17,15 @@ export default function NoticeAttachmentList({ attachments, handleDownload }) {
     <div className="border-t border-gray-200 pt-6 mt-6">
       <h4 className="text-sm font-medium text-gray-700 mb-4 flex items-center gap-2">
         <DocumentIcon className="w-4 h-4" />
-        {t('fileAttachments.attachments', '첨부파일')} ({attachments.length})
+        {t("fileAttachments.attachments", "첨부파일")} ({attachments.length})
       </h4>
       <div className="space-y-2">
         {attachments.map((attachment, index) => {
-          const fileName = attachment.fileName || "Unknown";
+          const fileName =
+            attachment.originalName ||
+            attachment.fileName ||
+            attachment.name ||
+            "Unknown";
 
           return (
             <button
@@ -35,7 +39,7 @@ export default function NoticeAttachmentList({ attachments, handleDownload }) {
                 {fileName}
               </span>
               <span className="text-xs text-gray-500 group-hover:text-blue-600">
-                {t('common.download', '다운로드')}
+                {t("common.download", "다운로드")}
               </span>
             </button>
           );

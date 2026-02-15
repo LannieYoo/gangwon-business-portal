@@ -32,6 +32,8 @@ class ApplicationStatus(str, Enum):
     """Application status enumeration."""
     submitted = "submitted"
     under_review = "under_review"
+    needs_supplement = "needs_supplement"
+    supplement_submitted = "supplement_submitted"
     approved = "approved"
     rejected = "rejected"
     cancelled = "cancelled"
@@ -237,6 +239,9 @@ class ProjectApplicationResponse(BaseModel):
     attachments: Optional[list] = None
     submitted_at: datetime
     reviewed_at: Optional[datetime]
+    review_note: Optional[str] = Field(None, description="Review notes (rejection reason or supplement request)")
+    material_request: Optional[str] = Field(None, description="Material request message from admin")
+    material_response: Optional[str] = Field(None, description="Material response from member")
 
     class Config:
         from_attributes = True
@@ -283,4 +288,9 @@ class ApplicationListResponsePaginated(BaseModel):
 class ApplicationStatusUpdate(BaseModel):
     """Schema for updating application status (admin)."""
     status: ApplicationStatus = Field(..., description="New status")
-    review_notes: Optional[str] = Field(None, description="Admin review notes")
+    review_notes: Optional[str] = Field(None, description="Admin review notes (rejection reason or supplement request)")
+
+
+class SupplementCreate(BaseModel):
+    """Schema for submitting supplementary materials (member)."""
+    attachments: list = Field(..., description="List of attachment objects")

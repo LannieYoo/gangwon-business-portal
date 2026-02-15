@@ -37,7 +37,6 @@ export default function MemberDetail() {
     translateRegion,
     translateStartupType,
     translateStartupStage,
-    translateBusinessField,
     translateKsicMajor,
     translateKsicSub,
     translateMainIndustryKsic,
@@ -415,10 +414,10 @@ export default function MemberDetail() {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t("member.businessField", "사업분야")}
+              {t("member.startupStage", "창업구분")}
             </label>
             <span className="text-base text-gray-900">
-              {translateBusinessField(member.businessField)}
+              {translateStartupStage(member.startupStage)}
             </span>
           </div>
           <div className="flex flex-col gap-2">
@@ -467,14 +466,6 @@ export default function MemberDetail() {
             </label>
             <span className="text-base text-gray-900">
               {translateFutureTech(member.futureTech)}
-            </span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">
-              {t("member.startupStage", "창업구분")}
-            </label>
-            <span className="text-base text-gray-900">
-              {translateStartupStage(member.startupStage)}
             </span>
           </div>
           <div className="flex flex-col gap-2">

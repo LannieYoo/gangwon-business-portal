@@ -110,7 +110,7 @@ export default function ApplicationRecordsView() {
       <RejectionReasonModal
         isOpen={showRejectionModal}
         onClose={() => setShowRejectionModal(false)}
-        reason={selectedApplication?.rejectionReason}
+        reason={selectedApplication?.reviewNote}
       />
 
       <SupplementMaterialsModal
@@ -120,7 +120,7 @@ export default function ApplicationRecordsView() {
           // TODO: Files in hook state might need manual reset if not handled by useEffect or onClose
         }}
         onSubmit={handleSubmitSupplement}
-        supplementMessage={selectedApplication?.supplementMessage}
+        supplementMessage={selectedApplication?.materialRequest}
         files={supplementFiles}
         onFilesSelected={handleFileSelect}
         onFileRemove={handleRemoveFile}

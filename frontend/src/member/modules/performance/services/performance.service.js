@@ -74,6 +74,7 @@ class PerformanceService {
         salesEmployment: formData.salesEmployment,
         governmentSupport: formData.governmentSupport,
         intellectualProperty: formData.intellectualProperty,
+        investmentInfo: formData.investmentInfo,
         notes: formData.notes,
       },
       hskCode: hskCode || null,

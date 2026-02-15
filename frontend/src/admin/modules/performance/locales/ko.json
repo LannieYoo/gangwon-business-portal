@@ -128,6 +128,7 @@
             "ipRegistrationType": {
                 "application": "출원",
                 "registration": "등록",
+                "registered": "등록",
                 "publication": "공개"
             },
             "country": {
@@ -139,9 +140,12 @@
                 "other": "기타"
             },
             "overseasApplicationType": {
+                "domestic": "국내",
+                "overseas": "해외",
                 "pct": "PCT",
                 "paris": "파리조약",
                 "direct": "직접출원",
+                "general": "일반 해외 신청",
                 "none": "없음"
             },
             "quarter": {
@@ -149,6 +153,29 @@
                 "q2": "2분기",
                 "q3": "3분기",
                 "q4": "4분기"
+            },
+            "tabs": {
+                "records": "실적 기록",
+                "investment": "투자 현황"
+            },
+            "investment": {
+                "title": "기관별 투자 현황",
+                "allYears": "전체 연도",
+                "selectYear": "연도 선택",
+                "institution": "투자 기관",
+                "type": "투자 유형",
+                "domestic": "국내",
+                "overseas": "해외",
+                "totalAmount": "투자 합계 (백만원)",
+                "companyCount": "기업 수",
+                "totalInvestment": "전체 투자 합계",
+                "totalInstitutions": "전체 기관 수",
+                "filterYear": "조회 연도",
+                "millionWon": "백만원",
+                "institutions": "개",
+                "investedCompanies": "투자 기업 목록",
+                "noData": "투자 정보가 없습니다.",
+                "loadError": "투자 정보를 불러오는데 실패했습니다."
             }
         }
     }

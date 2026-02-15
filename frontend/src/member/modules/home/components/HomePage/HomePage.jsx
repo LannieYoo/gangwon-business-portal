@@ -16,8 +16,8 @@ import ProjectPreview from "../ProjectPreview";
  */
 const HomePage = memo(function HomePage() {
   return (
-    <PageContainer className="pb-8" fullWidth={false}>
-      <div className="grid grid-cols-1 md:grid-cols-[repeat(3,minmax(0,425px))] justify-center gap-6 lg:gap-8 auto-rows-[475px]">
+    <PageContainer className="pb-8 overflow-hidden" fullWidth={false}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 w-full">
         {/* 项目公告 */}
         <div className="flex h-full">
           <ProjectPreview />
@@ -29,7 +29,7 @@ const HomePage = memo(function HomePage() {
         </div>
 
         {/* 主横幅(2) - 小尺寸，不全宽 */}
-        <div className="flex h-full">
+        <div className="flex min-h-[380px] lg:col-span-2 xl:col-span-1">
           <Banner
             bannerType={BANNER_TYPES.MAIN_SECONDARY}
             sectionClassName="h-full w-full rounded-lg overflow-hidden"
@@ -43,7 +43,3 @@ const HomePage = memo(function HomePage() {
 });
 
 export default HomePage;
-
-
-
-

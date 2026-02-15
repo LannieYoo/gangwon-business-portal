@@ -21,6 +21,7 @@ import {
 import SalesEmploymentForm from "./SalesEmploymentForm";
 import GovernmentSupportForm from "./GovernmentSupportForm";
 import IntellectualPropertyForm from "./IntellectualPropertyForm";
+import InvestmentInfoForm from "./InvestmentInfoForm";
 
 const PerformanceForm = () => {
   const { t } = useTranslation();
@@ -46,23 +47,30 @@ const PerformanceForm = () => {
   const tabs = [
     {
       key: "salesEmployment",
-      label: t('member.performance.tabs.salesEmployment', '매출 고용'),
+      label: t("member.performance.tabs.salesEmployment", "매출 고용"),
     },
     {
       key: "governmentSupport",
-      label: t('member.performance.tabs.governmentSupport', '정부지원 수혜 이력'),
+      label: t(
+        "member.performance.tabs.governmentSupport",
+        "정부지원 수혜 이력",
+      ),
     },
     {
       key: "intellectualProperty",
-      label: t('member.performance.tabs.intellectualProperty', '지식재산권'),
+      label: t("member.performance.tabs.intellectualProperty", "지식재산권"),
+    },
+    {
+      key: "investmentInfo",
+      label: t("member.performance.tabs.investmentInfo", "투자 정보"),
     },
   ];
 
   const quarterOptions = [
-    { value: "1", label: t('member.performance.quarter1', '1분기') },
-    { value: "2", label: t('member.performance.quarter2', '2분기') },
-    { value: "3", label: t('member.performance.quarter3', '3분기') },
-    { value: "4", label: t('member.performance.quarter4', '4분기') },
+    { value: "1", label: t("member.performance.quarter1", "1분기") },
+    { value: "2", label: t("member.performance.quarter2", "2분기") },
+    { value: "3", label: t("member.performance.quarter3", "3분기") },
+    { value: "4", label: t("member.performance.quarter4", "4분기") },
   ];
 
   return (
@@ -70,8 +78,8 @@ const PerformanceForm = () => {
       <div className="mb-6 sm:mb-8 lg:mb-10 flex justify-between items-center gap-4 min-h-[48px]">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 m-0">
           {id
-            ? t('member.performance.edit', '성과 수정')
-            : t('member.performance.createNew', '성과 등록')}
+            ? t("member.performance.edit", "성과 수정")
+            : t("member.performance.createNew", "성과 등록")}
         </h1>
         <div className="flex gap-3 flex-shrink-0">
           <Button
@@ -79,7 +87,7 @@ const PerformanceForm = () => {
             variant="secondary"
             disabled={saving}
           >
-            {t('member.performance.saveDraft', '임시저장')}
+            {t("member.performance.saveDraft", "임시저장")}
           </Button>
           <Button
             onClick={() => setSubmitConfirm({ open: true })}
@@ -145,6 +153,14 @@ const PerformanceForm = () => {
               <IntellectualPropertyForm
                 data={formData.intellectualProperty}
                 onChange={(val) => handleChange("intellectualProperty", val)}
+                onUpload={uploadAttachments}
+                uploading={uploading}
+              />
+            )}
+            {activeTab === "investmentInfo" && (
+              <InvestmentInfoForm
+                data={formData.investmentInfo}
+                onChange={(val) => handleChange("investmentInfo", val)}
                 onUpload={uploadAttachments}
                 uploading={uploading}
               />

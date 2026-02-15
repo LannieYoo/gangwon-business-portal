@@ -18,12 +18,18 @@ export default function SupplementMaterialsModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={t('member.projects.applicationRecords.supplementTitle', '추가 자료 제출')}
+      title={t(
+        "member.projects.applicationRecords.supplementTitle",
+        "추가 자료 제출",
+      )}
     >
       <div className="p-4">
         <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-700 mb-2">
-            {t('member.projects.applicationRecords.requestedMaterials', '요청된 자료')}
+            {t(
+              "member.projects.applicationRecords.requestedMaterials",
+              "요청된 자료",
+            )}
           </h4>
           <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded">
             {supplementMessage ||
@@ -39,7 +45,10 @@ export default function SupplementMaterialsModal({
             onFilesSelected={onFilesSelected}
             multiple
             accept=".pdf,.doc,.docx,.xls,.xlsx"
-            label={t('member.projects.applicationRecords.selectFiles', '파일 선택')}
+            label={t(
+              "member.projects.applicationRecords.selectFiles",
+              "파일 선택",
+            )}
             variant="outline"
             size="medium"
             className="w-full"
@@ -47,7 +56,7 @@ export default function SupplementMaterialsModal({
           <p className="text-gray-400 text-xs mt-2 text-center">
             {t(
               "projects.applicationRecords.uploadHint",
-              "PDF, DOC, XLS 형식 지원, 최대 10MB",
+              "PDF, DOC, XLS 형식 지원, 최대 20MB",
             )}
           </p>
         </div>
@@ -55,8 +64,11 @@ export default function SupplementMaterialsModal({
         {files.length > 0 && (
           <div className="mb-4">
             <h4 className="text-sm font-medium text-gray-700 mb-2">
-              {t('member.projects.applicationRecords.selectedFiles', '선택된 파일')} (
-              {files.length})
+              {t(
+                "member.projects.applicationRecords.selectedFiles",
+                "선택된 파일",
+              )}{" "}
+              ({files.length})
             </h4>
             <ul className="space-y-2">
               {files.map((file, index) => (
@@ -82,7 +94,7 @@ export default function SupplementMaterialsModal({
 
         <div className="flex justify-end gap-3">
           <Button variant="secondary" onClick={onClose} disabled={loading}>
-            {t('member.projects.applicationRecords.cancel', '취소')}
+            {t("member.projects.applicationRecords.cancel", "취소")}
           </Button>
           <Button
             variant="primary"
@@ -90,8 +102,8 @@ export default function SupplementMaterialsModal({
             disabled={loading || files.length === 0}
           >
             {loading
-              ? t('member.projects.applicationRecords.loading', '로딩중...')
-              : t('member.projects.applicationRecords.submit', '제출')}
+              ? t("member.projects.applicationRecords.loading", "로딩중...")
+              : t("member.projects.applicationRecords.submit", "제출")}
           </Button>
         </div>
       </div>

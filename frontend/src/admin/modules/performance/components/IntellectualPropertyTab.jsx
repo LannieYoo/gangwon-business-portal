@@ -3,11 +3,15 @@
  * 知识产权标签页内容
  */
 
-import { useTranslation } from 'react-i18next';
-import { Button } from '@shared/components';
-import { useDateFormatter } from '@shared/hooks';
+import { useTranslation } from "react-i18next";
+import { Button } from "@shared/components";
+import { useDateFormatter } from "@shared/hooks";
 
-export default function IntellectualPropertyTab({ record, onDownload, onDownloadByUrl }) {
+export default function IntellectualPropertyTab({
+  record,
+  onDownload,
+  onDownloadByUrl,
+}) {
   const { t } = useTranslation();
   const { formatDate, formatValue } = useDateFormatter();
 
@@ -15,16 +19,19 @@ export default function IntellectualPropertyTab({ record, onDownload, onDownload
    * 翻译枚举值
    */
   const translateEnumValue = (category, value) => {
-    if (!value) return '-';
+    if (!value) return "-";
     const key = `admin.performance.${category}.${value}`;
     const translated = t(key);
     return translated === key ? value : translated;
   };
 
-  if (!record?.dataJson?.intellectualProperty || record.dataJson.intellectualProperty.length === 0) {
+  if (
+    !record?.dataJson?.intellectualProperty ||
+    record.dataJson.intellectualProperty.length === 0
+  ) {
     return (
       <div className="text-center text-gray-500 py-8">
-        {t('common.noData', '데이터가 없습니다')}
+        {t("common.noData", "데이터가 없습니다")}
       </div>
     );
   }
@@ -37,71 +44,137 @@ export default function IntellectualPropertyTab({ record, onDownload, onDownload
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-600 font-medium">
-                {t('admin.performance.intellectualPropertyFields.name', '지식재산권명')}
-              </label>
-              <span className="text-base text-gray-900">{formatValue(item.name)}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-600 font-medium">
-                {t('admin.performance.intellectualPropertyFields.number', '지식재산권번호')}
-              </label>
-              <span className="text-base text-gray-900">{formatValue(item.number)}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-600 font-medium">
-                {t('admin.performance.intellectualPropertyFields.type', '지식재산권 구분')}
-              </label>
-              <span className="text-base text-gray-900">{translateEnumValue('ipType', item.type)}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-600 font-medium">
-                {t('admin.performance.intellectualPropertyFields.registrationType', '지식재산권 등록 구분')}
-              </label>
-              <span className="text-base text-gray-900">{translateEnumValue('ipRegistrationType', item.registrationType)}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-600 font-medium">
-                {t('admin.performance.intellectualPropertyFields.country', '등록 국가')}
-              </label>
-              <span className="text-base text-gray-900">{translateEnumValue('country', item.country)}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-600 font-medium">
-                {t('admin.performance.intellectualPropertyFields.overseasType', '해외 신청 구분')}
-              </label>
-              <span className="text-base text-gray-900">{translateEnumValue('overseasApplicationType', item.overseasType)}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-600 font-medium">
-                {t('admin.performance.intellectualPropertyFields.registrationDate', '등록일')}
-              </label>
-              <span className="text-base text-gray-900">{formatDate(item.registrationDate)}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm text-gray-600 font-medium">
-                {t('admin.performance.intellectualPropertyFields.publicDisclosure', '공개 희망 여부')}
+                {t(
+                  "admin.performance.intellectualPropertyFields.name",
+                  "지식재산권명",
+                )}
               </label>
               <span className="text-base text-gray-900">
-                {item.publicDisclosure ? t('common.yes', '예') : t('common.no', '아니오')}
+                {formatValue(item.name)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-600 font-medium">
+                {t(
+                  "admin.performance.intellectualPropertyFields.number",
+                  "지식재산권번호",
+                )}
+              </label>
+              <span className="text-base text-gray-900">
+                {formatValue(item.number)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-600 font-medium">
+                {t(
+                  "admin.performance.intellectualPropertyFields.type",
+                  "지식재산권 구분",
+                )}
+              </label>
+              <span className="text-base text-gray-900">
+                {translateEnumValue("ipType", item.type)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-600 font-medium">
+                {t(
+                  "admin.performance.intellectualPropertyFields.registrationType",
+                  "지식재산권 등록 구분",
+                )}
+              </label>
+              <span className="text-base text-gray-900">
+                {translateEnumValue(
+                  "ipRegistrationType",
+                  item.registrationType,
+                )}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-600 font-medium">
+                {t(
+                  "admin.performance.intellectualPropertyFields.country",
+                  "등록 국가",
+                )}
+              </label>
+              <span className="text-base text-gray-900">
+                {translateEnumValue("country", item.country)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-600 font-medium">
+                {t(
+                  "admin.performance.intellectualPropertyFields.overseasType",
+                  "해외 신청 구분",
+                )}
+              </label>
+              <span className="text-base text-gray-900">
+                {translateEnumValue(
+                  "overseasApplicationType",
+                  item.overseasType,
+                )}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-600 font-medium">
+                {t(
+                  "admin.performance.intellectualPropertyFields.registrationDate",
+                  "등록일",
+                )}
+              </label>
+              <span className="text-base text-gray-900">
+                {formatDate(item.registrationDate)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm text-gray-600 font-medium">
+                {t(
+                  "admin.performance.intellectualPropertyFields.publicDisclosure",
+                  "공개 희망 여부",
+                )}
+              </label>
+              <span className="text-base text-gray-900">
+                {item.publicDisclosure
+                  ? t("common.yes", "예")
+                  : t("common.no", "아니오")}
               </span>
             </div>
           </div>
           {item.attachments && item.attachments.length > 0 && (
             <div className="mt-4 pt-4 border-t border-gray-100">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.performance.intellectualPropertyFields.proofDocument', '증빙서류')}
+                {t(
+                  "admin.performance.intellectualPropertyFields.proofDocument",
+                  "증빙서류",
+                )}
               </label>
               <div className="space-y-2">
                 {item.attachments.map((attachment, attachmentIndex) => (
-                  <div key={attachmentIndex} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                  <div
+                    key={attachmentIndex}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded"
+                  >
                     <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      <svg
+                        className="w-4 h-4 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                        />
                       </svg>
-                      <span className="text-sm text-gray-700">{attachment.fileName || t('common.document', '증명문서')}</span>
+                      <span className="text-sm text-gray-700">
+                        {attachment.originalName ||
+                          attachment.fileName ||
+                          t("common.document", "증명문서")}
+                      </span>
                       {attachment.fileSize && (
                         <span className="text-xs text-gray-500">
-                          ({(attachment.fileSize / 1024).toFixed(1)} KB)
+                          ({(attachment.fileSize / 1024 / 1024).toFixed(1)} MB)
                         </span>
                       )}
                     </div>
@@ -110,13 +183,19 @@ export default function IntellectualPropertyTab({ record, onDownload, onDownload
                       size="sm"
                       onClick={() => {
                         if (attachment.fileUrl) {
-                          onDownloadByUrl(attachment.fileUrl, attachment.fileName);
+                          onDownloadByUrl(
+                            attachment.fileUrl,
+                            attachment.originalName || attachment.fileName,
+                          );
                         } else if (attachment.fileId) {
-                          onDownload(attachment.fileId, attachment.fileName);
+                          onDownload(
+                            attachment.fileId,
+                            attachment.originalName || attachment.fileName,
+                          );
                         }
                       }}
                     >
-                      {t('common.download', '다운로드')}
+                      {t("common.download", "다운로드")}
                     </Button>
                   </div>
                 ))}
@@ -128,7 +207,3 @@ export default function IntellectualPropertyTab({ record, onDownload, onDownload
     </div>
   );
 }
-
-
-
-

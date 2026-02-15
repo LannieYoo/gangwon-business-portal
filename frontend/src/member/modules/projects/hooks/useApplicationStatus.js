@@ -16,47 +16,76 @@ export function useApplicationStatus() {
     (status) => {
       const statusMap = {
         [ApplicationStatus.PENDING]: {
-          label: t("member.projects.applicationRecords.status.pending", "접수 대기"),
+          label: t(
+            "member.projects.applicationRecords.status.pending",
+            "접수 대기",
+          ),
           variant: "warning",
           canCancel: true,
         },
         [ApplicationStatus.SUBMITTED]: {
-          label: t("member.projects.applicationRecords.status.submitted", "접수 완료"),
+          label: t(
+            "member.projects.applicationRecords.status.submitted",
+            "접수 완료",
+          ),
           variant: "info",
           canCancel: true,
         },
         [ApplicationStatus.UNDER_REVIEW]: {
-          label: t("member.projects.applicationRecords.status.under_review", "심사중"),
+          label: t(
+            "member.projects.applicationRecords.status.under_review",
+            "심사중",
+          ),
           variant: "primary",
           canCancel: true,
         },
         [ApplicationStatus.REVIEWING]: {
-          label: t("member.projects.applicationRecords.status.reviewing", "심사중"),
+          label: t(
+            "member.projects.applicationRecords.status.reviewing",
+            "심사중",
+          ),
           variant: "primary",
           canCancel: true,
         },
         [ApplicationStatus.NEEDS_SUPPLEMENT]: {
           label: t(
-            "projects.applicationRecords.status.needs_supplement",
+            "member.projects.applicationRecords.status.needs_supplement",
             "보완 필요",
           ),
           variant: "warning",
           needsSupplement: true,
           canCancel: false,
         },
+        [ApplicationStatus.SUPPLEMENT_SUBMITTED]: {
+          label: t(
+            "member.projects.applicationRecords.status.supplement_submitted",
+            "서류보완완료",
+          ),
+          variant: "info",
+          canCancel: false,
+        },
         [ApplicationStatus.APPROVED]: {
-          label: t("member.projects.applicationRecords.status.approved", "승인"),
+          label: t(
+            "member.projects.applicationRecords.status.approved",
+            "승인",
+          ),
           variant: "success",
           canCancel: false,
         },
         [ApplicationStatus.REJECTED]: {
-          label: t("member.projects.applicationRecords.status.rejected", "거절"),
+          label: t(
+            "member.projects.applicationRecords.status.rejected",
+            "거절",
+          ),
           variant: "danger",
           canCancel: false,
           showRejectionReason: true,
         },
         [ApplicationStatus.CANCELLED]: {
-          label: t("member.projects.applicationRecords.status.cancelled", "취소"),
+          label: t(
+            "member.projects.applicationRecords.status.cancelled",
+            "취소",
+          ),
           variant: "gray",
           canCancel: false,
         },

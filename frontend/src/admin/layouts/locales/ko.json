@@ -24,7 +24,12 @@
         "statistics": "통계 보고서"
       },
       "footer": {
-        "copyright": "강원 창업톡. All rights reserved.",
+        "copyright": "강원대학교. All rights reserved.",
+        "termsOfService": "이용약관",
+        "privacyPolicy": "개인정보처리방침",
+        "noContent": "콘텐츠가 없습니다",
+        "error": "콘텐츠를 불러오는 중 오류가 발생했습니다",
+        "loading": "로딩 중...",
         "version": "버전"
       }
     }

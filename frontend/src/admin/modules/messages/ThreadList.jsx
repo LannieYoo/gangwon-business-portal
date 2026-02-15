@@ -510,7 +510,8 @@ export default function ThreadList() {
                                   };
 
                                   const fileUrl = getFileUrl(att.fileUrl);
-                                  const fileName = att.fileName || "";
+                                  const fileName =
+                                    att.originalName || att.fileName || "";
                                   const isImage =
                                     att.mimeType?.startsWith("image/") ||
                                     /\.(jpg|jpeg|png|gif|webp)$/i.test(
@@ -564,7 +565,11 @@ export default function ThreadList() {
                                       </span>
                                       {att.fileSize && (
                                         <span className="text-[10px] opacity-70">
-                                          ({(att.fileSize / 1024).toFixed(0)}KB)
+                                          (
+                                          {(att.fileSize / 1024 / 1024).toFixed(
+                                            1,
+                                          )}{" "}
+                                          MB)
                                         </span>
                                       )}
                                     </a>
@@ -608,7 +613,7 @@ export default function ThreadList() {
                             className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs"
                           >
                             <span className="truncate max-w-[120px]">
-                              {att.fileName}
+                              {att.originalName || att.fileName}
                             </span>
                             <button
                               type="button"

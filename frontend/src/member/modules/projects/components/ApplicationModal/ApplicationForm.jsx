@@ -60,7 +60,7 @@ export default function ApplicationForm({
             </span>
             <span className="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800">
               {t(
-                `projects.applicationRecords.status.${existingApplication.status}`,
+                `member.projects.applicationRecords.status.${existingApplication.status}`,
                 existingApplication.status,
               )}
             </span>

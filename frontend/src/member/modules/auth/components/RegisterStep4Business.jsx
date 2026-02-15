@@ -5,7 +5,6 @@ import {
   STARTUP_TYPES,
   STARTUP_STAGES,
   KSIC_MAJOR_CATEGORIES,
-  BUSINESS_FIELDS,
   MAIN_INDUSTRY_KSIC_MAJORS,
   GANGWON_FUTURE_INDUSTRIES,
   FUTURE_TECHNOLOGIES,
@@ -24,7 +23,6 @@ export const RegisterStep4Business = ({
     getStartupStageOptions,
     getKsicMajorOptions,
     getKsicSubOptions,
-    getBusinessFieldOptions,
     getMainIndustryKsicOptions,
     getMainIndustryKsicCodesOptions,
     getGangwonIndustryOptions,
@@ -73,10 +71,6 @@ export const RegisterStep4Business = ({
     () => getKsicSubOptions(ksicSubKeys, false),
     [getKsicSubOptions, ksicSubKeys],
   );
-  const businessFieldOptions = useMemo(
-    () => getBusinessFieldOptions(BUSINESS_FIELDS, false),
-    [getBusinessFieldOptions],
-  );
   const mainIndustryMajorOptions = useMemo(
     () => getMainIndustryKsicOptions(MAIN_INDUSTRY_KSIC_MAJORS, false),
     [getMainIndustryKsicOptions],
@@ -119,18 +113,20 @@ export const RegisterStep4Business = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("member.auth.businessField", "사업 분야")}
+          {t("member.auth.startupStage", "창업구분")}{" "}
+          <span className="text-red-500">*</span>
         </label>
         <select
-          name="businessField"
-          value={formData.businessField || ""}
+          name="startupStage"
+          value={formData.startupStage || ""}
           onChange={handleChange}
+          required
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
         >
           <option value="">
-            {t("member.auth.selectBusinessField", "사업 분야를 선택하세요")}
+            {t("member.auth.selectStartupStage", "창업구분을 선택하세요")}
           </option>
-          {businessFieldOptions.map((opt) => (
+          {startupStageOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -281,29 +277,6 @@ export const RegisterStep4Business = ({
             ))}
           </select>
         </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("member.auth.startupStage", "창업구분")}{" "}
-          <span className="text-red-500">*</span>
-        </label>
-        <select
-          name="startupStage"
-          value={formData.startupStage || ""}
-          onChange={handleChange}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-        >
-          <option value="">
-            {t("member.auth.selectStartupStage", "창업구분을 선택하세요")}
-          </option>
-          {startupStageOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div>

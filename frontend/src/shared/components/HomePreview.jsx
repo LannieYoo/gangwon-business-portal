@@ -25,21 +25,35 @@ function HomePreview({
 
   return (
     <section className="content-preview-section w-full flex-1 flex flex-col bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-      <div className="flex items-center justify-between mb-6 flex-shrink-0 max-md:flex-col max-md:items-start max-md:gap-2">
-        <h2 className="text-2xl font-semibold text-gray-900 m-0">{title}</h2>
+      <div className="flex items-center justify-between mb-6 flex-shrink-0 gap-2">
+        <h2 className="text-xl md:text-2xl font-semibold text-gray-900 m-0">
+          {title}
+        </h2>
         {viewAllLink && (
           <Link
             to={viewAllLink}
-            className="text-blue-600 no-underline text-sm font-medium transition-colors hover:text-blue-500 hover:underline"
+            className="text-blue-600 no-underline text-sm font-medium transition-colors hover:text-blue-500 hover:underline whitespace-nowrap flex-shrink-0"
           >
-            {t('common.viewAll', '전체 보기')}
+            {t("common.viewAll", "전체 보기")}
           </Link>
         )}
       </div>
 
       {loading ? (
-        <div className="p-8 text-center text-gray-500">
-          <p>{t('common.loading', '로딩 중...')}</p>
+        <div className="flex flex-col gap-3 flex-1">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="bg-white rounded-lg border border-gray-100 p-4 animate-pulse"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-5 w-14 bg-gray-200 rounded" />
+                <div className="h-3 w-20 bg-gray-100 rounded" />
+              </div>
+              <div className="h-4 w-3/4 bg-gray-200 rounded mb-2" />
+              <div className="h-4 w-1/2 bg-gray-100 rounded" />
+            </div>
+          ))}
         </div>
       ) : items.length > 0 ? (
         <div className="flex flex-col gap-3 flex-1 overflow-visible">
@@ -55,6 +69,7 @@ function HomePreview({
                 attachments={item.attachments}
                 onClick={onItemClick ? () => onItemClick(item.id) : undefined}
                 size="small"
+                className="flex-1"
               />
             );
           })}
@@ -62,7 +77,7 @@ function HomePreview({
       ) : (
         <Card className="p-8 text-center text-gray-500">
           <p className="text-sm text-gray-500 m-0 text-center p-4">
-            {emptyMessage || t('common.noData', '데이터가 없습니다')}
+            {emptyMessage || t("common.noData", "데이터가 없습니다")}
           </p>
         </Card>
       )}
@@ -72,7 +87,7 @@ function HomePreview({
         <Modal
           isOpen={!!selectedItem}
           onClose={onCloseModal}
-          title={selectedItem?.title || t('common.loading', '로딩 중...')}
+          title={selectedItem?.title || t("common.loading", "로딩 중...")}
           size="lg"
         >
           {selectedItem ? (
@@ -126,7 +141,7 @@ function HomePreview({
                 selectedItem.attachments.length > 0 && (
                   <div className="border-t pt-4 mt-4">
                     <h4 className="text-sm font-medium text-gray-700 mb-3">
-                      {t('components.fileUpload.attachments', '첨부파일')} (
+                      {t("components.fileUpload.attachments", "첨부파일")} (
                       {selectedItem.attachments.length})
                     </h4>
                     <div className="space-y-2">
@@ -135,14 +150,20 @@ function HomePreview({
                         const fileNameIndices = {};
 
                         selectedItem.attachments.forEach((attachment) => {
-                          const fileName = attachment.fileName || "Unknown";
+                          const fileName =
+                            attachment.originalName ||
+                            attachment.fileName ||
+                            "Unknown";
                           fileNameCounts[fileName] =
                             (fileNameCounts[fileName] || 0) + 1;
                         });
 
                         return selectedItem.attachments.map(
                           (attachment, index) => {
-                            const fileName = attachment.fileName || "Unknown";
+                            const fileName =
+                              attachment.originalName ||
+                              attachment.fileName ||
+                              "Unknown";
 
                             let displayName = fileName;
                             if (fileNameCounts[fileName] > 1) {
@@ -154,7 +175,9 @@ function HomePreview({
                             const handleDownloadClick = () => {
                               const url = attachment.fileUrl;
                               const fileName =
-                                attachment.fileName || "download";
+                                attachment.originalName ||
+                                attachment.fileName ||
+                                "download";
 
                               if (!url) {
                                 console.error(
@@ -186,7 +209,7 @@ function HomePreview({
                                   {displayName}
                                 </span>
                                 <span className="text-xs text-gray-500 group-hover:text-blue-600">
-                                  {t('common.download', '다운로드')}
+                                  {t("common.download", "다운로드")}
                                 </span>
                               </button>
                             );
@@ -205,7 +228,3 @@ function HomePreview({
 }
 
 export default HomePreview;
-
-
-
-

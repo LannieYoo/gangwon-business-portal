@@ -42,7 +42,8 @@ export function HomeCard({
     e.stopPropagation();
 
     const url = attachment.fileUrl;
-    const fileName = attachment.fileName || "download";
+    const fileName =
+      attachment.originalName || attachment.fileName || "download";
 
     if (!url) {
       console.error("No file URL found for attachment:", attachment);
@@ -142,13 +143,19 @@ export function HomeCard({
                     const fileNameIndices = {};
 
                     attachments.forEach((attachment) => {
-                      const fileName = attachment.fileName || "Unknown";
+                      const fileName =
+                        attachment.originalName ||
+                        attachment.fileName ||
+                        "Unknown";
                       fileNameCounts[fileName] =
                         (fileNameCounts[fileName] || 0) + 1;
                     });
 
                     return attachments.map((attachment, index) => {
-                      const fileName = attachment.fileName || "Unknown";
+                      const fileName =
+                        attachment.originalName ||
+                        attachment.fileName ||
+                        "Unknown";
 
                       let displayName = fileName;
                       if (fileNameCounts[fileName] > 1) {
@@ -181,7 +188,3 @@ export function HomeCard({
     </Card>
   );
 }
-
-
-
-

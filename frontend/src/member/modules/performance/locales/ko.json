@@ -19,7 +19,7 @@
       "annual": "연간",
       "title": "성과 관리",
       "subtitle": "기업 성과 데이터 입력 및 관리",
-      "query": "성과 조회",
+      "query": "이력 조회",
       "input": "성과 입력",
       "searchPlaceholder": "연도 또는 분기로 검색",
       "resultsCount": "총 {{count}}건",
@@ -102,7 +102,23 @@
       "tabs": {
         "salesEmployment": "매출 고용",
         "governmentSupport": "정부지원 수혜 이력",
-        "intellectualProperty": "지식재산권"
+        "intellectualProperty": "지식재산권",
+        "investmentInfo": "투자 정보"
+      },
+      "investmentInfo": {
+        "title": "투자 정보",
+        "hasInvestment": "투자 유치 여부",
+        "type": "국내/해외 구분",
+        "selectType": "선택해주세요",
+        "domestic": "국내",
+        "overseas": "해외",
+        "amount": "투자 금액 (백만원)",
+        "amountPlaceholder": "0",
+        "institution": "투자 기관",
+        "institutionPlaceholder": "투자 기관명 입력",
+        "attachments": "증빙서류",
+        "attachmentsHint": "투자 관련 증빙서류를 업로드하세요 (최대 5개, 파일당 최대 20MB)",
+        "add": "추가"
       },
       "salesEmploymentFields": {
         "sales": "매출액",
@@ -621,7 +637,8 @@
     "tabs": {
       "salesEmployment": "매출 고용",
       "governmentSupport": "정부지원 수혜 이력",
-      "intellectualProperty": "지식재산권"
+      "intellectualProperty": "지식재산권",
+      "investmentInfo": "투자 정보"
     },
     "annual": "연간",
     "intellectualPropertyFields": {

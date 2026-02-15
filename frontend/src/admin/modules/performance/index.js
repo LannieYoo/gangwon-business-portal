@@ -2,9 +2,4 @@
  * Performance Module Export
  */
 
-export { default as PerformanceList } from './PerformanceList';
-
-
-
-
-
+export { default as PerformanceList } from "./PerformanceList";

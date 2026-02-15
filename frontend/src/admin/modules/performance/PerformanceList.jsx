@@ -1,39 +1,57 @@
 ﻿/**
  * Performance List Component - Admin Portal
- * 业绩管理列表
+ * 业绩管理列表 + 投资总额查询 (Issue 11)
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, Table, Button, Badge, Modal, Textarea, Pagination, Alert, SearchInput } from '@shared/components';
-import performanceService from './services/performance.service';
-import membersService from '../members/services/members.service';
-import { uploadService } from '@shared/services';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Card,
+  Table,
+  Button,
+  Badge,
+  Modal,
+  Textarea,
+  Pagination,
+  Alert,
+  SearchInput,
+} from "@shared/components";
+import performanceService from "./services/performance.service";
+import membersService from "../members/services/members.service";
+import { uploadService } from "@shared/services";
 import {
   formatBusinessLicense,
   exportToExcel,
   exportToCsv,
   generateExportFilename,
-} from '@shared/utils';
-import { useDateFormatter, useMessage } from '@shared/hooks';
+} from "@shared/utils";
+import { useDateFormatter, useMessage } from "@shared/hooks";
 
 export default function PerformanceList() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const memberId = searchParams.get('memberId');
-  const { formatDateTime, formatDate, formatNumber, formatValue } = useDateFormatter();
-  const { message, messageVariant, showSuccess, showError, showWarning, clearMessage } = useMessage();
-  
+  const [searchParams, setSearchParams] = useSearchParams();
+  const memberId = searchParams.get("memberId");
+  const { formatDateTime, formatDate, formatNumber, formatValue } =
+    useDateFormatter();
+  const {
+    message,
+    messageVariant,
+    showSuccess,
+    showError,
+    showWarning,
+    clearMessage,
+  } = useMessage();
+
   const [loading, setLoading] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
-  const [reviewComment, setReviewComment] = useState('');
-  const [rejectComment, setRejectComment] = useState('');
+  const [reviewComment, setReviewComment] = useState("");
+  const [rejectComment, setRejectComment] = useState("");
   const [showApproveModal, setShowApproveModal] = useState(false);
-  const [approveComment, setApproveComment] = useState('');
+  const [approveComment, setApproveComment] = useState("");
   const [allRecords, setAllRecords] = useState([]);
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,7 +71,7 @@ export default function PerformanceList() {
       const params = {
         memberId: memberId || undefined,
         page: 1,
-        pageSize: 1000
+        pageSize: 1000,
       };
       const response = await performanceService.listPerformanceRecords(params);
       if (response && response.items) {
@@ -64,7 +82,7 @@ export default function PerformanceList() {
         setFilteredRecords([]);
       }
     } catch (error) {
-      console.error('Failed to load performance records:', error);
+      console.error("Failed to load performance records:", error);
       setAllRecords([]);
       setFilteredRecords([]);
     } finally {
@@ -77,31 +95,34 @@ export default function PerformanceList() {
   }, [loadAllPerformanceRecords]);
 
   // 状态映射配置
-  const getStatusConfig = useCallback((status) => {
-    const variantMap = {
-      approved: 'success',
-      submitted: 'info',
-      pending: 'warning',
-      revision_requested: 'warning',
-      revision_required: 'warning',
-      draft: 'secondary',
-      rejected: 'danger'
-    };
-    const statusKeyMap = {
-      approved: 'approved',
-      submitted: 'submitted',
-      pending: 'submitted',
-      revision_requested: 'revisionRequested',
-      revision_required: 'revisionRequested',
-      draft: 'draft',
-      rejected: 'rejected'
-    };
-    const statusKey = statusKeyMap[status] || status;
-    return {
-      variant: variantMap[status] || 'default',
-      label: t(`performance.status.${statusKey}`, status)
-    };
-  }, [t]);
+  const getStatusConfig = useCallback(
+    (status) => {
+      const variantMap = {
+        approved: "success",
+        submitted: "info",
+        pending: "warning",
+        revision_requested: "warning",
+        revision_required: "warning",
+        draft: "secondary",
+        rejected: "danger",
+      };
+      const statusKeyMap = {
+        approved: "approved",
+        submitted: "submitted",
+        pending: "submitted",
+        revision_requested: "revisionRequested",
+        revision_required: "revisionRequested",
+        draft: "draft",
+        rejected: "rejected",
+      };
+      const statusKey = statusKeyMap[status] || status;
+      return {
+        variant: variantMap[status] || "default",
+        label: t(`performance.status.${statusKey}`, status),
+      };
+    },
+    [t],
+  );
 
   // 分页后的数据
   const records = useMemo(() => {
@@ -117,73 +138,93 @@ export default function PerformanceList() {
 
   const handleApprove = async () => {
     try {
-      await performanceService.approvePerformance(selectedRecord.id, approveComment || null);
-      showSuccess(t('admin.performance.approveSuccess', '승인 성공'));
+      await performanceService.approvePerformance(
+        selectedRecord.id,
+        approveComment || null,
+      );
+      showSuccess(t("admin.performance.approveSuccess", "승인 성공"));
       setShowApproveModal(false);
-      setApproveComment('');
+      setApproveComment("");
       setSelectedRecord(null);
       await loadAllPerformanceRecords();
     } catch (error) {
-      console.error('Approve error:', error);
-      showError(t('admin.performance.approveFailed', '승인 실패'));
+      console.error("Approve error:", error);
+      showError(t("admin.performance.approveFailed", "승인 실패"));
     }
   };
 
   const handleRequestRevision = async () => {
     if (!reviewComment.trim()) {
-      showWarning(t('admin.performance.revisionCommentRequired', '수정 의견을 입력하세요'));
+      showWarning(
+        t(
+          "admin.performance.revisionCommentRequired",
+          "수정 의견을 입력하세요",
+        ),
+      );
       return;
     }
 
     try {
-      await performanceService.requestPerformanceRevision(selectedRecord.id, reviewComment);
-      showSuccess(t('admin.performance.revisionSuccess', '수정 요청이 전송되었습니다'));
+      await performanceService.requestPerformanceRevision(
+        selectedRecord.id,
+        reviewComment,
+      );
+      showSuccess(
+        t("admin.performance.revisionSuccess", "수정 요청이 전송되었습니다"),
+      );
       setShowReviewModal(false);
-      setReviewComment('');
+      setReviewComment("");
       setSelectedRecord(null);
       await loadAllPerformanceRecords();
     } catch (error) {
-      console.error('Request revision error:', error);
-      showError(t('admin.performance.revisionFailed', '수정 요청 실패'));
+      console.error("Request revision error:", error);
+      showError(t("admin.performance.revisionFailed", "수정 요청 실패"));
     }
   };
 
   const handleReject = async () => {
     if (!rejectComment.trim()) {
-      showWarning(t('admin.performance.rejectCommentRequired', '거부 사유를 입력하세요'));
+      showWarning(
+        t("admin.performance.rejectCommentRequired", "거부 사유를 입력하세요"),
+      );
       return;
     }
 
     try {
-      await performanceService.rejectPerformance(selectedRecord.id, rejectComment);
-      showSuccess(t('admin.performance.rejectSuccess', '거부 성공'));
+      await performanceService.rejectPerformance(
+        selectedRecord.id,
+        rejectComment,
+      );
+      showSuccess(t("admin.performance.rejectSuccess", "거부 성공"));
       setShowRejectModal(false);
-      setRejectComment('');
+      setRejectComment("");
       setSelectedRecord(null);
       await loadAllPerformanceRecords();
     } catch (error) {
-      console.error('Reject error:', error);
-      showError(t('admin.performance.rejectFailed', '거부 실패'));
+      console.error("Reject error:", error);
+      showError(t("admin.performance.rejectFailed", "거부 실패"));
     }
   };
 
   const handleCancelReview = async (record) => {
     try {
       await performanceService.cancelReviewPerformance(record.id);
-      showSuccess(t('admin.performance.cancelReviewSuccess', '취소 성공'));
+      showSuccess(t("admin.performance.cancelReviewSuccess", "취소 성공"));
       await loadAllPerformanceRecords();
     } catch (error) {
-      console.error('Cancel review error:', error);
-      showError(t('admin.performance.cancelReviewFailed', '취소 실패'));
+      console.error("Cancel review error:", error);
+      showError(t("admin.performance.cancelReviewFailed", "취소 실패"));
     }
   };
 
   const handleViewDetail = (recordId) => {
     if (!recordId) {
-      showError(t('admin.performance.detail.notFound', '실적 기록이 존재하지 않습니다'));
+      showError(
+        t("admin.performance.detail.notFound", "실적 기록이 존재하지 않습니다"),
+      );
       return;
     }
-    const idString = typeof recordId === 'string' ? recordId : String(recordId);
+    const idString = typeof recordId === "string" ? recordId : String(recordId);
     navigate(`/admin/performance/${idString}`);
   };
 
@@ -199,54 +240,62 @@ export default function PerformanceList() {
   };
 
   // 导出列配置
-  const exportColumns = useMemo(() => [
-    {
-      key: 'memberCompanyName',
-      label: t('admin.performance.table.memberName', '기업명'),
-      exportRender: (value, row) => value || row.memberBusinessNumber || '-',
-    },
-    {
-      key: 'memberBusinessNumber',
-      label: t('admin.performance.table.businessNumber', '사업자등록번호'),
-      exportRender: (value) => value ? formatBusinessLicense(value) : '-',
-    },
-    { key: 'year', label: t('admin.performance.table.year') },
-    {
-      key: 'quarter',
-      label: t('admin.performance.table.quarter'),
-      exportRender: (value) => value ? t(`performance.quarter.q${value}`, `${value}분기`) : t('performance.annual', '연간'),
-    },
-    {
-      key: 'status',
-      label: t('admin.performance.table.status'),
-      exportRender: (value) => {
-        const statusKeyMap = {
-          approved: 'approved',
-          submitted: 'submitted',
-          pending: 'submitted',
-          revision_requested: 'revisionRequested',
-          revision_required: 'revisionRequested',
-          draft: 'draft',
-          rejected: 'rejected'
-        };
-        const statusKey = statusKeyMap[value] || value;
-        return t(`performance.status.${statusKey}`, value);
+  const exportColumns = useMemo(
+    () => [
+      {
+        key: "memberCompanyName",
+        label: t("admin.performance.table.memberName", "기업명"),
+        exportRender: (value, row) => value || row.memberBusinessNumber || "-",
       },
-    },
-    {
-      key: 'submittedAt',
-      label: t('admin.performance.table.submittedAt', '제출 시간'),
-      exportRender: (value) => formatDateTime(value),
-    },
-  ], [t, formatDateTime]);
+      {
+        key: "memberBusinessNumber",
+        label: t("admin.performance.table.businessNumber", "사업자등록번호"),
+        exportRender: (value) => (value ? formatBusinessLicense(value) : "-"),
+      },
+      { key: "year", label: t("admin.performance.table.year") },
+      {
+        key: "quarter",
+        label: t("admin.performance.table.quarter"),
+        exportRender: (value) =>
+          value
+            ? t(`performance.quarter.q${value}`, `${value}분기`)
+            : t("performance.annual", "연간"),
+      },
+      {
+        key: "status",
+        label: t("admin.performance.table.status"),
+        exportRender: (value) => {
+          const statusKeyMap = {
+            approved: "approved",
+            submitted: "submitted",
+            pending: "submitted",
+            revision_requested: "revisionRequested",
+            revision_required: "revisionRequested",
+            draft: "draft",
+            rejected: "rejected",
+          };
+          const statusKey = statusKeyMap[value] || value;
+          return t(`performance.status.${statusKey}`, value);
+        },
+      },
+      {
+        key: "submittedAt",
+        label: t("admin.performance.table.submittedAt", "제출 시간"),
+        exportRender: (value) => formatDateTime(value),
+      },
+    ],
+    [t, formatDateTime],
+  );
 
-  const handleExport = async (format = 'excel') => {
+  const handleExport = async (format = "excel") => {
     setLoading(true);
     try {
-      const filename = generateExportFilename(t('admin.performance.export.filename'));
-      const sheetName = t('admin.performance.export.sheetName');
+      const filename = generateExportFilename(
+        t("admin.performance.export.filename"),
+      );
+      const sheetName = t("admin.performance.export.sheetName");
 
-      if (format === 'csv') {
+      if (format === "csv") {
         await exportToCsv({
           data: allRecords,
           columns: exportColumns,
@@ -264,117 +313,124 @@ export default function PerformanceList() {
         });
       }
 
-      showSuccess(t('admin.performance.exportSuccess', '내보내기 성공'));
+      showSuccess(t("admin.performance.exportSuccess", "내보내기 성공"));
     } catch (error) {
-      console.error('Export failed:', error);
-      showError(t('admin.performance.exportFailed', '내보내기 실패'));
+      console.error("Export failed:", error);
+      showError(t("admin.performance.exportFailed", "내보내기 실패"));
     } finally {
       setLoading(false);
     }
   };
 
   // 定义搜索列 - 与表格列保持一致
-  const searchColumns = useMemo(() => [
-    {
-      key: 'memberCompanyName',
-      label: t('admin.performance.table.memberName', '기업명'),
-      render: (value, row) => {
-        if (value) return value;
-        if (row.memberBusinessNumber) return row.memberBusinessNumber;
-        return '-';
-      }
-    },
-    {
-      key: 'memberBusinessNumber',
-      label: t('admin.performance.table.businessNumber', '사업자등록번호'),
-      render: (value) => value ? formatBusinessLicense(value) : '-'
-    },
-    {
-      key: 'year',
-      label: t('admin.performance.table.year'),
-      render: (value) => value || ''
-    },
-    {
-      key: 'quarter',
-      label: t('admin.performance.table.quarter'),
-      render: (value) => value ? t(`performance.quarter.q${value}`, `${value}분기`) : t('performance.annual', '연간')
-    },
-    {
-      key: 'status',
-      label: t('admin.performance.table.status'),
-      render: (value) => {
-        const statusConfig = getStatusConfig(value);
-        return statusConfig.label;
-      }
-    },
-    {
-      key: 'submittedAt',
-      label: t('admin.performance.table.submittedAt', '제출 시간'),
-      render: (value) => formatDateTime(value)
-    }
-  ], [t, getStatusConfig]);
+  const searchColumns = useMemo(
+    () => [
+      {
+        key: "memberCompanyName",
+        label: t("admin.performance.table.memberName", "기업명"),
+        render: (value, row) => {
+          if (value) return value;
+          if (row.memberBusinessNumber) return row.memberBusinessNumber;
+          return "-";
+        },
+      },
+      {
+        key: "memberBusinessNumber",
+        label: t("admin.performance.table.businessNumber", "사업자등록번호"),
+        render: (value) => (value ? formatBusinessLicense(value) : "-"),
+      },
+      {
+        key: "year",
+        label: t("admin.performance.table.year"),
+        render: (value) => value || "",
+      },
+      {
+        key: "quarter",
+        label: t("admin.performance.table.quarter"),
+        render: (value) =>
+          value
+            ? t(`performance.quarter.q${value}`, `${value}분기`)
+            : t("performance.annual", "연간"),
+      },
+      {
+        key: "status",
+        label: t("admin.performance.table.status"),
+        render: (value) => {
+          const statusConfig = getStatusConfig(value);
+          return statusConfig.label;
+        },
+      },
+      {
+        key: "submittedAt",
+        label: t("admin.performance.table.submittedAt", "제출 시간"),
+        render: (value) => formatDateTime(value),
+      },
+    ],
+    [t, getStatusConfig],
+  );
 
   const tableColumns = [
     {
-      key: 'memberCompanyName',
-      label: t('admin.performance.table.memberName', '기업명'),
+      key: "memberCompanyName",
+      label: t("admin.performance.table.memberName", "기업명"),
       render: (value, row) => {
         if (value) return value;
         if (row.memberBusinessNumber) return row.memberBusinessNumber;
-        return '-';
-      }
+        return "-";
+      },
     },
     {
-      key: 'memberBusinessNumber',
-      label: t('admin.performance.table.businessNumber', '사업자등록번호'),
-      render: (value) => value ? formatBusinessLicense(value) : '-'
+      key: "memberBusinessNumber",
+      label: t("admin.performance.table.businessNumber", "사업자등록번호"),
+      render: (value) => (value ? formatBusinessLicense(value) : "-"),
     },
     {
-      key: 'year',
-      label: t('admin.performance.table.year')
+      key: "year",
+      label: t("admin.performance.table.year"),
     },
     {
-      key: 'quarter',
-      label: t('admin.performance.table.quarter'),
-      render: (value) => value ? t(`performance.quarter.q${value}`, `${value}분기`) : t('performance.annual', '연간')
+      key: "quarter",
+      label: t("admin.performance.table.quarter"),
+      render: (value) =>
+        value
+          ? t(`performance.quarter.q${value}`, `${value}분기`)
+          : t("performance.annual", "연간"),
     },
     {
-      key: 'status',
-      label: t('admin.performance.table.status'),
+      key: "status",
+      label: t("admin.performance.table.status"),
       render: (value) => {
         const statusConfig = getStatusConfig(value);
         return (
-          <Badge variant={statusConfig.variant}>
-            {statusConfig.label}
-          </Badge>
+          <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
         );
-      }
+      },
     },
     {
-      key: 'submittedAt',
-      label: t('admin.performance.table.submittedAt', '제출 시간'),
-      render: (value) => formatDateTime(value)
+      key: "submittedAt",
+      label: t("admin.performance.table.submittedAt", "제출 시간"),
+      render: (value) => formatDateTime(value),
     },
     {
-      key: 'actions',
-      label: t('admin.performance.table.actions', '작업'),
+      key: "actions",
+      label: t("admin.performance.table.actions", "작업"),
       render: (_, row) => (
         <div className="flex items-center space-x-2">
           <button
             onClick={(e) => {
               e.stopPropagation();
               if (!row.id) {
-                showError(t('error.record.notFound'));
+                showError(t("error.record.notFound"));
                 return;
               }
               handleViewDetail(row.id);
             }}
             className="text-primary-600 hover:text-primary-900 font-medium text-sm"
           >
-            {t('common.view')}
+            {t("common.view")}
           </button>
           {/* 显示操作按钮：只有 submitted 状态的记录可以审核 */}
-          {row.status === 'submitted' && (
+          {row.status === "submitted" && (
             <>
               <span className="text-gray-300">|</span>
               <button
@@ -384,9 +440,9 @@ export default function PerformanceList() {
                   setShowReviewModal(true);
                 }}
                 className="text-yellow-600 hover:text-yellow-900 font-medium text-sm"
-                title={t('admin.performance.requestRevision', '보완 요청')}
+                title={t("admin.performance.requestRevision", "보완 요청")}
               >
-                {t('admin.performance.requestRevision')}
+                {t("admin.performance.requestRevision")}
               </button>
               <span className="text-gray-300">|</span>
               <button
@@ -396,9 +452,9 @@ export default function PerformanceList() {
                   setShowRejectModal(true);
                 }}
                 className="text-red-600 hover:text-red-900 font-medium text-sm"
-                title={t('admin.performance.reject', '거부')}
+                title={t("admin.performance.reject", "거부")}
               >
-                {t('admin.performance.reject', '거부')}
+                {t("admin.performance.reject", "거부")}
               </button>
               <span className="text-gray-300">|</span>
               <button
@@ -408,14 +464,16 @@ export default function PerformanceList() {
                   setShowApproveModal(true);
                 }}
                 className="text-green-600 hover:text-green-900 font-medium text-sm"
-                title={t('admin.performance.approve', '승인')}
+                title={t("admin.performance.approve", "승인")}
               >
-                {t('admin.performance.approve')}
+                {t("admin.performance.approve")}
               </button>
             </>
           )}
           {/* 显示取消审核按钮：已审核的记录可以取消 */}
-          {(row.status === 'approved' || row.status === 'rejected' || row.status === 'revision_requested') && (
+          {(row.status === "approved" ||
+            row.status === "rejected" ||
+            row.status === "revision_requested") && (
             <>
               <span className="text-gray-300">|</span>
               <button
@@ -424,15 +482,15 @@ export default function PerformanceList() {
                   handleCancelReview(row);
                 }}
                 className="text-orange-600 hover:text-orange-900 font-medium text-sm"
-                title={t('admin.performance.cancelReview', '취소')}
+                title={t("admin.performance.cancelReview", "취소")}
               >
-                {t('admin.performance.cancelReview', '취소')}
+                {t("admin.performance.cancelReview", "취소")}
               </button>
             </>
           )}
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -443,23 +501,30 @@ export default function PerformanceList() {
         </Alert>
       )}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-4">{t('admin.performance.title')}</h1>
-        
+        <h1 className="text-2xl font-semibold text-gray-900 mb-4">
+          {t("admin.performance.title")}
+        </h1>
+
+        {/* Tab Navigation removed (투자 현황 tab deleted) */}
+
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <SearchInput
             data={allRecords}
             columns={searchColumns}
             onFilter={handleFilterChange}
-            placeholder={t('admin.performance.searchPlaceholder', '기업명, 사업자등록번호, 연도, 유형, 상태 등 검색')}
+            placeholder={t(
+              "admin.performance.searchPlaceholder",
+              "기업명, 사업자등록번호, 연도, 유형, 상태 등 검색",
+            )}
             className="flex-1 min-w-[200px] max-w-md"
           />
           <div className="flex items-center space-x-2 md:ml-4 w-full md:w-auto">
             <Button
-              onClick={() => handleExport('excel')}
+              onClick={() => handleExport("excel")}
               variant="outline"
               disabled={loading}
             >
-              {t('admin.performance.exportExcel', 'Excel 내보내기')}
+              {t("admin.performance.exportExcel", "Excel 내보내기")}
             </Button>
           </div>
         </div>
@@ -468,16 +533,22 @@ export default function PerformanceList() {
       <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
         {(() => {
           if (loading) {
-            return <div className="p-12 text-center text-gray-500">{t('common.loading')}</div>;
+            return (
+              <div className="p-12 text-center text-gray-500">
+                {t("common.loading")}
+              </div>
+            );
           }
           if (records.length === 0) {
             return (
               <div className="p-12 text-center text-gray-500">
-                <p className="text-lg mb-2">{t('admin.performance.noRecords')}</p>
+                <p className="text-lg mb-2">
+                  {t("admin.performance.noRecords")}
+                </p>
                 <p className="text-sm text-gray-400">
-                  {totalCount === 0 
-                    ? t('error.record.noDataHint')
-                    : t('error.record.noMatchingRecords')}
+                  {totalCount === 0
+                    ? t("error.record.noDataHint")
+                    : t("error.record.noMatchingRecords")}
                 </p>
               </div>
             );
@@ -485,19 +556,16 @@ export default function PerformanceList() {
           return (
             <>
               <div className="overflow-x-auto -mx-4 px-4">
-                <Table 
-                  columns={tableColumns} 
-                  data={records}
-                />
+                <Table columns={tableColumns} data={records} />
               </div>
               {totalCount > pageSize && (
                 <div className="px-6 py-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
                   <div className="flex items-center text-sm text-gray-700">
                     <span>
-                      {t('common.pagination.showing', { 
-                        start: ((currentPage - 1) * pageSize) + 1, 
-                        end: Math.min(currentPage * pageSize, totalCount), 
-                        total: totalCount 
+                      {t("common.pagination.showing", {
+                        start: (currentPage - 1) * pageSize + 1,
+                        end: Math.min(currentPage * pageSize, totalCount),
+                        total: totalCount,
                       })}
                     </span>
                   </div>
@@ -519,36 +587,36 @@ export default function PerformanceList() {
         isOpen={showReviewModal}
         onClose={() => {
           setShowReviewModal(false);
-          setReviewComment('');
+          setReviewComment("");
           setSelectedRecord(null);
         }}
-        title={t('admin.performance.revisionModal.title')}
+        title={t("admin.performance.revisionModal.title")}
       >
         <div className="flex flex-col gap-3 md:gap-4">
-          <p>{t('admin.performance.revisionModal.description')}</p>
+          <p>{t("admin.performance.revisionModal.description")}</p>
           <Textarea
             value={reviewComment}
             onChange={(e) => setReviewComment(e.target.value)}
-            placeholder={t('admin.performance.revisionModal.placeholder')}
+            placeholder={t("admin.performance.revisionModal.placeholder")}
             rows={5}
           />
           <div className="flex flex-col-reverse md:flex-row justify-end gap-3 md:gap-4 mt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowReviewModal(false);
-                setReviewComment('');
+                setReviewComment("");
                 setSelectedRecord(null);
               }}
               className="w-full md:w-auto"
             >
-              {t('common.cancel')}
+              {t("common.cancel")}
             </Button>
-            <Button 
+            <Button
               onClick={handleRequestRevision}
               className="w-full md:w-auto"
             >
-              {t('admin.performance.requestRevision')}
+              {t("admin.performance.requestRevision")}
             </Button>
           </div>
         </div>
@@ -559,37 +627,45 @@ export default function PerformanceList() {
         isOpen={showRejectModal}
         onClose={() => {
           setShowRejectModal(false);
-          setRejectComment('');
+          setRejectComment("");
           setSelectedRecord(null);
         }}
-        title={t('admin.performance.rejectModal.title', '실적 기록 거부')}
+        title={t("admin.performance.rejectModal.title", "실적 기록 거부")}
       >
         <div className="flex flex-col gap-3 md:gap-4">
-          <p>{t('admin.performance.rejectModal.description', '거부 사유를 입력하세요.')}</p>
+          <p>
+            {t(
+              "admin.performance.rejectModal.description",
+              "거부 사유를 입력하세요.",
+            )}
+          </p>
           <Textarea
             value={rejectComment}
             onChange={(e) => setRejectComment(e.target.value)}
-            placeholder={t('admin.performance.rejectModal.placeholder', '거부 사유를 입력하세요...')}
+            placeholder={t(
+              "admin.performance.rejectModal.placeholder",
+              "거부 사유를 입력하세요...",
+            )}
             rows={5}
           />
           <div className="flex flex-col-reverse md:flex-row justify-end gap-3 md:gap-4 mt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowRejectModal(false);
-                setRejectComment('');
+                setRejectComment("");
                 setSelectedRecord(null);
               }}
               className="w-full md:w-auto"
             >
-              {t('common.cancel')}
+              {t("common.cancel")}
             </Button>
-            <Button 
+            <Button
               onClick={handleReject}
               variant="outline"
               className="w-full md:w-auto border-red-600 text-red-600 hover:bg-red-50"
             >
-              {t('admin.performance.reject', '거부')}
+              {t("admin.performance.reject", "거부")}
             </Button>
           </div>
         </div>
@@ -600,36 +676,41 @@ export default function PerformanceList() {
         isOpen={showApproveModal}
         onClose={() => {
           setShowApproveModal(false);
-          setApproveComment('');
+          setApproveComment("");
           setSelectedRecord(null);
         }}
-        title={t('admin.performance.approveModal.title', '실적 기록 승인')}
+        title={t("admin.performance.approveModal.title", "실적 기록 승인")}
       >
         <div className="flex flex-col gap-3 md:gap-4">
-          <p>{t('admin.performance.approveModal.description', '승인 의견을 입력하세요 (선택사항).')}</p>
+          <p>
+            {t(
+              "admin.performance.approveModal.description",
+              "승인 의견을 입력하세요 (선택사항).",
+            )}
+          </p>
           <Textarea
             value={approveComment}
             onChange={(e) => setApproveComment(e.target.value)}
-            placeholder={t('admin.performance.approveModal.placeholder', '승인 의견을 입력하세요...')}
+            placeholder={t(
+              "admin.performance.approveModal.placeholder",
+              "승인 의견을 입력하세요...",
+            )}
             rows={5}
           />
           <div className="flex flex-col-reverse md:flex-row justify-end gap-3 md:gap-4 mt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowApproveModal(false);
-                setApproveComment('');
+                setApproveComment("");
                 setSelectedRecord(null);
               }}
               className="w-full md:w-auto"
             >
-              {t('common.cancel')}
+              {t("common.cancel")}
             </Button>
-            <Button 
-              onClick={handleApprove}
-              className="w-full md:w-auto"
-            >
-              {t('admin.performance.approve', '승인')}
+            <Button onClick={handleApprove} className="w-full md:w-auto">
+              {t("admin.performance.approve", "승인")}
             </Button>
           </div>
         </div>
@@ -637,8 +718,3 @@ export default function PerformanceList() {
     </div>
   );
 }
-
-
-
-
-

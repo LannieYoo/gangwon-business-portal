@@ -138,7 +138,7 @@ const PerformanceList = () => {
 
       <div className="mb-6 sm:mb-8 lg:mb-10 min-h-[48px] flex items-center">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 m-0">
-          {t("member.performance.query", "성과 조회")}
+          {t("member.performance.query", "이력 조회")}
         </h1>
       </div>
 

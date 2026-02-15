@@ -3,31 +3,57 @@
  * 业绩详情页面 - 使用 TabContainer 重构
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Badge, Loading, Modal, Textarea, Alert, TabContainer } from '@shared/components';
-import performanceService from './services/performance.service';
-import membersService from '../members/services/members.service';
-import { uploadService } from '@shared/services';
-import { useDateFormatter, useMessage } from '@shared/hooks';
-import { SalesEmploymentTab, GovernmentSupportTab, IntellectualPropertyTab } from './components';
+import { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Card,
+  Button,
+  Badge,
+  Loading,
+  Modal,
+  Textarea,
+  Alert,
+  TabContainer,
+} from "@shared/components";
+import performanceService from "./services/performance.service";
+import membersService from "../members/services/members.service";
+import { uploadService } from "@shared/services";
+import { useDateFormatter, useMessage } from "@shared/hooks";
+import {
+  SalesEmploymentTab,
+  GovernmentSupportTab,
+  IntellectualPropertyTab,
+  InvestmentInfoTab,
+} from "./components";
 
 export default function PerformanceDetail() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const currentLanguage = i18n.language === 'zh' ? 'zh' : 'ko';
-  const { formatDateTime, formatDate: formatDateOnly, formatNumber, formatValue } = useDateFormatter();
-  const { message, messageVariant, showSuccess, showError, showWarning, clearMessage } = useMessage();
-  
+  const currentLanguage = i18n.language === "zh" ? "zh" : "ko";
+  const {
+    formatDateTime,
+    formatDate: formatDateOnly,
+    formatNumber,
+    formatValue,
+  } = useDateFormatter();
+  const {
+    message,
+    messageVariant,
+    showSuccess,
+    showError,
+    showWarning,
+    clearMessage,
+  } = useMessage();
+
   const [loading, setLoading] = useState(true);
   const [record, setRecord] = useState(null);
   const [member, setMember] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
-  const [reviewComment, setReviewComment] = useState('');
-  const [rejectComment, setRejectComment] = useState('');
+  const [reviewComment, setReviewComment] = useState("");
+  const [rejectComment, setRejectComment] = useState("");
 
   useEffect(() => {
     loadPerformanceDetail();
@@ -38,9 +64,11 @@ export default function PerformanceDetail() {
     const recordData = await performanceService.getPerformanceRecord(id);
     if (recordData) {
       setRecord(recordData);
-      
+
       if (recordData.memberId) {
-        const memberData = await membersService.getMemberDetail(recordData.memberId);
+        const memberData = await membersService.getMemberDetail(
+          recordData.memberId,
+        );
         setMember(memberData);
       }
     }
@@ -50,53 +78,64 @@ export default function PerformanceDetail() {
   const handleApprove = async () => {
     try {
       await performanceService.approvePerformance(id);
-      showSuccess(t('admin.performance.approveSuccess', '승인 성공'));
+      showSuccess(t("admin.performance.approveSuccess", "승인 성공"));
       loadPerformanceDetail();
     } catch (error) {
-      console.error('Approve error:', error);
-      showError(t('admin.performance.approveFailed', '승인 실패'));
+      console.error("Approve error:", error);
+      showError(t("admin.performance.approveFailed", "승인 실패"));
     }
   };
 
   const handleRequestRevision = async () => {
     if (!reviewComment.trim()) {
-      showWarning(t('admin.performance.revisionCommentRequired', '수정 의견을 입력하세요'));
+      showWarning(
+        t(
+          "admin.performance.revisionCommentRequired",
+          "수정 의견을 입력하세요",
+        ),
+      );
       return;
     }
 
     try {
       await performanceService.requestPerformanceRevision(id, reviewComment);
-      showSuccess(t('admin.performance.revisionSuccess', '수정 요청이 전송되었습니다'));
+      showSuccess(
+        t("admin.performance.revisionSuccess", "수정 요청이 전송되었습니다"),
+      );
       setShowReviewModal(false);
-      setReviewComment('');
+      setReviewComment("");
       loadPerformanceDetail();
     } catch (error) {
-      console.error('Request revision error:', error);
-      showError(t('admin.performance.revisionFailed', '수정 요청 실패'));
+      console.error("Request revision error:", error);
+      showError(t("admin.performance.revisionFailed", "수정 요청 실패"));
     }
   };
 
   const handleReject = async () => {
     if (!rejectComment.trim()) {
-      showWarning(t('admin.performance.rejectCommentRequired', '거부 사유를 입력하세요'));
+      showWarning(
+        t("admin.performance.rejectCommentRequired", "거부 사유를 입력하세요"),
+      );
       return;
     }
 
     try {
       await performanceService.rejectPerformance(id, rejectComment);
-      showSuccess(t('admin.performance.rejectSuccess', '거부 성공'));
+      showSuccess(t("admin.performance.rejectSuccess", "거부 성공"));
       setShowRejectModal(false);
-      setRejectComment('');
+      setRejectComment("");
       loadPerformanceDetail();
     } catch (error) {
-      console.error('Reject error:', error);
-      showError(t('admin.performance.rejectFailed', '거부 실패'));
+      console.error("Reject error:", error);
+      showError(t("admin.performance.rejectFailed", "거부 실패"));
     }
   };
 
   const handleDownload = async (fileId, filename = null) => {
     if (!fileId) {
-      showError(t('admin.performance.detail.fileNotFound', '파일을 찾을 수 없습니다'));
+      showError(
+        t("admin.performance.detail.fileNotFound", "파일을 찾을 수 없습니다"),
+      );
       return;
     }
 
@@ -105,7 +144,9 @@ export default function PerformanceDetail() {
 
   const handleDownloadByUrl = async (fileUrl, filename = null) => {
     if (!fileUrl) {
-      showError(t('admin.performance.detail.fileNotFound', '파일을 찾을 수 없습니다'));
+      showError(
+        t("admin.performance.detail.fileNotFound", "파일을 찾을 수 없습니다"),
+      );
       return;
     }
 
@@ -114,26 +155,29 @@ export default function PerformanceDetail() {
 
   const getStatusVariant = (status) => {
     const variantMap = {
-      approved: 'success',
-      submitted: 'info',
-      pending: 'warning',
-      revision_requested: 'warning',
-      revision_required: 'warning',
-      draft: 'secondary',
-      rejected: 'danger'
+      approved: "success",
+      submitted: "info",
+      pending: "warning",
+      revision_requested: "warning",
+      revision_required: "warning",
+      draft: "secondary",
+      rejected: "danger",
     };
-    return variantMap[status] || 'default';
+    return variantMap[status] || "default";
   };
 
   const getStatusLabel = (status) => {
     const statusLabelMap = {
-      approved: t('performance.status.approved', '승인 완료'),
-      submitted: t('performance.status.submitted', '심사중'),
-      pending: t('performance.status.submitted', '심사중'),
-      revision_requested: t('performance.status.revisionRequested', '수정 필요'),
-      revision_required: t('performance.status.revisionRequested', '수정 필요'),
-      draft: t('performance.status.draft', '임시저장'),
-      rejected: t('performance.status.rejected', '거부됨')
+      approved: t("performance.status.approved", "승인 완료"),
+      submitted: t("performance.status.submitted", "심사중"),
+      pending: t("performance.status.submitted", "심사중"),
+      revision_requested: t(
+        "performance.status.revisionRequested",
+        "수정 필요",
+      ),
+      revision_required: t("performance.status.revisionRequested", "수정 필요"),
+      draft: t("performance.status.draft", "임시저장"),
+      rejected: t("performance.status.rejected", "거부됨"),
     };
     return statusLabelMap[status] || status;
   };
@@ -141,11 +185,11 @@ export default function PerformanceDetail() {
   // 使用 useMemo 缓存 tabs 配置
   const tabs = useMemo(() => {
     if (!record) return [];
-    
+
     return [
       {
-        key: 'salesEmployment',
-        label: t('performance.tabs.salesEmployment', '매출 고용'),
+        key: "salesEmployment",
+        label: t("performance.tabs.salesEmployment", "매출 고용"),
         content: (
           <SalesEmploymentTab
             record={record}
@@ -153,11 +197,11 @@ export default function PerformanceDetail() {
             onDownload={handleDownload}
             onDownloadByUrl={handleDownloadByUrl}
           />
-        )
+        ),
       },
       {
-        key: 'governmentSupport',
-        label: t('performance.tabs.governmentSupport', '정부지원 수혜 이력'),
+        key: "governmentSupport",
+        label: t("performance.tabs.governmentSupport", "정부지원 수혜 이력"),
         content: (
           <GovernmentSupportTab
             record={record}
@@ -165,19 +209,30 @@ export default function PerformanceDetail() {
             onDownload={handleDownload}
             onDownloadByUrl={handleDownloadByUrl}
           />
-        )
+        ),
       },
       {
-        key: 'intellectualProperty',
-        label: t('performance.tabs.intellectualProperty', '지식재산권'),
+        key: "intellectualProperty",
+        label: t("performance.tabs.intellectualProperty", "지식재산권"),
         content: (
           <IntellectualPropertyTab
             record={record}
             onDownload={handleDownload}
             onDownloadByUrl={handleDownloadByUrl}
           />
-        )
-      }
+        ),
+      },
+      {
+        key: "investmentInfo",
+        label: t("performance.tabs.investmentInfo", "투자 정보"),
+        content: (
+          <InvestmentInfoTab
+            record={record}
+            onDownload={handleDownload}
+            onDownloadByUrl={handleDownloadByUrl}
+          />
+        ),
+      },
     ];
   }, [record, currentLanguage, t]);
 
@@ -188,15 +243,21 @@ export default function PerformanceDetail() {
   if (!record) {
     return (
       <div className="p-12 text-center text-red-600">
-        <p className="mb-6">{t('admin.performance.detail.notFound', '실적 기록이 존재하지 않습니다')}</p>
-        <Button onClick={() => navigate('/admin/performance')}>
-          {t('common.back')}
+        <p className="mb-6">
+          {t(
+            "admin.performance.detail.notFound",
+            "실적 기록이 존재하지 않습니다",
+          )}
+        </p>
+        <Button onClick={() => navigate("/admin/performance")}>
+          {t("common.back")}
         </Button>
       </div>
     );
   }
 
-  const canApprove = record.status === 'submitted' || record.status === 'pending';
+  const canApprove =
+    record.status === "submitted" || record.status === "pending";
 
   return (
     <div className="w-full">
@@ -205,32 +266,35 @@ export default function PerformanceDetail() {
           {message}
         </Alert>
       )}
-      
+
       {/* 顶部操作按钮 */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={() => navigate('/admin/performance')}>
-            {t('common.back')}
+          <Button
+            variant="outline"
+            onClick={() => navigate("/admin/performance")}
+          >
+            {t("common.back")}
           </Button>
         </div>
         {canApprove && (
           <div className="flex gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowReviewModal(true)}
               className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
             >
-              {t('admin.performance.requestRevision')}
+              {t("admin.performance.requestRevision")}
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowRejectModal(true)}
               className="border-red-600 text-red-600 hover:bg-red-50"
             >
-              {t('admin.performance.reject', '거부')}
+              {t("admin.performance.reject", "거부")}
             </Button>
             <Button onClick={handleApprove}>
-              {t('admin.performance.approve')}
+              {t("admin.performance.approve")}
             </Button>
           </div>
         )}
@@ -240,7 +304,7 @@ export default function PerformanceDetail() {
       <Card className="mb-6 p-6">
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 m-0">
-            {t('admin.performance.detail.basicInfo', '기본 정보')}
+            {t("admin.performance.detail.basicInfo", "기본 정보")}
           </h2>
         </div>
 
@@ -249,63 +313,78 @@ export default function PerformanceDetail() {
             <>
               <div className="flex flex-col gap-2">
                 <label className="text-sm text-gray-600 font-medium">
-                  {t('admin.performance.table.memberName', '기업명')}
+                  {t("admin.performance.table.memberName", "기업명")}
                 </label>
                 <span className="text-base text-gray-900">
-                  {member.companyName || member.businessNumber || '-'}
+                  {member.companyName || member.businessNumber || "-"}
                 </span>
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-sm text-gray-600 font-medium">
-                  {t('admin.members.detail.businessNumber', '사업자번호')}
+                  {t("admin.members.detail.businessNumber", "사업자번호")}
                 </label>
                 <span className="text-base text-gray-900">
-                  {member.businessNumber || '-'}
+                  {member.businessNumber || "-"}
                 </span>
               </div>
             </>
           )}
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t('admin.performance.table.year', '연도')}
-            </label>
-            <span className="text-base text-gray-900">{record.year || '-'}</span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600 font-medium">
-              {t('admin.performance.table.quarter', '분기')}
+              {t("admin.performance.table.year", "연도")}
             </label>
             <span className="text-base text-gray-900">
-              {record.quarter ? t(`performance.quarter.q${record.quarter}`, `${record.quarter}분기`) : t('performance.annual', '연간')}
+              {record.year || "-"}
             </span>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t('admin.performance.table.companyPhone', '기업 전화번호')}
+              {t("admin.performance.table.quarter", "분기")}
             </label>
-            <span className="text-base text-gray-900">{record.memberPhone || '-'}</span>
+            <span className="text-base text-gray-900">
+              {record.quarter
+                ? t(
+                    `performance.quarter.q${record.quarter}`,
+                    `${record.quarter}분기`,
+                  )
+                : t("performance.annual", "연간")}
+            </span>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t('admin.performance.table.submittedAt', '제출 시간')}
+              {t("admin.performance.table.companyPhone", "기업 전화번호")}
             </label>
-            <span className="text-base text-gray-900">{formatDateTime(record.submittedAt)}</span>
+            <span className="text-base text-gray-900">
+              {record.memberPhone || "-"}
+            </span>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t('admin.performance.detail.createdAt', '생성 시간')}
+              {t("admin.performance.table.submittedAt", "제출 시간")}
             </label>
-            <span className="text-base text-gray-900">{formatDateTime(record.createdAt)}</span>
+            <span className="text-base text-gray-900">
+              {formatDateTime(record.submittedAt)}
+            </span>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t('admin.performance.detail.updatedAt', '업데이트 시간')}
+              {t("admin.performance.detail.createdAt", "생성 시간")}
             </label>
-            <span className="text-base text-gray-900">{formatDateTime(record.updatedAt)}</span>
+            <span className="text-base text-gray-900">
+              {formatDateTime(record.createdAt)}
+            </span>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t('admin.performance.statusLabel')}
+              {t("admin.performance.detail.updatedAt", "업데이트 시간")}
+            </label>
+            <span className="text-base text-gray-900">
+              {formatDateTime(record.updatedAt)}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600 font-medium">
+              {t("admin.performance.statusLabel")}
             </label>
             <div className="flex items-center gap-2">
               <Badge variant={getStatusVariant(record.status)}>
@@ -330,34 +409,34 @@ export default function PerformanceDetail() {
         isOpen={showReviewModal}
         onClose={() => {
           setShowReviewModal(false);
-          setReviewComment('');
+          setReviewComment("");
         }}
-        title={t('admin.performance.revisionModal.title')}
+        title={t("admin.performance.revisionModal.title")}
       >
         <div className="flex flex-col gap-3 md:gap-4">
-          <p>{t('admin.performance.revisionModal.description')}</p>
+          <p>{t("admin.performance.revisionModal.description")}</p>
           <Textarea
             value={reviewComment}
             onChange={(e) => setReviewComment(e.target.value)}
-            placeholder={t('admin.performance.revisionModal.placeholder')}
+            placeholder={t("admin.performance.revisionModal.placeholder")}
             rows={5}
           />
           <div className="flex flex-col-reverse md:flex-row justify-end gap-3 md:gap-4 mt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowReviewModal(false);
-                setReviewComment('');
+                setReviewComment("");
               }}
               className="w-full md:w-auto"
             >
-              {t('common.cancel')}
+              {t("common.cancel")}
             </Button>
-            <Button 
+            <Button
               onClick={handleRequestRevision}
               className="w-full md:w-auto"
             >
-              {t('admin.performance.requestRevision')}
+              {t("admin.performance.requestRevision")}
             </Button>
           </div>
         </div>
@@ -368,35 +447,43 @@ export default function PerformanceDetail() {
         isOpen={showRejectModal}
         onClose={() => {
           setShowRejectModal(false);
-          setRejectComment('');
+          setRejectComment("");
         }}
-        title={t('admin.performance.rejectModal.title', '실적 기록 거부')}
+        title={t("admin.performance.rejectModal.title", "실적 기록 거부")}
       >
         <div className="flex flex-col gap-3 md:gap-4">
-          <p>{t('admin.performance.rejectModal.description', '거부 사유를 입력하세요.')}</p>
+          <p>
+            {t(
+              "admin.performance.rejectModal.description",
+              "거부 사유를 입력하세요.",
+            )}
+          </p>
           <Textarea
             value={rejectComment}
             onChange={(e) => setRejectComment(e.target.value)}
-            placeholder={t('admin.performance.rejectModal.placeholder', '거부 사유를 입력하세요...')}
+            placeholder={t(
+              "admin.performance.rejectModal.placeholder",
+              "거부 사유를 입력하세요...",
+            )}
             rows={5}
           />
           <div className="flex flex-col-reverse md:flex-row justify-end gap-3 md:gap-4 mt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowRejectModal(false);
-                setRejectComment('');
+                setRejectComment("");
               }}
               className="w-full md:w-auto"
             >
-              {t('common.cancel')}
+              {t("common.cancel")}
             </Button>
-            <Button 
+            <Button
               onClick={handleReject}
               variant="outline"
               className="w-full md:w-auto border-red-600 text-red-600 hover:bg-red-50"
             >
-              {t('admin.performance.reject', '거부')}
+              {t("admin.performance.reject", "거부")}
             </Button>
           </div>
         </div>
@@ -404,7 +491,3 @@ export default function PerformanceDetail() {
     </div>
   );
 }
-
-
-
-

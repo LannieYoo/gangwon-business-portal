@@ -1,6 +1,6 @@
 ﻿/**
  * Performance Service - 绩效管理服务 (管理员端)
- * 
+ *
  * 管理员端绩效审核功能
  * 遵循 dev-frontend_patterns skill 规范
  */
@@ -35,7 +35,10 @@ class PerformanceService {
    * @returns {Promise<Object>} 操作结果
    */
   async approvePerformance(recordId, comments = null) {
-    return await apiService.post(`${API_PREFIX}/admin/performance/${recordId}/approve`, { comments });
+    return await apiService.post(
+      `${API_PREFIX}/admin/performance/${recordId}/approve`,
+      { comments },
+    );
   }
 
   /**
@@ -45,7 +48,10 @@ class PerformanceService {
    * @returns {Promise<Object>} 操作结果
    */
   async requestPerformanceRevision(recordId, comments) {
-    return await apiService.post(`${API_PREFIX}/admin/performance/${recordId}/request-fix`, { comments });
+    return await apiService.post(
+      `${API_PREFIX}/admin/performance/${recordId}/request-fix`,
+      { comments },
+    );
   }
 
   /**
@@ -55,7 +61,10 @@ class PerformanceService {
    * @returns {Promise<Object>} 操作结果
    */
   async rejectPerformance(recordId, comments) {
-    return await apiService.post(`${API_PREFIX}/admin/performance/${recordId}/reject`, { comments: comments ?? null });
+    return await apiService.post(
+      `${API_PREFIX}/admin/performance/${recordId}/reject`,
+      { comments: comments ?? null },
+    );
   }
 
   /**
@@ -64,7 +73,10 @@ class PerformanceService {
    * @returns {Promise<Object>} 操作结果
    */
   async cancelReviewPerformance(recordId) {
-    return await apiService.post(`${API_PREFIX}/admin/performance/${recordId}/cancel-review`, {});
+    return await apiService.post(
+      `${API_PREFIX}/admin/performance/${recordId}/cancel-review`,
+      {},
+    );
   }
 
   /**
@@ -73,12 +85,24 @@ class PerformanceService {
    * @returns {Promise<Blob>} 导出文件
    */
   async exportPerformance(params) {
-    return await apiService.download(`${API_PREFIX}/admin/performance/export`, params);
+    return await apiService.download(
+      `${API_PREFIX}/admin/performance/export`,
+      params,
+    );
+  }
+
+  /**
+   * 获取机构别投资金额汇总 (Issue 11)
+   * @param {number} year - 年度筛选 (可选)
+   * @returns {Promise<Object>} 投资汇总数据
+   */
+  async getInvestmentSummary(year = null) {
+    const params = year ? { year } : {};
+    return await apiService.get(
+      `${API_PREFIX}/admin/performance/investment-summary`,
+      params,
+    );
   }
 }
 
 export default createService(PerformanceService);
-
-
-
-

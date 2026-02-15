@@ -3,21 +3,30 @@
  * 项目详情页面
  */
 
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Badge, Loading, Table, Pagination, Modal, Alert } from '@shared/components';
-import projectsService from './services/projects.service';
-import { uploadService, apiService } from '@shared/services';
-import { formatDate } from '@shared/utils';
-import { API_PREFIX } from '@shared/utils/constants';
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Card,
+  Button,
+  Badge,
+  Loading,
+  Table,
+  Pagination,
+  Modal,
+  Alert,
+} from "@shared/components";
+import projectsService from "./services/projects.service";
+import { uploadService, apiService } from "@shared/services";
+import { formatDate } from "@shared/utils";
+import { API_PREFIX } from "@shared/utils/constants";
 
 export default function ProjectDetail() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const currentLanguage = i18n.language === 'zh' ? 'zh' : 'ko';
-  
+  const currentLanguage = i18n.language === "zh" ? "zh" : "ko";
+
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState(null);
   const [applications, setApplications] = useState([]);
@@ -28,11 +37,17 @@ export default function ProjectDetail() {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
+  const [rejectReason, setRejectReason] = useState("");
   const [rejectingApplicationId, setRejectingApplicationId] = useState(null);
+  const [showSupplementRequestModal, setShowSupplementRequestModal] =
+    useState(false);
+  const [supplementRequestMessage, setSupplementRequestMessage] = useState("");
+  const [
+    supplementRequestingApplicationId,
+    setSupplementRequestingApplicationId,
+  ] = useState(null);
   const [message, setMessage] = useState(null);
-  const [messageVariant, setMessageVariant] = useState('success');
-
+  const [messageVariant, setMessageVariant] = useState("success");
 
   useEffect(() => {
     loadProjectDetail();
@@ -81,24 +96,22 @@ export default function ProjectDetail() {
     await uploadService.downloadFileByUrl(fileUrl, filename);
   };
 
-
-
   const getStatusVariant = (status) => {
     const variantMap = {
-      active: 'success',
-      inactive: 'secondary',
-      draft: 'warning',
-      cancelled: 'error'
+      active: "success",
+      inactive: "secondary",
+      draft: "warning",
+      cancelled: "error",
     };
-    return variantMap[status] || 'default';
+    return variantMap[status] || "default";
   };
 
   const getStatusLabel = (status) => {
     const statusLabelMap = {
-      active: t('admin.projects.status.active', '진행중'),
-      inactive: t('admin.projects.status.inactive', '종료됨'),
-      draft: t('admin.projects.status.draft', '초안'),
-      cancelled: t('admin.projects.status.cancelled', '취소됨')
+      active: t("admin.projects.status.active", "진행중"),
+      inactive: t("admin.projects.status.inactive", "종료됨"),
+      draft: t("admin.projects.status.draft", "초안"),
+      cancelled: t("admin.projects.status.cancelled", "취소됨"),
     };
     return statusLabelMap[status] || status;
   };
@@ -106,86 +119,150 @@ export default function ProjectDetail() {
   // Extract attachments from project
   const getAttachments = () => {
     const attachments = [];
-    
+
     if (project && project.attachments && Array.isArray(project.attachments)) {
-      project.attachments.forEach(att => {
+      project.attachments.forEach((att) => {
         attachments.push({
           id: att.id,
           url: att.fileUrl,
-          name: att.originalName || att.storedName || att.fileName || t('common.attachment', '첨부파일'),
-          type: 'attachment',
+          name:
+            att.originalName ||
+            att.storedName ||
+            att.fileName ||
+            t("common.attachment", "첨부파일"),
+          type: "attachment",
           fileSize: att.fileSize,
           mimeType: att.mimeType,
-          uploadedAt: att.uploadedAt
+          uploadedAt: att.uploadedAt,
         });
       });
     }
-    
+
     return attachments;
   };
 
   const handleStatusChange = async (applicationId, newStatus) => {
-    if (newStatus === 'rejected') {
+    if (newStatus === "rejected") {
       setRejectingApplicationId(applicationId);
-      setRejectReason('');
+      setRejectReason("");
       setShowRejectModal(true);
       return;
     }
-    
+
+    if (newStatus === "needs_supplement") {
+      setSupplementRequestingApplicationId(applicationId);
+      setSupplementRequestMessage("");
+      setShowSupplementRequestModal(true);
+      return;
+    }
+
     try {
       await apiService.put(
         `${API_PREFIX}/admin/applications/${applicationId}/status`,
-        { 
+        {
           status: newStatus,
-          reviewNotes: null 
-        }
+          reviewNotes: null,
+        },
       );
       loadApplications();
       setShowApplicationModal(false);
     } catch (error) {
-      console.error('Failed to update application status:', error);
-      setMessageVariant('error');
-      setMessage(t('admin.applications.updateStatusFailed', '상태 업데이트 실패'));
+      console.error("Failed to update application status:", error);
+      setMessageVariant("error");
+      setMessage(
+        t("admin.applications.updateStatusFailed", "상태 업데이트 실패"),
+      );
       setTimeout(() => setMessage(null), 3000);
     }
   };
 
   const handleConfirmReject = async () => {
     if (!rejectReason.trim()) {
-      setMessageVariant('warning');
-      setMessage(t('admin.applications.rejectReasonRequired', '거부 사유를 입력하세요'));
+      setMessageVariant("warning");
+      setMessage(
+        t("admin.applications.rejectReasonRequired", "거부 사유를 입력하세요"),
+      );
       setTimeout(() => setMessage(null), 3000);
       return;
     }
-    
+
     try {
       await apiService.put(
         `${API_PREFIX}/admin/applications/${rejectingApplicationId}/status`,
-        { 
-          status: 'rejected',
-          reviewNotes: rejectReason 
-        }
+        {
+          status: "rejected",
+          reviewNotes: rejectReason,
+        },
       );
       loadApplications();
       setShowApplicationModal(false);
       setShowRejectModal(false);
-      setRejectReason('');
+      setRejectReason("");
       setRejectingApplicationId(null);
-      setMessageVariant('success');
-      setMessage(t('admin.applications.rejectSuccess', '거부 성공'));
+      setMessageVariant("success");
+      setMessage(t("admin.applications.rejectSuccess", "거부 성공"));
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to reject application:', error);
-      setMessageVariant('error');
-      setMessage(t('admin.applications.updateStatusFailed', '상태 업데이트 실패'));
+      console.error("Failed to reject application:", error);
+      setMessageVariant("error");
+      setMessage(
+        t("admin.applications.updateStatusFailed", "상태 업데이트 실패"),
+      );
       setTimeout(() => setMessage(null), 3000);
     }
   };
 
   const handleCancelReject = () => {
     setShowRejectModal(false);
-    setRejectReason('');
+    setRejectReason("");
     setRejectingApplicationId(null);
+  };
+
+  const handleConfirmSupplementRequest = async () => {
+    if (!supplementRequestMessage.trim()) {
+      setMessageVariant("warning");
+      setMessage(
+        t(
+          "admin.applications.supplementMessageRequired",
+          "보완 요청 내용을 입력하세요",
+        ),
+      );
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
+
+    try {
+      await apiService.put(
+        `${API_PREFIX}/admin/applications/${supplementRequestingApplicationId}/status`,
+        {
+          status: "needs_supplement",
+          reviewNotes: supplementRequestMessage,
+        },
+      );
+      loadApplications();
+      setShowApplicationModal(false);
+      setShowSupplementRequestModal(false);
+      setSupplementRequestMessage("");
+      setSupplementRequestingApplicationId(null);
+      setMessageVariant("success");
+      setMessage(
+        t("admin.applications.supplementRequestSuccess", "보완 요청 성공"),
+      );
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error("Failed to request supplement:", error);
+      setMessageVariant("error");
+      setMessage(
+        t("admin.applications.updateStatusFailed", "상태 업데이트 실패"),
+      );
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
+  const handleCancelSupplementRequest = () => {
+    setShowSupplementRequestModal(false);
+    setSupplementRequestMessage("");
+    setSupplementRequestingApplicationId(null);
   };
 
   const handleViewApplication = (application) => {
@@ -200,64 +277,71 @@ export default function ProjectDetail() {
   // Applications table columns
   const applicationColumns = [
     {
-      key: 'companyName',
-      label: t('admin.applications.table.company', '기업명'),
-      width: '150px',
-      render: (value) => value || '-'
+      key: "companyName",
+      label: t("admin.applications.table.company", "기업명"),
+      width: "150px",
+      render: (value) => value || "-",
     },
     {
-      key: 'applicationReason',
-      label: t('admin.applications.table.applicationReason', '신청 사유'),
-      width: '250px',
+      key: "applicationReason",
+      label: t("admin.applications.table.applicationReason", "신청 사유"),
+      width: "250px",
       render: (value) => (
         <div className="max-w-xs truncate" title={value}>
-          {value || '-'}
+          {value || "-"}
         </div>
-      )
+      ),
     },
     {
-      key: 'submittedAt',
-      label: t('admin.applications.table.submittedAt', '신청일'),
-      width: '150px',
-      render: (value) => value ? formatDate(value, 'yyyy-MM-dd HH:mm', currentLanguage) : '-'
+      key: "submittedAt",
+      label: t("admin.applications.table.submittedAt", "신청일"),
+      width: "150px",
+      render: (value) =>
+        value ? formatDate(value, "yyyy-MM-dd HH:mm", currentLanguage) : "-",
     },
     {
-      key: 'reviewedAt',
-      label: t('admin.applications.table.reviewedAt', '심사일'),
-      width: '150px',
-      render: (value) => value ? formatDate(value, 'yyyy-MM-dd HH:mm', currentLanguage) : '-'
+      key: "reviewedAt",
+      label: t("admin.applications.table.reviewedAt", "심사일"),
+      width: "150px",
+      render: (value) =>
+        value ? formatDate(value, "yyyy-MM-dd HH:mm", currentLanguage) : "-",
     },
     {
-      key: 'status',
-      label: t('admin.applications.table.status', '상태'),
-      width: '120px',
+      key: "status",
+      label: t("admin.applications.table.status", "상태"),
+      width: "120px",
       render: (value) => {
         const getApplicationStatusVariant = (status) => {
           const variantMap = {
-            approved: 'success',
-            rejected: 'danger',
-            cancelled: 'error',
-            submitted: 'warning',
-            under_review: 'warning',
-            pending: 'warning'
+            approved: "success",
+            rejected: "danger",
+            cancelled: "error",
+            submitted: "warning",
+            under_review: "warning",
+            pending: "warning",
+            needs_supplement: "warning",
+            supplement_submitted: "info",
           };
-          return variantMap[status] || 'warning';
+          return variantMap[status] || "warning";
         };
-        
+
         return (
           <Badge variant={getApplicationStatusVariant(value)}>
             {t(`admin.applications.status.${value}`, value)}
           </Badge>
         );
-      }
+      },
     },
     {
-      key: 'actions',
-      label: '',
-      width: '200px',
+      key: "actions",
+      label: "",
+      width: "200px",
       render: (_, row) => {
-        const canOperate = row.status === 'submitted' || row.status === 'under_review';
-        
+        const canOperate =
+          row.status === "submitted" ||
+          row.status === "under_review" ||
+          row.status === "supplement_submitted";
+
         return (
           <div className="flex items-center space-x-2">
             <button
@@ -267,7 +351,7 @@ export default function ProjectDetail() {
               }}
               className="text-blue-600 hover:text-blue-900 font-medium text-sm"
             >
-              {t('common.view', '보기')}
+              {t("common.view", "보기")}
             </button>
             {row.memberId && (
               <>
@@ -279,7 +363,7 @@ export default function ProjectDetail() {
                   }}
                   className="text-primary-600 hover:text-primary-900 font-medium text-sm"
                 >
-                  {t('admin.applications.viewMember', '기업')}
+                  {t("admin.applications.viewMember", "기업")}
                 </button>
               </>
             )}
@@ -289,28 +373,38 @@ export default function ProjectDetail() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleStatusChange(row.id, 'approved');
+                    handleStatusChange(row.id, "approved");
                   }}
                   className="text-green-600 hover:text-green-900 font-medium text-sm"
                 >
-                  {t('common.approve', '승인')}
+                  {t("common.approve", "승인")}
                 </button>
                 <span className="text-gray-300">|</span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleStatusChange(row.id, 'rejected');
+                    handleStatusChange(row.id, "rejected");
                   }}
                   className="text-red-600 hover:text-red-900 font-medium text-sm"
                 >
-                  {t('common.reject', '거절')}
+                  {t("common.reject", "거절")}
+                </button>
+                <span className="text-gray-300">|</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStatusChange(row.id, "needs_supplement");
+                  }}
+                  className="text-amber-600 hover:text-amber-900 font-medium text-sm"
+                >
+                  {t("admin.applications.requestSupplement", "보완요청")}
                 </button>
               </>
             )}
           </div>
         );
-      }
-    }
+      },
+    },
   ];
 
   if (loading) {
@@ -320,9 +414,11 @@ export default function ProjectDetail() {
   if (!project) {
     return (
       <div className="p-12 text-center text-red-600">
-        <p className="mb-6">{t('admin.projects.detail.notFound', '지원사업을 찾을 수 없습니다')}</p>
-        <Button onClick={() => navigate('/admin/projects')}>
-          {t('common.backToList', '목록으로')}
+        <p className="mb-6">
+          {t("admin.projects.detail.notFound", "지원사업을 찾을 수 없습니다")}
+        </p>
+        <Button onClick={() => navigate("/admin/projects")}>
+          {t("common.backToList", "목록으로")}
         </Button>
       </div>
     );
@@ -333,23 +429,27 @@ export default function ProjectDetail() {
   return (
     <div className="w-full">
       {message && (
-        <Alert variant={messageVariant} className="mb-4" onClose={() => setMessage(null)}>
+        <Alert
+          variant={messageVariant}
+          className="mb-4"
+          onClose={() => setMessage(null)}
+        >
           {message}
         </Alert>
       )}
-      
+
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={() => navigate('/admin/projects')}>
-            {t('common.backToList', '목록으로')}
+          <Button variant="outline" onClick={() => navigate("/admin/projects")}>
+            {t("common.backToList", "목록으로")}
           </Button>
         </div>
         <div className="flex gap-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => navigate(`/admin/projects/${id}/edit`)}
           >
-            {t('common.edit', '수정')}
+            {t("common.edit", "수정")}
           </Button>
         </div>
       </div>
@@ -360,21 +460,23 @@ export default function ProjectDetail() {
         <Card className="lg:col-span-2 p-6">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 m-0">
-              {t('admin.projects.detail.basicInfo', '기본 정보')}
+              {t("admin.projects.detail.basicInfo", "기본 정보")}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-2 md:col-span-2">
               <label className="text-sm text-gray-600 font-medium">
-                {t('admin.projects.detail.title', '지원사업')}
+                {t("admin.projects.detail.title", "지원사업")}
               </label>
-              <span className="text-base text-gray-900">{project.title || '-'}</span>
+              <span className="text-base text-gray-900">
+                {project.title || "-"}
+              </span>
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-600 font-medium">
-                {t('admin.projects.detail.status', '상태')}
+                {t("admin.projects.detail.status", "상태")}
               </label>
               <div>
                 <Badge variant={getStatusVariant(project.status)}>
@@ -384,21 +486,27 @@ export default function ProjectDetail() {
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-600 font-medium">
-                {t('admin.projects.detail.createdAt', '생성일')}
+                {t("admin.projects.detail.createdAt", "생성일")}
               </label>
-              <span className="text-base text-gray-900">{formatDate(project.createdAt, 'yyyy-MM-dd', currentLanguage)}</span>
+              <span className="text-base text-gray-900">
+                {formatDate(project.createdAt, "yyyy-MM-dd", currentLanguage)}
+              </span>
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-600 font-medium">
-                {t('admin.projects.detail.startDate', '시작일')}
+                {t("admin.projects.detail.startDate", "시작일")}
               </label>
-              <span className="text-base text-gray-900">{formatDate(project.startDate, 'yyyy-MM-dd', currentLanguage)}</span>
+              <span className="text-base text-gray-900">
+                {formatDate(project.startDate, "yyyy-MM-dd", currentLanguage)}
+              </span>
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-600 font-medium">
-                {t('admin.projects.detail.endDate', '종료일')}
+                {t("admin.projects.detail.endDate", "종료일")}
               </label>
-              <span className="text-base text-gray-900">{formatDate(project.endDate, 'yyyy-MM-dd', currentLanguage)}</span>
+              <span className="text-base text-gray-900">
+                {formatDate(project.endDate, "yyyy-MM-dd", currentLanguage)}
+              </span>
             </div>
           </div>
         </Card>
@@ -407,22 +515,34 @@ export default function ProjectDetail() {
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 m-0">
-              {t('admin.projects.detail.image', '대표 이미지')}
+              {t("admin.projects.detail.image", "대표 이미지")}
             </h2>
           </div>
           <div className="flex justify-center items-center h-48">
-            {(project.imageUrl || project.image) ? (
-              <img 
-                src={project.imageUrl || project.image} 
+            {project.imageUrl || project.image ? (
+              <img
+                src={project.imageUrl || project.image}
                 alt={project.title}
                 className="max-w-full max-h-48 object-contain rounded-lg border border-gray-200"
               />
             ) : (
               <div className="text-gray-400 text-center">
-                <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg
+                  className="w-16 h-16 mx-auto mb-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
-                <p className="text-sm">{t('admin.projects.detail.noImage', '표지 이미지가 없습니다')}</p>
+                <p className="text-sm">
+                  {t("admin.projects.detail.noImage", "표지 이미지가 없습니다")}
+                </p>
               </div>
             )}
           </div>
@@ -434,11 +554,15 @@ export default function ProjectDetail() {
         <Card className="mb-6 p-6">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 m-0">
-              {t('admin.projects.detail.content', '지원사업')}
+              {t("admin.projects.detail.content", "지원사업")}
             </h2>
           </div>
           <div className="prose max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: project.description || project.content }} />
+            <div
+              dangerouslySetInnerHTML={{
+                __html: project.description || project.content,
+              }}
+            />
           </div>
         </Card>
       )}
@@ -448,39 +572,41 @@ export default function ProjectDetail() {
         <Card className="mb-6 p-6">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 m-0">
-              {t('admin.projects.detail.attachments', '첨부파일 목록')}
+              {t("admin.projects.detail.attachments", "첨부파일 목록")}
               <span className="ml-2 text-sm font-normal text-gray-500">
-                ({attachments.length} {t('admin.projects.detail.attachmentCount', '개 첨부파일')})
+                ({attachments.length}{" "}
+                {t("admin.projects.detail.attachmentCount", "개 첨부파일")})
               </span>
             </h2>
           </div>
           <div className="space-y-3">
             {attachments.map((attachment, index) => (
-              <div 
+              <div
                 key={attachment.id || index}
                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center gap-3 flex-1">
-                  <svg 
-                    className="w-5 h-5 text-gray-500 flex-shrink-0" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-5 h-5 text-gray-500 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
                     />
                   </svg>
                   <div className="flex-1 min-w-0">
                     <span className="text-sm font-medium text-gray-900 block truncate">
-                      {attachment.name || `${t('common.attachment', '첨부파일')} ${index + 1}`}
+                      {attachment.name ||
+                        `${t("common.attachment", "첨부파일")} ${index + 1}`}
                     </span>
                     {attachment.fileSize && (
                       <span className="text-xs text-gray-500">
-                        {(attachment.fileSize / 1024).toFixed(2)} KB
+                        {(attachment.fileSize / 1024 / 1024).toFixed(1)} MB
                       </span>
                     )}
                   </div>
@@ -491,16 +617,22 @@ export default function ProjectDetail() {
                   onClick={async () => {
                     if (attachment.id) {
                       if (attachment.url) {
-                        await handleDownloadByUrl(attachment.url, attachment.name);
+                        await handleDownloadByUrl(
+                          attachment.url,
+                          attachment.name,
+                        );
                       } else {
                         await handleDownload(attachment.id, attachment.name);
                       }
                     } else if (attachment.url) {
-                      await handleDownloadByUrl(attachment.url, attachment.name);
+                      await handleDownloadByUrl(
+                        attachment.url,
+                        attachment.name,
+                      );
                     }
                   }}
                 >
-                  {t('common.download', '다운로드')}
+                  {t("common.download", "다운로드")}
                 </Button>
               </div>
             ))}
@@ -512,20 +644,23 @@ export default function ProjectDetail() {
       <Card className="mb-6 p-6">
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 m-0">
-            {t('admin.projects.detail.applications', '신청 현황')}
+            {t("admin.projects.detail.applications", "신청 현황")}
             <span className="ml-2 text-sm font-normal text-gray-500">
-              ({applicationsTotal} {t('admin.projects.detail.applicationCount', '개 신청')})
+              ({applicationsTotal}{" "}
+              {t("admin.projects.detail.applicationCount", "개 신청")})
             </span>
           </h2>
         </div>
-        
+
         {applicationsLoading ? (
           <div className="py-8 text-center text-gray-500">
-            <p>{t('common.loading', '로딩 중...')}</p>
+            <p>{t("common.loading", "로딩 중...")}</p>
           </div>
         ) : applications.length === 0 ? (
           <div className="py-8 text-center text-gray-500">
-            <p>{t('admin.projects.detail.noApplications', '신청이 없습니다')}</p>
+            <p>
+              {t("admin.projects.detail.noApplications", "신청이 없습니다")}
+            </p>
           </div>
         ) : (
           <>
@@ -533,7 +668,7 @@ export default function ProjectDetail() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="p-4 bg-blue-50 rounded-lg">
                 <label className="text-sm text-gray-600 font-medium block mb-2">
-                  {t('admin.projects.detail.totalApplications', '총 신청수')}
+                  {t("admin.projects.detail.totalApplications", "총 신청수")}
                 </label>
                 <span className="text-2xl font-bold text-blue-600">
                   {applicationsTotal}
@@ -541,18 +676,24 @@ export default function ProjectDetail() {
               </div>
               <div className="p-4 bg-green-50 rounded-lg">
                 <label className="text-sm text-gray-600 font-medium block mb-2">
-                  {t('admin.projects.detail.approvedApplications', '승인됨')}
+                  {t("admin.projects.detail.approvedApplications", "승인됨")}
                 </label>
                 <span className="text-2xl font-bold text-green-600">
-                  {applications.filter(app => app.status === 'approved').length}
+                  {
+                    applications.filter((app) => app.status === "approved")
+                      .length
+                  }
                 </span>
               </div>
               <div className="p-4 bg-yellow-50 rounded-lg">
                 <label className="text-sm text-gray-600 font-medium block mb-2">
-                  {t('admin.projects.detail.pendingApplications', '대기중')}
+                  {t("admin.projects.detail.pendingApplications", "대기중")}
                 </label>
                 <span className="text-2xl font-bold text-yellow-600">
-                  {applications.filter(app => app.status === 'pending').length}
+                  {
+                    applications.filter((app) => app.status === "pending")
+                      .length
+                  }
                 </span>
               </div>
             </div>
@@ -560,12 +701,9 @@ export default function ProjectDetail() {
             {/* 신청 목록 */}
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {t('admin.projects.detail.applicationList', '신청 목록')}
+                {t("admin.projects.detail.applicationList", "신청 목록")}
               </h3>
-              <Table
-                columns={applicationColumns}
-                data={applications}
-              />
+              <Table columns={applicationColumns} data={applications} />
               {applicationsTotal > applicationsPageSize && (
                 <div className="mt-4 flex justify-center">
                   <Pagination
@@ -589,134 +727,178 @@ export default function ProjectDetail() {
             setShowApplicationModal(false);
             setSelectedApplication(null);
           }}
-          title={t('admin.applications.detail', '신청 상세')}
+          title={t("admin.applications.detail", "신청 상세")}
           size="lg"
         >
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-gray-600">
-                  {t('admin.applications.table.company', '기업명')}
+                  {t("admin.applications.table.company", "기업명")}
                 </label>
                 <p className="mt-1 text-sm text-gray-900">
-                  {selectedApplication.companyName || '-'}
+                  {selectedApplication.companyName || "-"}
                 </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">
-                  {t('admin.applications.table.status', '상태')}
+                  {t("admin.applications.table.status", "상태")}
                 </label>
                 <div className="mt-1">
                   <Badge
                     variant={
-                      selectedApplication.status === 'approved'
-                        ? 'success'
-                        : selectedApplication.status === 'rejected'
-                        ? 'danger'
-                        : 'warning'
+                      selectedApplication.status === "approved"
+                        ? "success"
+                        : selectedApplication.status === "rejected"
+                          ? "danger"
+                          : "warning"
                     }
                   >
-                    {t(`admin.applications.status.${selectedApplication.status}`, selectedApplication.status)}
+                    {t(
+                      `admin.applications.status.${selectedApplication.status}`,
+                      selectedApplication.status,
+                    )}
                   </Badge>
                 </div>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">
-                  {t('admin.applications.contactPersonName', '담당자 이름')}
+                  {t("admin.applications.contactPersonName", "담당자 이름")}
                 </label>
                 <p className="mt-1 text-sm text-gray-900">
-                  {selectedApplication.contactPersonName || '-'}
+                  {selectedApplication.contactPersonName || "-"}
                 </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">
-                  {t('admin.applications.contactPhone', '전화번호')}
+                  {t("admin.applications.contactPhone", "전화번호")}
                 </label>
                 <p className="mt-1 text-sm text-gray-900">
-                  {selectedApplication.contactPhone || '-'}
+                  {selectedApplication.contactPhone || "-"}
                 </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">
-                  {t('admin.applications.table.submittedAt', '신청일')}
+                  {t("admin.applications.table.submittedAt", "신청일")}
                 </label>
                 <p className="mt-1 text-sm text-gray-900">
-                  {selectedApplication.submittedAt 
-                    ? formatDate(selectedApplication.submittedAt, 'yyyy-MM-dd HH:mm', currentLanguage)
-                    : '-'}
+                  {selectedApplication.submittedAt
+                    ? formatDate(
+                        selectedApplication.submittedAt,
+                        "yyyy-MM-dd HH:mm",
+                        currentLanguage,
+                      )
+                    : "-"}
                 </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">
-                  {t('admin.applications.table.reviewedAt', '심사일')}
+                  {t("admin.applications.table.reviewedAt", "심사일")}
                 </label>
                 <p className="mt-1 text-sm text-gray-900">
-                  {selectedApplication.reviewedAt 
-                    ? formatDate(selectedApplication.reviewedAt, 'yyyy-MM-dd HH:mm', currentLanguage)
-                    : '-'}
+                  {selectedApplication.reviewedAt
+                    ? formatDate(
+                        selectedApplication.reviewedAt,
+                        "yyyy-MM-dd HH:mm",
+                        currentLanguage,
+                      )
+                    : "-"}
                 </p>
               </div>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-600">
-                {t('admin.applications.table.applicationReason', '신청 사유')}
+                {t("admin.applications.table.applicationReason", "신청 사유")}
               </label>
               <div className="mt-1 p-3 bg-gray-50 rounded-md">
                 <p className="text-sm text-gray-900 whitespace-pre-wrap">
-                  {selectedApplication.applicationReason || '-'}
+                  {selectedApplication.applicationReason || "-"}
                 </p>
               </div>
             </div>
-            {selectedApplication.attachments && selectedApplication.attachments.length > 0 && (
-              <div>
-                <label className="text-sm font-medium text-gray-600">
-                  {t('admin.applications.attachments', '첨부파일')}
-                </label>
-                <div className="mt-2 space-y-2">
-                  {selectedApplication.attachments.map((attachment, index) => (
-                    <div 
-                      key={attachment.fileId || index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <svg 
-                          className="w-4 h-4 text-gray-500 flex-shrink-0" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
+            {selectedApplication.attachments &&
+              selectedApplication.attachments.length > 0 && (
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    {t("admin.applications.attachments", "첨부파일")}
+                  </label>
+                  <div className="mt-2 space-y-2">
+                    {selectedApplication.attachments.map(
+                      (attachment, index) => (
+                        <div
+                          key={attachment.fileId || index}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
                         >
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" 
-                          />
-                        </svg>
-                        <span className="text-sm text-gray-900 truncate">
-                          {attachment.fileName || `${t('common.attachment', '첨부파일')} ${index + 1}`}
-                        </span>
-                        {attachment.fileSize && (
-                          <span className="text-xs text-gray-500">
-                            ({(attachment.fileSize / 1024).toFixed(2)} KB)
-                          </span>
-                        )}
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={async () => {
-                          if (attachment.fileUrl) {
-                            await handleDownloadByUrl(attachment.fileUrl, attachment.fileName);
-                          } else if (attachment.fileId) {
-                            await handleDownload(attachment.fileId, attachment.fileName);
-                          }
-                        }}
-                      >
-                        {t('common.download', '다운로드')}
-                      </Button>
-                    </div>
-                  ))}
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <svg
+                              className="w-4 h-4 text-gray-500 flex-shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <span className="text-sm text-gray-900 truncate">
+                              {attachment.originalName ||
+                                attachment.fileName ||
+                                `${t("common.attachment", "첨부파일")} ${index + 1}`}
+                            </span>
+                            {attachment.fileSize && (
+                              <span className="text-xs text-gray-500">
+                                (
+                                {(attachment.fileSize / 1024 / 1024).toFixed(1)}{" "}
+                                MB)
+                              </span>
+                            )}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              if (attachment.fileUrl) {
+                                await handleDownloadByUrl(
+                                  attachment.fileUrl,
+                                  attachment.originalName ||
+                                    attachment.fileName,
+                                );
+                              } else if (attachment.fileId) {
+                                await handleDownload(
+                                  attachment.fileId,
+                                  attachment.originalName ||
+                                    attachment.fileName,
+                                );
+                              }
+                            }}
+                          >
+                            {t("common.download", "다운로드")}
+                          </Button>
+                        </div>
+                      ),
+                    )}
+                  </div>
                 </div>
+              )}
+            {/* Display rejection reason or supplement request if present */}
+            {(selectedApplication.reviewNote ||
+              selectedApplication.materialRequest) && (
+              <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                <h4 className="text-sm font-medium text-amber-800 mb-1">
+                  {selectedApplication.status === "rejected"
+                    ? t("admin.applications.rejectionReason", "거절 사유")
+                    : t(
+                        "admin.applications.supplementRequestMessage",
+                        "보완 요청 내용",
+                      )}
+                </h4>
+                <p className="text-sm text-amber-700">
+                  {selectedApplication.reviewNote ||
+                    selectedApplication.materialRequest}
+                </p>
               </div>
             )}
             {selectedApplication.memberId && (
@@ -725,22 +907,40 @@ export default function ProjectDetail() {
                   variant="outline"
                   onClick={() => handleViewMember(selectedApplication.memberId)}
                 >
-                  {t('admin.applications.viewMemberDetail', '기업 상세 보기')}
+                  {t("admin.applications.viewMemberDetail", "기업 상세 보기")}
                 </Button>
-                {(selectedApplication.status === 'submitted' || selectedApplication.status === 'under_review') && (
+                {(selectedApplication.status === "submitted" ||
+                  selectedApplication.status === "under_review" ||
+                  selectedApplication.status === "supplement_submitted") && (
                   <>
                     <Button
                       variant="outline"
-                      onClick={() => handleStatusChange(selectedApplication.id, 'approved')}
+                      onClick={() =>
+                        handleStatusChange(selectedApplication.id, "approved")
+                      }
                     >
-                      {t('common.approve', '승인')}
+                      {t("common.approve", "승인")}
                     </Button>
                     <Button
                       variant="outline"
                       className="text-red-600 border-red-200 hover:bg-red-50"
-                      onClick={() => handleStatusChange(selectedApplication.id, 'rejected')}
+                      onClick={() =>
+                        handleStatusChange(selectedApplication.id, "rejected")
+                      }
                     >
-                      {t('common.reject', '거절')}
+                      {t("common.reject", "거절")}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-amber-600 border-amber-200 hover:bg-amber-50"
+                      onClick={() =>
+                        handleStatusChange(
+                          selectedApplication.id,
+                          "needs_supplement",
+                        )
+                      }
+                    >
+                      {t("admin.applications.requestSupplement", "보완요청")}
                     </Button>
                   </>
                 )}
@@ -755,34 +955,76 @@ export default function ProjectDetail() {
         <Modal
           isOpen={showRejectModal}
           onClose={handleCancelReject}
-          title={t('admin.applications.rejectReasonTitle', '거부 사유 입력')}
+          title={t("admin.applications.rejectReasonTitle", "거부 사유 입력")}
           size="md"
         >
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.applications.rejectReasonLabel', '거부 사유')}
+                {t("admin.applications.rejectReasonLabel", "거부 사유")}
               </label>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                placeholder={t('admin.applications.rejectReasonPlaceholder', '거부 사유를 입력하세요...')}
+                placeholder={t(
+                  "admin.applications.rejectReasonPlaceholder",
+                  "거부 사유를 입력하세요...",
+                )}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 rows={4}
               />
             </div>
             <div className="flex justify-end space-x-3">
-              <Button
-                variant="outline"
-                onClick={handleCancelReject}
-              >
-                {t('common.cancel', '취소')}
+              <Button variant="outline" onClick={handleCancelReject}>
+                {t("common.cancel", "취소")}
+              </Button>
+              <Button variant="danger" onClick={handleConfirmReject}>
+                {t("common.confirm", "확인")}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Supplement Request Modal */}
+      {showSupplementRequestModal && (
+        <Modal
+          isOpen={showSupplementRequestModal}
+          onClose={handleCancelSupplementRequest}
+          title={t("admin.applications.supplementRequestTitle", "보완 요청")}
+          size="md"
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t(
+                  "admin.applications.supplementRequestLabel",
+                  "보완 요청 내용",
+                )}
+              </label>
+              <textarea
+                value={supplementRequestMessage}
+                onChange={(e) => setSupplementRequestMessage(e.target.value)}
+                placeholder={t(
+                  "admin.applications.supplementRequestPlaceholder",
+                  "보완이 필요한 서류나 내용을 입력하세요...",
+                )}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end space-x-3">
+              <Button variant="outline" onClick={handleCancelSupplementRequest}>
+                {t("common.cancel", "취소")}
               </Button>
               <Button
-                variant="danger"
-                onClick={handleConfirmReject}
+                variant="warning"
+                onClick={handleConfirmSupplementRequest}
               >
-                {t('common.confirm', '확인')}
+                {t(
+                  "admin.applications.sendSupplementRequest",
+                  "보완 요청 보내기",
+                )}
               </Button>
             </div>
           </div>
@@ -791,6 +1033,3 @@ export default function ProjectDetail() {
     </div>
   );
 }
-
-
-

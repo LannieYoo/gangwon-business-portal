@@ -31,21 +31,23 @@ export default function Footer() {
       if (response && response.contentHtml) {
         setModalTitle(
           type === "terms_of_service"
-            ? t("footer.termsOfService", "이용약관")
-            : t("footer.privacyPolicy", "개인정보처리방침"),
+            ? t("admin.layouts.footer.termsOfService", "이용약관")
+            : t("admin.layouts.footer.privacyPolicy", "개인정보처리방침"),
         );
         setModalContent(response.contentHtml);
       } else {
         // 没有内容时的处理逻辑
         setModalTitle(
           type === "terms_of_service"
-            ? t("footer.termsOfService", "이용약관")
-            : t("footer.privacyPolicy", "개인정보처리방침"),
+            ? t("admin.layouts.footer.termsOfService", "이용약관")
+            : t("admin.layouts.footer.privacyPolicy", "개인정보처리방침"),
         );
-        setModalContent(t("footer.noContent", "콘텐츠가 없습니다"));
+        setModalContent(
+          t("admin.layouts.footer.noContent", "콘텐츠가 없습니다"),
+        );
       }
     } catch (err) {
-      setError(t("footer.error", "오류"));
+      setError(t("admin.layouts.footer.error", "오류"));
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +76,7 @@ export default function Footer() {
         <div className="max-w-full mx-auto flex justify-between items-center text-sm gap-6 whitespace-nowrap text-gray-600 max-md:gap-3 max-md:text-[0.8125rem] max-sm:text-xs max-sm:gap-2">
           <div className="flex items-center gap-3 flex-1 whitespace-nowrap overflow-hidden text-ellipsis">
             <p className="m-0 text-sm leading-[1.4] font-normal whitespace-nowrap text-gray-600 max-sm:text-xs">
-              &copy; {currentYear} {t("footer.copyright")}
+              &copy; {currentYear} {t("admin.layouts.footer.copyright")}
             </p>
           </div>
           <div className="flex items-center gap-4 text-right whitespace-nowrap flex-shrink-0 max-md:gap-3">
@@ -84,7 +86,7 @@ export default function Footer() {
                 className="text-sm no-underline transition-colors duration-200 font-medium py-1 text-gray-600 hover:underline hover:text-blue-700 max-sm:text-xs"
                 onClick={handleTermsClick}
               >
-                {t("footer.termsOfService")}
+                {t("admin.layouts.footer.termsOfService", "이용약관")}
               </a>
               <span className="text-sm mx-2 text-gray-300">|</span>
               <a
@@ -92,13 +94,13 @@ export default function Footer() {
                 className="text-sm no-underline transition-colors duration-200 font-medium py-1 text-gray-600 hover:underline hover:text-blue-700 max-sm:text-xs"
                 onClick={handlePrivacyClick}
               >
-                {t("footer.privacyPolicy")}
+                {t("admin.layouts.footer.privacyPolicy", "개인정보처리방침")}
               </a>
             </div>
             <span className="text-sm mx-2 text-gray-300">|</span>
             <div className="flex items-center gap-4">
               <span className="text-sm flex items-center gap-1 text-gray-600 max-sm:text-xs">
-                {t("footer.version")}:{" "}
+                {t("admin.layouts.footer.version", "버전")}:{" "}
                 <strong className="font-semibold text-blue-700">1.0.0</strong>
               </span>
             </div>
@@ -114,7 +116,7 @@ export default function Footer() {
       >
         {isLoading ? (
           <div className="text-center p-8 text-gray-500">
-            {t("footer.loading")}
+            {t("admin.layouts.footer.loading", "로딩 중...")}
           </div>
         ) : error ? (
           <div className="text-center p-8 text-red-600">{error}</div>

@@ -75,7 +75,7 @@
         "descriptionPlaceholder": "请输入支援事业的详细说明...",
         "coverImage": "支援事业代表图片",
         "coverImageAlt": "代表图片",
-        "imageHint": "支持 JPG, PNG 格式, 建议尺寸 800x400",
+        "imageHint": "支持 JPG, PNG 格式, 建议尺寸 850x1200",
         "selectImage": "选择图片",
         "changeImage": "更换图片",
         "removeImage": "删除图片",

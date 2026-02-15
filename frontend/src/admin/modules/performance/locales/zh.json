@@ -128,6 +128,7 @@
             "ipRegistrationType": {
                 "application": "申请中",
                 "registration": "已注册",
+                "registered": "已注册",
                 "publication": "已公开"
             },
             "country": {
@@ -139,9 +140,12 @@
                 "other": "其他"
             },
             "overseasApplicationType": {
+                "domestic": "国内",
+                "overseas": "海外",
                 "pct": "PCT",
                 "paris": "巴黎公约",
                 "direct": "直接申请",
+                "general": "一般海外申请",
                 "none": "无"
             },
             "quarter": {
@@ -149,6 +153,29 @@
                 "q2": "第2季度",
                 "q3": "第3季度",
                 "q4": "第4季度"
+            },
+            "tabs": {
+                "records": "业绩记录",
+                "investment": "投资概况"
+            },
+            "investment": {
+                "title": "机构投资概况",
+                "allYears": "全部年份",
+                "selectYear": "选择年份",
+                "institution": "投资机构",
+                "type": "投资类型",
+                "domestic": "国内",
+                "overseas": "海外",
+                "totalAmount": "投资总额 (百万韩元)",
+                "companyCount": "企业数量",
+                "totalInvestment": "投资总额",
+                "totalInstitutions": "机构数量",
+                "filterYear": "查询年份",
+                "millionWon": "百万韩元",
+                "institutions": "个",
+                "investedCompanies": "投资企业列表",
+                "noData": "暂无投资信息。",
+                "loadError": "加载投资信息失败。"
             }
         }
     }
