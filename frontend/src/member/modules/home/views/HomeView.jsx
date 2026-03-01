@@ -18,7 +18,7 @@ export default function HomeView() {
       {/* 主横幅(1) - 大尺寸，全宽 */}
       <Banner
         bannerType={BANNER_TYPES.MAIN_PRIMARY}
-        sectionClassName="mb-16"
+        sectionClassName="mb-6"
         height="400px"
         fullWidth={true}
       />
@@ -27,7 +27,3 @@ export default function HomeView() {
     </div>
   );
 }
-
-
-
-

@@ -56,7 +56,8 @@ export default function SupplementMaterialsModal({
           <p className="text-gray-400 text-xs mt-2 text-center">
             {t(
               "projects.applicationRecords.uploadHint",
-              "PDF, DOC, XLS 형식 지원, 최대 20MB",
+              "PDF, DOC, XLS 형식 지원, 최대 {{maxSize}}MB",
+              { maxSize: 20 },
             )}
           </p>
         </div>

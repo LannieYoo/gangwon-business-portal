@@ -1,134 +1,142 @@
 {
-    "admin": {
-        "messages": {
-            "title": "알림 센터",
-            "tabs": {
-                "threads": "1:1 상담",
-                "notifications": "시스템 알림",
-                "list": "쪽지 목록",
-                "send": "쪽지 보내기",
-                "broadcast": "일괄 발송",
-                "analytics": "쪽지 통계"
-            },
-            "avatar": {
-                "admin": "관",
-                "member": "회"
-            },
-            "systemNotifications": {
-                "title": "시스템 알림",
-                "empty": "시스템 알림이 없습니다",
-                "detail": "알림 상세"
-            },
-            "threads": {
-                "title": "1:1 상담 목록",
-                "description": "회원들의 1:1 상담 요청을 확인하고 답변합니다.",
-                "empty": "상담 요청이 없습니다"
-            },
-            "filters": {
-                "all": "전체",
-                "unread": "읽지 않음",
-                "read": "읽음"
-            },
-            "unread": "읽지 않음",
-            "read": "읽음",
-            "readStatus": "읽음 상태",
-            "sender": "발신자",
-            "searchNotifications": "알림 검색...",
-            "noNotifications": "알림이 없습니다",
-            "confirmDelete": "이 알림을 삭제하시겠습니까?",
-            "deleteWarning": "삭제된 알림은 복구할 수 없습니다.",
-            "deleteFailed": "알림 삭제에 실패했습니다",
-            "unreadCount": "읽지 않음",
-            "selectMessage": "쪽지를 선택하여 상세 내용을 확인하세요",
-            "category": {
-                "general": "일반 알림",
-                "announcement": "중요 공지",
-                "system": "시스템 알림",
-                "support": "기술 지원",
-                "performance": "성과 상담",
-                "member": "회원 관리",
-                "project": "사업 관리",
-                "label": "분류"
-            },
-            "notifications": {
-                "performance": {
-                    "review": {
-                        "subject": "[실적 관리] {{period}} 실적 심사 결과",
-                        "content": "{{period}} 실적이 {{statusKo}}되었습니다.",
-                        "contentWithComments": "{{period}} 실적이 {{statusKo}}되었습니다.\n\n관리자 의견: {{comments}}"
-                    },
-                    "submission": {
-                        "subject": "[실적 관리] 새로운 실적 제출",
-                        "content": "{{companyName}}에서 {{year}}년 {{quarter}}분기 실적을 제출했습니다."
-                    }
-                },
-                "member": {
-                    "registration": {
-                        "subject": "[회원 관리] 새로운 회원 가입 신청",
-                        "content": "{{companyName}} (사업자번호: {{businessNumber}})에서 회원 가입을 신청했습니다.\n이메일: {{email}}"
-                    },
-                    "approved": {
-                        "subject": "[회원 관리] 회원 가입 승인",
-                        "content": "{{companyName}}의 회원 가입이 승인되었습니다. 이제 모든 서비스를 이용하실 수 있습니다."
-                    },
-                    "rejected": {
-                        "subject": "[회원 관리] 회원 가입 거부",
-                        "content": "{{companyName}}의 회원 가입이 거부되었습니다.{{#reason}}\n\n사유: {{reason}}{{/reason}}"
-                    }
-                },
-                "project": {
-                    "application": {
-                        "subject": "[사업 관리] 새로운 사업 신청",
-                        "content": "{{companyName}}의 {{applicantName}}님이 '{{projectTitle}}' 사업에 신청했습니다."
-                    },
-                    "result": {
-                        "subject": "[사업 관리] 사업 신청 결과",
-                        "content": "'{{projectTitle}}' 사업 신청이 {{statusKo}}되었습니다."
-                    }
-                }
-            },
-            "thread": {
-                "title": "쪽지 스레드",
-                "member": "회원",
-                "noMessages": "쪽지가 없습니다",
-                "close": "스레드 닫기",
-                "reopen": "다시 열기",
-                "closed": "스레드가 닫혔습니다",
-                "reopened": "스레드가 다시 열렸습니다",
-                "confirmClose": "이 스레드를 닫으시겠습니까?",
-                "closeWarning": "닫힌 스레드에는 더 이상 답장할 수 없습니다. 계속하시겠습니까?",
-                "status": {
-                    "open": "진행 중",
-                    "resolved": "해결됨",
-                    "closed": "닫힘"
-                }
-            },
-            "composer": {
-                "contentPlaceholder": "쪽지 내용을 입력하세요..."
-            },
-            "analytics": {
-                "title": "쪽지 통계",
-                "description": "쪽지 관련 통계 데이터 및 트렌드 분석을 확인합니다.",
-                "last7Days": "최근 7일",
-                "last30Days": "최근 30일",
-                "last90Days": "최근 90일",
-                "allTime": "전체 기간",
-                "totalMessages": "총 쪽지 수",
-                "unreadMessages": "읽지 않은 쪽지",
-                "avgResponseTime": "평균 응답 시간",
-                "responseRate": "응답률",
-                "messagesTrend": "쪽지 추이",
-                "messagesByCategory": "카테고리별 쪽지 통계",
-                "responseTimeTrend": "응답 시간 추이",
-                "messageCount": "쪽지 수",
-                "responseTime": "응답 시간",
-                "minutes": "분",
-                "hours": "시간",
-                "categoryGeneral": "일반",
-                "categorySupport": "지원",
-                "categoryPerformance": "성과",
-                "categoryProject": "지원사업"
-            }
+  "admin": {
+    "messages": {
+      "title": "알림 센터",
+      "tabs": {
+        "threads": "1:1 상담",
+        "notifications": "시스템 알림",
+        "list": "쪽지 목록",
+        "send": "쪽지 보내기",
+        "broadcast": "일괄 발송",
+        "analytics": "쪽지 통계"
+      },
+      "avatar": {
+        "admin": "관",
+        "member": "회"
+      },
+      "systemNotifications": {
+        "title": "시스템 알림",
+        "empty": "시스템 알림이 없습니다",
+        "detail": "알림 상세"
+      },
+      "threads": {
+        "title": "1:1 상담 목록",
+        "description": "회원들의 1:1 상담 요청을 확인하고 답변합니다.",
+        "empty": "상담 요청이 없습니다"
+      },
+      "filters": {
+        "all": "전체",
+        "unread": "읽지 않음",
+        "read": "읽음"
+      },
+      "unread": "읽지 않음",
+      "read": "읽음",
+      "readStatus": "읽음 상태",
+      "sender": "발신자",
+      "searchNotifications": "알림 검색...",
+      "noNotifications": "알림이 없습니다",
+      "confirmDelete": "이 알림을 삭제하시겠습니까?",
+      "deleteWarning": "삭제된 알림은 복구할 수 없습니다.",
+      "deleteFailed": "알림 삭제에 실패했습니다",
+      "unreadCount": "읽지 않음",
+      "selectMessage": "쪽지를 선택하여 상세 내용을 확인하세요",
+      "category": {
+        "general": "일반 알림",
+        "announcement": "중요 공지",
+        "system": "시스템 알림",
+        "support": "기술 지원",
+        "performance": "성과 상담",
+        "member": "회원 관리",
+        "project": "사업 관리",
+        "label": "분류"
+      },
+      "notifications": {
+        "performance": {
+          "review": {
+            "subject": "[실적 관리] {{period}} 실적 심사 결과",
+            "content": "{{period}} 실적이 {{statusKo}}되었습니다.",
+            "contentWithComments": "{{period}} 실적이 {{statusKo}}되었습니다.\n\n관리자 의견: {{comments}}"
+          },
+          "submission": {
+            "subject": "[실적 관리] 새로운 실적 제출",
+            "content": "{{companyName}}에서 {{year}}년 {{quarter}}분기 실적을 제출했습니다."
+          }
+        },
+        "member": {
+          "registration": {
+            "subject": "[회원 관리] 새로운 회원 가입 신청",
+            "content": "{{companyName}} (사업자번호: {{businessNumber}})에서 회원 가입을 신청했습니다.\n이메일: {{email}}"
+          },
+          "approved": {
+            "subject": "[회원 관리] 회원 가입 승인",
+            "content": "{{companyName}}의 회원 가입이 승인되었습니다. 이제 모든 서비스를 이용하실 수 있습니다."
+          },
+          "rejected": {
+            "subject": "[회원 관리] 회원 가입 거부",
+            "content": "{{companyName}}의 회원 가입이 거부되었습니다.{{#reason}}\n\n사유: {{reason}}{{/reason}}"
+          }
+        },
+        "project": {
+          "application": {
+            "subject": "[사업 관리] 새로운 사업 신청",
+            "content": "{{companyName}}의 {{applicantName}}님이 '{{projectTitle}}' 사업에 신청했습니다."
+          },
+          "result": {
+            "subject": "[사업 관리] 사업 신청 결과",
+            "content": "'{{projectTitle}}' 사업 신청이 {{statusKo}}되었습니다."
+          },
+          "supplementRequest": {
+            "subject": "[사업 관리] 보완 자료 요청",
+            "content": "'{{projectTitle}}' 사업 신청에 대해 보완 자료가 요청되었습니다.{{#comments}}\n\n요청 내용: {{comments}}{{/comments}}"
+          },
+          "supplementSubmitted": {
+            "subject": "[사업 관리] 보완 자료 제출",
+            "content": "{{companyName}}에서 '{{projectTitle}}' 사업의 보완 자료를 제출했습니다."
+          }
         }
+      },
+      "thread": {
+        "title": "쪽지 스레드",
+        "member": "회원",
+        "noMessages": "쪽지가 없습니다",
+        "close": "스레드 닫기",
+        "reopen": "다시 열기",
+        "closed": "스레드가 닫혔습니다",
+        "reopened": "스레드가 다시 열렸습니다",
+        "confirmClose": "이 스레드를 닫으시겠습니까?",
+        "closeWarning": "닫힌 스레드에는 더 이상 답장할 수 없습니다. 계속하시겠습니까?",
+        "status": {
+          "open": "진행 중",
+          "resolved": "해결됨",
+          "closed": "닫힘"
+        }
+      },
+      "composer": {
+        "contentPlaceholder": "쪽지 내용을 입력하세요..."
+      },
+      "analytics": {
+        "title": "쪽지 통계",
+        "description": "쪽지 관련 통계 데이터 및 트렌드 분석을 확인합니다.",
+        "last7Days": "최근 7일",
+        "last30Days": "최근 30일",
+        "last90Days": "최근 90일",
+        "allTime": "전체 기간",
+        "totalMessages": "총 쪽지 수",
+        "unreadMessages": "읽지 않은 쪽지",
+        "avgResponseTime": "평균 응답 시간",
+        "responseRate": "응답률",
+        "messagesTrend": "쪽지 추이",
+        "messagesByCategory": "카테고리별 쪽지 통계",
+        "responseTimeTrend": "응답 시간 추이",
+        "messageCount": "쪽지 수",
+        "responseTime": "응답 시간",
+        "minutes": "분",
+        "hours": "시간",
+        "categoryGeneral": "일반",
+        "categorySupport": "지원",
+        "categoryPerformance": "성과",
+        "categoryProject": "지원사업"
+      }
     }
+  }
 }

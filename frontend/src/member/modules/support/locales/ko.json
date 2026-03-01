@@ -176,6 +176,14 @@
           "result": {
             "subject": "[사업 관리] 사업 신청 결과",
             "content": "'{{projectTitle}}' 사업 신청이 {{statusKo}}되었습니다."
+          },
+          "supplementRequest": {
+            "subject": "[사업 관리] 보완 자료 요청",
+            "content": "'{{projectTitle}}' 사업 신청에 보완 자료가 요청되었습니다."
+          },
+          "supplementSubmitted": {
+            "subject": "[사업 관리] 보완 자료 제출",
+            "content": "{{companyName}}에서 '{{projectTitle}}' 사업 신청의 보완 자료를 제출했습니다."
           }
         }
       }

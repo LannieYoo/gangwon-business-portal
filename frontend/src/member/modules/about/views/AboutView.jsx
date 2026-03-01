@@ -39,7 +39,3 @@ const AboutView = () => {
 };
 
 export default AboutView;
-
-
-
-

@@ -241,7 +241,7 @@
         "noReason": "거절 사유가 제공되지 않았습니다."
       },
       "supplementDefaultMessage": "관리자가 요청한 추가 자료를 제출해 주세요.",
-      "uploadHint": "PDF, DOC, XLS 형식 지원, 최대 10MB",
+      "uploadHint": "PDF, DOC, XLS 형식 지원, 최대 {{maxSize}}MB",
       "fileTooLarge": "파일 크기가 너무 큽니다.",
       "status": {
         "needs_supplement": "보완 필요"

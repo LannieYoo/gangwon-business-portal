@@ -178,6 +178,14 @@
           "result": {
             "subject": "[项目管理] 项目申请结果",
             "content": "'{{projectTitle}}'项目申请已{{statusZh}}。"
+          },
+          "supplementRequest": {
+            "subject": "[项目管理] 补充资料请求",
+            "content": "'{{projectTitle}}'项目申请需要补充资料。"
+          },
+          "supplementSubmitted": {
+            "subject": "[项目管理] 补充资料已提交",
+            "content": "{{companyName}}已提交'{{projectTitle}}'项目申请的补充资料。"
           }
         }
       }

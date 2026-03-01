@@ -7,17 +7,27 @@ import { createService } from "@shared/utils/helpers";
 class UploadService {
   // 上传公开文件
   async uploadPublic(file, onUploadProgress) {
-    return await apiService.upload(`${API_PREFIX}/upload/public`, file, onUploadProgress);
+    return await apiService.upload(
+      `${API_PREFIX}/upload/public`,
+      file,
+      onUploadProgress,
+    );
   }
 
   // 上传私有文件
   async uploadPrivate(file, onUploadProgress) {
-    return await apiService.upload(`${API_PREFIX}/upload/private`, file, onUploadProgress);
+    return await apiService.upload(
+      `${API_PREFIX}/upload/private`,
+      file,
+      onUploadProgress,
+    );
   }
 
   // 上传多个文件
   async uploadMultiple(files, onUploadProgress, isPublic) {
-    const url = isPublic ? `${API_PREFIX}/upload/public` : `${API_PREFIX}/upload/private`;
+    const url = isPublic
+      ? `${API_PREFIX}/upload/public`
+      : `${API_PREFIX}/upload/private`;
     return await apiService.uploadMultiple(url, files, onUploadProgress);
   }
 
@@ -34,7 +44,8 @@ class UploadService {
       throw new Error("File URL not available");
     }
 
-    const downloadFilename = filename ?? fileInfo.originalName ?? `file-${fileId}`;
+    const downloadFilename =
+      filename ?? fileInfo.originalName ?? `file-${fileId}`;
     await this.downloadFromUrl(fileInfo.fileUrl, downloadFilename);
   }
 
@@ -73,18 +84,23 @@ class UploadService {
     await apiService.download(fileUrl, {}, filename);
   }
 
-
   // 删除文件
   async deleteFile(fileId) {
     await apiService.delete(`${API_PREFIX}/upload/${fileId}`);
   }
 
-  // 上传文件并返回格式化的附件列表
+  // 上传文件并返回格式化的附件列表 (Upload files and return formatted attachment list)
+  // 保留原始文件名到 originalName，供组件显示使用 (Preserve original filename for component display)
   async uploadAttachments(files) {
     const uploadedFiles = [];
     for (const file of files) {
       const response = await this.uploadPublic(file);
-      uploadedFiles.push(response);
+      uploadedFiles.push({
+        ...response,
+        originalName: file.name, // 保留浏览器端的原始文件名 (Keep the original filename from browser File object)
+        name: file.name, // 兼容 att.name 读取 (Fallback for att.name access)
+        size: file.size, // 保留原始文件大小 (Keep original file size)
+      });
     }
     return uploadedFiles;
   }
@@ -94,8 +110,14 @@ class UploadService {
     const file = formData.get("file");
     const type = formData.get("type");
 
-    const isPublic = type === "banner" || type === "notice" || type === "public" || type === "project";
-    let url = isPublic ? `${API_PREFIX}/upload/public` : `${API_PREFIX}/upload/private`;
+    const isPublic =
+      type === "banner" ||
+      type === "notice" ||
+      type === "public" ||
+      type === "project";
+    let url = isPublic
+      ? `${API_PREFIX}/upload/public`
+      : `${API_PREFIX}/upload/private`;
 
     const resourceType = formData.get("resource_type") ?? type;
     const resourceId = formData.get("resource_id");
@@ -113,7 +135,3 @@ class UploadService {
 }
 
 export default createService(UploadService);
-
-
-
-

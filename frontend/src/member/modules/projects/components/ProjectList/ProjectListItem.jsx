@@ -59,7 +59,10 @@ export default function ProjectListItem({ project, onApply, onDetail }) {
             </div>
           )}
           <div className="flex-1">
-            <p className="text-[0.9375rem] text-gray-700 leading-relaxed m-0 whitespace-pre-line">
+            <p
+              className="text-[0.9375rem] text-gray-700 leading-relaxed m-0 whitespace-pre-line"
+              style={{ wordBreak: "keep-all", overflowWrap: "break-word" }}
+            >
               {project.description || ""}
             </p>
           </div>

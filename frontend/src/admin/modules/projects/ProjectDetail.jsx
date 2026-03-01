@@ -559,8 +559,13 @@ export default function ProjectDetail() {
           </div>
           <div className="prose max-w-none">
             <div
+              style={{
+                whiteSpace: "pre-line",
+                wordBreak: "keep-all",
+                overflowWrap: "break-word",
+              }}
               dangerouslySetInnerHTML={{
-                __html: project.description || project.content,
+                __html: project.description || project.content || "",
               }}
             />
           </div>
@@ -883,6 +888,98 @@ export default function ProjectDetail() {
                   </div>
                 </div>
               )}
+            {/* 보완 제출 자료 표시 (Display submitted supplement materials) */}
+            {selectedApplication.materialResponse &&
+              (() => {
+                let supplementFiles = [];
+                try {
+                  const parsed =
+                    typeof selectedApplication.materialResponse === "string"
+                      ? JSON.parse(selectedApplication.materialResponse)
+                      : selectedApplication.materialResponse;
+                  supplementFiles = Array.isArray(parsed) ? parsed : [];
+                } catch {
+                  supplementFiles = [];
+                }
+                if (supplementFiles.length === 0) return null;
+                return (
+                  <div className="mt-4">
+                    <label className="text-sm font-medium text-gray-600">
+                      {t(
+                        "admin.applications.supplementMaterials",
+                        "보완 제출 자료",
+                      )}
+                      <span className="ml-1 text-xs font-normal text-gray-400">
+                        ({supplementFiles.length})
+                      </span>
+                    </label>
+                    <div className="mt-2 space-y-2">
+                      {supplementFiles.map((file, idx) => (
+                        <div
+                          key={file.fileId || file.file_id || idx}
+                          className="flex items-center justify-between p-3 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors border border-blue-200"
+                        >
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <svg
+                              className="w-4 h-4 text-blue-500 flex-shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <span className="text-sm text-gray-900 truncate">
+                              {file.originalName ||
+                                file.original_name ||
+                                file.fileName ||
+                                file.file_name ||
+                                `${t("common.attachment", "첨부파일")} ${idx + 1}`}
+                            </span>
+                            {(file.fileSize || file.file_size) && (
+                              <span className="text-xs text-gray-500">
+                                (
+                                {(
+                                  (file.fileSize || file.file_size) /
+                                  1024 /
+                                  1024
+                                ).toFixed(1)}{" "}
+                                MB)
+                              </span>
+                            )}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              const url = file.fileUrl || file.file_url;
+                              const name =
+                                file.originalName ||
+                                file.original_name ||
+                                file.fileName ||
+                                file.file_name;
+                              if (url) {
+                                await handleDownloadByUrl(url, name);
+                              } else if (file.fileId || file.file_id) {
+                                await handleDownload(
+                                  file.fileId || file.file_id,
+                                  name,
+                                );
+                              }
+                            }}
+                          >
+                            {t("common.download", "다운로드")}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             {/* Display rejection reason or supplement request if present */}
             {(selectedApplication.reviewNote ||
               selectedApplication.materialRequest) && (

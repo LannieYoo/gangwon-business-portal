@@ -90,6 +90,15 @@ export function getNotificationTranslationKey(
       subject: `${namespace}.notifications.project.result.subject`,
       content: `${namespace}.notifications.project.result.content`,
     },
+    // 보완 요청/제출 通知
+    project_supplement_request: {
+      subject: `${namespace}.notifications.project.supplementRequest.subject`,
+      content: `${namespace}.notifications.project.supplementRequest.content`,
+    },
+    project_supplement_submitted: {
+      subject: `${namespace}.notifications.project.supplementSubmitted.subject`,
+      content: `${namespace}.notifications.project.supplementSubmitted.content`,
+    },
   };
 
   const keys = keyMap[type];
@@ -156,6 +165,8 @@ export function formatNotificationParams(data) {
       approved: { ko: "승인", zh: "批准" },
       rejected: { ko: "거부", zh: "驳回" },
       revision_requested: { ko: "보완 요청", zh: "要求补充" },
+      needs_supplement: { ko: "보완 필요", zh: "需补充" },
+      supplement_submitted: { ko: "보완 제출", zh: "补充已提交" },
       submitted: { ko: "제출", zh: "提交" },
       pending: { ko: "대기", zh: "待处理" },
     };

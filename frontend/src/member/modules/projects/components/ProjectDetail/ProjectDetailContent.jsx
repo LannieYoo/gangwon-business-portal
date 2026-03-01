@@ -124,8 +124,13 @@ export default function ProjectDetailContent({ project }) {
           </div>
           <div className="prose prose-sm md:prose max-w-none">
             <div
+              style={{
+                whiteSpace: "pre-line",
+                wordBreak: "keep-all",
+                overflowWrap: "break-word",
+              }}
               dangerouslySetInnerHTML={{
-                __html: project.description || project.contentHtml,
+                __html: project.description || project.contentHtml || "",
               }}
             />
           </div>

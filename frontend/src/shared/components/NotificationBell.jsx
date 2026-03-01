@@ -56,8 +56,19 @@ export default function NotificationBell({
 
     if (parsedData) {
       // 是结构化通知，使用翻译
-      const subjectKey = getNotificationTranslationKey(parsedData, "subject");
-      const contentKey = getNotificationTranslationKey(parsedData, "content");
+      // 根据用户类型选择翻译命名空间 (Choose namespace based on user type)
+      const namespace =
+        userType === "admin" ? "admin.messages" : "member.support";
+      const subjectKey = getNotificationTranslationKey(
+        parsedData,
+        "subject",
+        namespace,
+      );
+      const contentKey = getNotificationTranslationKey(
+        parsedData,
+        "content",
+        namespace,
+      );
       const params = formatNotificationParams(parsedData);
 
       return {

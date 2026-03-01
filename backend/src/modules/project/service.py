@@ -537,7 +537,7 @@ class ProjectService:
             'submitted': ['under_review', 'approved', 'rejected', 'needs_supplement'],
             'under_review': ['approved', 'rejected', 'needs_supplement'],
             'needs_supplement': ['under_review'],  # Only after member submits supplement
-            'supplement_submitted': ['under_review', 'approved', 'rejected'],
+            'supplement_submitted': ['under_review', 'approved', 'rejected', 'needs_supplement'],  # Admin can request more supplements
         }
         allowed = valid_transitions.get(current_status, [])
         if status.value not in allowed:

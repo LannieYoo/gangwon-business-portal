@@ -74,7 +74,7 @@ export default function InquiryAttachmentList({
             loadingLabel={t("common.uploading")}
           />
           <p className="text-xs text-gray-500 mt-2">
-            {t("member.support.attachmentHint")}
+            {t("member.support.attachmentHint", { maxSize: 20 })}
           </p>
         </div>
       )}
