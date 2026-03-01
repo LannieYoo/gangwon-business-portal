@@ -74,7 +74,7 @@ export default function NotificationDetailModal({
           </h2>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span>
-              {t("member.support.sender")}: {notification.senderName || "System"}
+              {t("member.support.sender")}: {notification.senderName || t("member.support.systemSender", "시스템")}
             </span>
             <span>{formatDate(notification.createdAt)}</span>
           </div>

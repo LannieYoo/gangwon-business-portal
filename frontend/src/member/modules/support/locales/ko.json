@@ -125,6 +125,7 @@
       "readStatus": "읽음 상태",
       "searchNotifications": "알림 검색...",
       "sender": "발신자",
+      "systemSender": "시스템",
       "goToPage": "페이지로 이동",
       "notifications": {
         "performance": {

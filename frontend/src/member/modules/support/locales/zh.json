@@ -127,6 +127,7 @@
       "readStatus": "阅读状态",
       "searchNotifications": "搜索通知...",
       "sender": "发送者",
+      "systemSender": "系统",
       "goToPage": "前往页面",
       "notifications": {
         "performance": {
