@@ -65,7 +65,7 @@
         "notice": {
           "title": "신청 전 확인사항",
           "item1": "모든 필수 항목(*)을 정확하게 입력해주세요.",
-          "item2": "첨부 파일은 PDF, DOC, XLS 형식만 가능합니다.",
+          "item2": "첨부 파일은 PDF, Word, Hwp, Excel, 이미지 형식만 가능합니다.",
           "item3": "제출 후에는 수정이 불가능하니 신중하게 작성해주세요."
         },
         "form": {
@@ -104,7 +104,7 @@
         "attachments": {
           "title": "첨부 서류",
           "description": "사업자등록증, 사업계획서 등 필요한 서류를 첨부해주세요.",
-          "hint": "파일 형식: PDF, DOC, XLS / 최대 {{maxSize}}MB",
+          "hint": "PDF, Word, Hwp, Excel, 이미지 형식 지원, 최대 {{maxSize}}MB",
           "uploaded": "업로드된 파일",
           "maxFiles": "최대 {{max}}개까지 첨부 가능",
           "required": "최소 1개 이상의 파일을 첨부해주세요.",
@@ -135,6 +135,7 @@
           "under_review": "심사중",
           "reviewing": "심사중",
           "needs_supplement": "보완 필요",
+          "supplement_submitted": "서류보완완료",
           "approved": "승인",
           "rejected": "거절",
           "cancelled": "취소"
@@ -241,7 +242,7 @@
         "noReason": "거절 사유가 제공되지 않았습니다."
       },
       "supplementDefaultMessage": "관리자가 요청한 추가 자료를 제출해 주세요.",
-      "uploadHint": "PDF, DOC, XLS 형식 지원, 최대 {{maxSize}}MB",
+      "uploadHint": "PDF, Word, Hwp, Excel, 이미지 형식 지원, 최대 {{maxSize}}MB",
       "fileTooLarge": "파일 크기가 너무 큽니다.",
       "status": {
         "needs_supplement": "보완 필요"

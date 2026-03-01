@@ -25,7 +25,7 @@
       "addFiles": "添加附件",
       "uploading": "上传中...",
       "remaining": "可上传 {{count}}/{{max}} 个文件",
-      "hint": "单个文件最大 {{max}}",
+      "hint": "支持 PDF、Word、Hwp、Excel、图片格式，单个文件最大 {{max}}",
       "fileTooLarge": "文件 {{name}} 超过最大大小 {{max}}",
       "attachments": "附件",
       "viewAll": "{{count}} 个附件",

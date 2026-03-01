@@ -31,7 +31,7 @@ export default function SupplementMaterialsModal({
               "요청된 자료",
             )}
           </h4>
-          <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded">
+          <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded whitespace-pre-line">
             {supplementMessage ||
               t(
                 "projects.applicationRecords.supplementDefaultMessage",
@@ -56,7 +56,7 @@ export default function SupplementMaterialsModal({
           <p className="text-gray-400 text-xs mt-2 text-center">
             {t(
               "projects.applicationRecords.uploadHint",
-              "PDF, DOC, XLS 형식 지원, 최대 {{maxSize}}MB",
+              "PDF, Word, Hwp, Excel, 이미지 형식 지원, 최대 {{maxSize}}MB",
               { maxSize: 20 },
             )}
           </p>

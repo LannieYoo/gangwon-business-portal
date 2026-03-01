@@ -8,7 +8,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@shared/utils";
-import { usePagination } from "@shared/hooks";
+import { usePagination, useMessage } from "@shared/hooks";
 import { useMyApplications } from "./useMyApplications";
 import { useApplicationStatus } from "./useApplicationStatus";
 import { useUpload } from "@shared/hooks";
@@ -22,6 +22,7 @@ export function useApplicationRecords(pageSize = 10) {
     refresh,
     cancelApplication,
   } = useMyApplications();
+  const { message, messageVariant, showSuccess, showWarning, showError } = useMessage();
 
   const [filteredApplications, setFilteredApplications] =
     useState(allApplications);
@@ -85,10 +86,10 @@ export function useApplicationRecords(pageSize = 10) {
       const validFiles = files.filter((file) => {
         const maxSize = MAX_DOCUMENT_SIZE; // 20MB
         if (file.size > maxSize) {
-          alert(
+          showWarning(
             t(
               "member.projects.applicationRecords.fileTooLarge",
-              "파일 크기가 너무 큽니다. (최대 20MB)",
+              { maxSize: Math.round(MAX_DOCUMENT_SIZE / 1024 / 1024) },
             ),
           );
           return false;
@@ -106,7 +107,7 @@ export function useApplicationRecords(pageSize = 10) {
 
   const handleSubmitSupplement = useCallback(async () => {
     if (supplementFiles.length === 0) {
-      alert(
+      showWarning(
         t(
           "member.projects.applicationRecords.noFilesSelected",
           "파일을 선택해주세요.",
@@ -129,7 +130,7 @@ export function useApplicationRecords(pageSize = 10) {
             mimeType: f.mimeType,
           })),
         );
-        alert(
+        showSuccess(
           t(
             "member.projects.applicationRecords.supplementSuccess",
             "추가 자료가 성공적으로 제출되었습니다.",
@@ -141,7 +142,7 @@ export function useApplicationRecords(pageSize = 10) {
       }
     } catch (err) {
       console.error("Supplement submit failed:", err);
-      alert(
+      showError(
         t(
           "member.projects.applicationRecords.supplementFailed",
           "제출에 실패했습니다. 다시 시도해주세요.",
@@ -211,5 +212,8 @@ export function useApplicationRecords(pageSize = 10) {
     totalPages: pagination.totalPages,
     pageSize: pagination.pageSize,
     onPageChange: pagination.onPageChange,
+    // 消息提示
+    message,
+    messageVariant,
   };
 }

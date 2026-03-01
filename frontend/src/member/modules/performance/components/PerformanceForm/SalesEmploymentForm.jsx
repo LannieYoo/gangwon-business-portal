@@ -306,7 +306,7 @@ const SalesEmploymentForm = ({ data, year, onChange, onUpload }) => {
         <p className="text-sm text-gray-500 mb-4">
           {t(
             "member.performance.salesEmploymentFields.evidenceDescription",
-            "각 카테고리별로 증빙서류를 첨부해 주세요. (카테고리당 최대 5개, 파일당 최대 20MB)",
+            "각 카테고리별로 증빙서류를 첨부해 주세요. (카테고리당 최대 5개)",
           )}
         </p>
 

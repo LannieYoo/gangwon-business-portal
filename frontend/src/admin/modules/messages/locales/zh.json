@@ -33,6 +33,7 @@
             "read": "已读",
             "readStatus": "阅读状态",
             "sender": "发送者",
+            "systemSender": "系统",
             "searchNotifications": "搜索通知...",
             "noNotifications": "暂无通知",
             "confirmDelete": "确定要删除这条通知吗？",

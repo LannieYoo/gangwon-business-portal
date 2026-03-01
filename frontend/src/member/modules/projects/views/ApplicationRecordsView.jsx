@@ -17,7 +17,7 @@ import ApplicationActionButtons from "../components/ApplicationRecords/Applicati
 import CancelApplicationModal from "../components/ApplicationRecords/CancelApplicationModal";
 import RejectionReasonModal from "../components/ApplicationRecords/RejectionReasonModal";
 import SupplementMaterialsModal from "../components/ApplicationRecords/SupplementMaterialsModal";
-import { Pagination } from "@shared/components";
+import { Pagination, Alert } from "@shared/components";
 
 export default function ApplicationRecordsView() {
   const {
@@ -49,6 +49,8 @@ export default function ApplicationRecordsView() {
     currentPage,
     totalPages,
     onPageChange,
+    message,
+    messageVariant,
   } = useApplicationRecords();
 
   const renderActionButtons = useCallback(
@@ -69,6 +71,11 @@ export default function ApplicationRecordsView() {
       <ProjectSubmenu />
 
       <ProjectPageContainer>
+        {message && (
+          <Alert variant={messageVariant} className="mb-4">
+            {message}
+          </Alert>
+        )}
         <div className="flex flex-col min-h-[calc(100vh-280px)]">
           <ApplicationRecordsHeader />
 
@@ -120,7 +127,20 @@ export default function ApplicationRecordsView() {
           // TODO: Files in hook state might need manual reset if not handled by useEffect or onClose
         }}
         onSubmit={handleSubmitSupplement}
-        supplementMessage={selectedApplication?.materialRequest}
+        supplementMessage={(() => {
+          const raw = selectedApplication?.materialRequest;
+          if (!raw) return null;
+          try {
+            const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+            if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]?.round) {
+              // Round-based: show the latest request message
+              return parsed[parsed.length - 1].message;
+            }
+          } catch {
+            // Legacy plain string
+          }
+          return raw;
+        })()}
         files={supplementFiles}
         onFilesSelected={handleFileSelect}
         onFileRemove={handleRemoveFile}

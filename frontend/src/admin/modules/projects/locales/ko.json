@@ -128,6 +128,8 @@
         "submitted": "제출됨",
         "under_review": "심사중",
         "pending": "대기중",
+        "needs_supplement": "보완 필요",
+        "supplement_submitted": "서류보완완료",
         "approved": "승인됨",
         "rejected": "거부됨",
         "cancelled": "취소됨"
@@ -148,7 +150,22 @@
       "rejectSuccess": "거부 성공",
       "contactPersonName": "담당자명",
       "contactPhone": "담당자 전화번호",
-      "attachments": "첨부파일"
+      "attachments": "첨부파일",
+      "requestSupplement": "보완요청",
+      "supplementMessageRequired": "보완 요청 내용을 입력하세요",
+      "supplementRequestSuccess": "보완 요청 성공",
+      "supplementMaterials": "보완 제출 자료",
+      "supplementRound": "제출 {{round}}차",
+      "rejectionReason": "거절 사유",
+      "supplementRequestMessage": "보완 요청 내용",
+      "supplementHistory": "보완 이력",
+      "supplementFileCount": "파일 {{count}}개",
+      "sendSupplementRequest": "보완 요청 보내기",
+      "supplementRoundSuffix": "차",
+      "clearHistory": "이력 삭제",
+      "confirmClearHistory": "보완 이력을 삭제하시겠습니까?",
+      "clearHistorySuccess": "보완 이력이 삭제되었습니다",
+      "clearHistoryFailed": "보완 이력 삭제 실패"
     }
   }
 }

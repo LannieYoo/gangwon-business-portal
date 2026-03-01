@@ -472,6 +472,25 @@ async def submit_supplement(
     return ProjectApplicationResponse.model_validate(application)
 
 
+@router.delete(
+    "/api/admin/applications/{application_id}/supplement-history",
+    response_model=ProjectApplicationResponse,
+    tags=["admin-projects"],
+    summary="Clear supplement history (Admin)",
+)
+@audit_log(action="clear_supplement", resource_type="project_application")
+async def clear_supplement_history(
+    application_id: UUID,
+    request: Request,
+    current_admin: Annotated[Member, Depends(get_current_admin_user)],
+):
+    """
+    Clear supplement request and response history for an application (admin only).
+    """
+    application = await service.clear_supplement_history(application_id)
+    return ProjectApplicationResponse.model_validate(application)
+
+
 @router.get(
     "/api/admin/applications/export",
     tags=["admin-projects"],

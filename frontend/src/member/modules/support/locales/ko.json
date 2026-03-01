@@ -71,7 +71,7 @@
       "attachments": "첨부파일",
       "attachmentNumber": "첨부파일 {{number}}",
       "addAttachment": "첨부파일 추가",
-      "attachmentHint": "PDF, Word, Excel, 이미지 형식 지원, 파일당 최대 {{maxSize}}MB",
+      "attachmentHint": "PDF, Word, Hwp, Excel, 이미지 형식 지원, 파일당 최대 {{maxSize}}MB",
       "maxFiles": "최대 3개까지 업로드 가능",
       "maxFilesLabel": "최대 3개",
       "maxAttachmentsReached": "최대 {{max}}개의 첨부파일만 업로드할 수 있습니다",

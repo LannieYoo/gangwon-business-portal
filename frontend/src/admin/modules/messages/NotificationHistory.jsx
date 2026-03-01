@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Badge, SearchInput } from '@shared/components';
+import { Badge, SearchInput, Pagination } from '@shared/components';
 import { messagesService } from './services/messages.service';
 import { formatDistanceToNow } from 'date-fns';
 import { ko, zhCN } from 'date-fns/locale';
@@ -26,6 +26,12 @@ export default function NotificationHistory() {
   const [deleteConfirmModal, setDeleteConfirmModal] = useState({ isOpen: false, notificationId: null });
   const [errorModal, setErrorModal] = useState({ isOpen: false, message: '' });
 
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(totalCount / pageSize)), [totalCount, pageSize]);
+
   const getLocale = () => {
     return i18n.language === 'ko' ? ko : zhCN;
   };
@@ -42,17 +48,19 @@ export default function NotificationHistory() {
     }
   };
 
-  const loadNotifications = useCallback(async () => {
+  const loadNotifications = useCallback(async (page = 1) => {
     setLoading(true);
     try {
       const response = await messagesService.getMessages({
-        page: 1,
-        pageSize: 100,
+        page,
+        pageSize,
         messageType: 'direct', // 只查询直接消息（系统通知）
       });
       
       setNotifications(response.items || []);
       setFilteredNotifications(response.items || []);
+      setTotalCount(response.total || 0);
+      setCurrentPage(page);
     } catch (error) {
       console.error('[NotificationHistory] Failed to load notifications:', error);
       setNotifications([]);
@@ -60,7 +68,7 @@ export default function NotificationHistory() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [pageSize]);
 
   useEffect(() => {
     loadNotifications();
@@ -182,7 +190,7 @@ export default function NotificationHistory() {
   const handleCloseModal = () => {
     setSelectedNotification(null);
     // 关闭模态框时刷新数据
-    loadNotifications();
+    loadNotifications(currentPage);
     // 触发全局事件，通知小铃铛刷新未读数量
     window.dispatchEvent(new Event('notification-read'));
   };
@@ -201,7 +209,7 @@ export default function NotificationHistory() {
       await messagesService.deleteMessage(notificationId);
       // 删除成功后刷新列表
       setDeleteConfirmModal({ isOpen: false, notificationId: null });
-      loadNotifications();
+      loadNotifications(currentPage);
       // 触发全局事件，通知小铃铛刷新未读数量
       window.dispatchEvent(new Event('notification-read'));
     } catch (error) {
@@ -366,6 +374,17 @@ export default function NotificationHistory() {
         </div>
       )}
 
+      {/* 分页 */}
+      {totalPages > 1 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => loadNotifications(page)}
+          />
+        </div>
+      )}
+
       {/* 详情模态框 */}
       {selectedNotification && (() => {
         const translated = translateNotification(selectedNotification);
@@ -379,7 +398,7 @@ export default function NotificationHistory() {
                   </h2>
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span>
-                      {t('admin.messages.sender')}: {selectedNotification.senderName || 'System'}
+                      {t('admin.messages.sender')}: {selectedNotification.senderName || t('admin.messages.systemSender', '시스템')}
                     </span>
                     <span>{formatDate(selectedNotification.createdAt)}</span>
                   </div>

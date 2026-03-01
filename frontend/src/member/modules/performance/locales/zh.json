@@ -55,7 +55,7 @@
       "people": "人",
       "proofDocument": "证明文件",
       "proofDocumentsDesc": "请上传销售额、雇佣人数、政府支持等相关证明文件。",
-      "fileUploadHint": "文件格式: PDF / 最大 {{maxSize}}MB",
+      "fileUploadHint": "支持 PDF、Word、Hwp、Excel、图片格式，单个文件最大 {{maxSize}}MB",
       "uploadedFiles": "已上传文件",
       "notes": "备注",
       "notesPlaceholder": "请输入其他需要说明的事项",
@@ -80,7 +80,7 @@
       "uploadFor": "为 {{period}} 上传附件",
       "selectFiles": "选择文件",
       "selectedFiles": "已选择 {{count}} 个文件",
-      "supportedFormats": "支持 PDF、Word、Excel、PPT、图片",
+      "supportedFormats": "支持 PDF、Word、Hwp、Excel、PPT、图片",
       "selectFileFirst": "请先选择文件",
       "uploadSuccess": "上传成功",
       "uploadFailed": "上传失败",
@@ -117,7 +117,7 @@
         "institution": "投资机构",
         "institutionPlaceholder": "请输入投资机构名称",
         "attachments": "证明文件",
-        "attachmentsHint": "请上传投资相关证明文件（最多5个，每个文件最大20MB）",
+        "attachmentsHint": "请上传投资相关证明文件（最多5个，支持PDF、Word、Hwp、Excel、图片格式，每个文件最大20MB）",
         "add": "添加"
       },
       "salesEmploymentFields": {
@@ -141,6 +141,8 @@
         "attachments": "证明文件",
         "uploadAttachments": "上传文件（可选择多个）",
         "attachmentsHint": "请上传销售额、出口额、雇佣相关的证明文件",
+        "evidenceDescription": "请为每个类别附上证明文件。（每类别最多5个）",
+        "legacyAttachments": "原有证明文件（未分类）",
         "unit": {
           "won": "元",
           "people": "名"

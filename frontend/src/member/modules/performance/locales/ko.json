@@ -55,7 +55,7 @@
       "people": "명",
       "proofDocument": "증빙서류",
       "proofDocumentsDesc": "매출액, 고용인원, 정부지원 등 관련 증빙서류를 업로드해주세요.",
-      "fileUploadHint": "파일 형식: PDF / 최대 {{maxSize}}MB",
+      "fileUploadHint": "PDF, Word, Hwp, Excel, 이미지 형식 지원, 파일당 최대 {{maxSize}}MB",
       "uploadedFiles": "업로드된 파일",
       "notes": "비고",
       "notesPlaceholder": "기타 설명이 필요한 사항을 입력하세요",
@@ -83,7 +83,7 @@
       "uploadFor": "{{period}} 첨부파일 업로드",
       "selectFiles": "파일 선택",
       "selectedFiles": "{{count}}개 파일 선택됨",
-      "supportedFormats": "PDF, Word, Excel, PPT, 이미지 지원",
+      "supportedFormats": "PDF, Word, Hwp, Excel, PPT, 이미지 지원",
       "selectFileFirst": "먼저 파일을 선택해주세요",
       "uploadSuccess": "업로드 성공",
       "uploadFailed": "업로드 실패",
@@ -117,7 +117,7 @@
         "institution": "투자 기관",
         "institutionPlaceholder": "투자 기관명 입력",
         "attachments": "증빙서류",
-        "attachmentsHint": "투자 관련 증빙서류를 업로드하세요 (최대 5개, 파일당 최대 20MB)",
+        "attachmentsHint": "투자 관련 증빙서류를 업로드하세요 (최대 5개, PDF, Word, Hwp, Excel, 이미지 형식 지원, 파일당 최대 20MB)",
         "add": "추가"
       },
       "salesEmploymentFields": {
@@ -141,6 +141,8 @@
         "attachments": "증빙서류",
         "uploadAttachments": "파일 업로드 (여러 개 선택 가능)",
         "attachmentsHint": "매출액, 수출액, 고용 관련 증빙서류를 업로드하세요",
+        "evidenceDescription": "각 카테고리별로 증빙서류를 첨부해 주세요. (카테고리당 최대 5개)",
+        "legacyAttachments": "기존 증빙서류 (미분류)",
         "unit": {
           "won": "원",
           "people": "명"

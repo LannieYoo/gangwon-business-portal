@@ -15,6 +15,7 @@ import {
   Pagination,
   Modal,
   Alert,
+  ConfirmModal,
 } from "@shared/components";
 import projectsService from "./services/projects.service";
 import { uploadService, apiService } from "@shared/services";
@@ -263,6 +264,33 @@ export default function ProjectDetail() {
     setShowSupplementRequestModal(false);
     setSupplementRequestMessage("");
     setSupplementRequestingApplicationId(null);
+  };
+
+  const [clearHistoryConfirm, setClearHistoryConfirm] = useState({ isOpen: false, applicationId: null });
+
+  const handleClearSupplementHistory = (applicationId) => {
+    setClearHistoryConfirm({ isOpen: true, applicationId });
+  };
+
+  const confirmClearSupplementHistory = async () => {
+    const { applicationId } = clearHistoryConfirm;
+    try {
+      await apiService.delete(
+        `${API_PREFIX}/admin/applications/${applicationId}/supplement-history`,
+      );
+      setClearHistoryConfirm({ isOpen: false, applicationId: null });
+      loadApplications();
+      setShowApplicationModal(false);
+      setMessageVariant("success");
+      setMessage(t("admin.applications.clearHistorySuccess", "보완 이력이 삭제되었습니다"));
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error("Failed to clear supplement history:", error);
+      setClearHistoryConfirm({ isOpen: false, applicationId: null });
+      setMessageVariant("error");
+      setMessage(t("admin.applications.clearHistoryFailed", "보완 이력 삭제 실패"));
+      setTimeout(() => setMessage(null), 3000);
+    }
   };
 
   const handleViewApplication = (application) => {
@@ -888,116 +916,223 @@ export default function ProjectDetail() {
                   </div>
                 </div>
               )}
-            {/* 보완 제출 자료 표시 (Display submitted supplement materials) */}
-            {selectedApplication.materialResponse &&
+            {/* 보완 이력 (Supplement History - combined request & response timeline) */}
+            {(selectedApplication.materialRequest ||
+              selectedApplication.materialResponse ||
+              (selectedApplication.status === "rejected" && selectedApplication.reviewNote)) &&
               (() => {
-                let supplementFiles = [];
+                // Parse supplement rounds (responses)
+                let supplementRounds = [];
                 try {
                   const parsed =
                     typeof selectedApplication.materialResponse === "string"
                       ? JSON.parse(selectedApplication.materialResponse)
                       : selectedApplication.materialResponse;
-                  supplementFiles = Array.isArray(parsed) ? parsed : [];
+                  if (Array.isArray(parsed) && parsed.length > 0) {
+                    if (parsed[0] && typeof parsed[0] === "object" && "round" in parsed[0]) {
+                      supplementRounds = parsed;
+                    } else {
+                      supplementRounds = [{ round: 1, submittedAt: null, files: parsed }];
+                    }
+                  }
                 } catch {
-                  supplementFiles = [];
+                  supplementRounds = [];
                 }
-                if (supplementFiles.length === 0) return null;
+
+                // Parse supplement requests (admin messages) - round-based
+                let requestRounds = [];
+                try {
+                  const rawRequest = selectedApplication.materialRequest;
+                  if (rawRequest) {
+                    const parsedReq = typeof rawRequest === "string" ? JSON.parse(rawRequest) : rawRequest;
+                    if (Array.isArray(parsedReq) && parsedReq.length > 0 && parsedReq[0] && typeof parsedReq[0] === "object" && "round" in parsedReq[0]) {
+                      requestRounds = parsedReq;
+                    } else {
+                      // Legacy: plain string
+                      requestRounds = [{ round: 1, message: rawRequest, requestedAt: null }];
+                    }
+                  }
+                } catch {
+                  // Legacy: plain string that's not valid JSON
+                  if (selectedApplication.materialRequest) {
+                    requestRounds = [{ round: 1, message: selectedApplication.materialRequest, requestedAt: null }];
+                  }
+                }
+
+                const hasSupplementHistory = supplementRounds.length > 0 || requestRounds.length > 0;
+                const isRejected = selectedApplication.status === "rejected";
+
+                // Show rejection reason separately if no supplement history
+                if (isRejected && selectedApplication.reviewNote && !hasSupplementHistory) {
+                  return (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                      <h4 className="text-sm font-medium text-red-800 mb-1">
+                        {t("admin.applications.rejectionReason", "거절 사유")}
+                      </h4>
+                      <p className="text-sm text-red-700 whitespace-pre-line">
+                        {selectedApplication.reviewNote}
+                      </p>
+                    </div>
+                  );
+                }
+
+                if (!hasSupplementHistory) return null;
+
+                const totalFiles = supplementRounds.reduce((sum, r) => sum + (r.files?.length || 0), 0);
+
+                // Build interleaved timeline: request1 → response1 → request2 → response2 → ...
+                const maxRound = Math.max(
+                  requestRounds.length,
+                  supplementRounds.length,
+                );
+
                 return (
                   <div className="mt-4">
-                    <label className="text-sm font-medium text-gray-600">
-                      {t(
-                        "admin.applications.supplementMaterials",
-                        "보완 제출 자료",
-                      )}
-                      <span className="ml-1 text-xs font-normal text-gray-400">
-                        ({supplementFiles.length})
-                      </span>
-                    </label>
-                    <div className="mt-2 space-y-2">
-                      {supplementFiles.map((file, idx) => (
-                        <div
-                          key={file.fileId || file.file_id || idx}
-                          className="flex items-center justify-between p-3 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors border border-blue-200"
-                        >
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <svg
-                              className="w-4 h-4 text-blue-500 flex-shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                              />
-                            </svg>
-                            <span className="text-sm text-gray-900 truncate">
-                              {file.originalName ||
-                                file.original_name ||
-                                file.fileName ||
-                                file.file_name ||
-                                `${t("common.attachment", "첨부파일")} ${idx + 1}`}
-                            </span>
-                            {(file.fileSize || file.file_size) && (
-                              <span className="text-xs text-gray-500">
-                                (
-                                {(
-                                  (file.fileSize || file.file_size) /
-                                  1024 /
-                                  1024
-                                ).toFixed(1)}{" "}
-                                MB)
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                        {t("admin.applications.supplementHistory", "보완 이력")}
+                        {totalFiles > 0 && (
+                          <span className="text-xs font-normal text-gray-400">
+                            ({t("admin.applications.supplementFileCount", "파일 {{count}}개", { count: totalFiles })})
+                          </span>
+                        )}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleClearSupplementHistory(selectedApplication.id)}
+                        className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        {t("admin.applications.clearHistory", "이력 삭제")}
+                      </button>
+                    </div>
+                    <div className="mt-2 border border-gray-200 rounded-lg overflow-hidden">
+                      {/* Timeline entries */}
+                      <div className="divide-y divide-gray-100">
+                        {Array.from({ length: maxRound }, (_, i) => i + 1).map((roundNum) => {
+                          const request = requestRounds.find((r) => r.round === roundNum);
+                          const submission = supplementRounds.find((r) => r.round === roundNum);
+                          return (
+                            <div key={`round-${roundNum}`}>
+                              {/* Admin request */}
+                              {request && (
+                                <div className="flex gap-3 p-3 bg-amber-50">
+                                  <div className="flex-shrink-0 mt-0.5">
+                                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-200 text-amber-700">
+                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                      </svg>
+                                    </span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <p className="text-xs font-medium text-amber-800">
+                                        {t("admin.applications.supplementRequestMessage", "보완 요청 내용")}
+                                        {requestRounds.length > 1 && (
+                                          <span className="ml-1 font-normal text-amber-600">({roundNum}{t("admin.applications.supplementRoundSuffix", "차")})</span>
+                                        )}
+                                      </p>
+                                      {request.requestedAt && (
+                                        <span className="text-xs text-amber-500">
+                                          {formatDate(request.requestedAt, "yyyy-MM-dd HH:mm", currentLanguage)}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-sm text-amber-700 whitespace-pre-line">
+                                      {request.message}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                              {/* Member submission */}
+                              {submission && (
+                                <div className="flex gap-3 p-3 bg-white">
+                                  <div className="flex-shrink-0 mt-0.5">
+                                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700">
+                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                      </svg>
+                                    </span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <p className="text-xs font-medium text-blue-700">
+                                        {t("admin.applications.supplementRound", "제출 {{round}}차", { round: submission.round })}
+                                        <span className="ml-1 font-normal text-gray-400">({(submission.files || []).length})</span>
+                                      </p>
+                                      {submission.submittedAt && (
+                                        <span className="text-xs text-gray-400">
+                                          {formatDate(submission.submittedAt, "yyyy-MM-dd HH:mm", currentLanguage)}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="space-y-1">
+                                      {(submission.files || []).map((file, idx) => (
+                                        <div
+                                          key={file.fileId || file.file_id || idx}
+                                          className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors"
+                                        >
+                                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                                            <svg className="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                            <span className="text-sm text-gray-900 truncate">
+                                              {file.originalName || file.original_name || file.fileName || file.file_name || `${t("common.attachment", "첨부파일")} ${idx + 1}`}
+                                            </span>
+                                            {(file.fileSize || file.file_size) && (
+                                              <span className="text-xs text-gray-500">
+                                                ({((file.fileSize || file.file_size) / 1024 / 1024).toFixed(1)} MB)
+                                              </span>
+                                            )}
+                                          </div>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={async () => {
+                                              const url = file.fileUrl || file.file_url;
+                                              const name = file.originalName || file.original_name || file.fileName || file.file_name;
+                                              if (url) {
+                                                await handleDownloadByUrl(url, name);
+                                              } else if (file.fileId || file.file_id) {
+                                                await handleDownload(file.fileId || file.file_id, name);
+                                              }
+                                            }}
+                                          >
+                                            {t("common.download", "다운로드")}
+                                          </Button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {/* Rejection reason if rejected after supplement */}
+                        {isRejected && selectedApplication.reviewNote && (
+                          <div className="flex gap-3 p-3 bg-red-50">
+                            <div className="flex-shrink-0 mt-0.5">
+                              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-200 text-red-700">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
                               </span>
-                            )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-red-800 mb-1">
+                                {t("admin.applications.rejectionReason", "거절 사유")}
+                              </p>
+                              <p className="text-sm text-red-700 whitespace-pre-line">
+                                {selectedApplication.reviewNote}
+                              </p>
+                            </div>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={async () => {
-                              const url = file.fileUrl || file.file_url;
-                              const name =
-                                file.originalName ||
-                                file.original_name ||
-                                file.fileName ||
-                                file.file_name;
-                              if (url) {
-                                await handleDownloadByUrl(url, name);
-                              } else if (file.fileId || file.file_id) {
-                                await handleDownload(
-                                  file.fileId || file.file_id,
-                                  name,
-                                );
-                              }
-                            }}
-                          >
-                            {t("common.download", "다운로드")}
-                          </Button>
-                        </div>
-                      ))}
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
               })()}
-            {/* Display rejection reason or supplement request if present */}
-            {(selectedApplication.reviewNote ||
-              selectedApplication.materialRequest) && (
-              <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
-                <h4 className="text-sm font-medium text-amber-800 mb-1">
-                  {selectedApplication.status === "rejected"
-                    ? t("admin.applications.rejectionReason", "거절 사유")
-                    : t(
-                        "admin.applications.supplementRequestMessage",
-                        "보완 요청 내용",
-                      )}
-                </h4>
-                <p className="text-sm text-amber-700">
-                  {selectedApplication.reviewNote ||
-                    selectedApplication.materialRequest}
-                </p>
-              </div>
-            )}
             {selectedApplication.memberId && (
               <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button
@@ -1127,6 +1262,14 @@ export default function ProjectDetail() {
           </div>
         </Modal>
       )}
+
+      <ConfirmModal
+        isOpen={clearHistoryConfirm.isOpen}
+        onClose={() => setClearHistoryConfirm({ isOpen: false, applicationId: null })}
+        onConfirm={confirmClearSupplementHistory}
+        title={t("admin.applications.clearHistory", "이력 삭제")}
+        message={t("admin.applications.confirmClearHistory", "보완 이력을 삭제하시겠습니까?")}
+      />
     </div>
   );
 }

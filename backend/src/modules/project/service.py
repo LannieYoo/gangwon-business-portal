@@ -555,9 +555,41 @@ class ProjectService:
         if review_notes is not None:
             update_data["review_note"] = review_notes
 
-        # Save supplement request message in material_request field
+        # Save supplement request message in material_request field (round-based)
         if status == ApplicationStatus.needs_supplement and review_notes:
-            update_data["material_request"] = review_notes
+            # Parse existing requests to append new round
+            existing_requests = []
+            existing_mr = application.get('material_request')
+            if existing_mr:
+                try:
+                    parsed = json.loads(existing_mr) if isinstance(existing_mr, str) else existing_mr
+                    if isinstance(parsed, list) and parsed and isinstance(parsed[0], dict) and 'round' in parsed[0]:
+                        existing_requests = parsed
+                    elif isinstance(parsed, list):
+                        # Legacy list but not round-based
+                        existing_requests = []
+                    else:
+                        # Legacy: single string or number → migrate to round-based format
+                        existing_requests = [{
+                            "round": 1,
+                            "message": str(existing_mr),
+                            "requestedAt": application.get('updated_at', application.get('created_at', '')),
+                        }]
+                except (json.JSONDecodeError, TypeError):
+                    # Plain string that's not valid JSON
+                    existing_requests = [{
+                        "round": 1,
+                        "message": str(existing_mr),
+                        "requestedAt": application.get('updated_at', application.get('created_at', '')),
+                    }]
+
+            new_request = {
+                "round": len(existing_requests) + 1,
+                "message": review_notes,
+                "requestedAt": datetime.utcnow().isoformat(),
+            }
+            all_requests = existing_requests + [new_request]
+            update_data["material_request"] = json.dumps(all_requests, ensure_ascii=False)
 
         # Use helper method
         updated = await supabase_service.update_record('project_applications', str(application_id), update_data)
@@ -567,7 +599,6 @@ class ProjectService:
             try:
                 from ...modules.messages.service import service as message_service
                 from ...modules.messages.schemas import MessageCreate
-                import json
                 
                 member_id = application.get('member_id')
                 project_id = application.get('project_id')
@@ -633,10 +664,37 @@ class ProjectService:
                 f"Only applications in 'needs_supplement' status can receive supplements."
             )
 
+        # Store each submission as a round with timestamp (support multiple submissions)
+        existing_rounds = []
+        existing_response = application.get('material_response')
+        if existing_response:
+            try:
+                parsed = json.loads(existing_response) if isinstance(existing_response, str) else existing_response
+                if isinstance(parsed, list):
+                    # Check if it's the new round-based format or legacy flat format
+                    if parsed and isinstance(parsed[0], dict) and 'round' in parsed[0]:
+                        existing_rounds = parsed
+                    else:
+                        # Migrate legacy flat format to round-based format
+                        existing_rounds = [{
+                            "round": 1,
+                            "submittedAt": application.get('updated_at', application.get('created_at', '')),
+                            "files": parsed,
+                        }]
+            except (json.JSONDecodeError, TypeError):
+                existing_rounds = []
+
+        new_round = {
+            "round": len(existing_rounds) + 1,
+            "submittedAt": datetime.now().isoformat(),
+            "files": attachments if isinstance(attachments, list) else [],
+        }
+        all_rounds = existing_rounds + [new_round]
+
         # Update application with supplement materials
         update_data = {
             "status": "supplement_submitted",
-            "material_response": json.dumps(attachments, ensure_ascii=False) if not isinstance(attachments, str) else attachments,
+            "material_response": json.dumps(all_rounds, ensure_ascii=False),
         }
 
         updated = await supabase_service.update_record(
@@ -722,6 +780,21 @@ class ProjectService:
             })
 
         return export_data
+
+    async def clear_supplement_history(self, application_id: UUID) -> dict:
+        """
+        Clear supplement request and response history (admin only).
+        """
+        application = await supabase_service.get_by_id('project_applications', str(application_id))
+        if not application:
+            raise NotFoundError(resource_type="Project application")
+
+        update_data = {
+            "material_request": None,
+            "material_response": None,
+        }
+        updated = await supabase_service.update_record('project_applications', str(application_id), update_data)
+        return updated
 
     async def export_applications_data(
         self, project_id: Optional[UUID], query: ApplicationListQuery

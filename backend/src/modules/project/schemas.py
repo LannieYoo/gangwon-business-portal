@@ -263,6 +263,7 @@ class ProjectApplicationListItem(BaseModel):
     reviewed_at: Optional[datetime]
     review_note: Optional[str] = None
     material_request: Optional[str] = None
+    material_response: Optional[str] = None
 
     class Config:
         from_attributes = True

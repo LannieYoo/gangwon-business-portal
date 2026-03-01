@@ -23,8 +23,8 @@ export function useMyApplications() {
     fetchApplications,
     'my-applications',
     {
-      cacheDuration: 1 * 60 * 1000, // 1分钟缓存
-      enabled: true
+      cacheDuration: 0, // 不缓存，始终获取最新数据
+      enabled: false
     }
   );
 

@@ -128,6 +128,8 @@
         "submitted": "已提交",
         "under_review": "审核中",
         "pending": "待处理",
+        "needs_supplement": "需补充",
+        "supplement_submitted": "补充材料已提交",
         "approved": "已批准",
         "rejected": "已拒绝",
         "cancelled": "已取消"
@@ -148,7 +150,22 @@
       "rejectSuccess": "拒绝成功",
       "contactPersonName": "负责人姓名",
       "contactPhone": "负责人电话",
-      "attachments": "附件"
+      "attachments": "附件",
+      "requestSupplement": "补充要求",
+      "supplementMessageRequired": "请输入补充要求内容",
+      "supplementRequestSuccess": "补充要求发送成功",
+      "supplementMaterials": "补充提交资料",
+      "supplementRound": "第 {{round}} 次提交",
+      "rejectionReason": "拒绝原因",
+      "supplementRequestMessage": "补充要求内容",
+      "supplementHistory": "补充历史",
+      "supplementFileCount": "文件 {{count}} 个",
+      "sendSupplementRequest": "发送补充要求",
+      "supplementRoundSuffix": "次",
+      "clearHistory": "删除历史",
+      "confirmClearHistory": "确定要删除补充历史吗？",
+      "clearHistorySuccess": "补充历史已删除",
+      "clearHistoryFailed": "删除补充历史失败"
     }
   }
 }

@@ -25,7 +25,7 @@
       "addFiles": "첨부파일 추가",
       "uploading": "업로드 중...",
       "remaining": "{{count}}/{{max}} 개 파일 업로드 가능",
-      "hint": "파일당 최대 {{max}}",
+      "hint": "PDF, Word, Hwp, Excel, 이미지 형식 지원, 파일당 최대 {{max}}",
       "fileTooLarge": "파일 {{name}}이(가) 최대 크기 {{max}}를 초과했습니다",
       "attachments": "첨부파일",
       "viewAll": "{{count}}개 첨부파일",

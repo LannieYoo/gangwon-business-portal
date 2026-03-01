@@ -403,7 +403,10 @@ export default function ProjectForm() {
                     </button>
                   </div>
                 ) : (
-                  <div className="w-full h-48 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center">
+                  <div
+                    className="w-full rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center"
+                    style={{ aspectRatio: "850 / 1200" }}
+                  >
                     <span className="text-gray-400 text-sm">
                       {t("admin.projects.form.noImage", "이미지가 없습니다")}
                     </span>

@@ -33,6 +33,7 @@
       "read": "읽음",
       "readStatus": "읽음 상태",
       "sender": "발신자",
+      "systemSender": "시스템",
       "searchNotifications": "알림 검색...",
       "noNotifications": "알림이 없습니다",
       "confirmDelete": "이 알림을 삭제하시겠습니까?",
