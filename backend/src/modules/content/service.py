@@ -305,6 +305,7 @@ class ContentService:
         
         query = query.eq('is_active', 'true')\
                     .order('display_order', desc=False)\
+                    .order('updated_at', desc=True)\
                     .order('created_at', desc=True)
         
         result = query.execute()
@@ -321,6 +322,8 @@ class ContentService:
         result = supabase_service.client.table('banners')\
             .select('*')\
             .order('display_order', desc=False)\
+            .order('updated_at', desc=True)\
+            .order('created_at', desc=True)\
             .execute()
         
         return result.data or []
@@ -341,6 +344,8 @@ class ContentService:
             .eq('banner_type', banner_type)\
             .eq('is_active', 'true')\
             .order('display_order', desc=False)\
+            .order('updated_at', desc=True)\
+            .order('created_at', desc=True)\
             .limit(1)\
             .execute()
         
@@ -352,6 +357,8 @@ class ContentService:
             .select('*')\
             .eq('banner_type', banner_type)\
             .order('display_order', desc=False)\
+            .order('updated_at', desc=True)\
+            .order('created_at', desc=True)\
             .limit(1)\
             .execute()
         
@@ -370,8 +377,15 @@ class ContentService:
         banner_data = {
             'id': str(uuid4()),
             'banner_type': data.banner_type,
-            'title': data.title,
+            'title_ko': data.title_ko,
+            'title_zh': data.title_zh,
+            'subtitle_ko': data.subtitle_ko,
+            'subtitle_zh': data.subtitle_zh,
+            'text_theme': data.text_theme,
+            'overlay_strength': data.overlay_strength,
+            'text_position': data.text_position,
             'image_url': data.image_url,
+            'mobile_image_url': data.mobile_image_url,
             'link_url': data.link_url,
             'is_active': data.is_active,
             'display_order': data.display_order or 0,
@@ -411,6 +425,12 @@ class ContentService:
             update_data['subtitle_ko'] = data.subtitle_ko
         if data.subtitle_zh is not None:
             update_data['subtitle_zh'] = data.subtitle_zh
+        if data.text_theme is not None:
+            update_data['text_theme'] = data.text_theme
+        if data.overlay_strength is not None:
+            update_data['overlay_strength'] = data.overlay_strength
+        if data.text_position is not None:
+            update_data['text_position'] = data.text_position
         if data.image_url is not None:
             update_data['image_url'] = data.image_url
         if data.mobile_image_url is not None:

@@ -354,6 +354,9 @@ class Banner(Base):
     title_zh = Column(String(200))
     subtitle_ko = Column(String(500))
     subtitle_zh = Column(String(500))
+    text_theme = Column(String(20))
+    overlay_strength = Column(String(20))
+    text_position = Column(String(20))
     is_active = Column(String(10), default="true")  # "true" or "false" as string
     display_order = Column(Integer, default=0)  # For sorting banners
     

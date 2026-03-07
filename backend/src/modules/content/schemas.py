@@ -251,6 +251,9 @@ class BannerCreate(BaseModel):
     title_zh: Optional[str] = Field(None, max_length=200, description="Chinese title")
     subtitle_ko: Optional[str] = Field(None, max_length=500, description="Korean subtitle")
     subtitle_zh: Optional[str] = Field(None, max_length=500, description="Chinese subtitle")
+    text_theme: Optional[str] = Field(None, max_length=20, description="Banner text theme")
+    overlay_strength: Optional[str] = Field(None, max_length=20, description="Banner overlay strength")
+    text_position: Optional[str] = Field(None, max_length=20, description="Banner text position")
     is_active: bool = Field(default=True, description="Whether banner is active")
     display_order: int = Field(default=0, description="Display order for sorting")
 
@@ -266,6 +269,9 @@ class BannerUpdate(BaseModel):
     title_zh: Optional[str] = Field(None, max_length=200, description="Chinese title")
     subtitle_ko: Optional[str] = Field(None, max_length=500, description="Korean subtitle")
     subtitle_zh: Optional[str] = Field(None, max_length=500, description="Chinese subtitle")
+    text_theme: Optional[str] = Field(None, max_length=20, description="Banner text theme")
+    overlay_strength: Optional[str] = Field(None, max_length=20, description="Banner overlay strength")
+    text_position: Optional[str] = Field(None, max_length=20, description="Banner text position")
     is_active: Optional[bool] = Field(None, description="Whether banner is active")
     display_order: Optional[int] = Field(None, description="Display order for sorting")
 
@@ -282,6 +288,9 @@ class BannerResponse(BaseModel):
     title_zh: Optional[str]
     subtitle_ko: Optional[str]
     subtitle_zh: Optional[str]
+    text_theme: Optional[str]
+    overlay_strength: Optional[str]
+    text_position: Optional[str]
     is_active: bool
     display_order: int
     created_at: datetime

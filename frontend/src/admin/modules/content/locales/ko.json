@@ -16,6 +16,7 @@
         "placeholder": "배너 관리 기능 개발 예정",
         "types": {
           "mainBanner": "메인 배너",
+          "mainSecondaryBanner": "메인 소형 배너",
           "systemIntro": "시스템 소개",
           "projects": "지원사업",
           "performance": "성과",
@@ -30,6 +31,27 @@
             "mobileImageHint": "권장: 1080 x 1350 (4:5), 최소: 750 x 938",
             "url": "링크 URL",
             "urlPlaceholder": "https://example.com",
+            "titleKo": "주제목",
+            "titleKoPlaceholder": "배너 주제목을 입력하세요",
+            "subtitleKo": "부제목",
+            "subtitleKoPlaceholder": "배너 부제목을 입력하세요",
+            "textTheme": "글자 색상",
+            "overlayStrength": "배경 어둡기",
+            "textPosition": "글자 위치",
+            "textThemeOptions": {
+              "light": "밝은 글자",
+              "dark": "어두운 글자"
+            },
+            "overlayStrengthOptions": {
+              "soft": "약함",
+              "medium": "보통",
+              "strong": "강함"
+            },
+            "textPositionOptions": {
+              "left": "왼쪽",
+              "center": "가운데",
+              "right": "오른쪽"
+            },
             "bannerType": "배너 유형",
             "imageUrl": "이미지 URL"
           }

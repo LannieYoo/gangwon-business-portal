@@ -6,12 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 import { contentService } from '@shared/services';
-
-// Banner 数据缓存 - 在模块级别缓存，避免重复请求
-const bannerCache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
 
 /**
  * 横幅数据管理 Hook
@@ -20,25 +15,8 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
  * @returns {object} { banners, loading, error, reload }
  */
 export function useBanners(bannerType, defaultBannerImages = {}) {
-  const { i18n } = useTranslation();
-  
-  // 从缓存初始化 state，避免闪烁
-  const [banners, setBanners] = useState(() => {
-    if (!bannerType) return [];
-    const cacheKey = `${bannerType}-${i18n.language}`;
-    const cached = bannerCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      return cached.banners;
-    }
-    return [];
-  });
-  
-  const [loading, setLoading] = useState(() => {
-    if (!bannerType) return false;
-    const cacheKey = `${bannerType}-${i18n.language}`;
-    const cached = bannerCache.get(cacheKey);
-    return !(cached && Date.now() - cached.timestamp < CACHE_DURATION);
-  });
+  const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(Boolean(bannerType));
   
   const [error, setError] = useState(null);
   const loadedImagesRef = useRef(new Set());
@@ -66,13 +44,10 @@ export function useBanners(bannerType, defaultBannerImages = {}) {
   /**
    * 生成占位符图片
    */
-  const generatePlaceholderImage = useCallback((width = 1920, height = 400, text = "") => {
+  const generatePlaceholderImage = useCallback((width = 1920, height = 400) => {
     const svg = `
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="#e5e7eb"/>
-        <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="24" fill="#9ca3af" text-anchor="middle" dominant-baseline="middle">
-          ${text || "Banner Placeholder"}
-        </text>
       </svg>
     `.trim();
     return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
@@ -84,16 +59,6 @@ export function useBanners(bannerType, defaultBannerImages = {}) {
   const loadBanners = useCallback(async () => {
     if (!bannerType) {
       setBanners([]);
-      setLoading(false);
-      return;
-    }
-
-    // 检查缓存
-    const cacheKey = `${bannerType}-${i18n.language}`;
-    const cached = bannerCache.get(cacheKey);
-    
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      setBanners(cached.banners);
       setLoading(false);
       return;
     }
@@ -112,18 +77,24 @@ export function useBanners(bannerType, defaultBannerImages = {}) {
           imageUrl: b.imageUrl,
           mobileImageUrl: b.mobileImageUrl || null,
           link: b.linkUrl || null,
-          title: i18n.language === "zh" ? b.titleZh || b.titleKo : b.titleKo || b.titleZh,
-          subtitle: i18n.language === "zh" ? b.subtitleZh || b.subtitleKo : b.subtitleKo || b.subtitleZh,
+          title: b.titleKo || null,
+          subtitle: b.subtitleKo || null,
+          textTheme: b.textTheme === 'dark' ? 'dark' : 'light',
+          overlayStrength: ['soft', 'medium', 'strong'].includes(b.overlayStrength) ? b.overlayStrength : 'medium',
+          textPosition: ['left', 'center', 'right'].includes(b.textPosition) ? b.textPosition : 'left',
         }));
       } else {
         // 使用默认横幅
         newBanners = [{
           id: "default",
-          imageUrl: defaultBannerImagesRef.current?.[bannerType] || generatePlaceholderImage(1920, 400, "Banner"),
+          imageUrl: defaultBannerImagesRef.current?.[bannerType] || generatePlaceholderImage(1920, 400),
           mobileImageUrl: null,
           link: null,
           title: null,
           subtitle: null,
+          textTheme: 'light',
+          overlayStrength: 'medium',
+          textPosition: 'left',
         }];
       }
 
@@ -141,8 +112,6 @@ export function useBanners(bannerType, defaultBannerImages = {}) {
         console.warn('[useBanners] Image preload failed:', preloadError);
       }
 
-      // 缓存数据
-      bannerCache.set(cacheKey, { banners: newBanners, timestamp: Date.now() });
       setBanners(newBanners);
     } catch (err) {
       console.error('[useBanners] Failed to load banners:', err);
@@ -151,11 +120,14 @@ export function useBanners(bannerType, defaultBannerImages = {}) {
       // 使用 fallback banner
       const fallbackBanner = [{
         id: "default",
-        imageUrl: defaultBannerImagesRef.current?.[bannerType] || generatePlaceholderImage(1920, 400, "Banner"),
+        imageUrl: defaultBannerImagesRef.current?.[bannerType] || generatePlaceholderImage(1920, 400),
         mobileImageUrl: null,
         link: null,
         title: null,
         subtitle: null,
+        textTheme: 'light',
+        overlayStrength: 'medium',
+        textPosition: 'left',
       }];
 
       try {
@@ -168,17 +140,14 @@ export function useBanners(bannerType, defaultBannerImages = {}) {
     } finally {
       setLoading(false);
     }
-  }, [bannerType, i18n.language, preloadImage, generatePlaceholderImage]);
+  }, [bannerType, preloadImage, generatePlaceholderImage]);
 
   /**
    * 重新加载横幅
    */
   const reload = useCallback(() => {
-    // 清除缓存
-    const cacheKey = `${bannerType}-${i18n.language}`;
-    bannerCache.delete(cacheKey);
     loadBanners();
-  }, [bannerType, i18n.language, loadBanners]);
+  }, [loadBanners]);
 
   // 加载横幅数据
   useEffect(() => {

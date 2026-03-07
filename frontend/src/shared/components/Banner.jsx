@@ -40,6 +40,53 @@ function useIsMobile(breakpoint = MOBILE_BREAKPOINT) {
   return isMobile;
 }
 
+function getOverlayClass(overlayStrength = "medium") {
+  if (overlayStrength === "soft") {
+    return "bg-gradient-to-r from-black/35 via-black/15 to-transparent";
+  }
+  if (overlayStrength === "strong") {
+    return "bg-gradient-to-r from-black/70 via-black/45 to-transparent";
+  }
+  return "bg-gradient-to-r from-black/55 via-black/25 to-transparent";
+}
+
+function getTextClasses(textTheme = "light") {
+  if (textTheme === "dark") {
+    return {
+      wrapper: "text-gray-900",
+      title: "text-gray-900 drop-shadow-[0_1px_1px_rgba(255,255,255,0.35)]",
+      subtitle: "text-gray-800/90 drop-shadow-[0_1px_1px_rgba(255,255,255,0.25)]",
+    };
+  }
+
+  return {
+    wrapper: "text-white",
+    title: "text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]",
+    subtitle: "text-white/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.3)]",
+  };
+}
+
+function getTextPositionClasses(textPosition = "left") {
+  if (textPosition === "center") {
+    return {
+      container: "justify-center",
+      text: "mx-auto w-full max-w-5xl text-center",
+    };
+  }
+
+  if (textPosition === "right") {
+    return {
+      container: "justify-end",
+      text: "ml-auto w-full max-w-5xl text-right",
+    };
+  }
+
+  return {
+    container: "justify-start",
+    text: "w-full max-w-5xl text-left",
+  };
+}
+
 /**
  * Generic Banner Component
  *
@@ -80,6 +127,8 @@ export default function Banner({
     return bannerData.imageUrl;
   }, [banners, currentBanner, isMobile]);
 
+  const currentBannerData = banners[currentBanner] || null;
+
   // 自动切换横幅
   useEffect(() => {
     if (banners.length <= 1) return;
@@ -93,11 +142,30 @@ export default function Banner({
   const handleBannerClick = useCallback(() => {
     const link = banners[currentBanner]?.link;
     if (!link) return;
+    const normalizedLink = link.trim();
 
-    if (link.startsWith("http://") || link.startsWith("https://")) {
-      window.open(link, "_blank");
+    if (
+      normalizedLink.startsWith("http://") ||
+      normalizedLink.startsWith("https://")
+    ) {
+      window.open(normalizedLink, "_blank");
+      return;
+    }
+
+    if (/^www\./i.test(normalizedLink)) {
+      window.open(`https://${normalizedLink}`, "_blank");
+      return;
+    }
+
+    if (/^[a-z0-9-]+(\.[a-z0-9-]+)+([/?#].*)?$/i.test(normalizedLink)) {
+      window.open(`https://${normalizedLink}`, "_blank");
+      return;
+    }
+
+    if (normalizedLink.startsWith("/")) {
+      navigate(normalizedLink);
     } else {
-      navigate(link.startsWith("/") ? link : `/${link}`);
+      navigate(`/${normalizedLink}`);
     }
   }, [banners, currentBanner, navigate]);
 
@@ -111,31 +179,52 @@ export default function Banner({
     ? "w-screen max-w-[100vw] ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]"
     : "w-full h-full";
 
-  // 高度样式
-  const heightClasses = fullWidth
-    ? "min-h-[400px] max-md:min-h-[300px] max-sm:min-h-[250px]"
-    : "h-full";
+  const sectionStyle = height ? { height } : undefined;
 
-  const hasLink = !!banners[currentBanner]?.link;
+  const hasLink = !!currentBannerData?.link;
+  const hasText = !!(currentBannerData?.title || currentBannerData?.subtitle);
+  const textClasses = getTextClasses(currentBannerData?.textTheme);
+  const overlayClass = getOverlayClass(currentBannerData?.overlayStrength);
+  const textPositionClasses = getTextPositionClasses(currentBannerData?.textPosition);
 
   return (
     <section
       className={`relative overflow-hidden ${fullWidthClasses} ${sectionClassName} ${className}`}
+      style={sectionStyle}
     >
       {/* Banner 图层 (Banner layer) */}
       {currentImageUrl ? (
-        <img
-          src={currentImageUrl}
-          alt={banners[currentBanner]?.title || "Banner"}
-          className={`block ${hasLink ? "cursor-pointer hover:opacity-90" : ""} ${
-            fullWidth ? "w-full object-cover" : "w-full h-full object-cover"
-          }`}
-          style={fullWidth ? { height } : undefined}
+        <div
+          className={`relative h-full ${hasLink ? "cursor-pointer" : ""}`}
           onClick={hasLink ? handleBannerClick : undefined}
-        />
+        >
+          <img
+            src={currentImageUrl}
+            alt={currentBannerData?.title || "Banner"}
+            className={`block h-full w-full transition-opacity object-cover ${hasLink ? "hover:opacity-90" : ""}`}
+          />
+          {hasText && (
+            <div className={`absolute inset-0 ${overlayClass}`}>
+              <div className={`mx-auto flex h-full w-full max-w-7xl items-center px-6 sm:px-10 lg:px-16 ${textPositionClasses.container}`}>
+                <div className={`${textClasses.wrapper} ${textPositionClasses.text}`}>
+                  {currentBannerData?.title && (
+                    <h2 className={`m-0 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl ${textClasses.title}`}>
+                      {currentBannerData.title}
+                    </h2>
+                  )}
+                  {currentBannerData?.subtitle && (
+                    <p className={`mt-3 mb-0 text-sm leading-6 sm:text-base lg:text-lg ${textClasses.subtitle}`}>
+                      {currentBannerData.subtitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       ) : (
         <div
-          className={`w-full ${heightClasses} bg-gray-100`}
+          className="h-full w-full bg-gray-100"
           role="img"
           aria-label="Banner"
         />

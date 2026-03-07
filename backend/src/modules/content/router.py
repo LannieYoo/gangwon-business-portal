@@ -45,7 +45,10 @@ service = ContentService()
 upload_service = UploadService()
 
 # Banner keys (直接使用前端值，无需映射)
-BANNER_KEYS = ['main_primary', 'about', 'projects', 'performance', 'support']
+BANNER_KEYS = ['main_primary', 'main_secondary', 'about', 'projects', 'performance', 'support']
+TEXT_THEME_OPTIONS = {'light', 'dark'}
+OVERLAY_STRENGTH_OPTIONS = {'soft', 'medium', 'strong'}
+TEXT_POSITION_OPTIONS = {'left', 'center', 'right'}
 
 
 # Public Notice Endpoints
@@ -407,11 +410,12 @@ async def get_banners_by_key(
     # Organize by banner key (直接使用前端值)
     result = {
         "banners": {
-            "main_primary": {"image": None, "mobile_image": None, "url": ""},
-            "about": {"image": None, "mobile_image": None, "url": ""},
-            "projects": {"image": None, "mobile_image": None, "url": ""},
-            "performance": {"image": None, "mobile_image": None, "url": ""},
-            "support": {"image": None, "mobile_image": None, "url": ""}
+            "main_primary": {"image": None, "mobile_image": None, "url": "", "titleKo": "", "subtitleKo": "", "textTheme": "light", "overlayStrength": "medium", "textPosition": "left"},
+            "main_secondary": {"image": None, "mobile_image": None, "url": "", "titleKo": "", "subtitleKo": "", "textTheme": "light", "overlayStrength": "medium", "textPosition": "left"},
+            "about": {"image": None, "mobile_image": None, "url": "", "titleKo": "", "subtitleKo": "", "textTheme": "light", "overlayStrength": "medium", "textPosition": "left"},
+            "projects": {"image": None, "mobile_image": None, "url": "", "titleKo": "", "subtitleKo": "", "textTheme": "light", "overlayStrength": "medium", "textPosition": "left"},
+            "performance": {"image": None, "mobile_image": None, "url": "", "titleKo": "", "subtitleKo": "", "textTheme": "light", "overlayStrength": "medium", "textPosition": "left"},
+            "support": {"image": None, "mobile_image": None, "url": "", "titleKo": "", "subtitleKo": "", "textTheme": "light", "overlayStrength": "medium", "textPosition": "left"}
         }
     }
     
@@ -431,7 +435,16 @@ async def get_banners_by_key(
                 result["banners"][banner_type] = {
                     "image": banner.get('image_url') or None,
                     "mobile_image": banner.get('mobile_image_url') or None,
-                    "url": banner.get('link_url') or ""
+                    "url": banner.get('link_url') or "",
+                    "titleKo": banner.get('title_ko') or "",
+                    "subtitleKo": banner.get('subtitle_ko') or "",
+                    "textTheme": banner.get('text_theme') if banner.get('text_theme') in TEXT_THEME_OPTIONS else (
+                        banner.get('title_zh') if banner.get('title_zh') in TEXT_THEME_OPTIONS else "light"
+                    ),
+                    "overlayStrength": banner.get('overlay_strength') if banner.get('overlay_strength') in OVERLAY_STRENGTH_OPTIONS else (
+                        banner.get('subtitle_zh') if banner.get('subtitle_zh') in OVERLAY_STRENGTH_OPTIONS else "medium"
+                    ),
+                    "textPosition": banner.get('text_position') if banner.get('text_position') in TEXT_POSITION_OPTIONS else "left",
                 }
     
     return result
@@ -450,6 +463,13 @@ async def update_banner_by_key(
     image: Optional[UploadFile] = File(None),
     mobile_image: Optional[UploadFile] = File(None),
     url: Optional[str] = Form(None),
+    title: Optional[str] = Form(None),
+    subtitle: Optional[str] = Form(None),
+    title_ko: Optional[str] = Form(None),
+    subtitle_ko: Optional[str] = Form(None),
+    text_theme: Optional[str] = Form(None),
+    overlay_strength: Optional[str] = Form(None),
+    text_position: Optional[str] = Form(None),
 ):
     """
     Update a banner by banner key (admin only).
@@ -463,6 +483,12 @@ async def update_banner_by_key(
     If banner exists, updates it.
     """
     from ...common.modules.exception import ValidationError, CMessageTemplate
+
+    normalized_title_ko = title_ko if title_ko is not None else title
+    normalized_subtitle_ko = subtitle_ko if subtitle_ko is not None else subtitle
+    normalized_text_theme = text_theme if text_theme in TEXT_THEME_OPTIONS else None
+    normalized_overlay_strength = overlay_strength if overlay_strength in OVERLAY_STRENGTH_OPTIONS else None
+    normalized_text_position = text_position if text_position in TEXT_POSITION_OPTIONS else None
     
     # Validate banner key (直接使用前端值)
     if banner_key not in BANNER_KEYS:
@@ -516,6 +542,16 @@ async def update_banner_by_key(
         # Update link_url if provided (even if empty string)
         if url is not None:
             update_data.link_url = url
+        if normalized_title_ko is not None:
+            update_data.title_ko = normalized_title_ko
+        if normalized_subtitle_ko is not None:
+            update_data.subtitle_ko = normalized_subtitle_ko
+        if normalized_text_theme is not None:
+            update_data.text_theme = normalized_text_theme
+        if normalized_overlay_strength is not None:
+            update_data.overlay_strength = normalized_overlay_strength
+        if normalized_text_position is not None:
+            update_data.text_position = normalized_text_position
         
         updated_banner = await service.update_banner(
             UUID(existing_banner['id']),
@@ -525,7 +561,18 @@ async def update_banner_by_key(
             "banner": {
                 "image": updated_banner.get('image_url'),
                 "mobile_image": updated_banner.get('mobile_image_url'),
-                "url": updated_banner.get('link_url') or ""
+                "url": updated_banner.get('link_url') or "",
+                "title": updated_banner.get('title_ko') or "",
+                "subtitle": updated_banner.get('subtitle_ko') or "",
+                "titleKo": updated_banner.get('title_ko') or "",
+                "subtitleKo": updated_banner.get('subtitle_ko') or "",
+                "textTheme": updated_banner.get('text_theme') if updated_banner.get('text_theme') in TEXT_THEME_OPTIONS else (
+                    updated_banner.get('title_zh') if updated_banner.get('title_zh') in TEXT_THEME_OPTIONS else "light"
+                ),
+                "overlayStrength": updated_banner.get('overlay_strength') if updated_banner.get('overlay_strength') in OVERLAY_STRENGTH_OPTIONS else (
+                    updated_banner.get('subtitle_zh') if updated_banner.get('subtitle_zh') in OVERLAY_STRENGTH_OPTIONS else "medium"
+                ),
+                "textPosition": updated_banner.get('text_position') if updated_banner.get('text_position') in TEXT_POSITION_OPTIONS else "left",
             }
         }
     else:
@@ -541,6 +588,11 @@ async def update_banner_by_key(
             image_url=image_url,
             mobile_image_url=mobile_image_url,
             link_url=url if url is not None else "",
+            title_ko=normalized_title_ko,
+            subtitle_ko=normalized_subtitle_ko,
+            text_theme=normalized_text_theme,
+            overlay_strength=normalized_overlay_strength,
+            text_position=normalized_text_position,
             is_active=True,
             display_order=0
         )
@@ -549,7 +601,18 @@ async def update_banner_by_key(
             "banner": {
                 "image": new_banner.get('image_url'),
                 "mobile_image": new_banner.get('mobile_image_url'),
-                "url": new_banner.get('link_url') or ""
+                "url": new_banner.get('link_url') or "",
+                "title": new_banner.get('title_ko') or "",
+                "subtitle": new_banner.get('subtitle_ko') or "",
+                "titleKo": new_banner.get('title_ko') or "",
+                "subtitleKo": new_banner.get('subtitle_ko') or "",
+                "textTheme": new_banner.get('text_theme') if new_banner.get('text_theme') in TEXT_THEME_OPTIONS else (
+                    new_banner.get('title_zh') if new_banner.get('title_zh') in TEXT_THEME_OPTIONS else "light"
+                ),
+                "overlayStrength": new_banner.get('overlay_strength') if new_banner.get('overlay_strength') in OVERLAY_STRENGTH_OPTIONS else (
+                    new_banner.get('subtitle_zh') if new_banner.get('subtitle_zh') in OVERLAY_STRENGTH_OPTIONS else "medium"
+                ),
+                "textPosition": new_banner.get('text_position') if new_banner.get('text_position') in TEXT_POSITION_OPTIONS else "left",
             }
         }
 

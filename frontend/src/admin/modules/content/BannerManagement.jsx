@@ -11,14 +11,29 @@ import { API_PREFIX } from '@shared/utils/constants';
 
 export default function BannerManagement() {
   const { t } = useTranslation();
+  const textThemeOptions = [
+    { value: 'light', label: t('admin.content.banners.form.fields.textThemeOptions.light') },
+    { value: 'dark', label: t('admin.content.banners.form.fields.textThemeOptions.dark') },
+  ];
+  const overlayStrengthOptions = [
+    { value: 'soft', label: t('admin.content.banners.form.fields.overlayStrengthOptions.soft') },
+    { value: 'medium', label: t('admin.content.banners.form.fields.overlayStrengthOptions.medium') },
+    { value: 'strong', label: t('admin.content.banners.form.fields.overlayStrengthOptions.strong') },
+  ];
+  const textPositionOptions = [
+    { value: 'left', label: t('admin.content.banners.form.fields.textPositionOptions.left') },
+    { value: 'center', label: t('admin.content.banners.form.fields.textPositionOptions.center') },
+    { value: 'right', label: t('admin.content.banners.form.fields.textPositionOptions.right') },
+  ];
   
   // Quick banner management state (by key)
   const [quickBanners, setQuickBanners] = useState({
-    mainPrimary: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' },
-    about: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' },
-    projects: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' },
-    performance: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' },
-    support: { image: null, mobileImage: null, file: null, mobileFile: null, url: '' }
+    mainPrimary: { image: null, mobileImage: null, file: null, mobileFile: null, url: '', titleKo: '', subtitleKo: '', textTheme: 'light', overlayStrength: 'medium', textPosition: 'left' },
+    mainSecondary: { image: null, mobileImage: null, file: null, mobileFile: null, url: '', titleKo: '', subtitleKo: '', textTheme: 'light', overlayStrength: 'medium', textPosition: 'left' },
+    about: { image: null, mobileImage: null, file: null, mobileFile: null, url: '', titleKo: '', subtitleKo: '', textTheme: 'light', overlayStrength: 'medium', textPosition: 'left' },
+    projects: { image: null, mobileImage: null, file: null, mobileFile: null, url: '', titleKo: '', subtitleKo: '', textTheme: 'light', overlayStrength: 'medium', textPosition: 'left' },
+    performance: { image: null, mobileImage: null, file: null, mobileFile: null, url: '', titleKo: '', subtitleKo: '', textTheme: 'light', overlayStrength: 'medium', textPosition: 'left' },
+    support: { image: null, mobileImage: null, file: null, mobileFile: null, url: '', titleKo: '', subtitleKo: '', textTheme: 'light', overlayStrength: 'medium', textPosition: 'left' }
   });
   const [loadingQuick, setLoadingQuick] = useState(false);
   const [message, setMessage] = useState(null);
@@ -31,16 +46,21 @@ export default function BannerManagement() {
     setLoadingQuick(true);
     const response = await apiService.get(`${API_PREFIX}/admin/banners`);
     if (response && response.banners) {
-      const bannerKeys = ['mainPrimary', 'about', 'projects', 'performance', 'support'];
+      const bannerKeys = ['mainPrimary', 'mainSecondary', 'about', 'projects', 'performance', 'support'];
       const normalizedBanners = {};
       bannerKeys.forEach(key => {
         const banner = response.banners[key] || {};
         normalizedBanners[key] = {
           image: banner.image || null,
-          mobileImage: banner.mobileImage || null,
+          mobileImage: banner.mobileImage || banner.mobile_image || null,
           file: null,
           mobileFile: null,
-          url: banner.url || ''
+          url: banner.url || '',
+          titleKo: banner.titleKo || '',
+          subtitleKo: banner.subtitleKo || '',
+          textTheme: banner.textTheme || 'light',
+          overlayStrength: banner.overlayStrength || 'medium',
+          textPosition: banner.textPosition || 'left',
         };
       });
       setQuickBanners(normalizedBanners);
@@ -81,6 +101,36 @@ export default function BannerManagement() {
     }));
   };
 
+  const handleQuickBannerTitleChange = (bannerKey, titleKo) => {
+    setQuickBanners(prev => ({
+      ...prev,
+      [bannerKey]: {
+        ...prev[bannerKey],
+        titleKo
+      }
+    }));
+  };
+
+  const handleQuickBannerSubtitleChange = (bannerKey, subtitleKo) => {
+    setQuickBanners(prev => ({
+      ...prev,
+      [bannerKey]: {
+        ...prev[bannerKey],
+        subtitleKo
+      }
+    }));
+  };
+
+  const handleQuickBannerStyleChange = (bannerKey, field, value) => {
+    setQuickBanners(prev => ({
+      ...prev,
+      [bannerKey]: {
+        ...prev[bannerKey],
+        [field]: value
+      }
+    }));
+  };
+
   const handleQuickBannerSave = async (bannerKey) => {
     setLoadingQuick(true);
     const formData = new FormData();
@@ -93,9 +143,19 @@ export default function BannerManagement() {
       formData.append('mobile_image', banner.mobileFile);
     }
     formData.append('url', banner.url || '');
+    formData.append('title_ko', banner.titleKo || '');
+    formData.append('subtitle_ko', banner.subtitleKo || '');
+    formData.append('text_theme', banner.textTheme || 'light');
+    formData.append('overlay_strength', banner.overlayStrength || 'medium');
+    formData.append('text_position', banner.textPosition || 'left');
     
     // Convert camelCase to snake_case for API endpoint
-    const apiKey = bannerKey === 'mainPrimary' ? 'main_primary' : bannerKey;
+    const apiKey =
+      bannerKey === 'mainPrimary'
+        ? 'main_primary'
+        : bannerKey === 'mainSecondary'
+          ? 'main_secondary'
+          : bannerKey;
     
     const response = await apiService.post(
       `${API_PREFIX}/admin/banners/${apiKey}`,
@@ -110,12 +170,19 @@ export default function BannerManagement() {
           image: response.banner.image !== null && response.banner.image !== undefined 
             ? response.banner.image 
             : prev[bannerKey].image,
-          mobileImage: response.banner.mobileImage !== null && response.banner.mobileImage !== undefined
+          mobileImage: (response.banner.mobileImage !== null && response.banner.mobileImage !== undefined)
             ? response.banner.mobileImage
+            : (response.banner.mobile_image !== null && response.banner.mobile_image !== undefined)
+              ? response.banner.mobile_image
             : prev[bannerKey].mobileImage,
           file: null,
           mobileFile: null,
-          url: response.banner.url !== undefined ? response.banner.url : prev[bannerKey].url
+          url: response.banner.url !== undefined ? response.banner.url : prev[bannerKey].url,
+          titleKo: response.banner.titleKo !== undefined ? response.banner.titleKo : prev[bannerKey].titleKo,
+          subtitleKo: response.banner.subtitleKo !== undefined ? response.banner.subtitleKo : prev[bannerKey].subtitleKo,
+          textTheme: response.banner.textTheme !== undefined ? response.banner.textTheme : prev[bannerKey].textTheme,
+          overlayStrength: response.banner.overlayStrength !== undefined ? response.banner.overlayStrength : prev[bannerKey].overlayStrength,
+          textPosition: response.banner.textPosition !== undefined ? response.banner.textPosition : prev[bannerKey].textPosition,
         }
       }));
     }
@@ -139,6 +206,7 @@ export default function BannerManagement() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { key: 'mainPrimary', label: t('admin.content.banners.types.mainBanner', '메인 배너') },
+              { key: 'mainSecondary', label: t('admin.content.banners.types.mainSecondaryBanner', '메인 소형 배너') },
               { key: 'about', label: t('admin.content.banners.types.systemIntro', '시스템 소개') },
               { key: 'projects', label: t('admin.content.banners.types.projects', '지원사업') },
               { key: 'performance', label: t('admin.content.banners.types.performance', '성과') },
@@ -230,15 +298,98 @@ export default function BannerManagement() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 mt-4">
-                    <label className="text-sm text-gray-600 font-medium">{t('admin.content.banners.form.fields.url', '링크 URL')}</label>
-                    <Input
-                      type="text"
-                      value={quickBanners[key].url}
-                      onChange={(e) => handleQuickBannerUrlChange(key, e.target.value)}
-                      placeholder={t('admin.content.banners.form.fields.urlPlaceholder', 'https://example.com')}
-                      className="w-full py-3 px-3 border border-gray-300 rounded text-sm font-inherit focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                    />
+                  <div className="mt-4 grid grid-cols-1 gap-4">
+                    <div className="flex flex-col gap-3">
+                      <label className="text-sm text-gray-600 font-medium">{t('admin.content.banners.form.fields.url', '링크 URL')}</label>
+                      <Input
+                        type="text"
+                        value={quickBanners[key].url}
+                        onChange={(e) => handleQuickBannerUrlChange(key, e.target.value)}
+                        placeholder={t('admin.content.banners.form.fields.urlPlaceholder', 'https://example.com')}
+                        className="w-full py-3 px-3 border border-gray-300 rounded text-sm font-inherit focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="flex flex-col gap-3">
+                        <label className="text-sm text-gray-600 font-medium">
+                          {t('admin.content.banners.form.fields.titleKo', '주제목')}
+                        </label>
+                        <Input
+                          type="text"
+                          value={quickBanners[key].titleKo}
+                          onChange={(e) => handleQuickBannerTitleChange(key, e.target.value)}
+                          placeholder={t('admin.content.banners.form.fields.titleKoPlaceholder', '배너 주제목을 입력하세요')}
+                          className="w-full py-3 px-3 border border-gray-300 rounded text-sm font-inherit focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <label className="text-sm text-gray-600 font-medium">
+                          {t('admin.content.banners.form.fields.subtitleKo', '부제목')}
+                        </label>
+                        <Input
+                          type="text"
+                          value={quickBanners[key].subtitleKo}
+                          onChange={(e) => handleQuickBannerSubtitleChange(key, e.target.value)}
+                          placeholder={t('admin.content.banners.form.fields.subtitleKoPlaceholder', '배너 부제목을 입력하세요')}
+                          className="w-full py-3 px-3 border border-gray-300 rounded text-sm font-inherit focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                      <div className="flex flex-col gap-3">
+                        <label className="text-sm text-gray-600 font-medium">
+                          {t('admin.content.banners.form.fields.textTheme')}
+                        </label>
+                        <select
+                          value={quickBanners[key].textTheme}
+                          onChange={(e) => handleQuickBannerStyleChange(key, 'textTheme', e.target.value)}
+                          className="w-full rounded border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                        >
+                          {textThemeOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <label className="text-sm text-gray-600 font-medium">
+                          {t('admin.content.banners.form.fields.overlayStrength')}
+                        </label>
+                        <select
+                          value={quickBanners[key].overlayStrength}
+                          onChange={(e) => handleQuickBannerStyleChange(key, 'overlayStrength', e.target.value)}
+                          className="w-full rounded border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                        >
+                          {overlayStrengthOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <label className="text-sm text-gray-600 font-medium">
+                          {t('admin.content.banners.form.fields.textPosition')}
+                        </label>
+                        <select
+                          value={quickBanners[key].textPosition}
+                          onChange={(e) => handleQuickBannerStyleChange(key, 'textPosition', e.target.value)}
+                          className="w-full rounded border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                        >
+                          {textPositionOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="mt-4 md:mt-3">
