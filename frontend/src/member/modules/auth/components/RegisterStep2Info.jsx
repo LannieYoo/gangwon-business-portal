@@ -67,6 +67,37 @@ export const RegisterStep2Info = ({
         />
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("member.representativeBirthDate", "대표자 생년월일")}
+          </label>
+          <input
+            type="date"
+            name="representativeBirthDate"
+            value={formData.representativeBirthDate || ""}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("member.representativeGender", "대표자 성별")}
+          </label>
+          <select
+            name="representativeGender"
+            value={formData.representativeGender || ""}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+          >
+            <option value="">{t("common.select", "선택하세요")}</option>
+            <option value="male">{t("common.male", "남성")}</option>
+            <option value="female">{t("common.female", "여성")}</option>
+          </select>
+        </div>
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {t("member.auth.establishedDate")}
@@ -119,6 +150,7 @@ export const RegisterStep2Info = ({
         </label>
         <div className="flex items-center gap-3">
           <FileUploadButton
+            accept="image/*"
             label={t("common.selectFile", "파일 선택")}
             onFilesSelected={(files) =>
               handleFileSelect(files[0], "businessLicenseFile", false)

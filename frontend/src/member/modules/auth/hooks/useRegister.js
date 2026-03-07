@@ -99,11 +99,18 @@ export const useRegister = () => {
     businessField: "",
     mainIndustryKsicMajor: "",
     mainIndustryKsicCodes: "",
+    gangwonIndustry: "",
+    futureTech: "",
     sales: "",
     employeeCount: "",
     websiteUrl: "",
     mainBusiness: "",
     cooperationFields: [],
+    representativeBirthDate: "",
+    representativeGender: "",
+    description: "",
+    participationPrograms: [],
+    investmentStatus: { hasInvestment: false, amount: "", institution: "" },
     agreeAll: false,
     termsOfService: false,
     privacyPolicy: false,
@@ -376,6 +383,12 @@ export const useRegister = () => {
         formData.cooperationFields.forEach((field) =>
           submitData.append("cooperationFields[]", field),
         );
+      } else if (key === "participationPrograms") {
+        formData.participationPrograms.forEach((prog) =>
+          submitData.append("participationPrograms[]", prog),
+        );
+      } else if (key === "investmentStatus") {
+        submitData.append(key, JSON.stringify(formData[key]));
       } else if (key === "sales" || key === "employeeCount") {
         submitData.append(key, parseFormattedNumber(formData[key]) || 0);
       } else {
@@ -421,6 +434,30 @@ export const useRegister = () => {
       } else if (message.includes("Email already registered")) {
         message = t("member.auth.emailAlreadyRegistered");
         setCurrentStep(3);
+      } else if (message.includes("REGISTER_LOGO_UPLOAD_FAILED")) {
+        message = t(
+          "member.auth.logoUploadFailedForRegister",
+          "기업 로고 업로드에 실패했습니다. 파일 형식과 크기를 확인한 후 다시 시도해주세요.",
+        );
+        setCurrentStep(2);
+      } else if (
+        message.includes("REGISTER_BUSINESS_LICENSE_UPLOAD_FAILED")
+      ) {
+        message = t(
+          "member.auth.businessLicenseUploadFailedForRegister",
+          "사업자등록증 업로드에 실패했습니다. 파일 형식과 크기를 확인한 후 다시 시도해주세요.",
+        );
+        setCurrentStep(2);
+      } else if (
+        message.includes("upload") ||
+        message.includes("Upload") ||
+        message.includes("storage")
+      ) {
+        message = t(
+          "member.auth.registerFileUploadFailed",
+          "첨부 파일 업로드 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
+        );
+        setCurrentStep(2);
       }
 
       setError(message);

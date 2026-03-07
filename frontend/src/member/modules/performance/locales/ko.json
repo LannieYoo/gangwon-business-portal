@@ -221,7 +221,7 @@
           "representativeBirthDate": "대표자 생년월일",
           "representativeGender": "대표자 성별",
           "representativePhone": "대표자 전화번호",
-          "phone": "기업 전화번호",
+          "phone": "회사대표 전화번호",
           "address": "주소",
           "region": "소재지",
           "selectRegion": "지역 선택",

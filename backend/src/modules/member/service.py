@@ -77,6 +77,7 @@ class MemberService:
             phone=member.get("phone"),
             website=member.get("website"),
             logo_url=member.get("logo_url"),
+            certificate_url=member.get("certificate_url"),
             # Contact person fields
             contact_person_name=member.get("contact_person_name"),
             contact_person_department=member.get("contact_person_department"),
@@ -144,6 +145,7 @@ class MemberService:
             phone=member.get("phone"),
             website=member.get("website"),
             logo_url=member.get("logo_url"),
+            certificate_url=member.get("certificate_url"),
             # Contact person fields
             contact_person_name=member.get("contact_person_name"),
             contact_person_department=member.get("contact_person_department"),
@@ -255,6 +257,8 @@ class MemberService:
             profile_update['website'] = data.website
         if data.logo_url is not None:
             profile_update['logo_url'] = data.logo_url
+        if data.certificate_url is not None:
+            profile_update['certificate_url'] = data.certificate_url
         # Contact person fields
         if data.contact_person_name is not None:
             profile_update['contact_person_name'] = data.contact_person_name
@@ -490,6 +494,26 @@ class MemberService:
         )
 
         return updated_member
+
+    async def delete_member(self, member_id: UUID) -> bool:
+        """
+        Hard delete a member (admin only).
+
+        Args:
+            member_id: Member UUID
+
+        Returns:
+            True if deleted
+
+        Raises:
+            NotFoundError: If member not found
+        """
+        member = await supabase_service.get_by_id('members', str(member_id))
+        if not member:
+            raise NotFoundError(resource_type="Member")
+
+        await supabase_service.hard_delete_record('members', str(member_id))
+        return True
 
     async def export_members_data(
         self, query: MemberListQuery

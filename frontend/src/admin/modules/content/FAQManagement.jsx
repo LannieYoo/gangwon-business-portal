@@ -3,7 +3,7 @@
  * FAQ管理组件
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Button, 
@@ -34,6 +34,12 @@ export default function FAQManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+
+  const paginatedFaqs = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return faqs.slice(startIndex, endIndex);
+  }, [faqs, currentPage, pageSize]);
 
   // FAQ分类选项（用于表单）
   const categoryOptions = [
@@ -137,6 +143,17 @@ export default function FAQManagement() {
     fetchFaqs();
   }, [searchTerm]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, pageSize]);
+
+  useEffect(() => {
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, pageSize, total]);
+
   // 处理新增
   const handleAdd = () => {
     setEditingFaq(null);
@@ -207,7 +224,7 @@ export default function FAQManagement() {
         </div>
       </Card>
 
-      <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-visible">
         {loading ? (
           <div className="p-12 text-center text-gray-500">{t('common.loading', '로딩 중...')}</div>
         ) : faqs.length === 0 ? (
@@ -224,7 +241,7 @@ export default function FAQManagement() {
             <div className="overflow-x-auto -mx-4 px-4">
               <Table
                 columns={columns}
-                data={faqs}
+                data={paginatedFaqs}
               />
             </div>
             {total > pageSize && (

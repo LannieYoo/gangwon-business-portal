@@ -41,6 +41,7 @@ class MemberProfileResponse(BaseModel):
     phone: Optional[str] = None
     website: Optional[str] = None
     logo_url: Optional[str] = None
+    certificate_url: Optional[str] = None
     # Contact person fields (担当者信息 - 登录系统的经办人员)
     contact_person_name: Optional[str] = None
     contact_person_department: Optional[str] = None
@@ -91,6 +92,7 @@ class MemberProfileUpdate(BaseModel):
     phone: Optional[str] = Field(None, max_length=50)
     website: Optional[str] = Field(None, max_length=255)
     logo_url: Optional[str] = Field(None, max_length=500)
+    certificate_url: Optional[str] = Field(None, max_length=500)
     # Contact person fields (担当者信息 - 登录系统的经办人员)
     contact_person_name: Optional[str] = Field(None, max_length=100)
     contact_person_department: Optional[str] = Field(None, max_length=100)

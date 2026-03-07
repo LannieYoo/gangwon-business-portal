@@ -3,6 +3,8 @@ Authentication router.
 
 API endpoints for user authentication and authorization.
 """
+import json
+
 from fastapi import APIRouter, Depends, status, Request
 
 from ...common.modules.audit import audit_log
@@ -35,11 +37,91 @@ auth_service = AuthService()
 @router.post("/register", response_model=dict, status_code=status.HTTP_201_CREATED)
 @audit_log(action="create", resource_type="member")
 async def register(
-    data: MemberRegisterRequest,
     request: Request,
 ):
     """Register a new member."""
-    member = await auth_service.register_member(data)
+    content_type = request.headers.get("content-type", "")
+
+    if content_type.startswith("multipart/form-data"):
+        form = await request.form()
+        logo_file = form.get("logo")
+        business_license_file = form.get("businessLicenseFile")
+
+        data = MemberRegisterRequest(
+            business_number=form.get("business_number") or form.get("businessNumber") or "",
+            company_name=form.get("companyName") or "",
+            password=form.get("password") or "",
+            email=form.get("email") or "",
+            region=form.get("region") or "",
+            company_type=form.get("category") or form.get("company_type"),
+            corporate_number=form.get("corporationNumber") or form.get("corporate_number"),
+            address=form.get("address"),
+            representative=form.get("representative"),
+            contact_person=form.get("contactPersonName") or form.get("contact_person"),
+            phone=form.get("phone"),
+            representative_phone=form.get("representativePhone") or form.get("representative_phone"),
+            contact_person_phone=form.get("contactPersonPhone") or form.get("contact_person_phone"),
+            contact_person_department=form.get("contactPersonDepartment") or form.get("contact_person_department"),
+            contact_person_position=form.get("contactPersonPosition") or form.get("contact_person_position"),
+            industry=form.get("industry") or form.get("businessField"),
+            revenue=form.get("sales") or form.get("revenue"),
+            employee_count=form.get("employeeCount") or form.get("employee_count"),
+            founding_date=form.get("establishedDate") or form.get("founding_date"),
+            website=form.get("websiteUrl") or form.get("website"),
+            main_business=form.get("mainBusiness") or form.get("main_business"),
+            startup_type=form.get("startupType") or form.get("startup_type"),
+            startup_stage=form.get("startupStage") or form.get("startup_stage"),
+            ksic_major=form.get("ksicMajor") or form.get("ksic_major"),
+            ksic_sub=form.get("ksicSub") or form.get("ksic_sub"),
+            category=form.get("category"),
+            business_field=form.get("businessField") or form.get("business_field"),
+            main_industry_ksic_major=form.get("mainIndustryKsicMajor") or form.get("main_industry_ksic_major"),
+            main_industry_ksic_codes=form.get("mainIndustryKsicCodes") or form.get("main_industry_ksic_codes"),
+            gangwon_industry=form.get("gangwonIndustry") or form.get("gangwon_industry"),
+            future_tech=form.get("futureTech") or form.get("future_tech"),
+            cooperation_fields=(
+                form.get("cooperationFields")
+                or form.get("cooperation_fields")
+                or (
+                    json.dumps(form.getlist("cooperationFields[]"), ensure_ascii=False)
+                    if form.getlist("cooperationFields[]")
+                    else None
+                )
+            ),
+            representative_birth_date=form.get("representativeBirthDate") or form.get("representative_birth_date"),
+            representative_gender=form.get("representativeGender") or form.get("representative_gender"),
+            description=form.get("description"),
+            participation_programs=(
+                form.get("participationPrograms")
+                or form.get("participation_programs")
+                or (
+                    json.dumps(form.getlist("participationPrograms[]"), ensure_ascii=False)
+                    if form.getlist("participationPrograms[]")
+                    else None
+                )
+            ),
+            investment_status=form.get("investmentStatus") or form.get("investment_status"),
+            terms_agreed=(
+                (form.get("termsOfService") == "true")
+                and (form.get("privacyPolicy") == "true")
+                and (form.get("thirdPartySharing") == "true")
+            ),
+        )
+
+        member = await auth_service.register_member(
+            data,
+            logo_file=logo_file if getattr(logo_file, "filename", None) else None,
+            business_license_file=(
+                business_license_file
+                if getattr(business_license_file, "filename", None)
+                else None
+            ),
+        )
+    else:
+        body = await request.json()
+        data = MemberRegisterRequest(**body)
+        member = await auth_service.register_member(data)
+
     return {
         "message": "Registration successful. Please wait for admin approval.",
         "member_id": str(member["id"]),

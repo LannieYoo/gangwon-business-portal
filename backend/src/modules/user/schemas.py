@@ -55,6 +55,11 @@ class MemberRegisterRequest(BaseModel):
     address: Optional[str] = Field(None, description="Company address")
     representative: Optional[str] = Field(None, max_length=100, description="Representative name")
     contact_person: Optional[str] = Field(None, max_length=100, description="Contact person name")
+    phone: Optional[str] = Field(None, max_length=20, description="Company phone number")
+    representative_phone: Optional[str] = Field(None, max_length=20, description="Representative phone number")
+    contact_person_phone: Optional[str] = Field(None, max_length=20, description="Contact person phone")
+    contact_person_department: Optional[str] = Field(None, max_length=100, description="Contact person department")
+    contact_person_position: Optional[str] = Field(None, max_length=100, description="Contact person position")
 
     # Step 3: Business information
     industry: Optional[str] = Field(None, max_length=100, description="Industry sector")
@@ -64,9 +69,29 @@ class MemberRegisterRequest(BaseModel):
     website: Optional[str] = Field(None, max_length=255, description="Company website")
     main_business: Optional[str] = Field(None, description="Main business description")
 
-    # Step 4: File uploads (file IDs from upload endpoint)
-    logo_file_id: Optional[UUID] = Field(None, description="Logo file attachment ID")
-    certificate_file_id: Optional[UUID] = Field(None, description="Business certificate file ID")
+    # Startup / industry classification
+    startup_type: Optional[str] = Field(None, max_length=50, description="Startup type")
+    startup_stage: Optional[str] = Field(None, max_length=50, description="Startup stage")
+    ksic_major: Optional[str] = Field(None, max_length=10, description="KSIC major code")
+    ksic_sub: Optional[str] = Field(None, max_length=10, description="KSIC sub code")
+    category: Optional[str] = Field(None, max_length=50, description="Company category")
+    business_field: Optional[str] = Field(None, max_length=10, description="Business field code")
+    main_industry_ksic_major: Optional[str] = Field(None, max_length=50, description="Main industry KSIC major category")
+    main_industry_ksic_codes: Optional[str] = Field(None, description="Main industry KSIC sub codes (JSON)")
+    gangwon_industry: Optional[str] = Field(None, max_length=50, description="Gangwon 7 future industries")
+    future_tech: Optional[str] = Field(None, max_length=50, description="Future promising technology")
+    cooperation_fields: Optional[str] = Field(None, description="Cooperation fields (JSON array)")
+
+    # Additional info
+    representative_birth_date: Optional[date] = Field(None, description="Representative birth date")
+    representative_gender: Optional[str] = Field(None, max_length=10, description="Representative gender (male/female)")
+    description: Optional[str] = Field(None, description="Company description")
+    participation_programs: Optional[str] = Field(None, description="Participation programs (JSON array)")
+    investment_status: Optional[str] = Field(None, description="Investment status (JSON object)")
+
+    # Step 4: File uploads (URLs from upload endpoint)
+    logo_url: Optional[str] = Field(None, max_length=500, description="Logo file URL")
+    certificate_url: Optional[str] = Field(None, max_length=500, description="Business certificate file URL")
 
     # Step 5: Terms agreement
     terms_agreed: bool = Field(..., description="Terms and conditions agreement")

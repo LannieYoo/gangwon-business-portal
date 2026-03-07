@@ -8,6 +8,7 @@ import {
   MAIN_INDUSTRY_KSIC_MAJORS,
   GANGWON_FUTURE_INDUSTRIES,
   FUTURE_TECHNOLOGIES,
+  PARTICIPATION_PROGRAMS,
   getSubCategoriesByMajor,
   getMainIndustryCodesByMajor,
 } from "@/shared/enums";
@@ -27,6 +28,7 @@ export const RegisterStep4Business = ({
     getMainIndustryKsicCodesOptions,
     getGangwonIndustryOptions,
     getFutureTechOptions,
+    translateParticipationPrograms,
   } = useEnumTranslation();
 
   const [ksicSubKeys, setKsicSubKeys] = useState([]);
@@ -281,34 +283,6 @@ export const RegisterStep4Business = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("member.auth.sales")}
-        </label>
-        <input
-          type="text"
-          name="sales"
-          value={formData.sales}
-          onChange={handleChange}
-          placeholder="0"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("member.auth.employeeCount")}
-        </label>
-        <input
-          type="text"
-          name="employeeCount"
-          value={formData.employeeCount}
-          onChange={handleChange}
-          placeholder="0"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
           {t("member.auth.websiteUrl")}
         </label>
         <input
@@ -334,6 +308,50 @@ export const RegisterStep4Business = ({
         />
       </div>
 
+      {/* 企业介绍 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t("member.description", "기업 소개")}
+        </label>
+        <textarea
+          name="description"
+          value={formData.description || ""}
+          onChange={handleChange}
+          rows={3}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("member.auth.sales")}
+          </label>
+          <input
+            type="text"
+            name="sales"
+            value={formData.sales}
+            onChange={handleChange}
+            placeholder="0"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("member.auth.employeeCount")}
+          </label>
+          <input
+            type="text"
+            name="employeeCount"
+            value={formData.employeeCount}
+            onChange={handleChange}
+            placeholder="0"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+          />
+        </div>
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {t("member.auth.cooperationFields")}
@@ -355,6 +373,100 @@ export const RegisterStep4Business = ({
         <p className="mt-1 text-xs text-gray-500">
           {t("common.commaSeparatedHint", "여러 값은 쉼표로 구분해주세요")}
         </p>
+      </div>
+
+      {/* 参与项目 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t("member.participationPrograms", "참여 프로그램")}
+        </label>
+        <div className="space-y-2">
+          {PARTICIPATION_PROGRAMS.map((prog) => (
+            <label key={prog} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.participationPrograms?.includes(prog) || false}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setFormData((prev) => ({
+                    ...prev,
+                    participationPrograms: checked
+                      ? [...(prev.participationPrograms || []), prog]
+                      : (prev.participationPrograms || []).filter((p) => p !== prog),
+                  }));
+                }}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">
+                {translateParticipationPrograms(prog)}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* 投资状况 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t("member.investmentStatus", "투자 현황")}
+        </label>
+        <div className="space-y-3 p-3 border border-gray-200 rounded-lg">
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">
+              {t("common.investmentYesNo", "투자 유무")}
+            </label>
+            <select
+              value={formData.investmentStatus?.hasInvestment ? "true" : "false"}
+              onChange={(e) => {
+                const has = e.target.value === "true";
+                setFormData((prev) => ({
+                  ...prev,
+                  investmentStatus: { ...prev.investmentStatus, hasInvestment: has },
+                }));
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+            >
+              <option value="false">{t("common.no", "아니오")}</option>
+              <option value="true">{t("common.yes", "예")}</option>
+            </select>
+          </div>
+          {formData.investmentStatus?.hasInvestment && (
+            <>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">
+                  {t("common.investmentAmount", "투자 금액")}
+                </label>
+                <input
+                  type="text"
+                  value={formData.investmentStatus?.amount || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      investmentStatus: { ...prev.investmentStatus, amount: e.target.value },
+                    }))
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">
+                  {t("common.investmentInstitution", "투자 기관")}
+                </label>
+                <input
+                  type="text"
+                  value={formData.investmentStatus?.institution || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      investmentStatus: { ...prev.investmentStatus, institution: e.target.value },
+                    }))
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

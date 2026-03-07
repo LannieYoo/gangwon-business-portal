@@ -68,64 +68,13 @@ class AuthService {
 
   // 会员注册
   async register(userData) {
-    let registrationData;
-
     if (userData instanceof FormData) {
-      const data = {};
-      const files = {};
-
-      for (const [key, value] of userData.entries()) {
-        if (value instanceof File) {
-          files[key] = value;
-        } else if (key.endsWith("[]")) {
-          const fieldName = key.replace("[]", "");
-          if (!data[fieldName]) {
-            data[fieldName] = [];
-          }
-          data[fieldName].push(value);
-        } else {
-          data[key] = value;
-        }
-      }
-
-      let logoFileId = null;
-      let certificateFileId = null;
-
-      registrationData = {
-        business_number:
-          data.businessNumber?.replace(/-/g, "") || data.business_number,
-        company_name: data.companyName,
-        password: data.password,
-        email: data.email,
-        region: data.region || null,
-        company_type: data.category || null,
-        corporate_number: data.corporationNumber?.replace(/-/g, "") || null,
-        address: data.address || null,
-        representative: data.representative || null,
-        contact_person: data.contactPersonName || null,
-        industry: data.businessField || null,
-        revenue: data.sales ? parseFloat(data.sales.replace(/,/g, "")) : null,
-        employee_count: data.employeeCount
-          ? parseInt(data.employeeCount.replace(/,/g, ""), 10)
-          : null,
-        founding_date: data.establishedDate || null,
-        website: data.websiteUrl || null,
-        main_business: data.mainBusiness || null,
-        logo_file_id: logoFileId,
-        certificate_file_id: certificateFileId,
-        terms_agreed: !!(
-          (data.termsOfService === "true" || data.termsOfService === true) &&
-          (data.privacyPolicy === "true" || data.privacyPolicy === true) &&
-          (data.thirdPartySharing === "true" || data.thirdPartySharing === true)
-        ),
-      };
-    } else {
-      registrationData = userData;
+      return await apiService.post(`${API_PREFIX}/auth/register`, userData);
     }
 
     return await apiService.post(
       `${API_PREFIX}/auth/register`,
-      registrationData,
+      userData,
     );
   }
 

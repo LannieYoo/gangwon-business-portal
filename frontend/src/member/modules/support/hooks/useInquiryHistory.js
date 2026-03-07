@@ -49,22 +49,23 @@ export function useInquiryHistory(pageSize = 10) {
 
   // 使用共享的分页 hook
   const pagination = usePagination({ items: allFilteredThreads, pageSize });
+  const { resetPage } = pagination;
 
   const handleFilterChange = useCallback(
     (filtered) => {
       setFilteredThreads(filtered);
-      pagination.resetPage();
+      resetPage();
     },
-    [pagination],
+    [resetPage],
   );
 
   // 状态筛选改变时重置页码
   const handleStatusFilterChange = useCallback(
     (value) => {
       setStatusFilter(value);
-      pagination.resetPage();
+      resetPage();
     },
-    [pagination],
+    [resetPage],
   );
 
   const openDetailModal = (threadId) => {

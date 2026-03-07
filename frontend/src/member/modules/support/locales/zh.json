@@ -157,10 +157,14 @@
           "subject": "会员管理通知",
           "newRegistration": "新会员注册",
           "newRegistrationContent": "{{companyName}} (营业执照号: {{businessNumber}}, 邮箱: {{email}}) 申请了会员注册。",
-          "approved": "会员注册批准",
-          "approvedContent": "{{companyName}}的会员注册已批准。",
-          "rejected": "会员注册拒绝",
-          "rejectedContent": "{{companyName}}的会员注册已拒绝。原因: {{reason}}",
+          "approved": {
+            "subject": "会员注册批准",
+            "content": "{{companyName}}的会员注册已批准。"
+          },
+          "rejected": {
+            "subject": "会员注册拒绝",
+            "content": "{{companyName}}的会员注册已拒绝。原因: {{reason}}"
+          },
           "registration": {
             "subject": "[会员管理] 新会员注册申请",
             "content": "{{companyName}} (营业执照号: {{businessNumber}})申请了会员注册。\n邮箱: {{email}}"

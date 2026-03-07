@@ -85,22 +85,23 @@ export function useFAQ(pageSize = 10) {
 
   // 使用共享的分页 hook
   const pagination = usePagination({ items: allFilteredFaqs, pageSize });
+  const { resetPage } = pagination;
 
   const handleFilterChange = useCallback(
     (filtered) => {
       setFilteredFaqs(filtered);
-      pagination.resetPage();
+      resetPage();
     },
-    [pagination],
+    [resetPage],
   );
 
   // 分类筛选改变时重置页码
   const handleCategoryChange = useCallback(
     (value) => {
       setSelectedCategory(value);
-      pagination.resetPage();
+      resetPage();
     },
-    [pagination],
+    [resetPage],
   );
 
   const toggleExpand = (id) => {

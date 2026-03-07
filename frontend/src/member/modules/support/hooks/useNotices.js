@@ -80,22 +80,23 @@ export function useNotices(pageSize = 10) {
 
   // 使用共享的分页 hook
   const pagination = usePagination({ items: allFilteredNotices, pageSize });
+  const { resetPage } = pagination;
 
   const handleFilterChange = useCallback(
     (filtered) => {
       setFilteredNotices(filtered);
-      pagination.resetPage();
+      resetPage();
     },
-    [pagination],
+    [resetPage],
   );
 
   // 重要性筛选改变时重置页码
   const handleImportanceFilterChange = useCallback(
     (value) => {
       setImportanceFilter(value);
-      pagination.resetPage();
+      resetPage();
     },
-    [pagination],
+    [resetPage],
   );
 
   const handleNoticeClick = (noticeId) => {

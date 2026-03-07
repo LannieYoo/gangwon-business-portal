@@ -155,6 +155,22 @@ async def reset_member_to_pending(
     }
 
 
+@router.delete("/api/admin/members/{member_id:uuid}", response_model=dict)
+@audit_log(action="delete", resource_type="member")
+async def delete_member(
+    member_id: UUID,
+    request: Request,
+    current_user: dict = Depends(get_current_admin_user),
+):
+    """Delete a member (admin only, hard delete)."""
+    await member_service.delete_member(member_id)
+    
+    return {
+        "message": "Member deleted successfully",
+        "member_id": str(member_id),
+    }
+
+
 @router.post(
     "/api/members/verify-company",
     response_model=CompanyVerifyResponse,

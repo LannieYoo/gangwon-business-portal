@@ -8,6 +8,7 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from uuid import UUID, uuid4
+from fastapi import UploadFile
 
 from ...common.modules.config import settings
 from ...common.modules.supabase.service import supabase_service
@@ -21,6 +22,7 @@ from ...common.modules.exception import (
     format_operation_failed,
 )
 from .schemas import MemberRegisterRequest
+from ..upload.service import UploadService
 
 from enum import Enum
 
@@ -115,7 +117,10 @@ class AuthService:
             raise AuthorizationError(CMessageTemplate.AUTH_INVALID_TOKEN)
 
     async def register_member(
-        self, data: MemberRegisterRequest
+        self,
+        data: MemberRegisterRequest,
+        logo_file: Optional[UploadFile] = None,
+        business_license_file: Optional[UploadFile] = None,
     ) -> dict:
         """
         Register a new member.
@@ -139,6 +144,32 @@ class AuthService:
         if existing_email:
             raise ValidationError(CMessageTemplate.VALIDATION_EMAIL_IN_USE)
 
+        logo_url = data.logo_url
+        certificate_url = data.certificate_url
+        upload_service = UploadService()
+
+        if logo_file:
+            try:
+                upload_result = await upload_service.upload_public_file(
+                    file=logo_file,
+                    user={"business_number": data.business_number},
+                    resource_type="registration",
+                )
+                logo_url = upload_result["file_url"]
+            except Exception as exc:
+                raise ValidationError("REGISTER_LOGO_UPLOAD_FAILED") from exc
+
+        if business_license_file:
+            try:
+                upload_result = await upload_service.upload_public_file(
+                    file=business_license_file,
+                    user={"business_number": data.business_number},
+                    resource_type="registration",
+                )
+                certificate_url = upload_result["file_url"]
+            except Exception as exc:
+                raise ValidationError("REGISTER_BUSINESS_LICENSE_UPLOAD_FAILED") from exc
+
         member_id = str(uuid4())
         
         # Create member record with profile fields (merged schema)
@@ -159,6 +190,32 @@ class AuthService:
             "address": data.address,
             "representative": data.representative,
             "website": data.website,
+            "phone": data.phone,
+            "representative_phone": data.representative_phone,
+            "contact_person_name": data.contact_person,
+            "contact_person_phone": data.contact_person_phone,
+            "contact_person_department": data.contact_person_department,
+            "contact_person_position": data.contact_person_position,
+            "main_business": data.main_business,
+            "legal_number": data.corporate_number,
+            "startup_type": data.startup_type,
+            "startup_stage": data.startup_stage,
+            "ksic_major": data.ksic_major,
+            "ksic_sub": data.ksic_sub,
+            "category": data.category,
+            "business_field": data.business_field,
+            "main_industry_ksic_major": data.main_industry_ksic_major,
+            "main_industry_ksic_codes": data.main_industry_ksic_codes,
+            "gangwon_industry": data.gangwon_industry,
+            "future_tech": data.future_tech,
+            "cooperation_fields": data.cooperation_fields,
+            "representative_birth_date": data.representative_birth_date.isoformat() if data.representative_birth_date else None,
+            "representative_gender": data.representative_gender,
+            "description": data.description,
+            "participation_programs": data.participation_programs,
+            "investment_status": data.investment_status,
+            "logo_url": logo_url,
+            "certificate_url": certificate_url,
             "created_at": datetime.utcnow().isoformat(),
             "updated_at": datetime.utcnow().isoformat(),
         }

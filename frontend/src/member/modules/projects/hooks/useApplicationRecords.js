@@ -43,13 +43,14 @@ export function useApplicationRecords(pageSize = 10) {
 
   // 使用共享的分页 hook
   const pagination = usePagination({ items: filteredApplications, pageSize });
+  const { resetPage } = pagination;
 
   const handleFilterChange = useCallback(
     (filtered) => {
       setFilteredApplications(filtered);
-      pagination.resetPage();
+      resetPage();
     },
-    [pagination],
+    [resetPage],
   );
 
   const { getStatusInfo } = useApplicationStatus();

@@ -58,6 +58,15 @@ class MembersService {
   }
 
   /**
+   * 删除会员
+   * @param {string} memberId - 会员ID
+   * @returns {Promise<Object>} 操作结果
+   */
+  async deleteMember(memberId) {
+    return await apiService.delete(`${API_PREFIX}/admin/members/${memberId}`);
+  }
+
+  /**
    * 查询 Nice D&B 企业信息
    * @param {string} businessNumber - 企业注册号
    * @returns {Promise<Object>} 企业信息

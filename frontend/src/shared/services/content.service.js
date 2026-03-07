@@ -29,6 +29,16 @@ class ContentService {
     return await apiService.get(`${API_PREFIX}/legal-content/${type}`);
   }
 
+  /**
+   * 更新法律内容 (Admin)
+   * @param {string} type - 内容类型
+   * @param {Object} data - { contentHtml: string }
+   * @returns {Promise<Object>} 更新后的法律内容
+   */
+  async updateLegalContent(type, data) {
+    return await apiService.put(`${API_PREFIX}/admin/content/legal/${type}`, data);
+  }
+
   // ===== 公告管理 (Notices) =====
 
   /**

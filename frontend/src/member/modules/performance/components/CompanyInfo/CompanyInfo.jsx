@@ -40,6 +40,7 @@ const CompanyInfo = () => {
     messageVariant,
     companyData,
     uploadingLogo,
+    uploadingCertificate,
     handleChange,
     handleCooperationFieldChange,
     handleParticipationProgramChange,
@@ -47,6 +48,7 @@ const CompanyInfo = () => {
     handleSave,
     handleCancel,
     handleLogoUpload,
+    handleCertificateUpload,
   } = useCompanyInfo();
 
   if (!isAuthenticated) {
@@ -122,7 +124,9 @@ const CompanyInfo = () => {
           isEditing={isEditing}
           onChange={handleChange}
           onLogoUpload={handleLogoUpload}
+          onCertificateUpload={handleCertificateUpload}
           uploadingLogo={uploadingLogo}
+          uploadingCertificate={uploadingCertificate}
           errors={fieldErrors}
         />
 

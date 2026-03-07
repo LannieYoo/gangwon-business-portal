@@ -58,6 +58,7 @@ export const useCompanyInfo = () => {
     website: "",
     logoUrl: null,
     logoPreview: null,
+    certificateUrl: null,
     businessField: "",
     revenue: "",
     employeeCount: "",
@@ -81,6 +82,7 @@ export const useCompanyInfo = () => {
   });
 
   const { uploading: uploadingLogo, upload: uploadLogo } = useUpload();
+  const { uploading: uploadingCertificate, upload: uploadCertificate } = useUpload();
   const logoPreviewRef = useRef(null);
 
   const cleanupLogoPreview = useCallback(() => {
@@ -125,6 +127,7 @@ export const useCompanyInfo = () => {
         website: profile.website || "",
         logoUrl: profile.logoUrl || null,
         logoPreview: null,
+        certificateUrl: profile.certificateUrl || null,
         businessField: profile.businessField || "",
         revenue: profile.revenue ? formatNumber(profile.revenue) : "",
         employeeCount: profile.employeeCount
@@ -344,6 +347,7 @@ export const useCompanyInfo = () => {
         representativePhone: companyData.representativePhone,
         phone: companyData.phone,
         logoUrl: companyData.logoUrl,
+        certificateUrl: companyData.certificateUrl,
         // Contact person fields
         contactPersonName: companyData.contactPersonName,
         contactPersonDepartment: companyData.contactPersonDepartment,
@@ -420,6 +424,31 @@ export const useCompanyInfo = () => {
     }
   };
 
+  const handleCertificateUpload = async (file) => {
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      setMessageVariant("error");
+      setMessage(validation.error);
+      return;
+    }
+
+    try {
+      const uploadResponse = await uploadCertificate(file);
+      setCompanyData((prev) => ({
+        ...prev,
+        certificateUrl: uploadResponse.fileUrl || uploadResponse.url,
+      }));
+      setMessageVariant("success");
+      setMessage(
+        t("member.performance.companyInfo.message.certificateUploadSuccess", "사업자등록증 업로드 성공"),
+      );
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      setMessageVariant("error");
+      setMessage(t("common.uploadFailed", "업로드에 실패했습니다"));
+    }
+  };
+
   return {
     isAuthenticated,
     isEditing,
@@ -431,6 +460,7 @@ export const useCompanyInfo = () => {
     messageVariant,
     companyData,
     uploadingLogo,
+    uploadingCertificate,
     handleChange,
     handleCooperationFieldChange,
     handleParticipationProgramChange,
@@ -438,5 +468,6 @@ export const useCompanyInfo = () => {
     handleSave,
     handleCancel,
     handleLogoUpload,
+    handleCertificateUpload,
   };
 };

@@ -22,6 +22,30 @@ import { uploadService, apiService } from "@shared/services";
 import { formatDate } from "@shared/utils";
 import { API_PREFIX } from "@shared/utils/constants";
 
+// 如果正文里已经包含同一张封面图，则隐藏单独的代表图片，避免重复展示。
+// Hide the standalone cover preview when the rich content already renders the same image.
+const hasDuplicatedCoverImage = (contentHtml, coverImageUrl) => {
+  if (!contentHtml || !coverImageUrl || !/<img\b/i.test(contentHtml)) {
+    return false;
+  }
+
+  const normalizeUrl = (value) => {
+    try {
+      return decodeURIComponent(value).trim().toLowerCase();
+    } catch {
+      return value.trim().toLowerCase();
+    }
+  };
+
+  const normalizedCoverImageUrl = normalizeUrl(coverImageUrl);
+  if (contentHtml.toLowerCase().includes(normalizedCoverImageUrl)) {
+    return true;
+  }
+
+  const coverImageName = normalizedCoverImageUrl.split("/").pop();
+  return coverImageName ? contentHtml.toLowerCase().includes(coverImageName) : false;
+};
+
 export default function ProjectDetail() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
@@ -453,6 +477,12 @@ export default function ProjectDetail() {
   }
 
   const attachments = getAttachments();
+  const projectContentHtml = project.description || project.content || "";
+  const coverImageUrl = project.imageUrl || project.image || "";
+  const shouldShowCoverImage = !hasDuplicatedCoverImage(
+    projectContentHtml,
+    coverImageUrl,
+  );
 
   return (
     <div className="w-full">
@@ -485,7 +515,7 @@ export default function ProjectDetail() {
       {/* 基本信息和封面图片 - 左右布局 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* 左侧：基本信息 */}
-        <Card className="lg:col-span-2 p-6">
+        <Card className={shouldShowCoverImage ? "lg:col-span-2 p-6" : "lg:col-span-3 p-6"}>
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 m-0">
               {t("admin.projects.detail.basicInfo", "기본 정보")}
@@ -540,45 +570,47 @@ export default function ProjectDetail() {
         </Card>
 
         {/* 右侧：封面图片 */}
-        <Card className="p-6">
-          <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900 m-0">
-              {t("admin.projects.detail.image", "대표 이미지")}
-            </h2>
-          </div>
-          <div className="flex justify-center items-center h-48">
-            {project.imageUrl || project.image ? (
-              <img
-                src={project.imageUrl || project.image}
-                alt={project.title}
-                className="max-w-full max-h-48 object-contain rounded-lg border border-gray-200"
-              />
-            ) : (
-              <div className="text-gray-400 text-center">
-                <svg
-                  className="w-16 h-16 mx-auto mb-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <p className="text-sm">
-                  {t("admin.projects.detail.noImage", "표지 이미지가 없습니다")}
-                </p>
-              </div>
-            )}
-          </div>
-        </Card>
+        {shouldShowCoverImage && (
+          <Card className="p-6">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900 m-0">
+                {t("admin.projects.detail.image", "대표 이미지")}
+              </h2>
+            </div>
+            <div className="flex justify-center items-center h-48">
+              {coverImageUrl ? (
+                <img
+                  src={coverImageUrl}
+                  alt={project.title}
+                  className="max-w-full max-h-48 object-contain rounded-lg border border-gray-200"
+                />
+              ) : (
+                <div className="text-gray-400 text-center">
+                  <svg
+                    className="w-16 h-16 mx-auto mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <p className="text-sm">
+                    {t("admin.projects.detail.noImage", "표지 이미지가 없습니다")}
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
+        )}
       </div>
 
       {/* 项目详情卡片 */}
-      {(project.description || project.content) && (
+      {projectContentHtml && (
         <Card className="mb-6 p-6">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 m-0">
@@ -593,7 +625,7 @@ export default function ProjectDetail() {
                 overflowWrap: "break-word",
               }}
               dangerouslySetInnerHTML={{
-                __html: project.description || project.content || "",
+                __html: projectContentHtml,
               }}
             />
           </div>

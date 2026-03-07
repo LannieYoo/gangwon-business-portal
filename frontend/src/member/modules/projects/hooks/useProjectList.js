@@ -34,13 +34,14 @@ export function useProjectList(pageSize = 10) {
 
   // 使用共享的分页 hook
   const pagination = usePagination({ items: filteredProjects, pageSize });
+  const { resetPage } = pagination;
 
   const handleFilterChange = useCallback(
     (filtered) => {
       setFilteredProjects(filtered);
-      pagination.resetPage();
+      resetPage();
     },
-    [pagination],
+    [resetPage],
   );
 
   const checkAndOpenModal = useCallback(

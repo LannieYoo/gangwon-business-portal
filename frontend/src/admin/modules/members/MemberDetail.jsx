@@ -53,6 +53,8 @@ export default function MemberDetail() {
   const [niceDnbError, setNiceDnbError] = useState(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
     loadMemberDetail();
@@ -102,6 +104,21 @@ export default function MemberDetail() {
     setRejectReason("");
   };
 
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await membersService.deleteMember(id);
+      setShowDeleteModal(false);
+      showSuccess(t("admin.members.deleteSuccess", "삭제 성공"));
+      navigate("/admin/members");
+    } catch (error) {
+      showError(t("admin.members.deleteFailed", "삭제 실패"));
+    }
+  };
+
   const handleSearchNiceDnb = async () => {
     if (!member || !member.businessNumber) {
       setNiceDnbError(
@@ -148,6 +165,9 @@ export default function MemberDetail() {
           {t("common.back")}
         </Button>
         <div className="flex gap-4">
+          <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50" onClick={handleDelete}>
+            {t("common.delete", "삭제")}
+          </Button>
           {member.approvalStatus === "pending" && (
             <>
               <Button variant="outline" onClick={handleReject}>
@@ -169,27 +189,63 @@ export default function MemberDetail() {
           </h2>
         </div>
 
-        {/* Logo Display */}
+        {/* Logo & Certificate Display */}
         <div className="mb-6 pb-6 border-b border-gray-200">
-          <label className="block text-sm text-gray-600 font-medium mb-3">
-            {t("performance.companyInfo.sections.logo", "기업 로고")}
-          </label>
-          {member.logoUrl ? (
-            <div className="w-24 h-24 sm:w-32 sm:h-32 border-2 border-gray-200 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
-              <img
-                src={member.logoUrl}
-                alt="Company Logo"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
-              />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            {/* Logo */}
+            <div>
+              <label className="block text-sm text-gray-600 font-medium mb-3">
+                {t("performance.companyInfo.sections.logo", "기업 로고")}
+              </label>
+              {member.logoUrl ? (
+                <div className="flex flex-col items-start gap-2">
+                  <div
+                    className="w-32 h-32 border-2 border-gray-200 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer hover:border-blue-300 hover:shadow-md transition-all"
+                    onClick={() => setPreviewImage({ url: member.logoUrl, title: t("performance.companyInfo.sections.logo", "기업 로고") })}
+                  >
+                    <img
+                      key="logo"
+                      src={member.logoUrl}
+                      alt="Company Logo"
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.target.style.display = "none"; }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 text-gray-500 text-xs sm:text-sm">
+                  {t("performance.companyInfo.profile.noLogo", "로고 없음")}
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="w-24 h-24 sm:w-32 sm:h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 text-gray-500 text-xs sm:text-sm">
-              {t("performance.companyInfo.profile.noLogo", "로고 없음")}
+
+            {/* Certificate / 사업자등록증 */}
+            <div>
+              <label className="block text-sm text-gray-600 font-medium mb-3">
+                {t("member.businessLicenseFile", "사업자등록증")}
+              </label>
+              {member.certificateUrl ? (
+                <div className="flex flex-col items-start gap-2">
+                  <div
+                    className="w-32 h-32 border-2 border-gray-200 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer hover:border-blue-300 hover:shadow-md transition-all"
+                    onClick={() => setPreviewImage({ url: member.certificateUrl, title: t("member.businessLicenseFile", "사업자등록증") })}
+                  >
+                    <img
+                      key="cert"
+                      src={member.certificateUrl}
+                      alt={t("member.businessLicenseFile", "사업자등록증")}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.target.style.display = "none"; }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 text-gray-500 text-xs sm:text-sm">
+                  {t("common.noFile", "파일 없음")}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -261,7 +317,7 @@ export default function MemberDetail() {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600 font-medium">
-              {t("member.phone", "기업 전화번호")}
+              {t("member.phone", "회사대표 전화번호")}
             </label>
             <span className="text-base text-gray-900">
               {member.phone || "-"}
@@ -976,6 +1032,59 @@ export default function MemberDetail() {
               </Button>
               <Button variant="danger" onClick={handleConfirmReject}>
                 {t("common.confirm", "확인")}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <Modal
+          isOpen={!!previewImage}
+          onClose={() => setPreviewImage(null)}
+          title={previewImage.title}
+          size="lg"
+        >
+          <div className="flex flex-col items-center gap-4">
+            <div className="max-h-[70vh] overflow-auto">
+              <img
+                src={previewImage.url}
+                alt={previewImage.title}
+                className="max-w-full h-auto rounded-lg"
+              />
+            </div>
+            <a
+              href={previewImage.url}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center font-medium no-underline rounded-md transition-all duration-200 bg-primary-600 text-white hover:bg-primary-700 hover:text-white px-4 py-2 text-base min-h-[40px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t("common.download", "다운로드")}
+            </a>
+          </div>
+        </Modal>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <Modal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          title={t("admin.members.deleteConfirmTitle", "회원 삭제")}
+          size="md"
+        >
+          <div className="space-y-4">
+            <p className="text-gray-700">
+              {t("admin.members.deleteConfirmMessage", "정말로 이 회원을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")}
+            </p>
+            <div className="flex justify-end space-x-3">
+              <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+                {t("common.cancel", "취소")}
+              </Button>
+              <Button variant="danger" onClick={handleConfirmDelete}>
+                {t("common.delete", "삭제")}
               </Button>
             </div>
           </div>

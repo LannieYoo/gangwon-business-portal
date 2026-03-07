@@ -155,10 +155,14 @@
           "subject": "회원 관리 알림",
           "newRegistration": "새로운 회원 가입",
           "newRegistrationContent": "{{companyName}} (사업자번호: {{businessNumber}}, 이메일: {{email}})에서 회원 가입을 신청했습니다.",
-          "approved": "회원 가입 승인",
-          "approvedContent": "{{companyName}}의 회원 가입이 승인되었습니다.",
-          "rejected": "회원 가입 거부",
-          "rejectedContent": "{{companyName}}의 회원 가입이 거부되었습니다. 사유: {{reason}}",
+          "approved": {
+            "subject": "회원 가입 승인",
+            "content": "{{companyName}}의 회원 가입이 승인되었습니다."
+          },
+          "rejected": {
+            "subject": "회원 가입 거부",
+            "content": "{{companyName}}의 회원 가입이 거부되었습니다. 사유: {{reason}}"
+          },
           "registration": {
             "subject": "[회원 관리] 새로운 회원 가입 신청",
             "content": "{{companyName}} (사업자번호: {{businessNumber}})에서 회원 가입을 신청했습니다.\n이메일: {{email}}"
