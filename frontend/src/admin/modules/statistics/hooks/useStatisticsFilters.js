@@ -308,11 +308,10 @@ export const useStatisticsFilters = (initialFilters = {}) => {
       // 创业阶段（使用共享 enums）
       if (filters.startupStages?.length > 0) {
         const stageKeyMap = {
-          pre_startup: "preliminary",
-          initial: "startupUnder3Years",
-          growth: "growthOver7Years",
-          leap: "growthOver7Years",
-          re_startup: "restart",
+          preliminary: "preliminary",
+          startup_under_3years: "startupUnder3Years",
+          growth_over_7years: "growthOver7Years",
+          restart: "restart",
         };
         filters.startupStages.forEach((stage) => {
           const enumKey = stageKeyMap[stage] || stage;

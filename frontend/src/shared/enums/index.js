@@ -248,6 +248,7 @@ export const GANGWON_FUTURE_INDUSTRIES = [
   "food_tech",
   "advanced_defense",
   "climate_tech",
+  "new_materials",
 ];
 
 /**

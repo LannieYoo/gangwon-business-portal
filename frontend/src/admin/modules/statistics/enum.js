@@ -71,15 +71,15 @@ export const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
  */
 export const STARTUP_STAGE = {
   /** 预备创业 (예비창업) */
-  PRE_STARTUP: "pre_startup",
-  /** 初创期 (초기) */
-  INITIAL: "initial",
-  /** 成长期 (성장) */
-  GROWTH: "growth",
-  /** 跳跃期 (도약) */
+  PRE_STARTUP: "preliminary",
+  /** 创业3年以内 (창업 3년 이내) */
+  INITIAL: "startup_under_3years",
+  /** 成长期7年以上 (성장기 7년 이상) */
+  GROWTH: "growth_over_7years",
+  /** 跳跃期 (도약) — 与成长期合并显示 */
   LEAP: "leap",
   /** 再创业 (재창업) */
-  RE_STARTUP: "re_startup",
+  RE_STARTUP: "restart",
 };
 
 /**
@@ -97,10 +97,6 @@ export const STARTUP_STAGE_OPTIONS = [
   {
     value: STARTUP_STAGE.GROWTH,
     labelKey: "enums.industry.startupStage.growthOver7Years",
-  },
-  {
-    value: STARTUP_STAGE.LEAP,
-    labelKey: "enums.industry.startupStage.growthOver7Years", // 跃进期也使用成长期翻译
   },
   {
     value: STARTUP_STAGE.RE_STARTUP,
